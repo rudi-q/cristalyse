@@ -17,7 +17,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  cristalyse: ^0.1.0
+  cristalyse: ^0.2.0
 ```
 
 ## Quick Example
