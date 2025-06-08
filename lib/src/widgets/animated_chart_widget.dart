@@ -333,8 +333,9 @@ class _AnimatedChartPainter extends CustomPainter {
     for (final tick in xTicks) {
       if (!tick.isFinite) continue;
       final x = plotArea.left + xScale.scale(tick);
-      if (!x.isFinite || x < plotArea.left - 10 || x > plotArea.right + 10)
+      if (!x.isFinite || x < plotArea.left - 10 || x > plotArea.right + 10) {
         continue;
+      }
 
       canvas.drawLine(
         Offset(x, plotArea.top),
@@ -348,8 +349,9 @@ class _AnimatedChartPainter extends CustomPainter {
     for (final tick in yTicks) {
       if (!tick.isFinite) continue;
       final y = plotArea.top + yScale.scale(tick);
-      if (!y.isFinite || y < plotArea.top - 10 || y > plotArea.bottom + 10)
+      if (!y.isFinite || y < plotArea.top - 10 || y > plotArea.bottom + 10) {
         continue;
+      }
 
       canvas.drawLine(
         Offset(plotArea.left, y),
@@ -415,8 +417,9 @@ class _AnimatedChartPainter extends CustomPainter {
       if (screenX < 0 ||
           screenX > plotArea.right ||
           screenY < 0 ||
-          screenY > plotArea.bottom + 100)
+          screenY > plotArea.bottom + 100) {
         continue;
+      }
 
       // Staggered animation - each point appears slightly after the previous
       final pointDelay =
@@ -447,8 +450,9 @@ class _AnimatedChartPainter extends CustomPainter {
 
       // Animate size (scale up from 0) with validation
       final animatedSize = math.max(0.0, baseSize * pointProgress);
-      if (!animatedSize.isFinite || animatedSize > 100)
+      if (!animatedSize.isFinite || animatedSize > 100) {
         continue; // Sanity check
+      }
 
       // Animate opacity with validation
       final animatedAlpha = math.max(
@@ -646,8 +650,9 @@ class _AnimatedChartPainter extends CustomPainter {
       for (final tick in xTicks) {
         if (!tick.isFinite) continue;
         final x = plotArea.left + xScale.scale(tick);
-        if (!x.isFinite || x < plotArea.left - 100 || x > plotArea.right + 100)
+        if (!x.isFinite || x < plotArea.left - 100 || x > plotArea.right + 100) {
           continue;
+        }
 
         // Safely get the axis text color and apply opacity
         final baseTextColor = theme.axisTextStyle.color ?? Colors.black87;
@@ -668,8 +673,9 @@ class _AnimatedChartPainter extends CustomPainter {
       for (final tick in yTicks) {
         if (!tick.isFinite) continue;
         final y = plotArea.top + yScale.scale(tick);
-        if (!y.isFinite || y < plotArea.top - 100 || y > plotArea.bottom + 100)
+        if (!y.isFinite || y < plotArea.top - 100 || y > plotArea.bottom + 100) {
           continue;
+        }
 
         // Safely get the axis text color and apply opacity
         final baseTextColor = theme.axisTextStyle.color ?? Colors.black87;

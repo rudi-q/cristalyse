@@ -1,3 +1,8 @@
+## 0.2.3 - 2025-06-08
+
+#### Technical
+- Code quality improvements and linting compliance
+
 ### 0.2.2 - 2025-06-08
 
 #### Documentation
