@@ -1,4 +1,3 @@
-// lib/src/widgets/chart_widget.dart
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../core/geometry.dart';
@@ -235,6 +234,14 @@ class _ChartPainter extends CustomPainter {
           yScale,
           colorScale,
           sizeScale);
+    } else if (geometry is LineGeometry) {
+      _drawLines(
+          canvas,
+          plotArea,
+          geometry,
+          xScale,
+          yScale,
+          colorScale);
     }
   }
 
@@ -271,6 +278,80 @@ class _ChartPainter extends CustomPainter {
     }
   }
 
+  void _drawLines(Canvas canvas,
+      Rect plotArea,
+      LineGeometry geometry,
+      LinearScale xScale,
+      LinearScale yScale,
+      ColorScale colorScale) {
+
+    if (colorColumn != null) {
+      // Group by color and draw separate lines
+      final groupedData = <dynamic, List<Map<String, dynamic>>>{};
+      for (final point in data) {
+        final colorValue = point[colorColumn];
+        groupedData.putIfAbsent(colorValue, () => []).add(point);
+      }
+
+      for (final entry in groupedData.entries) {
+        final colorValue = entry.key;
+        final groupData = entry.value;
+        final lineColor = geometry.color ?? colorScale.scale(colorValue);
+        _drawSingleLine(canvas, plotArea, groupData, xScale, yScale, lineColor, geometry);
+      }
+    } else {
+      // Draw single line for all data
+      final lineColor = geometry.color ?? theme.primaryColor;
+      _drawSingleLine(canvas, plotArea, data, xScale, yScale, lineColor, geometry);
+    }
+  }
+
+  void _drawSingleLine(Canvas canvas,
+      Rect plotArea,
+      List<Map<String, dynamic>> lineData,
+      LinearScale xScale,
+      LinearScale yScale,
+      Color color,
+      LineGeometry geometry) {
+
+    // Sort data by x value for proper line connection
+    final sortedData = List<Map<String, dynamic>>.from(lineData);
+    sortedData.sort((a, b) {
+      final aX = _getNumericValue(a[xColumn]) ?? 0;
+      final bX = _getNumericValue(b[xColumn]) ?? 0;
+      return aX.compareTo(bX);
+    });
+
+    final points = <Offset>[];
+    for (final point in sortedData) {
+      final x = _getNumericValue(point[xColumn]);
+      final y = _getNumericValue(point[yColumn]);
+
+      if (x == null || y == null) continue;
+
+      final screenX = plotArea.left + xScale.scale(x);
+      final screenY = plotArea.top + yScale.scale(y);
+      points.add(Offset(screenX, screenY));
+    }
+
+    if (points.length < 2) return;
+
+    final paint = Paint()
+      ..color = color.withOpacity(geometry.alpha)
+      ..strokeWidth = geometry.strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final path = Path();
+    path.moveTo(points.first.dx, points.first.dy);
+    for (int i = 1; i < points.length; i++) {
+      path.lineTo(points[i].dx, points[i].dy);
+    }
+
+    canvas.drawPath(path, paint);
+  }
+
   void _drawAxes(Canvas canvas, Size size, Rect plotArea, LinearScale xScale,
       LinearScale yScale) {
     final paint = Paint()
@@ -303,7 +384,7 @@ class _ChartPainter extends CustomPainter {
     final yTicks = yScale.getTicks(5);
     for (final tick in yTicks) {
       final y = plotArea.top + yScale.scale(tick);
-      _drawText(canvas, _formatNumber(tick), Offset(plotArea.left - 10, y),
+      _drawText(canvas, _formatNumber(tick), Offset(plotArea.left - 40, y - 6),
           theme.axisTextStyle);
     }
   }
@@ -317,7 +398,10 @@ class _ChartPainter extends CustomPainter {
   }
 
   void _drawText(Canvas canvas, String text, Offset position, TextStyle style) {
-    final textPainter = TextPainter(text: TextSpan(text: text, style: style),);
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr, // This was the missing piece!
+    );
     textPainter.layout();
     textPainter.paint(canvas, position);
   }

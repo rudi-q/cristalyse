@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../widgets/animated_chart_widget.dart';
 import 'geometry.dart';
 import 'scale.dart';
 import '../themes/chart_theme.dart';
@@ -18,6 +19,10 @@ class CristalyseChart {
   ColorScale? _colorScale;
   SizeScale? _sizeScale;
   ChartTheme _theme = ChartTheme.defaultTheme();
+
+  // Animation properties
+  Duration _animationDuration = const Duration(milliseconds: 300);
+  Curve _animationCurve = Curves.easeInOut;
 
   /// Set the data source for the chart
   ///
@@ -71,6 +76,27 @@ class CristalyseChart {
     return this;
   }
 
+  /// Add line chart
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.geom_line(strokeWidth: 2.0, alpha: 0.8)
+  /// ```
+  CristalyseChart geom_line({
+    double? strokeWidth,
+    Color? color,
+    double? alpha,
+    LineStyle? style,
+  }) {
+    _geometries.add(LineGeometry(
+      strokeWidth: strokeWidth ?? 2.0,
+      color: color,
+      alpha: alpha ?? 1.0,
+      style: style ?? LineStyle.solid,
+    ));
+    return this;
+  }
+
   /// Configure continuous X scale
   CristalyseChart scale_x_continuous({double? min, double? max}) {
     _xScale = LinearScale(min: min, max: max);
@@ -89,9 +115,27 @@ class CristalyseChart {
     return this;
   }
 
+  /// Configure animations
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.animate(
+  ///   duration: Duration(milliseconds: 500),
+  ///   curve: Curves.bounceOut,
+  /// )
+  /// ```
+  CristalyseChart animate({
+    Duration? duration,
+    Curve? curve,
+  }) {
+    _animationDuration = duration ?? _animationDuration;
+    _animationCurve = curve ?? _animationCurve;
+    return this;
+  }
+
   /// Build the chart widget
   Widget build() {
-    return CristalyseChartWidget(
+    return AnimatedCristalyseChartWidget(
       data: _data,
       xColumn: _xColumn,
       yColumn: _yColumn,
@@ -103,6 +147,8 @@ class CristalyseChart {
       colorScale: _colorScale,
       sizeScale: _sizeScale,
       theme: _theme,
+      animationDuration: _animationDuration,
+      animationCurve: _animationCurve,
     );
   }
 }
