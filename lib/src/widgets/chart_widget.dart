@@ -117,13 +117,14 @@ class _ChartPainter extends CustomPainter {
     // Draw geometries
     for (final geometry in geometries) {
       _drawGeometry(
-          canvas,
-          plotArea,
-          geometry,
-          xScale,
-          yScale,
-          colorScale,
-          sizeScale);
+        canvas,
+        plotArea,
+        geometry,
+        xScale,
+        yScale,
+        colorScale,
+        sizeScale,
+      );
     }
 
     // Draw axes
@@ -132,8 +133,11 @@ class _ChartPainter extends CustomPainter {
 
   LinearScale _setupXScale(double width) {
     final scale = (xScale as LinearScale?) ?? LinearScale();
-    final values = data.map((d) => _getNumericValue(d[xColumn])).where((
-        v) => v != null).cast<double>();
+    final values =
+        data
+            .map((d) => _getNumericValue(d[xColumn]))
+            .where((v) => v != null)
+            .cast<double>();
     if (values.isNotEmpty) {
       scale.domain = [
         scale.min ?? values.reduce(math.min),
@@ -146,8 +150,11 @@ class _ChartPainter extends CustomPainter {
 
   LinearScale _setupYScale(double height) {
     final scale = (yScale as LinearScale?) ?? LinearScale();
-    final values = data.map((d) => _getNumericValue(d[yColumn])).where((
-        v) => v != null).cast<double>();
+    final values =
+        data
+            .map((d) => _getNumericValue(d[yColumn]))
+            .where((v) => v != null)
+            .cast<double>();
     if (values.isNotEmpty) {
       scale.domain = [
         scale.min ?? values.reduce(math.min),
@@ -168,8 +175,11 @@ class _ChartPainter extends CustomPainter {
   SizeScale _setupSizeScale() {
     if (sizeColumn == null) return SizeScale();
 
-    final values = data.map((d) => _getNumericValue(d[sizeColumn])).where((
-        v) => v != null).cast<double>();
+    final values =
+        data
+            .map((d) => _getNumericValue(d[sizeColumn]))
+            .where((v) => v != null)
+            .cast<double>();
     if (values.isNotEmpty) {
       return SizeScale(
         domain: [values.reduce(math.min), values.reduce(math.max)],
@@ -186,16 +196,20 @@ class _ChartPainter extends CustomPainter {
   }
 
   void _drawBackground(Canvas canvas, Rect plotArea) {
-    final paint = Paint()
-      ..color = theme.plotBackgroundColor;
+    final paint = Paint()..color = theme.plotBackgroundColor;
     canvas.drawRect(plotArea, paint);
   }
 
-  void _drawGrid(Canvas canvas, Rect plotArea, LinearScale xScale,
-      LinearScale yScale) {
-    final paint = Paint()
-      ..color = theme.gridColor
-      ..strokeWidth = theme.gridWidth;
+  void _drawGrid(
+    Canvas canvas,
+    Rect plotArea,
+    LinearScale xScale,
+    LinearScale yScale,
+  ) {
+    final paint =
+        Paint()
+          ..color = theme.gridColor
+          ..strokeWidth = theme.gridWidth;
 
     // Vertical grid lines
     final xTicks = xScale.getTicks(5);
@@ -220,40 +234,39 @@ class _ChartPainter extends CustomPainter {
     }
   }
 
-  void _drawGeometry(Canvas canvas,
-      Rect plotArea,
-      Geometry geometry,
-      LinearScale xScale,
-      LinearScale yScale,
-      ColorScale colorScale,
-      SizeScale sizeScale,) {
+  void _drawGeometry(
+    Canvas canvas,
+    Rect plotArea,
+    Geometry geometry,
+    LinearScale xScale,
+    LinearScale yScale,
+    ColorScale colorScale,
+    SizeScale sizeScale,
+  ) {
     if (geometry is PointGeometry) {
       _drawPoints(
-          canvas,
-          plotArea,
-          geometry,
-          xScale,
-          yScale,
-          colorScale,
-          sizeScale);
+        canvas,
+        plotArea,
+        geometry,
+        xScale,
+        yScale,
+        colorScale,
+        sizeScale,
+      );
     } else if (geometry is LineGeometry) {
-      _drawLines(
-          canvas,
-          plotArea,
-          geometry,
-          xScale,
-          yScale,
-          colorScale);
+      _drawLines(canvas, plotArea, geometry, xScale, yScale, colorScale);
     }
   }
 
-  void _drawPoints(Canvas canvas,
-      Rect plotArea,
-      PointGeometry geometry,
-      LinearScale xScale,
-      LinearScale yScale,
-      ColorScale colorScale,
-      SizeScale sizeScale,) {
+  void _drawPoints(
+    Canvas canvas,
+    Rect plotArea,
+    PointGeometry geometry,
+    LinearScale xScale,
+    LinearScale yScale,
+    ColorScale colorScale,
+    SizeScale sizeScale,
+  ) {
     for (final point in data) {
       final x = _getNumericValue(point[xColumn]);
       final y = _getNumericValue(point[yColumn]);
@@ -264,29 +277,34 @@ class _ChartPainter extends CustomPainter {
       final screenY = plotArea.top + yScale.scale(y);
 
       // Determine point properties
-      final pointColor = geometry.color ??
-          (colorColumn != null ? colorScale.scale(point[colorColumn]) : theme
-              .primaryColor);
-      final pointSize = geometry.size ??
-          (sizeColumn != null ? sizeScale.scale(
-              _getNumericValue(point[sizeColumn]) ?? 0) : theme
-              .pointSizeDefault);
+      final pointColor =
+          geometry.color ??
+          (colorColumn != null
+              ? colorScale.scale(point[colorColumn])
+              : theme.primaryColor);
+      final pointSize =
+          geometry.size ??
+          (sizeColumn != null
+              ? sizeScale.scale(_getNumericValue(point[sizeColumn]) ?? 0)
+              : theme.pointSizeDefault);
 
-      final paint = Paint()
-        ..color = pointColor.withValues(alpha: geometry.alpha)
-        ..style = PaintingStyle.fill;
+      final paint =
+          Paint()
+            ..color = pointColor.withValues(alpha: geometry.alpha)
+            ..style = PaintingStyle.fill;
 
       canvas.drawCircle(Offset(screenX, screenY), pointSize, paint);
     }
   }
 
-  void _drawLines(Canvas canvas,
-      Rect plotArea,
-      LineGeometry geometry,
-      LinearScale xScale,
-      LinearScale yScale,
-      ColorScale colorScale) {
-
+  void _drawLines(
+    Canvas canvas,
+    Rect plotArea,
+    LineGeometry geometry,
+    LinearScale xScale,
+    LinearScale yScale,
+    ColorScale colorScale,
+  ) {
     if (colorColumn != null) {
       // Group by color and draw separate lines
       final groupedData = <dynamic, List<Map<String, dynamic>>>{};
@@ -299,23 +317,40 @@ class _ChartPainter extends CustomPainter {
         final colorValue = entry.key;
         final groupData = entry.value;
         final lineColor = geometry.color ?? colorScale.scale(colorValue);
-        _drawSingleLine(canvas, plotArea, groupData, xScale, yScale, lineColor, geometry);
+        _drawSingleLine(
+          canvas,
+          plotArea,
+          groupData,
+          xScale,
+          yScale,
+          lineColor,
+          geometry,
+        );
       }
     } else {
       // Draw single line for all data
       final lineColor = geometry.color ?? theme.primaryColor;
-      _drawSingleLine(canvas, plotArea, data, xScale, yScale, lineColor, geometry);
+      _drawSingleLine(
+        canvas,
+        plotArea,
+        data,
+        xScale,
+        yScale,
+        lineColor,
+        geometry,
+      );
     }
   }
 
-  void _drawSingleLine(Canvas canvas,
-      Rect plotArea,
-      List<Map<String, dynamic>> lineData,
-      LinearScale xScale,
-      LinearScale yScale,
-      Color color,
-      LineGeometry geometry) {
-
+  void _drawSingleLine(
+    Canvas canvas,
+    Rect plotArea,
+    List<Map<String, dynamic>> lineData,
+    LinearScale xScale,
+    LinearScale yScale,
+    Color color,
+    LineGeometry geometry,
+  ) {
     // Sort data by x value for proper line connection
     final sortedData = List<Map<String, dynamic>>.from(lineData);
     sortedData.sort((a, b) {
@@ -338,12 +373,13 @@ class _ChartPainter extends CustomPainter {
 
     if (points.length < 2) return;
 
-    final paint = Paint()
-      ..color = color.withValues(alpha: geometry.alpha)
-      ..strokeWidth = geometry.strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
+    final paint =
+        Paint()
+          ..color = color.withValues(alpha: geometry.alpha)
+          ..strokeWidth = geometry.strokeWidth
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
     path.moveTo(points.first.dx, points.first.dy);
@@ -354,11 +390,17 @@ class _ChartPainter extends CustomPainter {
     canvas.drawPath(path, paint);
   }
 
-  void _drawAxes(Canvas canvas, Size size, Rect plotArea, LinearScale xScale,
-      LinearScale yScale) {
-    final paint = Paint()
-      ..color = theme.axisColor
-      ..strokeWidth = theme.axisWidth;
+  void _drawAxes(
+    Canvas canvas,
+    Size size,
+    Rect plotArea,
+    LinearScale xScale,
+    LinearScale yScale,
+  ) {
+    final paint =
+        Paint()
+          ..color = theme.axisColor
+          ..strokeWidth = theme.axisWidth;
 
     // X axis
     canvas.drawLine(
@@ -378,16 +420,24 @@ class _ChartPainter extends CustomPainter {
     final xTicks = xScale.getTicks(5);
     for (final tick in xTicks) {
       final x = plotArea.left + xScale.scale(tick);
-      _drawText(canvas, _formatNumber(tick), Offset(x, plotArea.bottom + 20),
-          theme.axisTextStyle);
+      _drawText(
+        canvas,
+        _formatNumber(tick),
+        Offset(x, plotArea.bottom + 20),
+        theme.axisTextStyle,
+      );
     }
 
     // Y axis labels
     final yTicks = yScale.getTicks(5);
     for (final tick in yTicks) {
       final y = plotArea.top + yScale.scale(tick);
-      _drawText(canvas, _formatNumber(tick), Offset(plotArea.left - 40, y - 6),
-          theme.axisTextStyle);
+      _drawText(
+        canvas,
+        _formatNumber(tick),
+        Offset(plotArea.left - 40, y - 6),
+        theme.axisTextStyle,
+      );
     }
   }
 

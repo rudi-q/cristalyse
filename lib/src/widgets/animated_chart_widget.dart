@@ -41,10 +41,12 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
   });
 
   @override
-  State<AnimatedCristalyseChartWidget> createState() => _AnimatedCristalyseChartWidgetState();
+  State<AnimatedCristalyseChartWidget> createState() =>
+      _AnimatedCristalyseChartWidgetState();
 }
 
-class _AnimatedCristalyseChartWidgetState extends State<AnimatedCristalyseChartWidget>
+class _AnimatedCristalyseChartWidgetState
+    extends State<AnimatedCristalyseChartWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -213,13 +215,14 @@ class _AnimatedChartPainter extends CustomPainter {
     // Draw geometries with animation
     for (final geometry in geometries) {
       _drawGeometry(
-          canvas,
-          plotArea,
-          geometry,
-          xScale,
-          yScale,
-          colorScale,
-          sizeScale);
+        canvas,
+        plotArea,
+        geometry,
+        xScale,
+        yScale,
+        colorScale,
+        sizeScale,
+      );
     }
 
     // Draw axes
@@ -228,8 +231,11 @@ class _AnimatedChartPainter extends CustomPainter {
 
   LinearScale _setupXScale(double width) {
     final scale = (xScale as LinearScale?) ?? LinearScale();
-    final values = data.map((d) => _getNumericValue(d[xColumn])).where((
-        v) => v != null && v.isFinite).cast<double>();
+    final values =
+        data
+            .map((d) => _getNumericValue(d[xColumn]))
+            .where((v) => v != null && v.isFinite)
+            .cast<double>();
     if (values.isNotEmpty) {
       final minVal = scale.min ?? values.reduce(math.min);
       final maxVal = scale.max ?? values.reduce(math.max);
@@ -249,8 +255,11 @@ class _AnimatedChartPainter extends CustomPainter {
 
   LinearScale _setupYScale(double height) {
     final scale = (yScale as LinearScale?) ?? LinearScale();
-    final values = data.map((d) => _getNumericValue(d[yColumn])).where((
-        v) => v != null && v.isFinite).cast<double>();
+    final values =
+        data
+            .map((d) => _getNumericValue(d[yColumn]))
+            .where((v) => v != null && v.isFinite)
+            .cast<double>();
     if (values.isNotEmpty) {
       final minVal = scale.min ?? values.reduce(math.min);
       final maxVal = scale.max ?? values.reduce(math.max);
@@ -264,7 +273,10 @@ class _AnimatedChartPainter extends CustomPainter {
     } else {
       scale.domain = [0, 1]; // Fallback for empty data
     }
-    scale.range = [math.max(1.0, height), 0]; // Inverted for screen coordinates, ensure positive
+    scale.range = [
+      math.max(1.0, height),
+      0,
+    ]; // Inverted for screen coordinates, ensure positive
     return scale;
   }
 
@@ -278,8 +290,11 @@ class _AnimatedChartPainter extends CustomPainter {
   SizeScale _setupSizeScale() {
     if (sizeColumn == null) return SizeScale();
 
-    final values = data.map((d) => _getNumericValue(d[sizeColumn])).where((
-        v) => v != null).cast<double>();
+    final values =
+        data
+            .map((d) => _getNumericValue(d[sizeColumn]))
+            .where((v) => v != null)
+            .cast<double>();
     if (values.isNotEmpty) {
       return SizeScale(
         domain: [values.reduce(math.min), values.reduce(math.max)],
@@ -296,23 +311,30 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawBackground(Canvas canvas, Rect plotArea) {
-    final paint = Paint()
-      ..color = theme.plotBackgroundColor;
+    final paint = Paint()..color = theme.plotBackgroundColor;
     canvas.drawRect(plotArea, paint);
   }
 
-  void _drawGrid(Canvas canvas, Rect plotArea, LinearScale xScale,
-      LinearScale yScale) {
-    final paint = Paint()
-      ..color = theme.gridColor.withValues(alpha:math.max(0.0, math.min(1.0, animationProgress * 0.5)))
-      ..strokeWidth = math.max(0.1, theme.gridWidth);
+  void _drawGrid(
+    Canvas canvas,
+    Rect plotArea,
+    LinearScale xScale,
+    LinearScale yScale,
+  ) {
+    final paint =
+        Paint()
+          ..color = theme.gridColor.withValues(
+            alpha: math.max(0.0, math.min(1.0, animationProgress * 0.5)),
+          )
+          ..strokeWidth = math.max(0.1, theme.gridWidth);
 
     // Vertical grid lines
     final xTicks = xScale.getTicks(5);
     for (final tick in xTicks) {
       if (!tick.isFinite) continue;
       final x = plotArea.left + xScale.scale(tick);
-      if (!x.isFinite || x < plotArea.left - 10 || x > plotArea.right + 10) continue;
+      if (!x.isFinite || x < plotArea.left - 10 || x > plotArea.right + 10)
+        continue;
 
       canvas.drawLine(
         Offset(x, plotArea.top),
@@ -326,7 +348,8 @@ class _AnimatedChartPainter extends CustomPainter {
     for (final tick in yTicks) {
       if (!tick.isFinite) continue;
       final y = plotArea.top + yScale.scale(tick);
-      if (!y.isFinite || y < plotArea.top - 10 || y > plotArea.bottom + 10) continue;
+      if (!y.isFinite || y < plotArea.top - 10 || y > plotArea.bottom + 10)
+        continue;
 
       canvas.drawLine(
         Offset(plotArea.left, y),
@@ -336,41 +359,46 @@ class _AnimatedChartPainter extends CustomPainter {
     }
   }
 
-  void _drawGeometry(Canvas canvas,
-      Rect plotArea,
-      Geometry geometry,
-      LinearScale xScale,
-      LinearScale yScale,
-      ColorScale colorScale,
-      SizeScale sizeScale,) {
+  void _drawGeometry(
+    Canvas canvas,
+    Rect plotArea,
+    Geometry geometry,
+    LinearScale xScale,
+    LinearScale yScale,
+    ColorScale colorScale,
+    SizeScale sizeScale,
+  ) {
     if (geometry is PointGeometry) {
       _drawPointsAnimated(
-          canvas,
-          plotArea,
-          geometry,
-          xScale,
-          yScale,
-          colorScale,
-          sizeScale);
+        canvas,
+        plotArea,
+        geometry,
+        xScale,
+        yScale,
+        colorScale,
+        sizeScale,
+      );
     } else if (geometry is LineGeometry) {
       _drawLinesAnimated(
-          canvas,
-          plotArea,
-          geometry,
-          xScale,
-          yScale,
-          colorScale);
+        canvas,
+        plotArea,
+        geometry,
+        xScale,
+        yScale,
+        colorScale,
+      );
     }
   }
 
-  void _drawPointsAnimated(Canvas canvas,
-      Rect plotArea,
-      PointGeometry geometry,
-      LinearScale xScale,
-      LinearScale yScale,
-      ColorScale colorScale,
-      SizeScale sizeScale,) {
-
+  void _drawPointsAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    PointGeometry geometry,
+    LinearScale xScale,
+    LinearScale yScale,
+    ColorScale colorScale,
+    SizeScale sizeScale,
+  ) {
     // Animate points appearing with scale and fade
     for (int i = 0; i < data.length; i++) {
       final point = data[i];
@@ -384,43 +412,67 @@ class _AnimatedChartPainter extends CustomPainter {
 
       // Validate screen coordinates
       if (!screenX.isFinite || !screenY.isFinite) continue;
-      if (screenX < 0 || screenX > plotArea.right || screenY < 0 || screenY > plotArea.bottom + 100) continue;
+      if (screenX < 0 ||
+          screenX > plotArea.right ||
+          screenY < 0 ||
+          screenY > plotArea.bottom + 100)
+        continue;
 
       // Staggered animation - each point appears slightly after the previous
-      final pointDelay = data.isNotEmpty ? i / data.length * 0.3 : 0.0; // 30% of animation for staggering
-      final pointProgress = math.max(0.0,
-          math.min(1.0, (animationProgress - pointDelay) / math.max(0.001, 1.0 - pointDelay)));
+      final pointDelay =
+          data.isNotEmpty
+              ? i / data.length * 0.3
+              : 0.0; // 30% of animation for staggering
+      final pointProgress = math.max(
+        0.0,
+        math.min(
+          1.0,
+          (animationProgress - pointDelay) / math.max(0.001, 1.0 - pointDelay),
+        ),
+      );
 
       if (pointProgress <= 0) continue;
 
       // Determine point properties
-      final pointColor = geometry.color ??
-          (colorColumn != null ? colorScale.scale(point[colorColumn]) : theme.primaryColor);
-      final baseSize = geometry.size ??
-          (sizeColumn != null ? sizeScale.scale(_getNumericValue(point[sizeColumn]) ?? 0) : theme.pointSizeDefault);
+      final pointColor =
+          geometry.color ??
+          (colorColumn != null
+              ? colorScale.scale(point[colorColumn])
+              : theme.primaryColor);
+      final baseSize =
+          geometry.size ??
+          (sizeColumn != null
+              ? sizeScale.scale(_getNumericValue(point[sizeColumn]) ?? 0)
+              : theme.pointSizeDefault);
 
       // Animate size (scale up from 0) with validation
       final animatedSize = math.max(0.0, baseSize * pointProgress);
-      if (!animatedSize.isFinite || animatedSize > 100) continue; // Sanity check
+      if (!animatedSize.isFinite || animatedSize > 100)
+        continue; // Sanity check
 
       // Animate opacity with validation
-      final animatedAlpha = math.max(0.0, math.min(1.0, geometry.alpha * pointProgress));
+      final animatedAlpha = math.max(
+        0.0,
+        math.min(1.0, geometry.alpha * pointProgress),
+      );
 
-      final paint = Paint()
-        ..color = pointColor.withValues(alpha:animatedAlpha)
-        ..style = PaintingStyle.fill;
+      final paint =
+          Paint()
+            ..color = pointColor.withValues(alpha: animatedAlpha)
+            ..style = PaintingStyle.fill;
 
       canvas.drawCircle(Offset(screenX, screenY), animatedSize, paint);
     }
   }
 
-  void _drawLinesAnimated(Canvas canvas,
-      Rect plotArea,
-      LineGeometry geometry,
-      LinearScale xScale,
-      LinearScale yScale,
-      ColorScale colorScale) {
-
+  void _drawLinesAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    LineGeometry geometry,
+    LinearScale xScale,
+    LinearScale yScale,
+    ColorScale colorScale,
+  ) {
     if (colorColumn != null) {
       // Group by color and draw separate lines
       final groupedData = <dynamic, List<Map<String, dynamic>>>{};
@@ -433,23 +485,40 @@ class _AnimatedChartPainter extends CustomPainter {
         final colorValue = entry.key;
         final groupData = entry.value;
         final lineColor = geometry.color ?? colorScale.scale(colorValue);
-        _drawSingleLineAnimated(canvas, plotArea, groupData, xScale, yScale, lineColor, geometry);
+        _drawSingleLineAnimated(
+          canvas,
+          plotArea,
+          groupData,
+          xScale,
+          yScale,
+          lineColor,
+          geometry,
+        );
       }
     } else {
       // Draw single line for all data
       final lineColor = geometry.color ?? theme.primaryColor;
-      _drawSingleLineAnimated(canvas, plotArea, data, xScale, yScale, lineColor, geometry);
+      _drawSingleLineAnimated(
+        canvas,
+        plotArea,
+        data,
+        xScale,
+        yScale,
+        lineColor,
+        geometry,
+      );
     }
   }
 
-  void _drawSingleLineAnimated(Canvas canvas,
-      Rect plotArea,
-      List<Map<String, dynamic>> lineData,
-      LinearScale xScale,
-      LinearScale yScale,
-      Color color,
-      LineGeometry geometry) {
-
+  void _drawSingleLineAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    List<Map<String, dynamic>> lineData,
+    LinearScale xScale,
+    LinearScale yScale,
+    Color color,
+    LineGeometry geometry,
+  ) {
     // Sort data by x value for proper line connection
     final sortedData = List<Map<String, dynamic>>.from(lineData);
     sortedData.sort((a, b) {
@@ -470,8 +539,10 @@ class _AnimatedChartPainter extends CustomPainter {
 
       // Validate screen coordinates
       if (!screenX.isFinite || !screenY.isFinite) continue;
-      if (screenX < -1000 || screenX > plotArea.right + 1000 ||
-          screenY < -1000 || screenY > plotArea.bottom + 1000) {
+      if (screenX < -1000 ||
+          screenX > plotArea.right + 1000 ||
+          screenY < -1000 ||
+          screenY > plotArea.bottom + 1000) {
         continue;
       }
 
@@ -481,21 +552,31 @@ class _AnimatedChartPainter extends CustomPainter {
     if (allPoints.length < 2) return;
 
     // Animate line drawing from left to right
-    final animatedPointCount = math.max(1, (allPoints.length * animationProgress).round());
+    final animatedPointCount = math.max(
+      1,
+      (allPoints.length * animationProgress).round(),
+    );
     final points = allPoints.take(animatedPointCount).toList();
 
     if (points.length < 2) return;
 
     // Validate stroke width
-    final validatedStrokeWidth = math.max(0.1, math.min(50.0, geometry.strokeWidth));
-    final validatedAlpha = math.max(0.0, math.min(1.0, geometry.alpha * animationProgress));
+    final validatedStrokeWidth = math.max(
+      0.1,
+      math.min(50.0, geometry.strokeWidth),
+    );
+    final validatedAlpha = math.max(
+      0.0,
+      math.min(1.0, geometry.alpha * animationProgress),
+    );
 
-    final paint = Paint()
-      ..color = color.withValues(alpha:validatedAlpha)
-      ..strokeWidth = validatedStrokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
+    final paint =
+        Paint()
+          ..color = color.withValues(alpha: validatedAlpha)
+          ..strokeWidth = validatedStrokeWidth
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
     path.moveTo(points.first.dx, points.first.dy);
@@ -505,7 +586,8 @@ class _AnimatedChartPainter extends CustomPainter {
 
     // Add partial segment for smooth animation
     if (animatedPointCount < allPoints.length && points.length >= 2) {
-      final progress = (allPoints.length * animationProgress) - animatedPointCount;
+      final progress =
+          (allPoints.length * animationProgress) - animatedPointCount;
       final lastPoint = points.last;
       final nextPoint = allPoints[animatedPointCount];
       final partialX = lastPoint.dx + (nextPoint.dx - lastPoint.dx) * progress;
@@ -520,17 +602,23 @@ class _AnimatedChartPainter extends CustomPainter {
     canvas.drawPath(path, paint);
   }
 
-  void _drawAxes(Canvas canvas, Size size, Rect plotArea, LinearScale xScale,
-      LinearScale yScale) {
+  void _drawAxes(
+    Canvas canvas,
+    Size size,
+    Rect plotArea,
+    LinearScale xScale,
+    LinearScale yScale,
+  ) {
     // Validate animation progress to prevent invalid opacity values
     final validatedProgress = math.max(0.0, math.min(1.0, animationProgress));
 
     // Safely handle potential null colors
     final axisColor = theme.axisColor;
 
-    final paint = Paint()
-      ..color = axisColor.withValues(alpha:validatedProgress)
-      ..strokeWidth = math.max(0.1, theme.axisWidth);
+    final paint =
+        Paint()
+          ..color = axisColor.withValues(alpha: validatedProgress)
+          ..strokeWidth = math.max(0.1, theme.axisWidth);
 
     // X axis
     canvas.drawLine(
@@ -548,22 +636,31 @@ class _AnimatedChartPainter extends CustomPainter {
 
     // Animate labels appearing - but only if we have valid progress
     if (validatedProgress > 0.5) {
-      final labelOpacity = math.max(0.0, math.min(1.0, (validatedProgress - 0.5) * 2.0));
+      final labelOpacity = math.max(
+        0.0,
+        math.min(1.0, (validatedProgress - 0.5) * 2.0),
+      );
 
       // X axis labels
       final xTicks = xScale.getTicks(5);
       for (final tick in xTicks) {
         if (!tick.isFinite) continue;
         final x = plotArea.left + xScale.scale(tick);
-        if (!x.isFinite || x < plotArea.left - 100 || x > plotArea.right + 100) continue;
+        if (!x.isFinite || x < plotArea.left - 100 || x > plotArea.right + 100)
+          continue;
 
         // Safely get the axis text color and apply opacity
         final baseTextColor = theme.axisTextStyle.color ?? Colors.black87;
         final labelStyle = theme.axisTextStyle.copyWith(
-            color: baseTextColor.withValues(alpha:labelOpacity)
+          color: baseTextColor.withValues(alpha: labelOpacity),
         );
 
-        _drawText(canvas, _formatNumber(tick), Offset(x, plotArea.bottom + 20), labelStyle);
+        _drawText(
+          canvas,
+          _formatNumber(tick),
+          Offset(x, plotArea.bottom + 20),
+          labelStyle,
+        );
       }
 
       // Y axis labels
@@ -571,15 +668,21 @@ class _AnimatedChartPainter extends CustomPainter {
       for (final tick in yTicks) {
         if (!tick.isFinite) continue;
         final y = plotArea.top + yScale.scale(tick);
-        if (!y.isFinite || y < plotArea.top - 100 || y > plotArea.bottom + 100) continue;
+        if (!y.isFinite || y < plotArea.top - 100 || y > plotArea.bottom + 100)
+          continue;
 
         // Safely get the axis text color and apply opacity
         final baseTextColor = theme.axisTextStyle.color ?? Colors.black87;
         final labelStyle = theme.axisTextStyle.copyWith(
-            color: baseTextColor.withValues(alpha:labelOpacity)
+          color: baseTextColor.withValues(alpha: labelOpacity),
         );
 
-        _drawText(canvas, _formatNumber(tick), Offset(plotArea.left - 40, y - 6), labelStyle);
+        _drawText(
+          canvas,
+          _formatNumber(tick),
+          Offset(plotArea.left - 40, y - 6),
+          labelStyle,
+        );
       }
     }
   }

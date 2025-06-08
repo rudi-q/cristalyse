@@ -1,3 +1,9 @@
+### 0.2.2 - 2025-06-08
+
+#### Documentation
+- Updated README with comprehensive examples and installation guide
+- Added CONTRIBUTING.md for new contributors
+
 ### 0.2.1 - 2025-06-08
 
 #### Changed

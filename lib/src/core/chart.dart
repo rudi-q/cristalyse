@@ -44,12 +44,7 @@ class CristalyseChart {
   /// ```dart
   /// chart.mapping(x: 'date', y: 'value', color: 'category')
   /// ```
-  CristalyseChart mapping({
-    String? x,
-    String? y,
-    String? color,
-    String? size,
-  }) {
+  CristalyseChart mapping({String? x, String? y, String? color, String? size}) {
     _xColumn = x;
     _yColumn = y;
     _colorColumn = color;
@@ -63,16 +58,10 @@ class CristalyseChart {
   /// ```dart
   /// chart.geom_point(size: 5.0, alpha: 0.7)
   /// ```
-  CristalyseChart geomPoint({
-    double? size,
-    Color? color,
-    double? alpha,
-  }) {
-    _geometries.add(PointGeometry(
-      size: size,
-      color: color,
-      alpha: alpha ?? 1.0,
-    ));
+  CristalyseChart geomPoint({double? size, Color? color, double? alpha}) {
+    _geometries.add(
+      PointGeometry(size: size, color: color, alpha: alpha ?? 1.0),
+    );
     return this;
   }
 
@@ -88,12 +77,14 @@ class CristalyseChart {
     double? alpha,
     LineStyle? style,
   }) {
-    _geometries.add(LineGeometry(
-      strokeWidth: strokeWidth ?? 2.0,
-      color: color,
-      alpha: alpha ?? 1.0,
-      style: style ?? LineStyle.solid,
-    ));
+    _geometries.add(
+      LineGeometry(
+        strokeWidth: strokeWidth ?? 2.0,
+        color: color,
+        alpha: alpha ?? 1.0,
+        style: style ?? LineStyle.solid,
+      ),
+    );
     return this;
   }
 
@@ -124,10 +115,7 @@ class CristalyseChart {
   ///   curve: Curves.bounceOut,
   /// )
   /// ```
-  CristalyseChart animate({
-    Duration? duration,
-    Curve? curve,
-  }) {
+  CristalyseChart animate({Duration? duration, Curve? curve}) {
     _animationDuration = duration ?? _animationDuration;
     _animationCurve = curve ?? _animationCurve;
     return this;

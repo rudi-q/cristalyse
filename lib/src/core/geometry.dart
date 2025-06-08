@@ -9,11 +9,7 @@ class PointGeometry extends Geometry {
   final Color? color;
   final double alpha;
 
-  PointGeometry({
-    this.size,
-    this.color,
-    required this.alpha,
-  });
+  PointGeometry({this.size, this.color, required this.alpha});
 }
 
 /// Line geometry for line charts
@@ -32,8 +28,4 @@ class LineGeometry extends Geometry {
 }
 
 /// Line styles for line geometry
-enum LineStyle {
-  solid,
-  dashed,
-  dotted,
-}
+enum LineStyle { solid, dashed, dotted }
