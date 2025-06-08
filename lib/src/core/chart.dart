@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+
+import '../themes/chart_theme.dart';
 import '../widgets/animated_chart_widget.dart';
 import 'geometry.dart';
 import 'scale.dart';
-import '../themes/chart_theme.dart';
-import '../widgets/chart_widget.dart';
 
 /// Main chart class implementing grammar of graphics API
 class CristalyseChart {

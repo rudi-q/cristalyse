@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
 import '../core/geometry.dart';
 import '../core/scale.dart';
 import '../themes/chart_theme.dart';

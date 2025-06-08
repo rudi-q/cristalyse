@@ -1,10 +1,11 @@
 // lib/src/widgets/animated_chart_widget.dart
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+
 import '../core/geometry.dart';
 import '../core/scale.dart';
 import '../themes/chart_theme.dart';
-import 'chart_widget.dart';
 
 /// Animated wrapper for the chart widget
 class AnimatedCristalyseChartWidget extends StatefulWidget {
