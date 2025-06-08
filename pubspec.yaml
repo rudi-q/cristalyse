@@ -1,7 +1,7 @@
 name: cristalyse
 description: "Cristalyse is a high-performance data visualization library for Dart/Flutter that implements grammar of graphics principles with native rendering capabilities."
 version: 0.2.0
-homepage:
+repository: https://github.com/rudi-q/cristalyse
 
 environment:
   sdk: ^3.7.0
