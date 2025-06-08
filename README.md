@@ -17,7 +17,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  cristalyse: ^0.2.0
+  cristalyse: ^0.2.1
 ```
 
 ## Quick Example
@@ -32,9 +32,10 @@ CristalyseChart()
     {'x': 3, 'y': 1, 'category': 'A'},
   ])
   .mapping(x: 'x', y: 'y', color: 'category')
-  .geom_point(size: 6.0, alpha: 0.8)
-  .scale_x_continuous(min: 0, max: 4)
-  .scale_y_continuous(min: 0, max: 4)
+  .geomLine(strokeWidth: 2.5, alpha: 0.8)
+  .geomPoint(size: 3.0, alpha: 0.6)
+  .scaleXContinuous()
+  .scaleYContinuous()
   .theme(ChartTheme.defaultTheme())
   .build()
 ```

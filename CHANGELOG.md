@@ -1,3 +1,8 @@
+### 0.2.1 - 2025-06-08
+
+#### Changed
+- Updated deprecated code to use `withValues` instead of `withOpacity`
+
 ### [0.2.0] - 2025-06-08
 
 #### Added

@@ -21,7 +21,7 @@ class CristalyseChartWidget extends StatelessWidget {
   final ChartTheme theme;
 
   const CristalyseChartWidget({
-    Key? key,
+    super.key,
     required this.data,
     this.xColumn,
     this.yColumn,
@@ -33,7 +33,7 @@ class CristalyseChartWidget extends StatelessWidget {
     this.colorScale,
     this.sizeScale,
     required this.theme,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -273,7 +273,7 @@ class _ChartPainter extends CustomPainter {
               .pointSizeDefault);
 
       final paint = Paint()
-        ..color = pointColor.withOpacity(geometry.alpha)
+        ..color = pointColor.withValues(alpha: geometry.alpha)
         ..style = PaintingStyle.fill;
 
       canvas.drawCircle(Offset(screenX, screenY), pointSize, paint);
@@ -339,7 +339,7 @@ class _ChartPainter extends CustomPainter {
     if (points.length < 2) return;
 
     final paint = Paint()
-      ..color = color.withOpacity(geometry.alpha)
+      ..color = color.withValues(alpha: geometry.alpha)
       ..strokeWidth = geometry.strokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round

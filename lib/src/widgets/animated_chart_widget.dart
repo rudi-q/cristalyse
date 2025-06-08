@@ -24,7 +24,7 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
   final Curve animationCurve;
 
   const AnimatedCristalyseChartWidget({
-    Key? key,
+    super.key,
     required this.data,
     this.xColumn,
     this.yColumn,
@@ -38,7 +38,7 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
     required this.theme,
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.easeInOut,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedCristalyseChartWidget> createState() => _AnimatedCristalyseChartWidgetState();
@@ -304,7 +304,7 @@ class _AnimatedChartPainter extends CustomPainter {
   void _drawGrid(Canvas canvas, Rect plotArea, LinearScale xScale,
       LinearScale yScale) {
     final paint = Paint()
-      ..color = theme.gridColor.withOpacity(math.max(0.0, math.min(1.0, animationProgress * 0.5)))
+      ..color = theme.gridColor.withValues(alpha:math.max(0.0, math.min(1.0, animationProgress * 0.5)))
       ..strokeWidth = math.max(0.1, theme.gridWidth);
 
     // Vertical grid lines
@@ -387,7 +387,7 @@ class _AnimatedChartPainter extends CustomPainter {
       if (screenX < 0 || screenX > plotArea.right || screenY < 0 || screenY > plotArea.bottom + 100) continue;
 
       // Staggered animation - each point appears slightly after the previous
-      final pointDelay = data.length > 0 ? i / data.length * 0.3 : 0.0; // 30% of animation for staggering
+      final pointDelay = data.isNotEmpty ? i / data.length * 0.3 : 0.0; // 30% of animation for staggering
       final pointProgress = math.max(0.0,
           math.min(1.0, (animationProgress - pointDelay) / math.max(0.001, 1.0 - pointDelay)));
 
@@ -407,7 +407,7 @@ class _AnimatedChartPainter extends CustomPainter {
       final animatedAlpha = math.max(0.0, math.min(1.0, geometry.alpha * pointProgress));
 
       final paint = Paint()
-        ..color = pointColor.withOpacity(animatedAlpha)
+        ..color = pointColor.withValues(alpha:animatedAlpha)
         ..style = PaintingStyle.fill;
 
       canvas.drawCircle(Offset(screenX, screenY), animatedSize, paint);
@@ -471,7 +471,9 @@ class _AnimatedChartPainter extends CustomPainter {
       // Validate screen coordinates
       if (!screenX.isFinite || !screenY.isFinite) continue;
       if (screenX < -1000 || screenX > plotArea.right + 1000 ||
-          screenY < -1000 || screenY > plotArea.bottom + 1000) continue;
+          screenY < -1000 || screenY > plotArea.bottom + 1000) {
+        continue;
+      }
 
       allPoints.add(Offset(screenX, screenY));
     }
@@ -489,7 +491,7 @@ class _AnimatedChartPainter extends CustomPainter {
     final validatedAlpha = math.max(0.0, math.min(1.0, geometry.alpha * animationProgress));
 
     final paint = Paint()
-      ..color = color.withOpacity(validatedAlpha)
+      ..color = color.withValues(alpha:validatedAlpha)
       ..strokeWidth = validatedStrokeWidth
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
@@ -527,7 +529,7 @@ class _AnimatedChartPainter extends CustomPainter {
     final axisColor = theme.axisColor;
 
     final paint = Paint()
-      ..color = axisColor.withOpacity(validatedProgress)
+      ..color = axisColor.withValues(alpha:validatedProgress)
       ..strokeWidth = math.max(0.1, theme.axisWidth);
 
     // X axis
@@ -558,7 +560,7 @@ class _AnimatedChartPainter extends CustomPainter {
         // Safely get the axis text color and apply opacity
         final baseTextColor = theme.axisTextStyle.color ?? Colors.black87;
         final labelStyle = theme.axisTextStyle.copyWith(
-            color: baseTextColor.withOpacity(labelOpacity)
+            color: baseTextColor.withValues(alpha:labelOpacity)
         );
 
         _drawText(canvas, _formatNumber(tick), Offset(x, plotArea.bottom + 20), labelStyle);
@@ -574,7 +576,7 @@ class _AnimatedChartPainter extends CustomPainter {
         // Safely get the axis text color and apply opacity
         final baseTextColor = theme.axisTextStyle.color ?? Colors.black87;
         final labelStyle = theme.axisTextStyle.copyWith(
-            color: baseTextColor.withOpacity(labelOpacity)
+            color: baseTextColor.withValues(alpha:labelOpacity)
         );
 
         _drawText(canvas, _formatNumber(tick), Offset(plotArea.left - 40, y - 6), labelStyle);

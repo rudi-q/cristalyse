@@ -63,7 +63,7 @@ class CristalyseChart {
   /// ```dart
   /// chart.geom_point(size: 5.0, alpha: 0.7)
   /// ```
-  CristalyseChart geom_point({
+  CristalyseChart geomPoint({
     double? size,
     Color? color,
     double? alpha,
@@ -82,7 +82,7 @@ class CristalyseChart {
   /// ```dart
   /// chart.geom_line(strokeWidth: 2.0, alpha: 0.8)
   /// ```
-  CristalyseChart geom_line({
+  CristalyseChart geomLine({
     double? strokeWidth,
     Color? color,
     double? alpha,
@@ -98,13 +98,13 @@ class CristalyseChart {
   }
 
   /// Configure continuous X scale
-  CristalyseChart scale_x_continuous({double? min, double? max}) {
+  CristalyseChart scaleXContinuous({double? min, double? max}) {
     _xScale = LinearScale(min: min, max: max);
     return this;
   }
 
   /// Configure continuous Y scale
-  CristalyseChart scale_y_continuous({double? min, double? max}) {
+  CristalyseChart scaleYContinuous({double? min, double? max}) {
     _yScale = LinearScale(min: min, max: max);
     return this;
   }

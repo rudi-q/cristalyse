@@ -12,7 +12,7 @@ void main() {
       final chart = CristalyseChart()
           .data(data)
           .mapping(x: 'x', y: 'y')
-          .geom_point();
+          .geomPoint();
 
       expect(chart, isNotNull);
     });
@@ -20,7 +20,7 @@ void main() {
     test('should handle empty data', () {
       final chart = CristalyseChart()
           .data([])
-          .geom_point();
+          .geomPoint();
 
       expect(chart, isNotNull);
     });
