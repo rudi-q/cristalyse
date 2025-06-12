@@ -16,6 +16,7 @@ class ChartTheme {
   final List<Color> colorPalette;
   final EdgeInsets padding;
   final TextStyle axisTextStyle;
+  final TextStyle? axisLabelStyle;
 
   const ChartTheme({
     required this.backgroundColor,
@@ -32,6 +33,7 @@ class ChartTheme {
     required this.colorPalette,
     required this.padding,
     required this.axisTextStyle,
+    this.axisLabelStyle,
   });
 
   /// Default light theme
@@ -60,8 +62,9 @@ class ChartTheme {
         Colors.cyan,
         Colors.lime,
       ],
-      padding: EdgeInsets.all(60),
-      axisTextStyle: TextStyle(fontSize: 12, color: Colors.black87),
+      padding: const EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+      axisTextStyle: const TextStyle(fontSize: 12, color: Colors.black87),
+      axisLabelStyle: const TextStyle(fontSize: 12, color: Colors.black87),
     );
   }
 
@@ -91,8 +94,9 @@ class ChartTheme {
         Colors.cyanAccent,
         Colors.limeAccent,
       ],
-      padding: EdgeInsets.all(60),
-      axisTextStyle: TextStyle(fontSize: 12, color: Colors.white70),
+      padding: const EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+      axisTextStyle: const TextStyle(fontSize: 12, color: Colors.white70),
+      axisLabelStyle: const TextStyle(fontSize: 12, color: Colors.white70),
     );
   }
 }

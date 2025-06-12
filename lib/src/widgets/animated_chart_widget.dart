@@ -1047,50 +1047,82 @@ class _AnimatedChartPainter extends CustomPainter {
       ..strokeWidth = theme.axisWidth
       ..style = PaintingStyle.stroke;
 
-    // Draw x-axis
-    if (xScale is OrdinalScale) {
-      final ticks = xScale.getTicks(5);
-      for (final tick in ticks) {
-        final x = plotArea.left + xScale.scale(tick);
-        canvas.drawLine(
-          Offset(x, plotArea.bottom),
-          Offset(x, plotArea.bottom + theme.axisWidth * 2),
-          paint,
-        );
+    final axisLabelStyle = theme.axisLabelStyle ??
+        const TextStyle(color: Colors.black, fontSize: 12);
+
+    final horizontalScale = xScale;
+    final verticalScale = yScale;
+
+    // Draw horizontal axis ticks and labels (bottom)
+    final hTicks = horizontalScale.getTicks(5);
+    for (final tick in hTicks) {
+      final pos = plotArea.left + horizontalScale.scale(tick);
+      canvas.drawLine(
+        Offset(pos, plotArea.bottom),
+        Offset(pos, plotArea.bottom + theme.axisWidth * 2),
+        paint,
+      );
+
+      final String label;
+      if (tick is num) {
+        if (tick.truncateToDouble() == tick) {
+          label = tick.toInt().toString();
+        } else {
+          label = tick.toStringAsFixed(1);
+        }
+      } else {
+        label = tick.toString();
       }
-    } else {
-      final ticks = xScale.getTicks(5);
-      for (final tick in ticks) {
-        final x = plotArea.left + xScale.scale(tick);
-        canvas.drawLine(
-          Offset(x, plotArea.bottom),
-          Offset(x, plotArea.bottom + theme.axisWidth * 2),
-          paint,
-        );
-      }
+
+      final textPainter = TextPainter(
+        text: TextSpan(text: label, style: axisLabelStyle),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      );
+      textPainter.layout();
+      textPainter.paint(
+        canvas,
+        Offset(
+          pos - textPainter.width / 2,
+          plotArea.bottom + theme.axisWidth * 2 + 8, // Increased padding
+        ),
+      );
     }
 
-    // Draw y-axis
-    if (yScale is OrdinalScale) {
-      final ticks = yScale.getTicks(5);
-      for (final tick in ticks) {
-        final y = plotArea.top + yScale.scale(tick);
-        canvas.drawLine(
-          Offset(plotArea.left - theme.axisWidth * 2, y),
-          Offset(plotArea.left, y),
-          paint,
-        );
+    // Draw vertical axis ticks and labels (left)
+    final vTicks = verticalScale.getTicks(5);
+    for (final tick in vTicks) {
+      final pos = plotArea.top + verticalScale.scale(tick);
+      canvas.drawLine(
+        Offset(plotArea.left - theme.axisWidth * 2, pos),
+        Offset(plotArea.left, pos),
+        paint,
+      );
+
+      final String label;
+      if (tick is num) {
+        if (tick.truncateToDouble() == tick) {
+          label = tick.toInt().toString();
+        } else {
+          label = tick.toStringAsFixed(1);
+        }
+      } else {
+        label = tick.toString();
       }
-    } else {
-      final ticks = yScale.getTicks(5);
-      for (final tick in ticks) {
-        final y = plotArea.top + yScale.scale(tick);
-        canvas.drawLine(
-          Offset(plotArea.left - theme.axisWidth * 2, y),
-          Offset(plotArea.left, y),
-          paint,
-        );
-      }
+
+      final textPainter = TextPainter(
+        text: TextSpan(text: label, style: axisLabelStyle),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.right,
+      );
+      textPainter.layout(minWidth: 0, maxWidth: plotArea.left - 16); // Provide more space to prevent wrapping
+      textPainter.paint(
+        canvas,
+        Offset(
+          plotArea.left - textPainter.width - theme.axisWidth * 2 - 8, // Increased padding
+          pos - textPainter.height / 2,
+        ),
+      );
     }
   }
 }
