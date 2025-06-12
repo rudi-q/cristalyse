@@ -1,3 +1,29 @@
+# 0.4.4 - 2025-06-12
+
+## Added
+
+* Stacked Bar Charts: Full support for stacked bars with `BarStyle.stacked`
+	+ Segment-by-segment progressive animation with staggered timing
+	+ Automatic cumulative value calculation for proper stacking
+	+ Consistent color ordering across all stacked groups
+	+ Smart Y-scale domain calculation based on total stack heights (not individual segments)
+
+## Fixed
+
+* Stacked Bar Scale Domain: Y-axis now correctly calculates domain based on cumulative stacked totals instead of individual segment values, preventing bars from rendering outside chart bounds
+* Stacked Bar Animation: Improved animation timing with proper segment delays for smooth visual building effect
+
+## Improved
+
+* Example App: Added new "Stacked Bars" tab showcasing revenue breakdown by category with realistic business data
+* Chart Features Documentation: Updated feature descriptions to include stacked bar capabilities
+
+## Technical
+
+* Enhanced `_setupYScale` method to detect stacked bar geometries and calculate proper domain bounds
+* Added 10% padding to stacked bar charts for better visual spacing
+* Improved data grouping logic in `_drawStackedBars` with consistent sorting for predictable stacking order
+
 ## 0.4.3 - 2025-06-12
 
 #### Added

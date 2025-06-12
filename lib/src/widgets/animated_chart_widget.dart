@@ -410,115 +410,122 @@ class _AnimatedChartPainter extends CustomPainter {
   Scale _setupYScale(double height, bool hasBarGeometry) {
     if (coordFlipped) {
       // Horizontal bar: Y-axis is ordinal, maps to xColumn (category axis)
-      final preconfigured =
-          xScale; // Horizontal Y-axis uses X's preconfigured scale
-      final scale =
-          (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+      final preconfigured = xScale;
+      final scale = (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
       final dataCol = xColumn;
 
       if (dataCol == null || data.isEmpty) {
         scale.domain = [];
-        scale.range = [
-          0,
-          height,
-        ]; // Or [height, 0] depending on desired category order
+        scale.range = [0, height];
         return scale;
       }
       if (scale.domain.isEmpty) {
-        // Only set if not pre-configured
-        final distinctValues =
-            data
-                .map((d) => d[dataCol])
-                .where((v) => v != null)
-                .toSet()
-                .toList();
+        final distinctValues = data
+            .map((d) => d[dataCol])
+            .where((v) => v != null)
+            .toSet()
+            .toList();
         scale.domain = distinctValues;
       }
-      scale.range = [
-        0,
-        height,
-      ]; // For ordinal Y, typically top to bottom for categories
+      scale.range = [0, height];
       return scale;
     } else {
       // Vertical bar or other: Y-axis maps to yColumn
       final preconfigured = yScale;
       final dataCol = yColumn;
-      // For vertical bars, Y is typically linear (value axis)
-      // Allow ordinal Y if explicitly configured or if yColumn is categorical (less common for bars)
+
+      // Check if we have stacked bars
+      final hasStackedBars = geometries.any((g) =>
+      g is BarGeometry && g.style == BarStyle.stacked);
+
       if (preconfigured is OrdinalScale ||
           (hasBarGeometry &&
               _isColumnCategorical(dataCol) &&
               preconfigured is! LinearScale)) {
-        final scale =
-            (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+        final scale = (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
         if (dataCol == null || data.isEmpty) {
           scale.domain = [];
           scale.range = [height, 0];
           return scale;
         }
         if (scale.domain.isEmpty) {
-          // Only set if not pre-configured
-          final distinctValues =
-              data
-                  .map((d) => d[dataCol])
-                  .where((v) => v != null)
-                  .toSet()
-                  .toList();
+          final distinctValues = data
+              .map((d) => d[dataCol])
+              .where((v) => v != null)
+              .toSet()
+              .toList();
           scale.domain = distinctValues;
         }
-        scale.range = [
-          height,
-          0,
-        ]; // Standard for cartesian Y ordinal: bottom to top
+        scale.range = [height, 0];
         return scale;
       } else {
         // Linear Y-axis (value axis for vertical bars)
-        final scale =
-            (preconfigured is LinearScale ? preconfigured : LinearScale());
+        final scale = (preconfigured is LinearScale ? preconfigured : LinearScale());
         if (dataCol == null || data.isEmpty) {
-          scale.domain =
-              scale.min != null && scale.max != null
-                  ? [scale.min!, scale.max!]
-                  : [0, 1];
+          scale.domain = scale.min != null && scale.max != null
+              ? [scale.min!, scale.max!]
+              : [0, 1];
           scale.range = [height, 0];
           return scale;
         }
-        final values =
-            data
-                .map((d) => _getNumericValue(d[dataCol]))
-                .where((v) => v != null && v.isFinite)
-                .cast<double>();
+
+        List<double> values;
+
+        if (hasStackedBars && colorColumn != null) {
+          // For stacked bars, calculate the maximum stacked total per group
+          final groups = <dynamic, double>{};
+          for (final point in data) {
+            final x = point[xColumn];
+            final y = _getNumericValue(point[yColumn]);
+            if (y == null || !y.isFinite || y <= 0) continue;
+
+            groups[x] = (groups[x] ?? 0) + y;
+          }
+          values = groups.values.where((v) => v.isFinite).cast<double>().toList();
+        } else {
+          // For regular bars/charts, use individual values
+          values = data
+              .map((d) => _getNumericValue(d[dataCol]))
+              .where((v) => v != null && v.isFinite)
+              .cast<double>()
+              .toList();
+        }
 
         if (values.isNotEmpty) {
-          double domainMin = scale.min ?? values.reduce(math.min);
+          double domainMin = scale.min ?? 0; // Always start from 0 for bar charts
           double domainMax = scale.max ?? values.reduce(math.max);
 
-          // Ensure 0 is included for bar charts, or handle single value cases
+          // Add some padding to the top for better visual appearance
+          if (hasStackedBars) {
+            domainMax = domainMax * 1.1; // Add 10% padding for stacked bars
+          }
+
+          // Handle single value case
           if (domainMin == domainMax) {
-            if (domainMin == 0) {
+            if (domainMax == 0) {
               domainMin = -0.5;
               domainMax = 0.5;
-            } else if (domainMin > 0) {
-              domainMax = domainMin + domainMin.abs() * 0.2;
+            } else if (domainMax > 0) {
+              domainMax = domainMax + domainMax * 0.2;
               domainMin = 0;
             } else {
               domainMin = domainMin - domainMin.abs() * 0.2;
               domainMax = 0;
             }
           } else {
+            // Ensure we always include 0 for bar charts
             if (domainMin > 0) domainMin = 0;
             if (domainMax < 0) domainMax = 0;
           }
+
           scale.domain = [domainMin, domainMax];
           if (scale.domain[0] == scale.domain[1]) {
-            // Still equal after adjustments
             scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
           }
         } else {
-          scale.domain =
-              scale.min != null && scale.max != null
-                  ? [scale.min!, scale.max!]
-                  : [0, 1];
+          scale.domain = scale.min != null && scale.max != null
+              ? [scale.min!, scale.max!]
+              : [0, 1];
         }
         scale.range = [height, 0]; // Inverted for screen Y
         return scale;
@@ -816,13 +823,13 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawStackedBars(
-    Canvas canvas,
-    Rect plotArea,
-    BarGeometry geometry,
-    Scale xScale,
-    Scale yScale,
-    ColorScale colorScale,
-  ) {
+      Canvas canvas,
+      Rect plotArea,
+      BarGeometry geometry,
+      Scale xScale,
+      Scale yScale,
+      ColorScale colorScale,
+      ) {
     // Group data by x value for stacking
     final groups = <dynamic, List<Map<String, dynamic>>>{};
     for (final point in data) {
@@ -836,8 +843,7 @@ class _AnimatedChartPainter extends CustomPainter {
       final groupData = groupEntry.value;
 
       // Staggered animation for stacked bars
-      final groupDelay =
-          groups.isNotEmpty ? groupIndex / groups.length * 0.2 : 0.0;
+      final groupDelay = groups.isNotEmpty ? groupIndex / groups.length * 0.3 : 0.0;
       final groupProgress = math.max(
         0.0,
         math.min(
@@ -851,27 +857,47 @@ class _AnimatedChartPainter extends CustomPainter {
         continue;
       }
 
+      // Sort group data by color for consistent stacking order
+      groupData.sort((a, b) {
+        final aColor = a[colorColumn]?.toString() ?? '';
+        final bColor = b[colorColumn]?.toString() ?? '';
+        return aColor.compareTo(bColor);
+      });
+
       // Calculate cumulative values for stacking
       double cumulativeValue = 0;
-      for (final point in groupData) {
+      for (int i = 0; i < groupData.length; i++) {
+        final point = groupData[i];
         final y = _getNumericValue(point[yColumn]);
-        if (y == null || !y.isFinite) continue;
+        if (y == null || !y.isFinite || y <= 0) continue; // Skip negative/invalid values for stacking
+
+        // Animate each segment with slight delay
+        final segmentDelay = i / groupData.length * 0.2;
+        final segmentProgress = math.max(
+          0.0,
+          math.min(
+            1.0,
+            (groupProgress - segmentDelay) / math.max(0.001, 1.0 - segmentDelay),
+          ),
+        );
+
+        if (segmentProgress <= 0) continue;
 
         _drawSingleBar(
           canvas,
           plotArea,
           geometry,
           x,
-          y,
+          y * segmentProgress, // Animate the height of this segment
           xScale,
           yScale,
           colorScale,
-          groupProgress,
+          1.0, // Full progress for the bar itself
           point,
           yStackOffset: cumulativeValue,
         );
 
-        cumulativeValue += y;
+        cumulativeValue += y * segmentProgress;
       }
 
       groupIndex++;

@@ -9,6 +9,7 @@ import 'graphs/groupedBar.dart';
 import 'graphs/horizontalBarChart.dart';
 import 'graphs/lineChart.dart';
 import 'graphs/scatterPlot.dart';
+import 'graphs/stackedBarChart.dart';
 
 void main() {
   runApp(CristalyseExampleApp());
@@ -100,11 +101,12 @@ class _ExampleHomeState extends State<ExampleHome>
   late final List<Map<String, dynamic>> _barChartData;
   late final List<Map<String, dynamic>> _groupedBarData;
   late final List<Map<String, dynamic>> _horizontalBarData;
+  late final List<Map<String, dynamic>> _stackedBarData;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -119,6 +121,7 @@ class _ExampleHomeState extends State<ExampleHome>
     });
 
     _generateSampleData();
+    _generateStackedBarData();
     _fabAnimationController.forward();
   }
 
@@ -187,6 +190,32 @@ class _ExampleHomeState extends State<ExampleHome>
     }).toList();
   }
 
+  void _generateStackedBarData() {
+    // Realistic stacked bar data - Revenue by Category per Quarter
+    final categories = ['Product Sales', 'Services', 'Subscriptions'];
+    final quarters = ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024'];
+    _stackedBarData = <Map<String, dynamic>>[];
+
+    for (final quarter in quarters) {
+      for (int i = 0; i < categories.length; i++) {
+        final category = categories[i];
+        // Different base values for each category to make stacking interesting
+        final baseValues = [40.0, 25.0, 30.0]; // Product Sales highest, Services middle, Subscriptions lowest
+        final quarterMultiplier = quarters.indexOf(quarter) * 0.2 + 1.0; // Growth over quarters
+        final categoryMultiplier = [1.0, 0.8, 1.2][i]; // Different growth rates per category
+
+        final revenue = baseValues[i] * quarterMultiplier * categoryMultiplier +
+            (math.Random().nextDouble() - 0.5) * 10; // Add some variance
+
+        _stackedBarData.add({
+          'quarter': quarter,
+          'category': category,
+          'revenue': math.max(5, revenue), // Ensure positive values
+        });
+      }
+    }
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -213,6 +242,7 @@ class _ExampleHomeState extends State<ExampleHome>
       case 2:
       case 3:
       case 4:
+      case 5:
         final value = _sliderValue.clamp(0.1, 1.0);
         return 'Bar Width: ${(value * 100).toStringAsFixed(0)}%';
       default:
@@ -226,7 +256,8 @@ class _ExampleHomeState extends State<ExampleHome>
       'User Growth Trends',
       'Quarterly Revenue',
       'Product Performance by Quarter',
-      'Team Size by Department'
+      'Team Size by Department',
+      'Revenue Breakdown by Category',
     ];
   }
 
@@ -236,7 +267,8 @@ class _ExampleHomeState extends State<ExampleHome>
       'Steady monthly growth with seasonal variations in user acquisition',
       'Strong Q4 performance driven by holiday sales and new partnerships',
       'Mobile app leading growth, API services showing steady adoption',
-      'Engineering team expansion supporting our product development goals'
+      'Engineering team expansion supporting our product development goals',
+      'Product sales continue to drive growth, with subscriptions showing strong momentum',
     ];
   }
 
@@ -288,120 +320,120 @@ class _ExampleHomeState extends State<ExampleHome>
       height: _showControls ? null : 0,
       child: _showControls
           ? Container(
-              margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+        margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.tune,
+                    color: Theme.of(context).primaryColor, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  'Chart Controls',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
                   ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => setState(() => _showControls = false),
+                  icon: const Icon(Icons.keyboard_arrow_up),
+                  iconSize: 18,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.tune,
-                          color: Theme.of(context).primaryColor, size: 18),
-                      const SizedBox(width: 8),
                       Text(
-                        'Chart Controls',
+                        _getDisplayedValue(),
                         style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).primaryColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[700],
                         ),
                       ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () => setState(() => _showControls = false),
-                        icon: const Icon(Icons.keyboard_arrow_up),
-                        iconSize: 18,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
+                      SliderTheme(
+                        data: SliderThemeData(
+                          trackHeight: 3,
+                          thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6,
+                          ),
+                          overlayShape: const RoundSliderOverlayShape(
+                            overlayRadius: 12,
+                          ),
+                        ),
+                        child: Slider(
+                          value: _sliderValue,
+                          min: 0.0,
+                          max: 1.0,
+                          divisions: 20,
+                          onChanged: (value) =>
+                              setState(() => _sliderValue = value),
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _getDisplayedValue(),
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            SliderTheme(
-                              data: SliderThemeData(
-                                trackHeight: 3,
-                                thumbShape: const RoundSliderThumbShape(
-                                  enabledThumbRadius: 6,
-                                ),
-                                overlayShape: const RoundSliderOverlayShape(
-                                  overlayRadius: 12,
-                                ),
-                              ),
-                              child: Slider(
-                                value: _sliderValue,
-                                min: 0.0,
-                                max: 1.0,
-                                divisions: 20,
-                                onChanged: (value) =>
-                                    setState(() => _sliderValue = value),
-                              ),
-                            ),
-                          ],
+                ),
+                const SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${_themeNames[_currentThemeIndex]} • ${_paletteNames[_currentPaletteIndex]}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: _colorPalettes[_currentPaletteIndex]
+                          .take(4)
+                          .map((color) => Container(
+                        width: 16,
+                        height: 16,
+                        margin: const EdgeInsets.only(right: 4),
+                        decoration: BoxDecoration(
+                          color: color,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 1.5,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${_themeNames[_currentThemeIndex]} • ${_paletteNames[_currentPaletteIndex]}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: _colorPalettes[_currentPaletteIndex]
-                                .take(4)
-                                .map((color) => Container(
-                                      width: 16,
-                                      height: 16,
-                                      margin: const EdgeInsets.only(right: 4),
-                                      decoration: BoxDecoration(
-                                        color: color,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 1.5,
-                                        ),
-                                      ),
-                                    ))
-                                .toList(),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            )
+                      ))
+                          .toList(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+      )
           : const SizedBox.shrink(),
     );
   }
@@ -454,6 +486,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Bar Chart'),
             Tab(text: 'Grouped Bars'),
             Tab(text: 'Horizontal Bars'),
+            Tab(text: 'Stacked Bars'),
           ],
         ),
       ),
@@ -531,6 +564,16 @@ class _ExampleHomeState extends State<ExampleHome>
                         'Avg Tenure', '2.8y', '+0.3y', Colors.purple),
                   ],
                 ),
+                _buildChartPage(
+                  chartTitles[5],
+                  chartDescriptions[5],
+                  buildStackedBarTab(currentTheme, _stackedBarData, _sliderValue),
+                  [
+                    _buildStatsCard('Total Revenue', '\$385k', '+18.2%', Colors.green),
+                    _buildStatsCard('Product Mix', '52%', '+3.1%', Colors.blue),
+                    _buildStatsCard('Growth Rate', '23.4%', '+5.7%', Colors.orange),
+                  ],
+                ),
               ],
             ),
           ),
@@ -605,11 +648,11 @@ class _ExampleHomeState extends State<ExampleHome>
           Row(
             children: stats
                 .map((stat) => Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: stat,
-                      ),
-                    ))
+              child: Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: stat,
+              ),
+            ))
                 .toList(),
           ),
 
@@ -684,31 +727,31 @@ class _ExampleHomeState extends State<ExampleHome>
     return Column(
       children: features
           .map((feature) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        feature,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[700],
-                          height: 1.3,
-                        ),
-                      ),
-                    ),
-                  ],
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(
+          children: [
+            Container(
+              width: 4,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                feature,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.grey[700],
+                  height: 1.3,
                 ),
-              ))
+              ),
+            ),
+          ],
+        ),
+      ))
           .toList(),
     );
   }
@@ -749,6 +792,13 @@ class _ExampleHomeState extends State<ExampleHome>
           'Ideal for ranking and categorical comparisons',
           'Space-efficient labeling for long category names',
           'Consistent animation system across orientations'
+        ];
+      case 5:
+        return [
+          'Segment-by-segment progressive stacking animation',
+          'Automatic part-to-whole relationship visualization',
+          'Consistent color mapping across all segments',
+          'Perfect for budget breakdowns and composition analysis'
         ];
       default:
         return [];
