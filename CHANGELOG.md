@@ -1,3 +1,8 @@
+## 0.4.1 - 2025-06-12
+
+#### Technical
+- Code quality improvements and linting compliance
+
 ## 0.4.0 - 2025-06-12
 
 #### Added

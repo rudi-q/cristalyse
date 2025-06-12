@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
@@ -22,11 +20,14 @@ Widget buildHorizontalBarTab(ChartTheme currentTheme,
               .scaleXOrdinal()
               .scaleYContinuous(min: 0)
               .theme(currentTheme)
-              .animate(duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuart)
+              .animate(
+                  duration: Duration(milliseconds: 1000),
+                  curve: Curves.easeOutQuart)
               .build(),
         ),
         SizedBox(height: 16),
-        Text('• Bars grow from left to right\n• Categorical Y-axis for departments\n• Great for ranking data'),
+        Text(
+            '• Bars grow from left to right\n• Categorical Y-axis for departments\n• Great for ranking data'),
       ],
     ),
   );

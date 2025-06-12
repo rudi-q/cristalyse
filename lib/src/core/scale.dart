@@ -89,7 +89,9 @@ class OrdinalScale extends Scale {
     final totalRange = _range[1] - _range[0];
     final paddingSpace = _padding * totalRange / 2; // Split padding
 
-    return _range[0] + paddingSpace + index * (_bandWidth + _padding * totalRange / _domain.length);
+    return _range[0] +
+        paddingSpace +
+        index * (_bandWidth + _padding * totalRange / _domain.length);
   }
 
   /// Get the center position of a band

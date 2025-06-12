@@ -9,18 +9,14 @@ void main() {
         {'x': 2, 'y': 3},
       ];
 
-      final chart = CristalyseChart()
-          .data(data)
-          .mapping(x: 'x', y: 'y')
-          .geomPoint();
+      final chart =
+          CristalyseChart().data(data).mapping(x: 'x', y: 'y').geomPoint();
 
       expect(chart, isNotNull);
     });
 
     test('should handle empty data', () {
-      final chart = CristalyseChart()
-          .data([])
-          .geomPoint();
+      final chart = CristalyseChart().data([]).geomPoint();
 
       expect(chart, isNotNull);
     });

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cristalyse/cristalyse.dart';
 import 'package:cristalyse_example/chartTheme.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +9,6 @@ import 'graphs/groupedBar.dart';
 import 'graphs/horizontalBarChart.dart';
 import 'graphs/lineChart.dart';
 import 'graphs/scatterPlot.dart';
-
-import 'dart:math' as math;
 
 void main() {
   runApp(CristalyseExampleApp());
@@ -35,7 +35,8 @@ class ExampleHome extends StatefulWidget {
   State<ExampleHome> createState() => _ExampleHomeState();
 }
 
-class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin {
+class _ExampleHomeState extends State<ExampleHome>
+    with TickerProviderStateMixin {
   late TabController _tabController;
   int _currentThemeIndex = 0;
   final _themes = [
@@ -89,8 +90,10 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
 
     _scatterPlotData = List.generate(50, (i) {
       final x = i.toDouble();
-      final y =
-          x * 0.5 + (i % 3) * 2 + (i % 7) * 0.3 + math.Random().nextDouble() * 2;
+      final y = x * 0.5 +
+          (i % 3) * 2 +
+          (i % 7) * 0.3 +
+          math.Random().nextDouble() * 2;
       final category = ['Alpha', 'Beta', 'Gamma'][i % 3];
       return {'x': x, 'y': y, 'category': category, 'size': (i % 5) + 1.0};
     });
@@ -212,7 +215,8 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
             child: TabBarView(
               controller: _tabController,
               children: [
-                buildScatterPlotTab(currentTheme, _scatterPlotData, _sliderValue),
+                buildScatterPlotTab(
+                    currentTheme, _scatterPlotData, _sliderValue),
                 buildLineChartTab(currentTheme, _lineChartData, _sliderValue),
                 buildBarChartTab(currentTheme, _barChartData, _sliderValue),
                 buildGroupedBarTab(currentTheme, _groupedBarData, _sliderValue),

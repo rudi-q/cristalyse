@@ -191,10 +191,11 @@ class _AnimatedChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (data.isEmpty || geometries.isEmpty) {
-      final debugPaint = Paint()
-        ..color = Colors.red
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0;
+      final debugPaint =
+          Paint()
+            ..color = Colors.red
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.0;
       canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), debugPaint);
       return;
     }
@@ -211,16 +212,23 @@ class _AnimatedChartPainter extends CustomPainter {
     );
 
     if (plotArea.width <= 0 || plotArea.height <= 0) {
-      final debugPaint = Paint()
-        ..color = Colors.yellow
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0;
+      final debugPaint =
+          Paint()
+            ..color = Colors.yellow
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.0;
       canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), debugPaint);
       return;
     }
 
-    final xScale = _setupXScale(plotArea.width, geometries.any((g) => g is BarGeometry));
-    final yScale = _setupYScale(plotArea.height, geometries.any((g) => g is BarGeometry));
+    final xScale = _setupXScale(
+      plotArea.width,
+      geometries.any((g) => g is BarGeometry),
+    );
+    final yScale = _setupYScale(
+      plotArea.height,
+      geometries.any((g) => g is BarGeometry),
+    );
     final colorScale = _setupColorScale();
     final sizeScale = _setupSizeScale();
 
@@ -252,21 +260,28 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   Scale _setupXScale(double width, bool hasBarGeometry) {
-    if (coordFlipped) { // Horizontal bar: X-axis is linear, maps to yColumn (value axis)
-      final preconfigured = yScale; // Horizontal X-axis uses Y's preconfigured scale if applicable
-      final scale = (preconfigured is LinearScale ? preconfigured : LinearScale());
+    if (coordFlipped) {
+      // Horizontal bar: X-axis is linear, maps to yColumn (value axis)
+      final preconfigured =
+          yScale; // Horizontal X-axis uses Y's preconfigured scale if applicable
+      final scale =
+          (preconfigured is LinearScale ? preconfigured : LinearScale());
       final dataCol = yColumn;
 
       if (dataCol == null || data.isEmpty) {
-        scale.domain = scale.min != null && scale.max != null ? [scale.min!, scale.max!] : [0, 1];
+        scale.domain =
+            scale.min != null && scale.max != null
+                ? [scale.min!, scale.max!]
+                : [0, 1];
         scale.range = [0, width];
         return scale;
       }
 
-      final values = data
-          .map((d) => _getNumericValue(d[dataCol]))
-          .where((v) => v != null && v.isFinite)
-          .cast<double>();
+      final values =
+          data
+              .map((d) => _getNumericValue(d[dataCol]))
+              .where((v) => v != null && v.isFinite)
+              .cast<double>();
 
       if (values.isNotEmpty) {
         double domainMin = scale.min ?? values.reduce(math.min);
@@ -274,49 +289,78 @@ class _AnimatedChartPainter extends CustomPainter {
 
         // Ensure 0 is included for bar charts, or handle single value cases
         if (domainMin == domainMax) {
-          if (domainMin == 0) { domainMin = -0.5; domainMax = 0.5; } // Single value is 0
-          else if (domainMin > 0) { domainMax = domainMin + domainMin.abs() * 0.2; domainMin = 0; } // Single positive value
-          else { domainMin = domainMin - domainMin.abs() * 0.2; domainMax = 0; } // Single negative value
+          if (domainMin == 0) {
+            domainMin = -0.5;
+            domainMax = 0.5;
+          } // Single value is 0
+          else if (domainMin > 0) {
+            domainMax = domainMin + domainMin.abs() * 0.2;
+            domainMin = 0;
+          } // Single positive value
+          else {
+            domainMin = domainMin - domainMin.abs() * 0.2;
+            domainMax = 0;
+          } // Single negative value
         } else {
-          if (domainMin > 0) domainMin = 0; // If all values positive, extend to 0
-          if (domainMax < 0) domainMax = 0; // If all values negative, extend to 0
+          if (domainMin > 0)
+            domainMin = 0; // If all values positive, extend to 0
+          if (domainMax < 0)
+            domainMax = 0; // If all values negative, extend to 0
         }
         scale.domain = [domainMin, domainMax];
-        if (scale.domain[0] == scale.domain[1]) { // Still equal after adjustments (e.g. min=0, max=0)
-            scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+        if (scale.domain[0] == scale.domain[1]) {
+          // Still equal after adjustments (e.g. min=0, max=0)
+          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
         }
       } else {
-        scale.domain = scale.min != null && scale.max != null ? [scale.min!, scale.max!] : [0, 1]; // Default if no valid values
+        scale.domain =
+            scale.min != null && scale.max != null
+                ? [scale.min!, scale.max!]
+                : [0, 1]; // Default if no valid values
       }
       scale.range = [0, width];
       return scale;
-    } else { // Vertical bar or other: X-axis maps to xColumn
+    } else {
+      // Vertical bar or other: X-axis maps to xColumn
       final preconfigured = xScale;
       final dataCol = xColumn;
-      if (preconfigured is OrdinalScale || (hasBarGeometry && _isColumnCategorical(dataCol))) {
-        final scale = (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+      if (preconfigured is OrdinalScale ||
+          (hasBarGeometry && _isColumnCategorical(dataCol))) {
+        final scale =
+            (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
         if (dataCol == null || data.isEmpty) {
           scale.domain = [];
           scale.range = [0, width];
           return scale;
         }
-        if (scale.domain.isEmpty) { // Only set if not pre-configured
-          final distinctValues = data.map((d) => d[dataCol]).where((v) => v != null).toSet().toList();
+        if (scale.domain.isEmpty) {
+          // Only set if not pre-configured
+          final distinctValues =
+              data
+                  .map((d) => d[dataCol])
+                  .where((v) => v != null)
+                  .toSet()
+                  .toList();
           scale.domain = distinctValues;
         }
         scale.range = [0, width];
         return scale;
       } else {
-        final scale = (preconfigured is LinearScale ? preconfigured : LinearScale());
+        final scale =
+            (preconfigured is LinearScale ? preconfigured : LinearScale());
         if (dataCol == null || data.isEmpty) {
-          scale.domain = scale.min != null && scale.max != null ? [scale.min!, scale.max!] : [0, 1];
+          scale.domain =
+              scale.min != null && scale.max != null
+                  ? [scale.min!, scale.max!]
+                  : [0, 1];
           scale.range = [0, width];
           return scale;
         }
-        final values = data
-            .map((d) => _getNumericValue(d[dataCol]))
-            .where((v) => v != null && v.isFinite)
-            .cast<double>();
+        final values =
+            data
+                .map((d) => _getNumericValue(d[dataCol]))
+                .where((v) => v != null && v.isFinite)
+                .cast<double>();
 
         if (values.isNotEmpty) {
           double domainMin = scale.min ?? values.reduce(math.min);
@@ -324,19 +368,34 @@ class _AnimatedChartPainter extends CustomPainter {
 
           // Ensure 0 is included for bar charts, or handle single value cases
           if (domainMin == domainMax) {
-            if (domainMin == 0) { domainMin = -0.5; domainMax = 0.5; } // Single value is 0
-            else if (domainMin > 0) { domainMax = domainMin + domainMin.abs() * 0.2; domainMin = 0; } // Single positive value
-            else { domainMin = domainMin - domainMin.abs() * 0.2; domainMax = 0; } // Single negative value
+            if (domainMin == 0) {
+              domainMin = -0.5;
+              domainMax = 0.5;
+            } // Single value is 0
+            else if (domainMin > 0) {
+              domainMax = domainMin + domainMin.abs() * 0.2;
+              domainMin = 0;
+            } // Single positive value
+            else {
+              domainMin = domainMin - domainMin.abs() * 0.2;
+              domainMax = 0;
+            } // Single negative value
           } else {
-            if (domainMin > 0) domainMin = 0; // If all values positive, extend to 0
-            if (domainMax < 0) domainMax = 0; // If all values negative, extend to 0
+            if (domainMin > 0)
+              domainMin = 0; // If all values positive, extend to 0
+            if (domainMax < 0)
+              domainMax = 0; // If all values negative, extend to 0
           }
           scale.domain = [domainMin, domainMax];
-           if (scale.domain[0] == scale.domain[1]) { // Still equal after adjustments
+          if (scale.domain[0] == scale.domain[1]) {
+            // Still equal after adjustments
             scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
           }
         } else {
-          scale.domain = scale.min != null && scale.max != null ? [scale.min!, scale.max!] : [0, 1];
+          scale.domain =
+              scale.min != null && scale.max != null
+                  ? [scale.min!, scale.max!]
+                  : [0, 1];
         }
         scale.range = [0, width];
         return scale;
@@ -345,51 +404,86 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   Scale _setupYScale(double height, bool hasBarGeometry) {
-    if (coordFlipped) { // Horizontal bar: Y-axis is ordinal, maps to xColumn (category axis)
-      final preconfigured = xScale; // Horizontal Y-axis uses X's preconfigured scale
-      final scale = (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+    if (coordFlipped) {
+      // Horizontal bar: Y-axis is ordinal, maps to xColumn (category axis)
+      final preconfigured =
+          xScale; // Horizontal Y-axis uses X's preconfigured scale
+      final scale =
+          (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
       final dataCol = xColumn;
 
       if (dataCol == null || data.isEmpty) {
         scale.domain = [];
-        scale.range = [0, height]; // Or [height, 0] depending on desired category order
+        scale.range = [
+          0,
+          height,
+        ]; // Or [height, 0] depending on desired category order
         return scale;
       }
-      if (scale.domain.isEmpty) { // Only set if not pre-configured
-        final distinctValues = data.map((d) => d[dataCol]).where((v) => v != null).toSet().toList();
+      if (scale.domain.isEmpty) {
+        // Only set if not pre-configured
+        final distinctValues =
+            data
+                .map((d) => d[dataCol])
+                .where((v) => v != null)
+                .toSet()
+                .toList();
         scale.domain = distinctValues;
       }
-      scale.range = [0, height]; // For ordinal Y, typically top to bottom for categories
+      scale.range = [
+        0,
+        height,
+      ]; // For ordinal Y, typically top to bottom for categories
       return scale;
-    } else { // Vertical bar or other: Y-axis maps to yColumn
+    } else {
+      // Vertical bar or other: Y-axis maps to yColumn
       final preconfigured = yScale;
       final dataCol = yColumn;
       // For vertical bars, Y is typically linear (value axis)
       // Allow ordinal Y if explicitly configured or if yColumn is categorical (less common for bars)
-      if (preconfigured is OrdinalScale || (hasBarGeometry && _isColumnCategorical(dataCol) && preconfigured is! LinearScale )) {
-        final scale = (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+      if (preconfigured is OrdinalScale ||
+          (hasBarGeometry &&
+              _isColumnCategorical(dataCol) &&
+              preconfigured is! LinearScale)) {
+        final scale =
+            (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
         if (dataCol == null || data.isEmpty) {
           scale.domain = [];
-          scale.range = [height, 0]; 
-          return scale;
-        }
-        if (scale.domain.isEmpty) { // Only set if not pre-configured
-          final distinctValues = data.map((d) => d[dataCol]).where((v) => v != null).toSet().toList();
-          scale.domain = distinctValues;
-        }
-        scale.range = [height, 0]; // Standard for cartesian Y ordinal: bottom to top
-        return scale;
-      } else { // Linear Y-axis (value axis for vertical bars)
-        final scale = (preconfigured is LinearScale ? preconfigured : LinearScale());
-        if (dataCol == null || data.isEmpty) {
-          scale.domain = scale.min != null && scale.max != null ? [scale.min!, scale.max!] : [0, 1];
           scale.range = [height, 0];
           return scale;
         }
-        final values = data
-            .map((d) => _getNumericValue(d[dataCol]))
-            .where((v) => v != null && v.isFinite)
-            .cast<double>();
+        if (scale.domain.isEmpty) {
+          // Only set if not pre-configured
+          final distinctValues =
+              data
+                  .map((d) => d[dataCol])
+                  .where((v) => v != null)
+                  .toSet()
+                  .toList();
+          scale.domain = distinctValues;
+        }
+        scale.range = [
+          height,
+          0,
+        ]; // Standard for cartesian Y ordinal: bottom to top
+        return scale;
+      } else {
+        // Linear Y-axis (value axis for vertical bars)
+        final scale =
+            (preconfigured is LinearScale ? preconfigured : LinearScale());
+        if (dataCol == null || data.isEmpty) {
+          scale.domain =
+              scale.min != null && scale.max != null
+                  ? [scale.min!, scale.max!]
+                  : [0, 1];
+          scale.range = [height, 0];
+          return scale;
+        }
+        final values =
+            data
+                .map((d) => _getNumericValue(d[dataCol]))
+                .where((v) => v != null && v.isFinite)
+                .cast<double>();
 
         if (values.isNotEmpty) {
           double domainMin = scale.min ?? values.reduce(math.min);
@@ -397,19 +491,30 @@ class _AnimatedChartPainter extends CustomPainter {
 
           // Ensure 0 is included for bar charts, or handle single value cases
           if (domainMin == domainMax) {
-            if (domainMin == 0) { domainMin = -0.5; domainMax = 0.5; }
-            else if (domainMin > 0) { domainMax = domainMin + domainMin.abs() * 0.2; domainMin = 0; }
-            else { domainMin = domainMin - domainMin.abs() * 0.2; domainMax = 0; }
+            if (domainMin == 0) {
+              domainMin = -0.5;
+              domainMax = 0.5;
+            } else if (domainMin > 0) {
+              domainMax = domainMin + domainMin.abs() * 0.2;
+              domainMin = 0;
+            } else {
+              domainMin = domainMin - domainMin.abs() * 0.2;
+              domainMax = 0;
+            }
           } else {
             if (domainMin > 0) domainMin = 0;
             if (domainMax < 0) domainMax = 0;
           }
           scale.domain = [domainMin, domainMax];
-           if (scale.domain[0] == scale.domain[1]) { // Still equal after adjustments
+          if (scale.domain[0] == scale.domain[1]) {
+            // Still equal after adjustments
             scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
           }
         } else {
-          scale.domain = scale.min != null && scale.max != null ? [scale.min!, scale.max!] : [0, 1];
+          scale.domain =
+              scale.min != null && scale.max != null
+                  ? [scale.min!, scale.max!]
+                  : [0, 1];
         }
         scale.range = [height, 0]; // Inverted for screen Y
         return scale;
@@ -424,7 +529,8 @@ class _AnimatedChartPainter extends CustomPainter {
     for (final row in data) {
       final value = row[column];
       if (value != null) {
-        return value is String || value is bool; // Add other types if considered categorical
+        return value is String ||
+            value is bool; // Add other types if considered categorical
       }
     }
     return false; // Default to non-categorical if all values are null or column is empty
@@ -440,10 +546,11 @@ class _AnimatedChartPainter extends CustomPainter {
   SizeScale _setupSizeScale() {
     if (sizeColumn == null) return SizeScale();
 
-    final values = data
-        .map((d) => _getNumericValue(d[sizeColumn]))
-        .where((v) => v != null)
-        .cast<double>();
+    final values =
+        data
+            .map((d) => _getNumericValue(d[sizeColumn]))
+            .where((v) => v != null)
+            .cast<double>();
     if (values.isNotEmpty) {
       return SizeScale(
         domain: [values.reduce(math.min), values.reduce(math.max)],
@@ -464,17 +571,14 @@ class _AnimatedChartPainter extends CustomPainter {
     canvas.drawRect(plotArea, paint);
   }
 
-  void _drawGrid(
-      Canvas canvas,
-      Rect plotArea,
-      Scale xScale,
-      Scale yScale,
-      ) {
-    final paint = Paint()
-      ..color = theme.gridColor.withAlpha(
-        (math.max(0.0, math.min(1.0, animationProgress * 0.5)) * 255).round(),
-      )
-      ..strokeWidth = math.max(0.1, theme.gridWidth);
+  void _drawGrid(Canvas canvas, Rect plotArea, Scale xScale, Scale yScale) {
+    final paint =
+        Paint()
+          ..color = theme.gridColor.withAlpha(
+            (math.max(0.0, math.min(1.0, animationProgress * 0.5)) * 255)
+                .round(),
+          )
+          ..strokeWidth = math.max(0.1, theme.gridWidth);
 
     // Vertical grid lines
     final xTicks = xScale.getTicks(5);
@@ -487,7 +591,8 @@ class _AnimatedChartPainter extends CustomPainter {
         x = plotArea.left + xScale.scale(tick);
       }
 
-      if (!x.isFinite || x < plotArea.left - 10 || x > plotArea.right + 10) continue;
+      if (!x.isFinite || x < plotArea.left - 10 || x > plotArea.right + 10)
+        continue;
 
       canvas.drawLine(
         Offset(x, plotArea.top),
@@ -507,7 +612,8 @@ class _AnimatedChartPainter extends CustomPainter {
         y = plotArea.top + yScale.scale(tick);
       }
 
-      if (!y.isFinite || y < plotArea.top - 10 || y > plotArea.bottom + 10) continue;
+      if (!y.isFinite || y < plotArea.top - 10 || y > plotArea.bottom + 10)
+        continue;
 
       canvas.drawLine(
         Offset(plotArea.left, y),
@@ -518,14 +624,14 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawGeometry(
-      Canvas canvas,
-      Rect plotArea,
-      Geometry geometry,
-      Scale xScale,
-      Scale yScale,
-      ColorScale colorScale,
-      SizeScale sizeScale,
-      ) {
+    Canvas canvas,
+    Rect plotArea,
+    Geometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+    SizeScale sizeScale,
+  ) {
     if (geometry is PointGeometry) {
       _drawPointsAnimated(
         canvas,
@@ -546,25 +652,18 @@ class _AnimatedChartPainter extends CustomPainter {
         colorScale,
       );
     } else if (geometry is BarGeometry) {
-      _drawBarsAnimated(
-        canvas,
-        plotArea,
-        geometry,
-        xScale,
-        yScale,
-        colorScale,
-      );
+      _drawBarsAnimated(canvas, plotArea, geometry, xScale, yScale, colorScale);
     }
   }
 
   void _drawBarsAnimated(
-      Canvas canvas,
-      Rect plotArea,
-      BarGeometry geometry,
-      Scale xScale,
-      Scale yScale,
-      ColorScale colorScale,
-      ) {
+    Canvas canvas,
+    Rect plotArea,
+    BarGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+  ) {
     if (colorColumn != null && geometry.style == BarStyle.grouped) {
       _drawGroupedBars(canvas, plotArea, geometry, xScale, yScale, colorScale);
     } else if (colorColumn != null && geometry.style == BarStyle.stacked) {
@@ -575,13 +674,13 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawSimpleBars(
-      Canvas canvas,
-      Rect plotArea,
-      BarGeometry geometry,
-      Scale xScale,
-      Scale yScale,
-      ColorScale colorScale,
-      ) {
+    Canvas canvas,
+    Rect plotArea,
+    BarGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+  ) {
     for (int i = 0; i < data.length; i++) {
       final point = data[i];
       final x = point[xColumn];
@@ -593,7 +692,10 @@ class _AnimatedChartPainter extends CustomPainter {
       final barDelay = data.isNotEmpty ? i / data.length * 0.2 : 0.0;
       final barProgress = math.max(
         0.0,
-        math.min(1.0, (animationProgress - barDelay) / math.max(0.001, 1.0 - barDelay)),
+        math.min(
+          1.0,
+          (animationProgress - barDelay) / math.max(0.001, 1.0 - barDelay),
+        ),
       );
 
       if (barProgress <= 0) continue;
@@ -614,13 +716,13 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawGroupedBars(
-      Canvas canvas,
-      Rect plotArea,
-      BarGeometry geometry,
-      Scale xScale,
-      Scale yScale,
-      ColorScale colorScale,
-      ) {
+    Canvas canvas,
+    Rect plotArea,
+    BarGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+  ) {
     // Group data by x value and color
     final groups = <dynamic, Map<dynamic, double>>{};
     for (final point in data) {
@@ -643,10 +745,14 @@ class _AnimatedChartPainter extends CustomPainter {
       final colorValues = groupEntry.value;
 
       // Staggered animation for grouped bars
-      final groupDelay = groups.isNotEmpty ? groupIndex / groups.length * 0.2 : 0.0;
+      final groupDelay =
+          groups.isNotEmpty ? groupIndex / groups.length * 0.2 : 0.0;
       final groupProgress = math.max(
         0.0,
-        math.min(1.0, (animationProgress - groupDelay) / math.max(0.001, 1.0 - groupDelay)),
+        math.min(
+          1.0,
+          (animationProgress - groupDelay) / math.max(0.001, 1.0 - groupDelay),
+        ),
       );
 
       if (groupProgress <= 0) {
@@ -662,7 +768,10 @@ class _AnimatedChartPainter extends CustomPainter {
         basePosition = plotArea.left + xScale.scale(x);
         totalGroupWidth = xScale.bandWidth * geometry.width;
       } else {
-        basePosition = plotArea.left + xScale.scale(x) - 20; // Default width for continuous
+        basePosition =
+            plotArea.left +
+            xScale.scale(x) -
+            20; // Default width for continuous
         totalGroupWidth = 40 * geometry.width;
       }
 
@@ -701,13 +810,13 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawStackedBars(
-      Canvas canvas,
-      Rect plotArea,
-      BarGeometry geometry,
-      Scale xScale,
-      Scale yScale,
-      ColorScale colorScale,
-      ) {
+    Canvas canvas,
+    Rect plotArea,
+    BarGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+  ) {
     // Group data by x value for stacking
     final groups = <dynamic, List<Map<String, dynamic>>>{};
     for (final point in data) {
@@ -721,10 +830,14 @@ class _AnimatedChartPainter extends CustomPainter {
       final groupData = groupEntry.value;
 
       // Staggered animation for stacked bars
-      final groupDelay = groups.isNotEmpty ? groupIndex / groups.length * 0.2 : 0.0;
+      final groupDelay =
+          groups.isNotEmpty ? groupIndex / groups.length * 0.2 : 0.0;
       final groupProgress = math.max(
         0.0,
-        math.min(1.0, (animationProgress - groupDelay) / math.max(0.001, 1.0 - groupDelay)),
+        math.min(
+          1.0,
+          (animationProgress - groupDelay) / math.max(0.001, 1.0 - groupDelay),
+        ),
       );
 
       if (groupProgress <= 0) {
@@ -774,15 +887,17 @@ class _AnimatedChartPainter extends CustomPainter {
     double? customWidth, // For grouped bars
     double yStackOffset = 0, // For stacked bars
   }) {
-    final color = colorColumn != null
-        ? colorScale.scale(dataPoint[colorColumn])
-        : (theme.colorPalette.isNotEmpty
-            ? theme.colorPalette.first
-            : theme.primaryColor);
+    final color =
+        colorColumn != null
+            ? colorScale.scale(dataPoint[colorColumn])
+            : (theme.colorPalette.isNotEmpty
+                ? theme.colorPalette.first
+                : theme.primaryColor);
 
-    final paint = Paint()
-      ..color = color.withAlpha((geometry.alpha * 255).round())
-      ..style = PaintingStyle.fill;
+    final paint =
+        Paint()
+          ..color = color.withAlpha((geometry.alpha * 255).round())
+          ..style = PaintingStyle.fill;
 
     Rect barRect;
 
@@ -832,7 +947,8 @@ class _AnimatedChartPainter extends CustomPainter {
 
       barRect = Rect.fromLTWH(
         xPos.isFinite ? xPos : 0,
-        yStart - (barHeight * animationProgress), // Animate height from baseline
+        yStart -
+            (barHeight * animationProgress), // Animate height from baseline
         barWidth.isFinite ? barWidth : 0,
         barHeight.isFinite ? barHeight * animationProgress : 0,
       );
@@ -843,7 +959,8 @@ class _AnimatedChartPainter extends CustomPainter {
     }
 
     // Draw the bar with optional border radius
-    if (geometry.borderRadius != null && geometry.borderRadius != BorderRadius.zero) {
+    if (geometry.borderRadius != null &&
+        geometry.borderRadius != BorderRadius.zero) {
       canvas.drawRRect(geometry.borderRadius!.toRRect(barRect), paint);
     } else {
       canvas.drawRect(barRect, paint);
@@ -851,12 +968,16 @@ class _AnimatedChartPainter extends CustomPainter {
 
     // Draw border if specified
     if (geometry.borderWidth > 0) {
-      final borderPaint = Paint()
-        ..color = theme.borderColor.withAlpha((geometry.alpha * 255).round())
-        ..strokeWidth = geometry.borderWidth
-        ..style = PaintingStyle.stroke;
+      final borderPaint =
+          Paint()
+            ..color = theme.borderColor.withAlpha(
+              (geometry.alpha * 255).round(),
+            )
+            ..strokeWidth = geometry.borderWidth
+            ..style = PaintingStyle.stroke;
 
-      if (geometry.borderRadius != null && geometry.borderRadius != BorderRadius.zero) {
+      if (geometry.borderRadius != null &&
+          geometry.borderRadius != BorderRadius.zero) {
         canvas.drawRRect(geometry.borderRadius!.toRRect(barRect), borderPaint);
       } else {
         canvas.drawRect(barRect, borderPaint);
@@ -865,14 +986,14 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawPointsAnimated(
-      Canvas canvas,
-      Rect plotArea,
-      PointGeometry geometry,
-      Scale xScale,
-      Scale yScale,
-      ColorScale colorScale,
-      SizeScale sizeScale,
-      ) {
+    Canvas canvas,
+    Rect plotArea,
+    PointGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+    SizeScale sizeScale,
+  ) {
     for (int i = 0; i < data.length; i++) {
       final point = data[i];
       final x = _getNumericValue(point[xColumn]);
@@ -884,34 +1005,38 @@ class _AnimatedChartPainter extends CustomPainter {
       final pointDelay = data.isNotEmpty ? i / data.length * 0.2 : 0.0;
       final pointProgress = math.max(
         0.0,
-        math.min(1.0, (animationProgress - pointDelay) / math.max(0.001, 1.0 - pointDelay)),
+        math.min(
+          1.0,
+          (animationProgress - pointDelay) / math.max(0.001, 1.0 - pointDelay),
+        ),
       );
 
       if (pointProgress <= 0) continue;
 
-      final color = colorColumn != null
-          ? colorScale.scale(point[colorColumn])
-          : (theme.colorPalette.isNotEmpty
-              ? theme.colorPalette.first
-              : theme.primaryColor);
+      final color =
+          colorColumn != null
+              ? colorScale.scale(point[colorColumn])
+              : (theme.colorPalette.isNotEmpty
+                  ? theme.colorPalette.first
+                  : theme.primaryColor);
 
-      final size = sizeColumn != null
-          ? sizeScale.scale(point[sizeColumn])
-          : theme.pointSizeDefault;
+      final size =
+          sizeColumn != null
+              ? sizeScale.scale(point[sizeColumn])
+              : theme.pointSizeDefault;
 
-      final paint = Paint()
-        ..color = color.withAlpha((geometry.alpha * pointProgress * 255).round())
-        ..style = PaintingStyle.fill;
+      final paint =
+          Paint()
+            ..color = color.withAlpha(
+              (geometry.alpha * pointProgress * 255).round(),
+            )
+            ..style = PaintingStyle.fill;
 
       final pointX = plotArea.left + xScale.scale(x);
       final pointY = plotArea.top + yScale.scale(y);
 
       if (geometry.shape == PointShape.circle) {
-        canvas.drawCircle(
-          Offset(pointX, pointY),
-          size * pointProgress,
-          paint,
-        );
+        canvas.drawCircle(Offset(pointX, pointY), size * pointProgress, paint);
       } else if (geometry.shape == PointShape.square) {
         canvas.drawRect(
           Rect.fromCenter(
@@ -924,18 +1049,27 @@ class _AnimatedChartPainter extends CustomPainter {
       } else if (geometry.shape == PointShape.triangle) {
         final path = Path();
         path.moveTo(pointX, pointY - size * pointProgress);
-        path.lineTo(pointX - size * pointProgress, pointY + size * pointProgress);
-        path.lineTo(pointX + size * pointProgress, pointY + size * pointProgress);
+        path.lineTo(
+          pointX - size * pointProgress,
+          pointY + size * pointProgress,
+        );
+        path.lineTo(
+          pointX + size * pointProgress,
+          pointY + size * pointProgress,
+        );
         path.close();
         canvas.drawPath(path, paint);
       }
 
       // Draw border if specified
       if (geometry.borderWidth > 0) {
-        final borderPaint = Paint()
-          ..color = theme.borderColor.withAlpha((geometry.alpha * pointProgress * 255).round())
-          ..strokeWidth = geometry.borderWidth
-          ..style = PaintingStyle.stroke;
+        final borderPaint =
+            Paint()
+              ..color = theme.borderColor.withAlpha(
+                (geometry.alpha * pointProgress * 255).round(),
+              )
+              ..strokeWidth = geometry.borderWidth
+              ..style = PaintingStyle.stroke;
 
         if (geometry.shape == PointShape.circle) {
           canvas.drawCircle(
@@ -955,8 +1089,14 @@ class _AnimatedChartPainter extends CustomPainter {
         } else if (geometry.shape == PointShape.triangle) {
           final path = Path();
           path.moveTo(pointX, pointY - size * pointProgress);
-          path.lineTo(pointX - size * pointProgress, pointY + size * pointProgress);
-          path.lineTo(pointX + size * pointProgress, pointY + size * pointProgress);
+          path.lineTo(
+            pointX - size * pointProgress,
+            pointY + size * pointProgress,
+          );
+          path.lineTo(
+            pointX + size * pointProgress,
+            pointY + size * pointProgress,
+          );
           path.close();
           canvas.drawPath(path, borderPaint);
         }
@@ -965,49 +1105,58 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawLinesAnimated(
-      Canvas canvas,
-      Rect plotArea,
-      LineGeometry geometry,
-      Scale xScale,
-      Scale yScale,
-      ColorScale colorScale,
-      ) {
-    final color = colorColumn != null
-        ? colorScale.scale(data.first[colorColumn])
-        : (theme.colorPalette.isNotEmpty
-            ? theme.colorPalette.first
-            : theme.primaryColor);
+    Canvas canvas,
+    Rect plotArea,
+    LineGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+  ) {
+    final color =
+        colorColumn != null
+            ? colorScale.scale(data.first[colorColumn])
+            : (theme.colorPalette.isNotEmpty
+                ? theme.colorPalette.first
+                : theme.primaryColor);
 
-    final points = data
-        .map((point) {
-          // Ensure x and y values are numeric before scaling
-          final num? xVal = _getNumericValue(point[xColumn]);
-          final num? yVal = _getNumericValue(point[yColumn]);
-          if (xVal == null || yVal == null) return null; // Skip invalid points
-          return Offset(
-            plotArea.left + xScale.scale(xVal),
-            plotArea.top + yScale.scale(yVal),
-          );
-        })
-        .whereType<Offset>() // Filter out nulls from invalid points
-        .toList();
+    final points =
+        data
+            .map((point) {
+              // Ensure x and y values are numeric before scaling
+              final num? xVal = _getNumericValue(point[xColumn]);
+              final num? yVal = _getNumericValue(point[yColumn]);
+              if (xVal == null || yVal == null)
+                return null; // Skip invalid points
+              return Offset(
+                plotArea.left + xScale.scale(xVal),
+                plotArea.top + yScale.scale(yVal),
+              );
+            })
+            .whereType<Offset>() // Filter out nulls from invalid points
+            .toList();
 
     if (points.length < 2) return;
 
     // Animation progress for this specific line
     // lineDelay is currently always 0.0 if data is present, meaning line animation starts with global animationProgress.
-    final lineDelay = 0.0; // Simplified, as data.isNotEmpty check is implicitly handled by points.length check
+    final lineDelay =
+        0.0; // Simplified, as data.isNotEmpty check is implicitly handled by points.length check
     final lineProgress = math.max(
       0.0,
-      math.min(1.0, (animationProgress - lineDelay) / math.max(0.001, 1.0 - lineDelay)),
+      math.min(
+        1.0,
+        (animationProgress - lineDelay) / math.max(0.001, 1.0 - lineDelay),
+      ),
     );
 
-    if (lineProgress <= 0.001) return; // Epsilon check for early exit if no progress
+    if (lineProgress <= 0.001)
+      return; // Epsilon check for early exit if no progress
 
-    final paint = Paint()
-      ..color = color.withAlpha((geometry.alpha * 255).round())
-      ..strokeWidth = geometry.strokeWidth
-      ..style = PaintingStyle.stroke;
+    final paint =
+        Paint()
+          ..color = color.withAlpha((geometry.alpha * 255).round())
+          ..strokeWidth = geometry.strokeWidth
+          ..style = PaintingStyle.stroke;
 
     final path = Path();
     final int numSegments = points.length - 1;
@@ -1015,7 +1164,8 @@ class _AnimatedChartPainter extends CustomPainter {
     // Calculate how many full segments to draw and the progress into the next partial segment
     final double totalProgressiveSegments = numSegments * lineProgress;
     final int fullyDrawnSegments = totalProgressiveSegments.floor();
-    final double partialSegmentProgress = totalProgressiveSegments - fullyDrawnSegments;
+    final double partialSegmentProgress =
+        totalProgressiveSegments - fullyDrawnSegments;
 
     path.moveTo(points[0].dx, points[0].dy);
 
@@ -1029,31 +1179,38 @@ class _AnimatedChartPainter extends CustomPainter {
     if (partialSegmentProgress > 0.001 && fullyDrawnSegments < numSegments) {
       final Offset lastFullPoint = points[fullyDrawnSegments];
       final Offset nextPoint = points[fullyDrawnSegments + 1];
-      
-      final double dx = lastFullPoint.dx + (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
-      final double dy = lastFullPoint.dy + (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
+
+      final double dx =
+          lastFullPoint.dx +
+          (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
+      final double dy =
+          lastFullPoint.dy +
+          (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
       path.lineTo(dx, dy);
     }
-    
+
     // Only draw if the path actually has something (more than just a moveTo)
-    if (fullyDrawnSegments > 0 || (partialSegmentProgress > 0.001 && fullyDrawnSegments < numSegments)) {
-        canvas.drawPath(path, paint);
+    if (fullyDrawnSegments > 0 ||
+        (partialSegmentProgress > 0.001 && fullyDrawnSegments < numSegments)) {
+      canvas.drawPath(path, paint);
     }
   }
 
   void _drawAxes(
-      Canvas canvas,
-      Size size,
-      Rect plotArea,
-      Scale xScale,
-      Scale yScale,
-      ) {
-    final paint = Paint()
-      ..color = theme.axisColor
-      ..strokeWidth = theme.axisWidth
-      ..style = PaintingStyle.stroke;
+    Canvas canvas,
+    Size size,
+    Rect plotArea,
+    Scale xScale,
+    Scale yScale,
+  ) {
+    final paint =
+        Paint()
+          ..color = theme.axisColor
+          ..strokeWidth = theme.axisWidth
+          ..style = PaintingStyle.stroke;
 
-    final axisLabelStyle = theme.axisLabelStyle ??
+    final axisLabelStyle =
+        theme.axisLabelStyle ??
         const TextStyle(color: Colors.black, fontSize: 12);
 
     final horizontalScale = xScale;
@@ -1121,11 +1278,17 @@ class _AnimatedChartPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.right,
       );
-      textPainter.layout(minWidth: 0, maxWidth: plotArea.left - 16); // Provide more space to prevent wrapping
+      textPainter.layout(
+        minWidth: 0,
+        maxWidth: plotArea.left - 16,
+      ); // Provide more space to prevent wrapping
       textPainter.paint(
         canvas,
         Offset(
-          plotArea.left - textPainter.width - theme.axisWidth * 2 - 8, // Increased padding
+          plotArea.left -
+              textPainter.width -
+              theme.axisWidth * 2 -
+              8, // Increased padding
           pos - textPainter.height / 2,
         ),
       );

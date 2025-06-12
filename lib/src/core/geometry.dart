@@ -67,6 +67,6 @@ enum BarOrientation { vertical, horizontal }
 
 /// Bar styling options
 enum BarStyle {
-  grouped,    // Multiple series side-by-side
-  stacked,    // Multiple series stacked on top
+  grouped, // Multiple series side-by-side
+  stacked, // Multiple series stacked on top
 }

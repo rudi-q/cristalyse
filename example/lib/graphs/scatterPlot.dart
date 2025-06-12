@@ -1,11 +1,9 @@
-import 'dart:math' as math;
-
 import 'package:cristalyse/cristalyse.dart';
 import 'package:cristalyse_example/chartTheme.dart';
 import 'package:flutter/material.dart';
 
-Widget buildScatterPlotTab(
-    ChartTheme currentTheme, List<Map<String, dynamic>> data, double sliderValue) {
+Widget buildScatterPlotTab(ChartTheme currentTheme,
+    List<Map<String, dynamic>> data, double sliderValue) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
@@ -24,11 +22,14 @@ Widget buildScatterPlotTab(
               .theme(currentTheme.copyWith(
                 pointSizeMax: 2.0 + sliderValue * 20.0,
               ))
-              .animate(duration: Duration(milliseconds: 800), curve: Curves.elasticOut)
+              .animate(
+                  duration: Duration(milliseconds: 800),
+                  curve: Curves.elasticOut)
               .build(),
         ),
         SizedBox(height: 16),
-        Text('• Points animate in with staggered timing\n• Size and color mapped to data\n• Smooth elastic animation curve'),
+        Text(
+            '• Points animate in with staggered timing\n• Size and color mapped to data\n• Smooth elastic animation curve'),
       ],
     ),
   );

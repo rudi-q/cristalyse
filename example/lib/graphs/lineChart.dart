@@ -1,10 +1,8 @@
-import 'dart:math' as math;
-
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildLineChartTab(
-    ChartTheme currentTheme, List<Map<String, dynamic>> data, double sliderValue) {
+Widget buildLineChartTab(ChartTheme currentTheme,
+    List<Map<String, dynamic>> data, double sliderValue) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
@@ -25,7 +23,8 @@ Widget buildLineChartTab(
               .build(),
         ),
         SizedBox(height: 16),
-        Text('• Line draws from left to right\n• Smooth animation with partial segments\n• Responsive to theme changes'),
+        Text(
+            '• Line draws from left to right\n• Smooth animation with partial segments\n• Responsive to theme changes'),
       ],
     ),
   );
