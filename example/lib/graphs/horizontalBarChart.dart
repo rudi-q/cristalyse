@@ -3,16 +3,10 @@ import 'dart:math' as math;
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildHorizontalBarTab(ChartTheme currentTheme) {
-  // Generate horizontal bar data
-  final departments = ['Engineering', 'Sales', 'Marketing', 'Support', 'HR'];
-  final data = departments.map((dept) {
-    final headcount = 5 + math.Random().nextDouble() * 45;
-    return {'department': dept, 'headcount': headcount};
-  }).toList();
-
+Widget buildHorizontalBarTab(
+    ChartTheme currentTheme, List<Map<String, dynamic>> data) {
   return SingleChildScrollView(
-    padding: EdgeInsets.all(16),
+    padding: const EdgeInsets.all(16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

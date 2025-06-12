@@ -3,21 +3,10 @@ import 'dart:math' as math;
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildGroupedBarTab(ChartTheme currentTheme) {
-  // Generate grouped bar data
-  final quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
-  final products = ['Product A', 'Product B', 'Product C'];
-  final data = <Map<String, dynamic>>[];
-
-  for (final quarter in quarters) {
-    for (final product in products) {
-      final revenue = 20 + math.Random().nextDouble() * 40;
-      data.add({'quarter': quarter, 'product': product, 'revenue': revenue});
-    }
-  }
-
+Widget buildGroupedBarTab(
+    ChartTheme currentTheme, List<Map<String, dynamic>> data) {
   return SingleChildScrollView(
-    padding: EdgeInsets.all(16),
+    padding: const EdgeInsets.all(16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

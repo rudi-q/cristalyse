@@ -3,17 +3,10 @@ import 'dart:math' as math;
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildScatterPlotTab(var currentTheme) {
-  // Generate scatter plot data
-  final data = List.generate(50, (i) {
-    final x = i.toDouble();
-    final y = x * 0.5 + (i % 3) * 2 + (i % 7) * 0.3 + math.Random().nextDouble() * 2;
-    final category = ['Alpha', 'Beta', 'Gamma'][i % 3];
-    return {'x': x, 'y': y, 'category': category, 'size': (i % 5) + 1.0};
-  });
-
+Widget buildScatterPlotTab(
+    ChartTheme currentTheme, List<Map<String, dynamic>> data) {
   return SingleChildScrollView(
-    padding: EdgeInsets.all(16),
+    padding: const EdgeInsets.all(16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

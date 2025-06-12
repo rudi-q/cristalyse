@@ -3,16 +3,10 @@ import 'dart:math' as math;
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildLineChartTab(ChartTheme currentTheme) {
-  // Generate time series data
-  final data = List.generate(30, (i) {
-    final x = i.toDouble();
-    final y = 10 + 5 * math.sin(x * 0.3) + math.Random().nextDouble() * 2;
-    return {'x': x, 'y': y, 'category': 'Time Series'};
-  });
-
+Widget buildLineChartTab(
+    ChartTheme currentTheme, List<Map<String, dynamic>> data) {
   return SingleChildScrollView(
-    padding: EdgeInsets.all(16),
+    padding: const EdgeInsets.all(16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

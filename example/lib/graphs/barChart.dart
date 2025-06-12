@@ -3,16 +3,10 @@ import 'dart:math' as math;
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildBarChartTab(ChartTheme currentTheme) {
-  // Generate bar chart data
-  final categories = ['Q1', 'Q2', 'Q3', 'Q4'];
-  final data = categories.map((quarter) {
-    final revenue = 50 + math.Random().nextDouble() * 50;
-    return {'quarter': quarter, 'revenue': revenue};
-  }).toList();
-
+Widget buildBarChartTab(
+    ChartTheme currentTheme, List<Map<String, dynamic>> data) {
   return SingleChildScrollView(
-    padding: EdgeInsets.all(16),
+    padding: const EdgeInsets.all(16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

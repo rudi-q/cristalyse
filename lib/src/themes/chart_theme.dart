@@ -99,4 +99,64 @@ class ChartTheme {
       axisLabelStyle: const TextStyle(fontSize: 12, color: Colors.white70),
     );
   }
+
+  /// Solarized Light theme variant
+  static ChartTheme solarizedLightTheme() {
+    return const ChartTheme(
+      backgroundColor: Color(0xFFfdf6e3), // base3
+      plotBackgroundColor: Color(0xFFeee8d5), // base2
+      primaryColor: Color(0xFF268bd2), // blue
+      borderColor: Color(0xFF93a1a1), // base1
+      gridColor: Color(0xFFeee8d5), // base2
+      axisColor: Color(0xFF586e75), // base01
+      gridWidth: 0.5,
+      axisWidth: 1.0,
+      pointSizeDefault: 5.0,
+      pointSizeMin: 2.0,
+      pointSizeMax: 12.0,
+      colorPalette: [
+        Color(0xFF268bd2), // blue
+        Color(0xFFdc322f), // red
+        Color(0xFF859900), // green
+        Color(0xFFb58900), // yellow
+        Color(0xFF6c71c4), // violet
+        Color(0xFFd33682), // magenta
+        Color(0xFF2aa198), // cyan
+        Color(0xFFcb4b16), // orange
+      ],
+      padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+      axisTextStyle: TextStyle(fontSize: 12, color: Color(0xFF586e75)), // base01
+      axisLabelStyle: TextStyle(fontSize: 12, color: Color(0xFF586e75)), // base01
+    );
+  }
+
+  /// Solarized Dark theme variant
+  static ChartTheme solarizedDarkTheme() {
+    return const ChartTheme(
+      backgroundColor: Color(0xFF002b36), // base03
+      plotBackgroundColor: Color(0xFF073642), // base02
+      primaryColor: Color(0xFF268bd2), // blue
+      borderColor: Color(0xFF586e75), // base01
+      gridColor: Color(0xFF073642), // base02
+      axisColor: Color(0xFF839496), // base0
+      gridWidth: 0.5,
+      axisWidth: 1.0,
+      pointSizeDefault: 5.0,
+      pointSizeMin: 2.0,
+      pointSizeMax: 12.0,
+      colorPalette: [
+        Color(0xFF268bd2), // blue
+        Color(0xFFdc322f), // red
+        Color(0xFF859900), // green
+        Color(0xFFb58900), // yellow
+        Color(0xFF6c71c4), // violet
+        Color(0xFFd33682), // magenta
+        Color(0xFF2aa198), // cyan
+        Color(0xFFcb4b16), // orange
+      ],
+      padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+      axisTextStyle: TextStyle(fontSize: 12, color: Color(0xFF839496)), // base0
+      axisLabelStyle: TextStyle(fontSize: 12, color: Color(0xFF839496)), // base0
+    );
+  }
 }
