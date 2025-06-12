@@ -1,3 +1,8 @@
+## 0.4.3 - 2025-06-12
+
+#### Added
+- 📸 Added screenshots of the example app to README
+
 ## 0.4.2 - 2025-06-12
 
 #### Improved

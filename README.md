@@ -18,6 +18,20 @@
 - ⚡ **GPU-Accelerated Performance** - Handle large datasets without breaking a sweat
 - 🎯 **Flutter-First Design** - Seamlessly integrates with your existing Flutter apps
 
+### See What You Can Build
+
+<p align="center">
+  <img src="example/screenshots/cristalyse_scatter_plot.gif" alt="Animated Scatter Plot" width="400"/>
+  <br/>
+  <em>Interactive scatter plots with smooth animations and multi-dimensional data mapping</em>
+</p>
+
+<p align="center">
+  <img src="example/screenshots/cristalyse_line_chart.gif" alt="Progressive Line Chart" width="400"/>
+  <br/>
+  <em>Progressive line drawing with customizable themes and multi-series support</em>
+</p>
+
 ## 🎯 Perfect For
 
 - **Flutter developers** building data-driven apps who need more than basic chart widgets
@@ -69,6 +83,12 @@ class MyChart extends StatelessWidget {
 
 **Result:** A beautiful, animated scatter plot that works identically on iOS, Android, Web, and Desktop.
 
+<p align="center">
+  <img src="example/screenshots/cristalyse_scatter_plot.png" alt="Simple Scatter Plot" width="350"/>
+  <br/>
+  <em>Your first chart - clean, responsive, and cross-platform</em>
+</p>
+
 ## 🎬 See It In Action
 
 ### Animated Scatter Plot
@@ -105,7 +125,16 @@ CristalyseChart()
   .build()
 ```
 
-### Horizontal Bar Chart
+### Bar Charts Made Simple
+
+<div align="center">
+  <img src="example/screenshots/cristalyse_bar_chart.gif" alt="Animated Bar Chart" width="350"/>
+  <img src="example/screenshots/cristalyse_horizontal_bar_chart.gif" alt="Horizontal Bar Chart" width="350"/>
+  <br/>
+  <em>Vertical and horizontal bar charts with staggered animations</em>
+</div>
+
+### Grouped Bar Chart
 ```dart
 // Don't forget to define your data, for example:
 // final departmentData = [
@@ -129,6 +158,12 @@ CristalyseChart()
   .animate(duration: Duration(milliseconds: 900))
   .build()
 ```
+
+<p align="center">
+  <img src="example/screenshots/cristalyse_grouped_bar_chart.gif" alt="Grouped Bar Chart" width="400"/>
+  <br/>
+  <em>Grouped bar charts for comparing multiple series side-by-side</em>
+</p>
 
 ## 🎨 Grammar of Graphics Made Simple
 
@@ -168,15 +203,15 @@ Cristalyse follows the proven grammar of graphics pattern. If you've used ggplot
 ```dart
 Widget buildRevenueTrend() {
   return CristalyseChart()
-    .data(monthlyRevenue)
-    .mapping(x: 'month', y: 'revenue', color: 'product_line')
-    .geomLine(strokeWidth: 3.0)
-    .geomPoint(size: 5.0)
-    .scaleXContinuous()
-    .scaleYContinuous(min: 0)
-    .theme(ChartTheme.solarizedDarkTheme()) // Example: Use the new Solarized Dark theme
-    .animate(duration: Duration(milliseconds: 1500))
-    .build();
+      .data(monthlyRevenue)
+      .mapping(x: 'month', y: 'revenue', color: 'product_line')
+      .geomLine(strokeWidth: 3.0)
+      .geomPoint(size: 5.0)
+      .scaleXContinuous()
+      .scaleYContinuous(min: 0)
+      .theme(ChartTheme.solarizedDarkTheme()) // Example: Use the new Solarized Dark theme
+      .animate(duration: Duration(milliseconds: 1500))
+      .build();
 }
 ```
 
@@ -184,15 +219,15 @@ Widget buildRevenueTrend() {
 ```dart
 Widget buildEngagementScatter() {
   return CristalyseChart()
-    .data(userMetrics)
-    .mapping(x: 'session_length', y: 'pages_viewed', 
-             color: 'user_type', size: 'revenue')
-    .geomPoint(alpha: 0.6)
-    .scaleXContinuous()
-    .scaleYContinuous()
-    .theme(isDarkMode ? ChartTheme.darkTheme() : ChartTheme.defaultTheme())
-    .animate(duration: Duration(milliseconds: 800), curve: Curves.elasticOut)
-    .build();
+      .data(userMetrics)
+      .mapping(x: 'session_length', y: 'pages_viewed',
+      color: 'user_type', size: 'revenue')
+      .geomPoint(alpha: 0.6)
+      .scaleXContinuous()
+      .scaleYContinuous()
+      .theme(isDarkMode ? ChartTheme.darkTheme() : ChartTheme.defaultTheme())
+      .animate(duration: Duration(milliseconds: 800), curve: Curves.elasticOut)
+      .build();
 }
 ```
 
@@ -224,8 +259,8 @@ chart.theme(customTheme)
 ### Animation Control
 ```dart
 chart.animate(
-  duration: Duration(milliseconds: 1200),
-  curve: Curves.elasticOut,  // Try different curves!
+duration: Duration(milliseconds: 1200),
+curve: Curves.elasticOut,  // Try different curves!
 )
 ```
 
@@ -233,13 +268,13 @@ chart.animate(
 ```dart
 // Map any data structure
 chart
-  .data(complexData)
-  .mapping(
-    x: 'timestamp',           // Time series
-    y: 'metric_value',        // Numeric values  
-    color: 'category',        // Color grouping
-    size: 'importance'        // Size encoding
-  )
+    .data(complexData)
+    .mapping(
+x: 'timestamp',           // Time series
+y: 'metric_value',        // Numeric values  
+color: 'category',        // Color grouping
+size: 'importance'        // Size encoding
+)
 ```
 
 ## 📱 Platform Support
@@ -253,7 +288,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.4.2** - Production ready for scatter plots and line charts and custom themes
+**Current Version: 0.4.3** - Production ready for scatter plots and line charts and custom themes
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
