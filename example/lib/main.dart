@@ -1,4 +1,5 @@
 import 'package:cristalyse/cristalyse.dart';
+import 'package:cristalyse_example/chartTheme.dart';
 import 'package:flutter/material.dart';
 
 import 'graphs/barChart.dart';
@@ -44,6 +45,31 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
     ChartTheme.solarizedDarkTheme(),
   ];
 
+  int _currentPaletteIndex = 0;
+  final _colorPalettes = [
+    ChartTheme.defaultTheme().colorPalette, // Default
+    const [
+      Color(0xfff44336),
+      Color(0xffe91e63),
+      Color(0xff9c27b0),
+      Color(0xff673ab7),
+    ], // Warm
+    const [
+      Color(0xff2196f3),
+      Color(0xff00bcd4),
+      Color(0xff009688),
+      Color(0xff4caf50),
+    ], // Cool
+    const [
+      Color(0xffffb74d),
+      Color(0xffff8a65),
+      Color(0xffdce775),
+      Color(0xffaed581),
+    ], // Pastel
+  ];
+
+  double _sliderValue = 0.5;
+
   late final List<Map<String, dynamic>> _scatterPlotData;
   late final List<Map<String, dynamic>> _lineChartData;
   late final List<Map<String, dynamic>> _barChartData;
@@ -54,6 +80,12 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
   void initState() {
     super.initState();
     _tabController = TabController(length: 5, vsync: this);
+    _tabController.addListener(() {
+      // Rebuild to update the displayed value when the tab changes
+      if (mounted) {
+        setState(() {});
+      }
+    });
 
     _scatterPlotData = List.generate(50, (i) {
       final x = i.toDouble();
@@ -105,7 +137,31 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
     super.dispose();
   }
 
-  ChartTheme get currentTheme => _themes[_currentThemeIndex];
+  ChartTheme get currentTheme {
+    final baseTheme = _themes[_currentThemeIndex];
+    return baseTheme.copyWith(
+      colorPalette: _colorPalettes[_currentPaletteIndex],
+    );
+  }
+
+  String _getDisplayedValue() {
+    final index = _tabController.index;
+    switch (index) {
+      case 0: // Scatter
+        final value = 2.0 + _sliderValue * 20.0;
+        return 'Size: ${value.toStringAsFixed(1)}';
+      case 1: // Line
+        final value = 1.0 + _sliderValue * 9.0;
+        return 'Width: ${value.toStringAsFixed(1)}';
+      case 2: // Bar
+      case 3: // Grouped Bar
+      case 4: // Horizontal Bar
+        final value = _sliderValue.clamp(0.1, 1.0);
+        return 'Width: ${value.toStringAsFixed(2)}';
+      default:
+        return _sliderValue.toStringAsFixed(2);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -124,24 +180,73 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          buildScatterPlotTab(currentTheme, _scatterPlotData),
-          buildLineChartTab(currentTheme, _lineChartData),
-          buildBarChartTab(currentTheme, _barChartData),
-          buildGroupedBarTab(currentTheme, _groupedBarData),
-          buildHorizontalBarTab(currentTheme, _horizontalBarData)
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              children: [
+                const Text('Adjust Value'),
+                Expanded(
+                  child: Slider(
+                    value: _sliderValue,
+                    min: 0.0,
+                    max: 1.0,
+                    divisions: 20,
+                    label: _sliderValue.toStringAsFixed(2),
+                    onChanged: (value) {
+                      setState(() {
+                        _sliderValue = value;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(_getDisplayedValue(),
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                buildScatterPlotTab(currentTheme, _scatterPlotData, _sliderValue),
+                buildLineChartTab(currentTheme, _lineChartData, _sliderValue),
+                buildBarChartTab(currentTheme, _barChartData, _sliderValue),
+                buildGroupedBarTab(currentTheme, _groupedBarData, _sliderValue),
+                buildHorizontalBarTab(
+                    currentTheme, _horizontalBarData, _sliderValue)
+              ],
+            ),
+          ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _currentThemeIndex = (_currentThemeIndex + 1) % _themes.length;
-          });
-        },
-        tooltip: 'Change Theme',
-        child: const Icon(Icons.palette),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                _currentThemeIndex = (_currentThemeIndex + 1) % _themes.length;
+              });
+            },
+            tooltip: 'Change Theme',
+            child: const Icon(Icons.palette),
+          ),
+          const SizedBox(width: 16),
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                _currentPaletteIndex =
+                    (_currentPaletteIndex + 1) % _colorPalettes.length;
+              });
+            },
+            tooltip: 'Change Colors',
+            child: const Icon(Icons.color_lens),
+          ),
+        ],
       ),
     );
   }

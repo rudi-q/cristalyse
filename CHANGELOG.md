@@ -1,3 +1,18 @@
+## 0.4.0 - 2025-06-12
+
+#### Added
+- **Enhanced Theming**: Added `solarizedLightTheme` and `solarizedDarkTheme` to the theme factory.
+- **Color Palettes**: Introduced multiple color palettes (`warm`, `cool`, `pastel`) that can be applied independently of the base theme.
+- **Custom Label Styles**: Added an optional `axisLabelStyle` to `ChartTheme` for more granular control over axis label appearance.
+- **Interactive Example App**: The example app now features controls to dynamically cycle through themes, color palettes, and adjust chart-specific properties like bar width, line stroke width, and point size via a slider.
+
+#### Fixed
+- **Axis Label Rendering**: Overhauled axis label drawing logic to correctly render labels with proper spacing and prevent overlap, especially on horizontal charts.
+- **Color Palette Application**: Ensured that color palette changes now correctly apply to all chart types, including those without explicit color mappings.
+
+#### Changed
+- **Improved Padding**: Increased default padding in `ChartTheme` to give axis labels more breathing room.
+
 ## 0.3.0 - 2025-06-12
 
 #### Added

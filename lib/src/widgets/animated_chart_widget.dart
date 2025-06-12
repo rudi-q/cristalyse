@@ -776,7 +776,9 @@ class _AnimatedChartPainter extends CustomPainter {
   }) {
     final color = colorColumn != null
         ? colorScale.scale(dataPoint[colorColumn])
-        : theme.primaryColor;
+        : (theme.colorPalette.isNotEmpty
+            ? theme.colorPalette.first
+            : theme.primaryColor);
 
     final paint = Paint()
       ..color = color.withAlpha((geometry.alpha * 255).round())
@@ -889,7 +891,9 @@ class _AnimatedChartPainter extends CustomPainter {
 
       final color = colorColumn != null
           ? colorScale.scale(point[colorColumn])
-          : theme.primaryColor;
+          : (theme.colorPalette.isNotEmpty
+              ? theme.colorPalette.first
+              : theme.primaryColor);
 
       final size = sizeColumn != null
           ? sizeScale.scale(point[sizeColumn])
@@ -970,7 +974,9 @@ class _AnimatedChartPainter extends CustomPainter {
       ) {
     final color = colorColumn != null
         ? colorScale.scale(data.first[colorColumn])
-        : theme.primaryColor;
+        : (theme.colorPalette.isNotEmpty
+            ? theme.colorPalette.first
+            : theme.primaryColor);
 
     final points = data
         .map((point) {

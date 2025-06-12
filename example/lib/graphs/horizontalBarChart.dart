@@ -3,8 +3,8 @@ import 'dart:math' as math;
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildHorizontalBarTab(
-    ChartTheme currentTheme, List<Map<String, dynamic>> data) {
+Widget buildHorizontalBarTab(ChartTheme currentTheme,
+    List<Map<String, dynamic>> data, double sliderValue) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
@@ -17,7 +17,7 @@ Widget buildHorizontalBarTab(
           child: CristalyseChart()
               .data(data)
               .mapping(x: 'department', y: 'headcount')
-              .geomBar()
+              .geomBar(width: sliderValue.clamp(0.1, 1.0))
               .coordFlip()
               .scaleXOrdinal()
               .scaleYContinuous(min: 0)

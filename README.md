@@ -140,7 +140,7 @@ Cristalyse follows the proven grammar of graphics pattern. If you've used ggplot
 | **Mapping** | Connect data to visuals | `.mapping(x: 'date', y: 'revenue', color: 'region')` |
 | **Geometry** | How to draw the data | `.geomPoint()`, `.geomLine()` |
 | **Scales** | Transform data to screen coordinates | `.scaleXContinuous()`, `.scaleYContinuous()` |
-| **Themes** | Visual styling | `.theme(ChartTheme.darkTheme())` |
+| **Themes** | Visual styling | `.theme(ChartTheme.defaultTheme())` |
 | **Animation** | Bring it to life | `.animate(duration: Duration(milliseconds: 500))` |
 
 ## 🔥 Current Features
@@ -151,6 +151,7 @@ Cristalyse follows the proven grammar of graphics pattern. If you've used ggplot
 - **Bar charts** (vertical and horizontal)
 - **Smooth animations** with customizable timing
 - **Light and dark themes** with full customization
+- **Enhanced theming** with multiple built-in themes (including Solarized) and color palettes
 - **Responsive scaling** for all screen sizes
 - **High-DPI support** for crisp visuals
 
@@ -173,7 +174,7 @@ Widget buildRevenueTrend() {
     .geomPoint(size: 5.0)
     .scaleXContinuous()
     .scaleYContinuous(min: 0)
-    .theme(ChartTheme.defaultTheme())
+    .theme(ChartTheme.solarizedDarkTheme()) // Example: Use the new Solarized Dark theme
     .animate(duration: Duration(milliseconds: 1500))
     .build();
 }
@@ -252,14 +253,15 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.3.0** - Production ready for scatter plots and line charts
+**Current Version: 0.4.0** - Production ready for scatter plots and line charts and custom themes
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
 - ✅ **v0.1.0** - Scatter plots and basic theming
 - ✅ **v0.2.0** - Line charts and animations
 - ✅ **v0.3.0** - Bar charts (including horizontal) and areas
-- 🚧 **v0.4.0** - Statistical layers
+- ✅ **v0.4.0** - Enhanced theming with custom colors and text styles
+- 🚧 **v0.5.0** - Statistical layers
 
 ## 🤝 Contributing
 
