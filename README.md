@@ -253,7 +253,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.4.1** - Production ready for scatter plots and line charts and custom themes
+**Current Version: 0.4.2** - Production ready for scatter plots and line charts and custom themes
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 

@@ -1,3 +1,8 @@
+## 0.4.2 - 2025-06-12
+
+#### Improved
+- Enhanced the example project to showcase multiple chart types, themes, and color palettes.
+
 ## 0.4.1 - 2025-06-12
 
 #### Technical

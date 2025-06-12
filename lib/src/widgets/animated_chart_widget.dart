@@ -302,10 +302,12 @@ class _AnimatedChartPainter extends CustomPainter {
             domainMax = 0;
           } // Single negative value
         } else {
-          if (domainMin > 0)
+          if (domainMin > 0) {
             domainMin = 0; // If all values positive, extend to 0
-          if (domainMax < 0)
+          }
+          if (domainMax < 0) {
             domainMax = 0; // If all values negative, extend to 0
+          }
         }
         scale.domain = [domainMin, domainMax];
         if (scale.domain[0] == scale.domain[1]) {
@@ -381,10 +383,12 @@ class _AnimatedChartPainter extends CustomPainter {
               domainMax = 0;
             } // Single negative value
           } else {
-            if (domainMin > 0)
+            if (domainMin > 0) {
               domainMin = 0; // If all values positive, extend to 0
-            if (domainMax < 0)
+            }
+            if (domainMax < 0) {
               domainMax = 0; // If all values negative, extend to 0
+            }
           }
           scale.domain = [domainMin, domainMax];
           if (scale.domain[0] == scale.domain[1]) {
@@ -591,8 +595,9 @@ class _AnimatedChartPainter extends CustomPainter {
         x = plotArea.left + xScale.scale(tick);
       }
 
-      if (!x.isFinite || x < plotArea.left - 10 || x > plotArea.right + 10)
+      if (!x.isFinite || x < plotArea.left - 10 || x > plotArea.right + 10) {
         continue;
+      }
 
       canvas.drawLine(
         Offset(x, plotArea.top),
@@ -612,8 +617,9 @@ class _AnimatedChartPainter extends CustomPainter {
         y = plotArea.top + yScale.scale(tick);
       }
 
-      if (!y.isFinite || y < plotArea.top - 10 || y > plotArea.bottom + 10)
+      if (!y.isFinite || y < plotArea.top - 10 || y > plotArea.bottom + 10) {
         continue;
+      }
 
       canvas.drawLine(
         Offset(plotArea.left, y),
@@ -1125,8 +1131,9 @@ class _AnimatedChartPainter extends CustomPainter {
               // Ensure x and y values are numeric before scaling
               final num? xVal = _getNumericValue(point[xColumn]);
               final num? yVal = _getNumericValue(point[yColumn]);
-              if (xVal == null || yVal == null)
+              if (xVal == null || yVal == null) {
                 return null; // Skip invalid points
+              }
               return Offset(
                 plotArea.left + xScale.scale(xVal),
                 plotArea.top + yScale.scale(yVal),
@@ -1149,8 +1156,9 @@ class _AnimatedChartPainter extends CustomPainter {
       ),
     );
 
-    if (lineProgress <= 0.001)
+    if (lineProgress <= 0.001) {
       return; // Epsilon check for early exit if no progress
+    }
 
     final paint =
         Paint()
