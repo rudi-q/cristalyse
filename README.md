@@ -53,7 +53,12 @@ class MyChart extends StatelessWidget {
     return CristalyseChart()
       .data(data)
       .mapping(x: 'x', y: 'y', color: 'category')
-      .geomPoint(size: 6.0, alpha: 0.8)
+      .geomPoint(
+        size: 8.0, // Made points a bit larger to see border clearly
+        alpha: 0.8,
+        shape: PointShape.triangle, // Example: use triangles
+        borderWidth: 1.5,           // Example: add a border to points
+      )
       .scaleXContinuous()
       .scaleYContinuous()
       .theme(ChartTheme.defaultTheme())
@@ -100,6 +105,31 @@ CristalyseChart()
   .build()
 ```
 
+### Horizontal Bar Chart
+```dart
+// Don't forget to define your data, for example:
+// final departmentData = [
+//   {'department': 'Sales', 'headcount': 25},
+//   {'department': 'Engineering', 'headcount': 40},
+//   {'department': 'Marketing', 'headcount': 15},
+//   {'department': 'HR', 'headcount': 10},
+// ];
+
+CristalyseChart()
+  .data(departmentData) // Replace with your actual data
+  .mapping(x: 'department', y: 'headcount') // x becomes the category axis, y the value axis
+  .geomBar(
+    borderRadius: BorderRadius.circular(4), // Example: rounded corners for bars
+    borderWidth: 1.0,                       // Example: add a border to bars
+  )
+  .coordFlip() // This is the key to make the bar chart horizontal
+  .scaleXOrdinal() // After coordFlip, X scale is for categories (departments)
+  .scaleYContinuous(min: 0) // After coordFlip, Y scale is for values (headcount)
+  .theme(ChartTheme.defaultTheme())
+  .animate(duration: Duration(milliseconds: 900))
+  .build()
+```
+
 ## 🎨 Grammar of Graphics Made Simple
 
 Cristalyse follows the proven grammar of graphics pattern. If you've used ggplot2, you'll feel right at home:
@@ -118,13 +148,13 @@ Cristalyse follows the proven grammar of graphics pattern. If you've used ggplot
 ### ✅ Ready to Use
 - **Scatter plots** with size and color mapping
 - **Line charts** with multi-series support
+- **Bar charts** (vertical and horizontal)
 - **Smooth animations** with customizable timing
 - **Light and dark themes** with full customization
 - **Responsive scaling** for all screen sizes
 - **High-DPI support** for crisp visuals
 
 ### 🚧 Coming Soon (Next Releases)
-- Bar charts and histograms
 - Area charts with stacking
 - Statistical overlays (regression lines, confidence intervals)
 - Interactive pan and zoom
@@ -222,14 +252,14 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.2.1** - Production ready for scatter plots and line charts
+**Current Version: 0.3.0** - Production ready for scatter plots and line charts
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
 - ✅ **v0.1.0** - Scatter plots and basic theming
 - ✅ **v0.2.0** - Line charts and animations
-- 🚧 **v0.3.0** - Bar charts and areas (Q3 2025)
-- 🚧 **v0.4.0** - Statistical layers (Q4 2025)
+- ✅ **v0.3.0** - Bar charts (including horizontal) and areas
+- 🚧 **v0.4.0** - Statistical layers
 
 ## 🤝 Contributing
 

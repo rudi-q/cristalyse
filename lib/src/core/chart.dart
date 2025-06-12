@@ -24,6 +24,8 @@ class CristalyseChart {
   Duration _animationDuration = const Duration(milliseconds: 300);
   Curve _animationCurve = Curves.easeInOut;
 
+  bool _coordFlipped = false; // Added this line
+
   /// Set the data source for the chart
   ///
   /// Example:
@@ -56,11 +58,23 @@ class CristalyseChart {
   ///
   /// Example:
   /// ```dart
-  /// chart.geom_point(size: 5.0, alpha: 0.7)
+  /// chart.geomPoint(size: 5.0, alpha: 0.7)
   /// ```
-  CristalyseChart geomPoint({double? size, Color? color, double? alpha}) {
+  CristalyseChart geomPoint({
+    double? size,
+    Color? color,
+    double? alpha,
+    PointShape? shape,
+    double? borderWidth,
+  }) {
     _geometries.add(
-      PointGeometry(size: size, color: color, alpha: alpha ?? 1.0),
+      PointGeometry(
+        size: size,
+        color: color,
+        alpha: alpha ?? 1.0,
+        shape: shape ?? PointShape.circle,
+        borderWidth: borderWidth ?? 0.0,
+      ),
     );
     return this;
   }
@@ -69,7 +83,7 @@ class CristalyseChart {
   ///
   /// Example:
   /// ```dart
-  /// chart.geom_line(strokeWidth: 2.0, alpha: 0.8)
+  /// chart.geomLine(strokeWidth: 2.0, alpha: 0.8)
   /// ```
   CristalyseChart geomLine({
     double? strokeWidth,
@@ -88,6 +102,34 @@ class CristalyseChart {
     return this;
   }
 
+  /// Add bar chart
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.geomBar(width: 0.8, orientation: BarOrientation.vertical)
+  /// ```
+  CristalyseChart geomBar({
+    double? width,
+    Color? color,
+    double? alpha,
+    BarOrientation? orientation,
+    BarStyle? style,
+    BorderRadius? borderRadius,
+    double? borderWidth,
+  }) {
+    final barGeom = BarGeometry(
+      width: width ?? 0.8,
+      color: color,
+      alpha: alpha ?? 1.0,
+      orientation: orientation ?? BarOrientation.vertical,
+      style: style ?? BarStyle.grouped,
+      borderRadius: borderRadius,
+      borderWidth: borderWidth ?? 0.0,
+    );
+    _geometries.add(barGeom);
+    return this;
+  }
+
   /// Configure continuous X scale
   CristalyseChart scaleXContinuous({double? min, double? max}) {
     _xScale = LinearScale(min: min, max: max);
@@ -97,6 +139,18 @@ class CristalyseChart {
   /// Configure continuous Y scale
   CristalyseChart scaleYContinuous({double? min, double? max}) {
     _yScale = LinearScale(min: min, max: max);
+    return this;
+  }
+
+  /// Configure categorical X scale (useful for bar charts)
+  CristalyseChart scaleXOrdinal() {
+    _xScale = OrdinalScale();
+    return this;
+  }
+
+  /// Configure categorical Y scale
+  CristalyseChart scaleYOrdinal() {
+    _yScale = OrdinalScale();
     return this;
   }
 
@@ -121,6 +175,15 @@ class CristalyseChart {
     return this;
   }
 
+  /// Flips the coordinate system.
+  ///
+  /// This is typically used to create horizontal bar charts from vertical ones,
+  /// or to swap the roles of X and Y axes for other chart types.
+  CristalyseChart coordFlip() {
+    _coordFlipped = true;
+    return this;
+  }
+
   /// Build the chart widget
   Widget build() {
     return AnimatedCristalyseChartWidget(
@@ -137,6 +200,7 @@ class CristalyseChart {
       theme: _theme,
       animationDuration: _animationDuration,
       animationCurve: _animationCurve,
+      coordFlipped: _coordFlipped,
     );
   }
 }

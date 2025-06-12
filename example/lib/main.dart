@@ -34,7 +34,7 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -58,11 +58,13 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
         ],
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: true,
           tabs: [
             Tab(text: 'Scatter Plot'),
             Tab(text: 'Line Chart'),
-            Tab(text: 'Combined'),
-            Tab(text: 'Multi-Series'),
+            Tab(text: 'Bar Chart'),
+            Tab(text: 'Grouped Bars'),
+            Tab(text: 'Horizontal Bars')
           ],
         ),
       ),
@@ -71,8 +73,9 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
         children: [
           _buildScatterPlotTab(),
           _buildLineChartTab(),
-          _buildCombinedTab(),
-          _buildMultiSeriesTab(),
+          _buildBarChartTab(),
+          _buildGroupedBarTab(),
+          _buildHorizontalBarTab()
         ],
       ),
     );
@@ -147,53 +150,50 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
     );
   }
 
-  Widget _buildCombinedTab() {
-    // Generate data for combined chart
-    final data = List.generate(25, (i) {
-      final x = i.toDouble();
-      final y = 5 + 3 * math.sin(x * 0.4) + math.Random().nextDouble();
-      return {'x': x, 'y': y};
-    });
+  Widget _buildBarChartTab() {
+    // Generate bar chart data
+    final categories = ['Q1', 'Q2', 'Q3', 'Q4'];
+    final data = categories.map((quarter) {
+      final revenue = 50 + math.Random().nextDouble() * 50;
+      return {'quarter': quarter, 'revenue': revenue};
+    }).toList();
 
     return SingleChildScrollView(
       padding: EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Combined Line + Points', style: Theme.of(context).textTheme.headlineSmall),
+          Text('Animated Bar Chart', style: Theme.of(context).textTheme.headlineSmall),
           SizedBox(height: 16),
           Container(
             height: 400,
             child: CristalyseChart()
                 .data(data)
-                .mapping(x: 'x', y: 'y')
-                .geomLine(strokeWidth: 2.0, alpha: 0.7)
-                .geomPoint(size: 4.0, alpha: 0.9)
-                .scaleXContinuous()
-                .scaleYContinuous()
+                .mapping(x: 'quarter', y: 'revenue')
+                .geomBar(width: 0.7, alpha: 0.8)
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
                 .theme(currentTheme)
-                .animate(duration: Duration(milliseconds: 1000), curve: Curves.easeInOutCubic)
+                .animate(duration: Duration(milliseconds: 1000), curve: Curves.easeOutBack)
                 .build(),
           ),
           SizedBox(height: 16),
-          Text('• Multiple geometries on same chart\n• Line appears first, then points\n• Coordinated animation timing'),
+          Text('• Bars grow from bottom with staggered timing\n• Categorical X-axis with ordinal scale\n• Smooth back-ease animation'),
         ],
       ),
     );
   }
 
-  Widget _buildMultiSeriesTab() {
-    // Generate multi-series data
-    final categories = ['Series A', 'Series B', 'Series C'];
+  Widget _buildGroupedBarTab() {
+    // Generate grouped bar data
+    final quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+    final products = ['Product A', 'Product B', 'Product C'];
     final data = <Map<String, dynamic>>[];
 
-    for (final category in categories) {
-      for (int i = 0; i < 20; i++) {
-        final x = i.toDouble();
-        final baseY = categories.indexOf(category) * 3;
-        final y = baseY + 2 * math.sin(x * 0.5 + categories.indexOf(category)) +
-            math.Random().nextDouble();
-        data.add({'x': x, 'y': y, 'category': category});
+    for (final quarter in quarters) {
+      for (final product in products) {
+        final revenue = 20 + math.Random().nextDouble() * 40;
+        data.add({'quarter': quarter, 'product': product, 'revenue': revenue});
       }
     }
 
@@ -202,25 +202,96 @@ class _ExampleHomeState extends State<ExampleHome> with TickerProviderStateMixin
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Multi-Series Line Chart', style: Theme.of(context).textTheme.headlineSmall),
+          Text('Grouped Bar Chart', style: Theme.of(context).textTheme.headlineSmall),
           SizedBox(height: 16),
           Container(
             height: 400,
             child: CristalyseChart()
                 .data(data)
-                .mapping(x: 'x', y: 'y', color: 'category')
-                .geomLine(strokeWidth: 2.5, alpha: 0.8)
-                .geomPoint(size: 3.0, alpha: 0.6)
-                .scaleXContinuous()
-                .scaleYContinuous()
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(width: 0.8, style: BarStyle.grouped, alpha: 0.9)
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
                 .theme(currentTheme)
-                .animate(duration: Duration(milliseconds: 1500), curve: Curves.easeOutQuart)
+                .animate(duration: Duration(milliseconds: 1200), curve: Curves.easeOutCubic)
                 .build(),
           ),
           SizedBox(height: 16),
-          Text('• Multiple series with color mapping\n• Each series animates independently\n• Points and lines coordinated'),
+          Text('• Multiple series grouped side-by-side\n• Color mapping for different products\n• Coordinated group animation'),
         ],
       ),
+    );
+  }
+
+  Widget _buildHorizontalBarTab() {
+    // Generate horizontal bar data
+    final departments = ['Engineering', 'Sales', 'Marketing', 'Support', 'HR'];
+    final data = departments.map((dept) {
+      final headcount = 5 + math.Random().nextDouble() * 45;
+      return {'department': dept, 'headcount': headcount};
+    }).toList();
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Horizontal Bar Chart', style: Theme.of(context).textTheme.headlineSmall),
+          SizedBox(height: 16),
+          Container(
+            height: 400,
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'department', y: 'headcount')
+                .geomBar()
+                .coordFlip()
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
+                .theme(currentTheme)
+                .animate(duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuart)
+                .build(),
+          ),
+          SizedBox(height: 16),
+          Text('• Bars grow from left to right\n• Categorical Y-axis for departments\n• Great for ranking data'),
+        ],
+      ),
+    );
+  }
+}
+
+// Extension to add copyWith method to ChartTheme
+extension ChartThemeExtension on ChartTheme {
+  ChartTheme copyWith({
+    Color? backgroundColor,
+    Color? plotBackgroundColor,
+    Color? primaryColor,
+    Color? borderColor,
+    Color? gridColor,
+    Color? axisColor,
+    double? gridWidth,
+    double? axisWidth,
+    double? pointSizeDefault,
+    double? pointSizeMin,
+    double? pointSizeMax,
+    List<Color>? colorPalette,
+    EdgeInsets? padding,
+    TextStyle? axisTextStyle,
+  }) {
+    return ChartTheme(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      plotBackgroundColor: plotBackgroundColor ?? this.plotBackgroundColor,
+      primaryColor: primaryColor ?? this.primaryColor,
+      borderColor: borderColor ?? this.borderColor,
+      gridColor: gridColor ?? this.gridColor,
+      axisColor: axisColor ?? this.axisColor,
+      gridWidth: gridWidth ?? this.gridWidth,
+      axisWidth: axisWidth ?? this.axisWidth,
+      pointSizeDefault: pointSizeDefault ?? this.pointSizeDefault,
+      pointSizeMin: pointSizeMin ?? this.pointSizeMin,
+      pointSizeMax: pointSizeMax ?? this.pointSizeMax,
+      colorPalette: colorPalette ?? this.colorPalette,
+      padding: padding ?? this.padding,
+      axisTextStyle: axisTextStyle ?? this.axisTextStyle,
     );
   }
 }

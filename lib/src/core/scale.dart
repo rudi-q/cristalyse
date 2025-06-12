@@ -2,32 +2,108 @@ import 'package:flutter/material.dart';
 
 /// Base class for all scales
 abstract class Scale {
-  double scale(double value);
-  List<double> getTicks(int count);
+  double scale(dynamic value);
+  List<dynamic> getTicks(int count);
+  List<dynamic> get domain;
+  List<double> get range;
 }
 
 /// Linear scale for continuous data
 class LinearScale extends Scale {
-  List<double> domain = [0, 1];
-  List<double> range = [0, 1];
+  List<double> _domain = [0, 1];
+  List<double> _range = [0, 1];
   final double? min;
   final double? max;
 
   LinearScale({this.min, this.max});
 
   @override
-  double scale(double value) {
-    final domainSpan = domain[1] - domain[0];
-    final rangeSpan = range[1] - range[0];
-    if (domainSpan == 0) return range[0];
-    return range[0] + (value - domain[0]) / domainSpan * rangeSpan;
+  List<double> get domain => _domain;
+  set domain(List<double> value) => _domain = value;
+
+  @override
+  List<double> get range => _range;
+  set range(List<double> value) => _range = value;
+
+  @override
+  double scale(dynamic value) {
+    if (value is! num) return _range[0];
+    final numValue = value.toDouble();
+    final domainSpan = _domain[1] - _domain[0];
+    final rangeSpan = _range[1] - _range[0];
+    if (domainSpan == 0) return _range[0];
+    return _range[0] + (numValue - _domain[0]) / domainSpan * rangeSpan;
   }
 
   @override
   List<double> getTicks(int count) {
-    if (count <= 1) return [domain[0]];
-    final step = (domain[1] - domain[0]) / (count - 1);
-    return List.generate(count, (i) => domain[0] + i * step);
+    if (count <= 1) return [_domain[0]];
+    final step = (_domain[1] - _domain[0]) / (count - 1);
+    return List.generate(count, (i) => _domain[0] + i * step);
+  }
+}
+
+/// Ordinal scale for categorical data (essential for bar charts)
+class OrdinalScale extends Scale {
+  List<dynamic> _domain = [];
+  List<double> _range = [0, 1];
+  final double _padding; // 10% padding between bands
+  double _bandWidth = 0;
+
+  OrdinalScale({double padding = 0.1}) : _padding = padding;
+
+  @override
+  List<dynamic> get domain => _domain;
+  set domain(List<dynamic> value) {
+    _domain = value;
+    _calculateBandWidth();
+  }
+
+  @override
+  List<double> get range => _range;
+  set range(List<double> value) {
+    _range = value;
+    _calculateBandWidth();
+  }
+
+  double get bandWidth => _bandWidth;
+  double get padding => _padding;
+
+  void _calculateBandWidth() {
+    if (_domain.isEmpty) {
+      _bandWidth = 0;
+      return;
+    }
+
+    final totalRange = _range[1] - _range[0];
+    final totalPadding = _padding * totalRange;
+    final availableSpace = totalRange - totalPadding;
+    _bandWidth = availableSpace / _domain.length;
+  }
+
+  @override
+  double scale(dynamic value) {
+    final index = _domain.indexOf(value);
+    if (index == -1) return _range[0];
+
+    final totalRange = _range[1] - _range[0];
+    final paddingSpace = _padding * totalRange / 2; // Split padding
+
+    return _range[0] + paddingSpace + index * (_bandWidth + _padding * totalRange / _domain.length);
+  }
+
+  /// Get the center position of a band
+  double bandCenter(dynamic value) {
+    return scale(value) + _bandWidth / 2;
+  }
+
+  @override
+  List<dynamic> getTicks(int count) {
+    // For ordinal scales, return all domain values or subset
+    if (count >= _domain.length) return List.from(_domain);
+
+    final step = _domain.length / count;
+    return List.generate(count, (i) => _domain[(i * step).floor()]);
   }
 }
 

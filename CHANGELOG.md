@@ -1,3 +1,15 @@
+## 0.3.0 - 2025-06-12
+
+#### Added
+- Bar chart support with `geomBar()`.
+- Horizontal bar chart functionality via `coordFlip()` method.
+- Added `borderRadius` and `borderWidth` properties to `BarGeometry` for enhanced styling.
+
+#### Fixed
+- Resolved numerous rendering issues and lint errors in `animated_chart_widget.dart` to enable robust bar chart display.
+- Corrected scale setup and drawing logic for flipped coordinates in horizontal bar charts.
+- Ensured proper propagation of the `coordFlipped` flag throughout the chart rendering pipeline.
+
 ## 0.2.3 - 2025-06-08
 
 #### Technical
