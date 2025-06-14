@@ -3,6 +3,9 @@
 **The grammar of graphics visualization library that Flutter developers have been waiting for.**
 
 [![pub package](https://img.shields.io/pub/v/cristalyse.svg)](https://pub.dev/packages/cristalyse)
+[![pub points](https://img.shields.io/pub/points/cristalyse)](https://pub.dev/packages/cristalyse/score)
+[![likes](https://img.shields.io/pub/likes/cristalyse)](https://pub.dev/packages/cristalyse/score)
+[![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-blue)](https://flutter.dev/)
 [![Flutter support](https://img.shields.io/badge/Flutter-1.17%2B-blue)](https://flutter.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -428,7 +431,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.5.0** - Production ready with dual Y-axis support
+**Current Version: 0.5.1** - Production ready with dual Y-axis support
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 

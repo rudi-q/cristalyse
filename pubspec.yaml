@@ -1,12 +1,16 @@
 name: cristalyse
 description: "Cristalyse is a high-performance data visualization library for Dart/Flutter that implements grammar of graphics principles with native rendering capabilities."
-version: 0.5.0
+version: 0.5.1
 homepage: https://github.com/rudi-q/cristalyse
 repository: https://github.com/rudi-q/cristalyse
 issue_tracker: https://github.com/rudi-q/cristalyse/issues
 documentation: https://github.com/rudi-q/cristalyse#readme
 
 screenshots:
+  - description: 'Dual Y-axis Example with custom theme'
+    path: example/screenshots/cristalyse_dual_axis_chart.gif
+  - description: 'Stacked Bar Plot Example with custom theme'
+    path: example/screenshots/cristalyse_stacked_bar_chart.gif
   - description: 'Grouped Bar Plot Example with custom theme'
     path: example/screenshots/cristalyse_grouped_bar_chart.gif
   - description: 'Horizontal Bar Plot Example with custom theme'

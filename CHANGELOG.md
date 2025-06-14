@@ -1,3 +1,7 @@
+## 0.5.1 - 2025-06-14
+#### Documentation
+- Updated screenshots with latest examples
+
 ## 0.5.0 - 2025-06-14
 
 #### 🚀 Major Feature: Dual Y-Axis Support
