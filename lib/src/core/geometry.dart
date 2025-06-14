@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
+/// Enum for specifying which Y-axis to use
+enum YAxis { primary, secondary }
+
 /// Base class for all chart geometries
-abstract class Geometry {}
+abstract class Geometry {
+  final YAxis yAxis;
+
+  Geometry({this.yAxis = YAxis.primary});
+}
 
 /// Enum for point shapes
 enum PointShape { circle, square, triangle }
@@ -20,6 +27,7 @@ class PointGeometry extends Geometry {
     this.alpha = 1.0,
     this.shape = PointShape.circle,
     this.borderWidth = 0.0,
+    super.yAxis,
   });
 }
 
@@ -35,6 +43,7 @@ class LineGeometry extends Geometry {
     this.color,
     this.alpha = 1.0,
     this.style = LineStyle.solid,
+    super.yAxis,
   });
 }
 
@@ -56,6 +65,7 @@ class BarGeometry extends Geometry {
     this.style = BarStyle.grouped,
     this.borderRadius,
     this.borderWidth = 0.0,
+    super.yAxis,
   });
 }
 

@@ -10,12 +10,18 @@ class CristalyseChart {
   List<Map<String, dynamic>> _data = [];
   String? _xColumn;
   String? _yColumn;
+
+  /// Secondary Y-axis column
+  String? _y2Column;
   String? _colorColumn;
   String? _sizeColumn;
 
   final List<Geometry> _geometries = [];
   Scale? _xScale;
   Scale? _yScale;
+
+  /// Secondary Y-axis scale
+  Scale? _y2Scale;
   ColorScale? _colorScale;
   SizeScale? _sizeScale;
   ChartTheme _theme = ChartTheme.defaultTheme();
@@ -24,15 +30,15 @@ class CristalyseChart {
   Duration _animationDuration = const Duration(milliseconds: 300);
   Curve _animationCurve = Curves.easeInOut;
 
-  bool _coordFlipped = false; // Added this line
+  bool _coordFlipped = false;
 
   /// Set the data source for the chart
   ///
   /// Example:
   /// ```dart
   /// CristalyseChart().data([
-  ///   {'x': 1, 'y': 2, 'category': 'A'},
-  ///   {'x': 2, 'y': 3, 'category': 'B'},
+  ///   {'x': 1, 'y': 2, 'y2': 85, 'category': 'A'},
+  ///   {'x': 2, 'y': 3, 'y2': 92, 'category': 'B'},
   /// ])
   /// ```
   CristalyseChart data(List<Map<String, dynamic>> data) {
@@ -44,7 +50,7 @@ class CristalyseChart {
   ///
   /// Example:
   /// ```dart
-  /// chart.mapping(x: 'date', y: 'value', color: 'category')
+  /// chart.mapping(x: 'date', y: 'revenue', color: 'category')
   /// ```
   CristalyseChart mapping({String? x, String? y, String? color, String? size}) {
     _xColumn = x;
@@ -54,11 +60,22 @@ class CristalyseChart {
     return this;
   }
 
+  /// Map data to secondary Y-axis (right side)
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.mappingY2('conversion_rate')
+  /// ```
+  CristalyseChart mappingY2(String column) {
+    _y2Column = column;
+    return this;
+  }
+
   /// Add scatter plot points
   ///
   /// Example:
   /// ```dart
-  /// chart.geomPoint(size: 5.0, alpha: 0.7)
+  /// chart.geomPoint(size: 5.0, alpha: 0.7, yAxis: YAxis.secondary)
   /// ```
   CristalyseChart geomPoint({
     double? size,
@@ -66,6 +83,7 @@ class CristalyseChart {
     double? alpha,
     PointShape? shape,
     double? borderWidth,
+    YAxis? yAxis,
   }) {
     _geometries.add(
       PointGeometry(
@@ -74,6 +92,7 @@ class CristalyseChart {
         alpha: alpha ?? 1.0,
         shape: shape ?? PointShape.circle,
         borderWidth: borderWidth ?? 0.0,
+        yAxis: yAxis ?? YAxis.primary,
       ),
     );
     return this;
@@ -83,13 +102,14 @@ class CristalyseChart {
   ///
   /// Example:
   /// ```dart
-  /// chart.geomLine(strokeWidth: 2.0, alpha: 0.8)
+  /// chart.geomLine(strokeWidth: 2.0, alpha: 0.8, yAxis: YAxis.secondary)
   /// ```
   CristalyseChart geomLine({
     double? strokeWidth,
     Color? color,
     double? alpha,
     LineStyle? style,
+    YAxis? yAxis,
   }) {
     _geometries.add(
       LineGeometry(
@@ -97,6 +117,7 @@ class CristalyseChart {
         color: color,
         alpha: alpha ?? 1.0,
         style: style ?? LineStyle.solid,
+        yAxis: yAxis ?? YAxis.primary,
       ),
     );
     return this;
@@ -106,7 +127,7 @@ class CristalyseChart {
   ///
   /// Example:
   /// ```dart
-  /// chart.geomBar(width: 0.8, orientation: BarOrientation.vertical)
+  /// chart.geomBar(width: 0.8, orientation: BarOrientation.vertical, yAxis: YAxis.secondary)
   /// ```
   CristalyseChart geomBar({
     double? width,
@@ -116,6 +137,7 @@ class CristalyseChart {
     BarStyle? style,
     BorderRadius? borderRadius,
     double? borderWidth,
+    YAxis? yAxis,
   }) {
     final barGeom = BarGeometry(
       width: width ?? 0.8,
@@ -125,6 +147,7 @@ class CristalyseChart {
       style: style ?? BarStyle.grouped,
       borderRadius: borderRadius,
       borderWidth: borderWidth ?? 0.0,
+      yAxis: yAxis ?? YAxis.primary,
     );
     _geometries.add(barGeom);
     return this;
@@ -136,9 +159,20 @@ class CristalyseChart {
     return this;
   }
 
-  /// Configure continuous Y scale
+  /// Configure continuous Y scale (primary/left axis)
   CristalyseChart scaleYContinuous({double? min, double? max}) {
     _yScale = LinearScale(min: min, max: max);
+    return this;
+  }
+
+  /// Configure continuous secondary Y scale (right axis)
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.scaleY2Continuous(min: 0, max: 100) // For percentage data
+  /// ```
+  CristalyseChart scaleY2Continuous({double? min, double? max}) {
+    _y2Scale = LinearScale(min: min, max: max);
     return this;
   }
 
@@ -190,11 +224,13 @@ class CristalyseChart {
       data: _data,
       xColumn: _xColumn,
       yColumn: _yColumn,
+      y2Column: _y2Column,
       colorColumn: _colorColumn,
       sizeColumn: _sizeColumn,
       geometries: _geometries,
       xScale: _xScale,
       yScale: _yScale,
+      y2Scale: _y2Scale,
       colorScale: _colorScale,
       sizeScale: _sizeScale,
       theme: _theme,

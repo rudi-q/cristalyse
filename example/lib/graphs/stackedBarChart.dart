@@ -16,15 +16,15 @@ Widget buildStackedBarTab(ChartTheme currentTheme,
               .data(data)
               .mapping(x: 'quarter', y: 'revenue', color: 'category')
               .geomBar(
-              width: sliderValue.clamp(0.1, 1.0),
-              style: BarStyle.stacked, // This is the key!
-              alpha: 0.9)
+                  width: sliderValue.clamp(0.1, 1.0),
+                  style: BarStyle.stacked, // This is the key!
+                  alpha: 0.9)
               .scaleXOrdinal()
               .scaleYContinuous(min: 0)
               .theme(currentTheme)
               .animate(
-              duration: const Duration(milliseconds: 1400),
-              curve: Curves.easeOutQuart)
+                  duration: const Duration(milliseconds: 1400),
+                  curve: Curves.easeOutQuart)
               .build(),
         ),
         const SizedBox(height: 16),

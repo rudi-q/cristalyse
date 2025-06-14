@@ -5,6 +5,7 @@ import 'package:cristalyse_example/chartTheme.dart';
 import 'package:flutter/material.dart';
 
 import 'graphs/barChart.dart';
+import 'graphs/dualAxisChart.dart';
 import 'graphs/groupedBar.dart';
 import 'graphs/horizontalBarChart.dart';
 import 'graphs/lineChart.dart';
@@ -102,11 +103,12 @@ class _ExampleHomeState extends State<ExampleHome>
   late final List<Map<String, dynamic>> _groupedBarData;
   late final List<Map<String, dynamic>> _horizontalBarData;
   late final List<Map<String, dynamic>> _stackedBarData;
+  late final List<Map<String, dynamic>> _dualAxisData;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 7, vsync: this);
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -122,6 +124,7 @@ class _ExampleHomeState extends State<ExampleHome>
 
     _generateSampleData();
     _generateStackedBarData();
+    _generateDualAxisData();
     _fabAnimationController.forward();
   }
 
@@ -190,6 +193,53 @@ class _ExampleHomeState extends State<ExampleHome>
     }).toList();
   }
 
+  void _generateDualAxisData() {
+    // Realistic dual-axis data - Revenue vs Conversion Rate
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    _dualAxisData = <Map<String, dynamic>>[];
+
+    for (int i = 0; i < months.length; i++) {
+      final month = months[i];
+
+      // Revenue data (left Y-axis) - ranges from ~100k to ~200k
+      final baseRevenue = 120 + i * 5; // Growing trend
+      final seasonalRevenue = math.sin(i * 0.5) * 20; // Seasonal variation
+      final revenue = baseRevenue +
+          seasonalRevenue +
+          (math.Random().nextDouble() - 0.5) * 15;
+
+      // Conversion rate data (right Y-axis) - ranges from ~15% to ~25%
+      final baseConversion = 18 + i * 0.3; // Slow improvement over time
+      final seasonalConversion =
+          math.cos(i * 0.4) * 3; // Different seasonal pattern
+      final conversionRate = baseConversion +
+          seasonalConversion +
+          (math.Random().nextDouble() - 0.5) * 2;
+
+      final dataPoint = {
+        'month': month,
+        'revenue': math.max(80.0, revenue), // Ensure positive revenue
+        'conversion_rate': math.max(10.0,
+            math.min(30.0, conversionRate)), // Keep conversion rate reasonable
+      };
+
+      _dualAxisData.add(dataPoint);
+    }
+  }
+
   void _generateStackedBarData() {
     // Realistic stacked bar data - Revenue by Category per Quarter
     final categories = ['Product Sales', 'Services', 'Subscriptions'];
@@ -200,9 +250,15 @@ class _ExampleHomeState extends State<ExampleHome>
       for (int i = 0; i < categories.length; i++) {
         final category = categories[i];
         // Different base values for each category to make stacking interesting
-        final baseValues = [40.0, 25.0, 30.0]; // Product Sales highest, Services middle, Subscriptions lowest
-        final quarterMultiplier = quarters.indexOf(quarter) * 0.2 + 1.0; // Growth over quarters
-        final categoryMultiplier = [1.0, 0.8, 1.2][i]; // Different growth rates per category
+        final baseValues = [
+          40.0,
+          25.0,
+          30.0
+        ]; // Product Sales highest, Services middle, Subscriptions lowest
+        final quarterMultiplier =
+            quarters.indexOf(quarter) * 0.2 + 1.0; // Growth over quarters
+        final categoryMultiplier =
+            [1.0, 0.8, 1.2][i]; // Different growth rates per category
 
         final revenue = baseValues[i] * quarterMultiplier * categoryMultiplier +
             (math.Random().nextDouble() - 0.5) * 10; // Add some variance
@@ -258,6 +314,7 @@ class _ExampleHomeState extends State<ExampleHome>
       'Product Performance by Quarter',
       'Team Size by Department',
       'Revenue Breakdown by Category',
+      'Revenue vs Conversion Performance',
     ];
   }
 
@@ -269,6 +326,7 @@ class _ExampleHomeState extends State<ExampleHome>
       'Mobile app leading growth, API services showing steady adoption',
       'Engineering team expansion supporting our product development goals',
       'Product sales continue to drive growth, with subscriptions showing strong momentum',
+      'Revenue growth correlates with improved conversion optimization',
     ];
   }
 
@@ -320,120 +378,120 @@ class _ExampleHomeState extends State<ExampleHome>
       height: _showControls ? null : 0,
       child: _showControls
           ? Container(
-        margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.tune,
-                    color: Theme.of(context).primaryColor, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  'Chart Controls',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+              margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () => setState(() => _showControls = false),
-                  icon: const Icon(Icons.keyboard_arrow_up),
-                  iconSize: 18,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
+                      Icon(Icons.tune,
+                          color: Theme.of(context).primaryColor, size: 18),
+                      const SizedBox(width: 8),
                       Text(
-                        _getDisplayedValue(),
+                        'Chart Controls',
                         style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey[700],
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
                         ),
                       ),
-                      SliderTheme(
-                        data: SliderThemeData(
-                          trackHeight: 3,
-                          thumbShape: const RoundSliderThumbShape(
-                            enabledThumbRadius: 6,
-                          ),
-                          overlayShape: const RoundSliderOverlayShape(
-                            overlayRadius: 12,
-                          ),
-                        ),
-                        child: Slider(
-                          value: _sliderValue,
-                          min: 0.0,
-                          max: 1.0,
-                          divisions: 20,
-                          onChanged: (value) =>
-                              setState(() => _sliderValue = value),
-                        ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () => setState(() => _showControls = false),
+                        icon: const Icon(Icons.keyboard_arrow_up),
+                        iconSize: 18,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${_themeNames[_currentThemeIndex]} • ${_paletteNames[_currentPaletteIndex]}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey[700],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      children: _colorPalettes[_currentPaletteIndex]
-                          .take(4)
-                          .map((color) => Container(
-                        width: 16,
-                        height: 16,
-                        margin: const EdgeInsets.only(right: 4),
-                        decoration: BoxDecoration(
-                          color: color,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Colors.white,
-                            width: 1.5,
-                          ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _getDisplayedValue(),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                            SliderTheme(
+                              data: SliderThemeData(
+                                trackHeight: 3,
+                                thumbShape: const RoundSliderThumbShape(
+                                  enabledThumbRadius: 6,
+                                ),
+                                overlayShape: const RoundSliderOverlayShape(
+                                  overlayRadius: 12,
+                                ),
+                              ),
+                              child: Slider(
+                                value: _sliderValue,
+                                min: 0.0,
+                                max: 1.0,
+                                divisions: 20,
+                                onChanged: (value) =>
+                                    setState(() => _sliderValue = value),
+                              ),
+                            ),
+                          ],
                         ),
-                      ))
-                          .toList(),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ),
-      )
+                      ),
+                      const SizedBox(width: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${_themeNames[_currentThemeIndex]} • ${_paletteNames[_currentPaletteIndex]}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: _colorPalettes[_currentPaletteIndex]
+                                .take(4)
+                                .map((color) => Container(
+                                      width: 16,
+                                      height: 16,
+                                      margin: const EdgeInsets.only(right: 4),
+                                      decoration: BoxDecoration(
+                                        color: color,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 1.5,
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
           : const SizedBox.shrink(),
     );
   }
@@ -487,6 +545,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Grouped Bars'),
             Tab(text: 'Horizontal Bars'),
             Tab(text: 'Stacked Bars'),
+            Tab(text: 'Dual Y-Axis'),
           ],
         ),
       ),
@@ -567,11 +626,27 @@ class _ExampleHomeState extends State<ExampleHome>
                 _buildChartPage(
                   chartTitles[5],
                   chartDescriptions[5],
-                  buildStackedBarTab(currentTheme, _stackedBarData, _sliderValue),
+                  buildStackedBarTab(
+                      currentTheme, _stackedBarData, _sliderValue),
                   [
-                    _buildStatsCard('Total Revenue', '\$385k', '+18.2%', Colors.green),
+                    _buildStatsCard(
+                        'Total Revenue', '\$385k', '+18.2%', Colors.green),
                     _buildStatsCard('Product Mix', '52%', '+3.1%', Colors.blue),
-                    _buildStatsCard('Growth Rate', '23.4%', '+5.7%', Colors.orange),
+                    _buildStatsCard(
+                        'Growth Rate', '23.4%', '+5.7%', Colors.orange),
+                  ],
+                ),
+                _buildChartPage(
+                  'Revenue vs Conversion Performance',
+                  'Revenue growth correlates with improved conversion optimization',
+                  buildDualAxisTab(currentTheme, _dualAxisData, _sliderValue),
+                  [
+                    _buildStatsCard(
+                        'Avg Revenue', '\$156k', '+12.8%', Colors.blue),
+                    _buildStatsCard(
+                        'Avg Conversion', '19.2%', '+2.4%', Colors.green),
+                    _buildStatsCard(
+                        'Correlation', '0.73', '+0.12', Colors.purple),
                   ],
                 ),
               ],
@@ -648,11 +723,11 @@ class _ExampleHomeState extends State<ExampleHome>
           Row(
             children: stats
                 .map((stat) => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: stat,
-              ),
-            ))
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: stat,
+                      ),
+                    ))
                 .toList(),
           ),
 
@@ -727,31 +802,31 @@ class _ExampleHomeState extends State<ExampleHome>
     return Column(
       children: features
           .map((feature) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Row(
-          children: [
-            Container(
-              width: 4,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                shape: BoxShape.circle,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                feature,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey[700],
-                  height: 1.3,
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        feature,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[700],
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-          ],
-        ),
-      ))
+              ))
           .toList(),
     );
   }
@@ -799,6 +874,13 @@ class _ExampleHomeState extends State<ExampleHome>
           'Automatic part-to-whole relationship visualization',
           'Consistent color mapping across all segments',
           'Perfect for budget breakdowns and composition analysis'
+        ];
+      case 6:
+        return [
+          'Dual Y-axis support for different data scales',
+          'Independent left and right axis scaling',
+          'Combined bar and line visualizations',
+          'Perfect for correlating volume vs efficiency metrics'
         ];
       default:
         return [];

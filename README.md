@@ -17,17 +17,19 @@
 - 📱 **True Cross-Platform** - One codebase → Mobile, Web, Desktop, all looking identical
 - ⚡ **GPU-Accelerated Performance** - Handle large datasets without breaking a sweat
 - 🎯 **Flutter-First Design** - Seamlessly integrates with your existing Flutter apps
+- 📊 **Dual Y-Axis Support** - Professional business dashboards with independent left/right scales
+- 📈 **Advanced Bar Charts** - Grouped, stacked, and horizontal variations with smooth animations
 
 ### See What You Can Build
 
 <p align="center">
-  <img src="example/screenshots/cristalyse_scatter_plot.gif" alt="Animated Scatter Plot" width="400"/>
+  <img src="example/screenshots/cristalyse_scatter_plot.gif" alt="Animated Scatter Plot" width="600"/>
   <br/>
   <em>Interactive scatter plots with smooth animations and multi-dimensional data mapping</em>
 </p>
 
 <p align="center">
-  <img src="example/screenshots/cristalyse_line_chart.gif" alt="Progressive Line Chart" width="400"/>
+  <img src="example/screenshots/cristalyse_line_chart.gif" alt="Progressive Line Chart" width="600"/>
   <br/>
   <em>Progressive line drawing with customizable themes and multi-series support</em>
 </p>
@@ -37,6 +39,7 @@
 - **Flutter developers** building data-driven apps who need more than basic chart widgets
 - **Data scientists** who want to deploy interactive visualizations to mobile without learning Swift/Kotlin
 - **Enterprise teams** building dashboards that need consistent UX across all platforms
+- **Business analysts** creating professional reports with dual Y-axis charts and advanced visualizations
 
 ## 🚀 Quick Start
 
@@ -84,7 +87,7 @@ class MyChart extends StatelessWidget {
 **Result:** A beautiful, animated scatter plot that works identically on iOS, Android, Web, and Desktop.
 
 <p align="center">
-  <img src="example/screenshots/cristalyse_scatter_plot.png" alt="Simple Scatter Plot" width="350"/>
+  <img src="example/screenshots/cristalyse_scatter_plot.png" alt="Simple Scatter Plot" width="600"/>
   <br/>
   <em>Your first chart - clean, responsive, and cross-platform</em>
 </p>
@@ -125,77 +128,172 @@ CristalyseChart()
   .build()
 ```
 
-### Bar Charts Made Simple
+## 📊 Advanced Bar Charts
 
 <div align="center">
-  <img src="example/screenshots/cristalyse_bar_chart.gif" alt="Animated Bar Chart" width="350"/>
-  <img src="example/screenshots/cristalyse_horizontal_bar_chart.gif" alt="Horizontal Bar Chart" width="350"/>
+  <img src="example/screenshots/cristalyse_bar_chart.gif" alt="Animated Bar Chart" width="400"/>
+  <img src="example/screenshots/cristalyse_horizontal_bar_chart.gif" alt="Horizontal Bar Chart" width="400"/>
   <br/>
   <em>Vertical and horizontal bar charts with staggered animations</em>
 </div>
 
-### Grouped Bar Chart
+### Stacked Bar Charts
 ```dart
-// Don't forget to define your data, for example:
-// final departmentData = [
-//   {'department': 'Sales', 'headcount': 25},
-//   {'department': 'Engineering', 'headcount': 40},
-//   {'department': 'Marketing', 'headcount': 15},
-//   {'department': 'HR', 'headcount': 10},
-// ];
-
+// Perfect for budget breakdowns and composition analysis
 CristalyseChart()
-  .data(departmentData) // Replace with your actual data
-  .mapping(x: 'department', y: 'headcount') // x becomes the category axis, y the value axis
+  .data(revenueData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'category')
   .geomBar(
-    borderRadius: BorderRadius.circular(4), // Example: rounded corners for bars
-    borderWidth: 1.0,                       // Example: add a border to bars
+    style: BarStyle.stacked,     // Stack segments on top of each other
+    width: 0.8,
+    alpha: 0.9,
   )
-  .coordFlip() // This is the key to make the bar chart horizontal
-  .scaleXOrdinal() // After coordFlip, X scale is for categories (departments)
-  .scaleYContinuous(min: 0) // After coordFlip, Y scale is for values (headcount)
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
   .theme(ChartTheme.defaultTheme())
-  .animate(duration: Duration(milliseconds: 900))
+  .animate(duration: Duration(milliseconds: 1400))
   .build()
 ```
 
 <p align="center">
-  <img src="example/screenshots/cristalyse_grouped_bar_chart.gif" alt="Grouped Bar Chart" width="400"/>
+  <img src="example/screenshots/cristalyse_stacked_bar_chart.gif" alt="Stacked Bar Chart" width="600"/>
+  <br/>
+  <em>Stacked bars with segment-by-segment progressive animation</em>
+</p>
+
+### Grouped Bar Charts
+```dart
+// Compare multiple series side-by-side
+CristalyseChart()
+  .data(productData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(
+    style: BarStyle.grouped,     // Place bars side-by-side
+    width: 0.8,
+    alpha: 0.9,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+<p align="center">
+  <img src="example/screenshots/cristalyse_grouped_bar_chart.gif" alt="Grouped Bar Chart" width="600"/>
   <br/>
   <em>Grouped bar charts for comparing multiple series side-by-side</em>
 </p>
 
-## 🎨 Grammar of Graphics Made Simple
+### Horizontal Bar Charts
+```dart
+// Great for ranking and long category names
+CristalyseChart()
+  .data(departmentData)
+  .mapping(x: 'department', y: 'headcount')
+  .geomBar(
+    borderRadius: BorderRadius.circular(4), // Rounded corners
+    borderWidth: 1.0,                       // Add borders
+  )
+  .coordFlip()                              // Flip to horizontal
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
 
-Cristalyse follows the proven grammar of graphics pattern. If you've used ggplot2, you'll feel right at home:
+## 🎯 Dual Y-Axis Charts
 
-| Component | Purpose | Example |
-|-----------|---------|---------|
-| **Data** | Your dataset | `.data(salesData)` |
-| **Mapping** | Connect data to visuals | `.mapping(x: 'date', y: 'revenue', color: 'region')` |
-| **Geometry** | How to draw the data | `.geomPoint()`, `.geomLine()` |
-| **Scales** | Transform data to screen coordinates | `.scaleXContinuous()`, `.scaleYContinuous()` |
-| **Themes** | Visual styling | `.theme(ChartTheme.defaultTheme())` |
-| **Animation** | Bring it to life | `.animate(duration: Duration(milliseconds: 500))` |
+**Perfect for business dashboards** - correlate volume metrics with efficiency metrics on independent scales.
+
+```dart
+// Revenue vs Conversion Rate - The Classic Business Dashboard
+CristalyseChart()
+  .data(businessData)
+  .mapping(x: 'month', y: 'revenue')        // Primary Y-axis (left)
+  .mappingY2('conversion_rate')             // Secondary Y-axis (right)
+  .geomBar(
+    yAxis: YAxis.primary,                   // Revenue bars use left axis
+    alpha: 0.7,
+  )
+  .geomLine(
+    yAxis: YAxis.secondary,                 // Conversion line uses right axis
+    strokeWidth: 3.0,
+    color: Colors.orange,
+  )
+  .geomPoint(
+    yAxis: YAxis.secondary,                 // Points on conversion line
+    size: 8.0,
+    color: Colors.orange,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)                 // Left axis: Revenue ($k)
+  .scaleY2Continuous(min: 0, max: 100)      // Right axis: Percentage (%)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+<p align="center">
+  <img src="example/screenshots/cristalyse_dual_axis_chart.gif" alt="Dual Axis Chart" width="600"/>
+  <br/>
+  <em>Dual axis charts for correlating two different metrics on independent scales</em>
+</p>
+
+### More Dual Y-Axis Examples
+
+```dart
+// Sales Volume vs Customer Satisfaction
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'week', y: 'sales_volume')
+  .mappingY2('satisfaction_score')
+  .geomBar(yAxis: YAxis.primary)            // Volume bars
+  .geomLine(yAxis: YAxis.secondary)         // Satisfaction trend
+  .scaleY2Continuous(min: 1, max: 5)        // Rating scale
+  .build();
+
+// Website Traffic vs Bounce Rate
+CristalyseChart()
+  .data(analyticsData)
+  .mapping(x: 'date', y: 'page_views')
+  .mappingY2('bounce_rate')
+  .geomArea(yAxis: YAxis.primary, alpha: 0.3)    // Traffic area
+  .geomLine(yAxis: YAxis.secondary, strokeWidth: 2.0) // Bounce rate line
+  .scaleY2Continuous(min: 0, max: 100)      // Percentage scale
+  .build();
+```
 
 ## 🔥 Current Features
 
-### ✅ Ready to Use
+### ✅ Chart Types
 - **Scatter plots** with size and color mapping
-- **Line charts** with multi-series support
-- **Bar charts** (vertical and horizontal)
-- **Smooth animations** with customizable timing
-- **Light and dark themes** with full customization
-- **Enhanced theming** with multiple built-in themes (including Solarized) and color palettes
+- **Line charts** with multi-series support and progressive drawing
+- **Bar charts** (vertical, horizontal, grouped, stacked) with smooth animations
+- **Dual Y-axis charts** for professional business dashboards
+- **Combined visualizations** (bars + lines, points + lines, etc.)
+
+### ✅ Advanced Features
+- **Grammar of Graphics API** - Familiar ggplot2-style syntax
+- **Smooth 60fps animations** with customizable timing and curves
+- **Dual Y-axis support** with independent scales and data routing
+- **Coordinate flipping** for horizontal charts
+- **Multiple themes** (Light, Dark, Solarized Light/Dark)
+- **Custom color palettes** and styling options
 - **Responsive scaling** for all screen sizes
 - **High-DPI support** for crisp visuals
 
+### ✅ Data Handling
+- **Flexible data formats** - List<Map<String, dynamic>>
+- **Mixed data types** - Automatic type detection and conversion
+- **Missing value handling** - Graceful degradation for null/invalid data
+- **Large dataset support** - Optimized for 1000+ data points
+- **Real-time updates** - Smooth transitions when data changes
+
 ### 🚧 Coming Soon (Next Releases)
-- Area charts with stacking
+- Area charts with stacking and filling options
 - Statistical overlays (regression lines, confidence intervals)
-- Interactive pan and zoom
-- Faceting for small multiples
-- Export to PNG/SVG
+- Interactive pan and zoom capabilities
+- Faceting for small multiples and grid layouts
+- Export to PNG/SVG with high-DPI support
 
 ## 🎯 Real-World Examples
 
@@ -209,7 +307,7 @@ Widget buildRevenueTrend() {
       .geomPoint(size: 5.0)
       .scaleXContinuous()
       .scaleYContinuous(min: 0)
-      .theme(ChartTheme.solarizedDarkTheme()) // Example: Use the new Solarized Dark theme
+      .theme(ChartTheme.solarizedDarkTheme()) // Use Solarized Dark theme
       .animate(duration: Duration(milliseconds: 1500))
       .build();
 }
@@ -231,14 +329,40 @@ Widget buildEngagementScatter() {
 }
 ```
 
+### Business Intelligence Dashboard
+```dart
+Widget buildKPIDashboard() {
+  return CristalyseChart()
+      .data(kpiData)
+      .mapping(x: 'quarter', y: 'revenue')
+      .mappingY2('profit_margin')             // Dual Y-axis for percentage
+      .geomBar(
+        yAxis: YAxis.primary,
+        style: BarStyle.stacked,              // Stack revenue components
+        color: 'revenue_source',
+      )
+      .geomLine(
+        yAxis: YAxis.secondary,               // Profit margin trend
+        strokeWidth: 4.0,
+        color: Colors.green,
+      )
+      .scaleXOrdinal()
+      .scaleYContinuous(min: 0)               // Revenue scale
+      .scaleY2Continuous(min: 0, max: 50)     // Percentage scale
+      .theme(ChartTheme.defaultTheme())
+      .build();
+}
+```
+
 ## 💡 Why Not Just Use...?
 
 | Alternative | Why Cristalyse is Better |
 |-------------|---------------------------|
-| **fl_chart** | Grammar of graphics API vs basic chart widgets. Smooth animations vs static charts. |
-| **charts_flutter** | Active development vs deprecated. Modern Flutter APIs vs legacy code. |
+| **fl_chart** | Grammar of graphics API vs basic chart widgets. Dual Y-axis support vs single axis limitation. |
+| **charts_flutter** | Active development vs deprecated. Stacked bars and advanced features vs basic charts. |
 | **Web charts (plotly.js)** | Native performance vs DOM rendering. True mobile deployment vs responsive web. |
 | **Platform-specific charts** | Write once vs write 3x for iOS/Android/Web. Consistent UX vs platform differences. |
+| **Business tools (Tableau)** | Embedded in your app vs separate tools. Full customization vs template limitations. |
 
 ## 🛠 Advanced Configuration
 
@@ -259,22 +383,38 @@ chart.theme(customTheme)
 ### Animation Control
 ```dart
 chart.animate(
-duration: Duration(milliseconds: 1200),
-curve: Curves.elasticOut,  // Try different curves!
+  duration: Duration(milliseconds: 1200),
+  curve: Curves.elasticOut,  // Try different curves!
 )
 ```
 
-### Data Mapping
+### Advanced Data Mapping
 ```dart
 // Map any data structure
 chart
     .data(complexData)
     .mapping(
-x: 'timestamp',           // Time series
-y: 'metric_value',        // Numeric values  
-color: 'category',        // Color grouping
-size: 'importance'        // Size encoding
-)
+      x: 'timestamp',           // Time series
+      y: 'metric_value',        // Numeric values  
+      color: 'category',        // Color grouping
+      size: 'importance'        // Size encoding
+    )
+    .mappingY2('efficiency')    // Secondary Y-axis for dual charts
+```
+
+### Stacked Bar Configuration
+```dart
+chart
+    .data(budgetData)
+    .mapping(x: 'department', y: 'amount', color: 'category')
+    .geomBar(
+      style: BarStyle.stacked,        // Stack segments
+      width: 0.8,                     // Bar width
+      borderRadius: BorderRadius.circular(4), // Rounded corners
+      alpha: 0.9,                     // Transparency
+    )
+    .scaleXOrdinal()
+    .scaleYContinuous(min: 0)
 ```
 
 ## 📱 Platform Support
@@ -288,15 +428,16 @@ size: 'importance'        // Size encoding
 
 ## 🧪 Development Status
 
-**Current Version: 0.4.3** - Production ready for scatter plots and line charts and custom themes
+**Current Version: 0.5.0** - Production ready with dual Y-axis support
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
 - ✅ **v0.1.0** - Scatter plots and basic theming
 - ✅ **v0.2.0** - Line charts and animations
 - ✅ **v0.3.0** - Bar charts (including horizontal) and areas
-- ✅ **v0.4.0** - Enhanced theming with custom colors and text styles
-- 🚧 **v0.5.0** - Statistical layers
+- ✅ **v0.4.0** - Enhanced theming with custom colors and text styles, stacked bars
+- ✅ **v0.5.0** - **Dual Y-axis support** and advanced bar chart variations
+- 🚧 **v0.6.0** - Statistical layers and interactive features
 
 ## 🤝 Contributing
 
@@ -321,3 +462,5 @@ MIT License - build whatever you want, commercially or otherwise.
 ---
 
 **Ready to create stunning visualizations?** `flutter pub add cristalyse` and start building! 🚀
+
+*Cristalyse: Finally, the grammar of graphics library Flutter developers deserve.*
