@@ -40,11 +40,18 @@ Widget buildInteractiveScatterTab(
             tooltip: TooltipConfig(
               builder: (point) {
                 return Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: Colors.white, width: 2), // Prominent border
+                    color: Colors.black.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.white24, width: 1),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 12.0,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -58,7 +65,7 @@ Widget buildInteractiveScatterTab(
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Text(
                         'Week: ${point.getDisplayValue('x')}',
                         style: const TextStyle(color: Colors.white, fontSize: 12),
@@ -79,13 +86,20 @@ Widget buildInteractiveScatterTab(
                   ),
                 );
               },
-              showDelay: const Duration(milliseconds: 50), // Faster for debugging
-              hideDelay: const Duration(milliseconds: 200),
+              showDelay: const Duration(milliseconds: 10), // Almost instant for smooth switching
+              hideDelay: const Duration(milliseconds: 1500), // Much longer to hide
+              followPointer: false, // Disable to prevent pan interference
+            ),
+            hover: const HoverConfig(
+              hitTestRadius: 30.0, // Very generous hit area
+              debounce: Duration(milliseconds: 50),
             ),
             click: ClickConfig(
               onTap: (point) {
                 // In a real app, you'd navigate to details or show a dialog
+                debugPrint('Tapped on data point: ${point.data}');
               },
+              hitTestRadius: 35.0, // Even more generous for taps
             ),
           )
               .animate(

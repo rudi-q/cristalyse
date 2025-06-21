@@ -20,9 +20,8 @@ class InteractionDetector {
   final String? colorColumn;
   final bool coordFlipped;
 
-  // Spatial index for fast hit testing
-  final Map<int, List<_IndexedDataPoint>> _spatialGrid = {};
-  final int _gridSize = 20; // Grid cell size in pixels
+  // Simple list of all indexed points for reliable detection
+  final List<_IndexedDataPoint> _allPoints = [];
   bool _indexBuilt = false;
 
   InteractionDetector({
@@ -40,31 +39,20 @@ class InteractionDetector {
   });
 
   /// Find the closest data point to the given screen coordinates
-  DataPointInfo? detectPoint(Offset screenPosition, {double maxDistance = 15.0}) {
+  DataPointInfo? detectPoint(Offset screenPosition, {double maxDistance = 20.0}) {
     if (!_indexBuilt) {
-      _buildSpatialIndex();
+      _buildIndex();
     }
 
     _IndexedDataPoint? closest;
     double closestDistance = maxDistance;
 
-    // Check grid cells around the touch point
-    final touchGridX = (screenPosition.dx / _gridSize).floor();
-    final touchGridY = (screenPosition.dy / _gridSize).floor();
-
-    for (int gx = touchGridX - 1; gx <= touchGridX + 1; gx++) {
-      for (int gy = touchGridY - 1; gy <= touchGridY + 1; gy++) {
-        final gridKey = _gridKey(gx, gy);
-        final cellPoints = _spatialGrid[gridKey];
-        if (cellPoints == null) continue;
-
-        for (final point in cellPoints) {
-          final distance = _calculateDistance(screenPosition, point);
-          if (distance < closestDistance) {
-            closest = point;
-            closestDistance = distance;
-          }
-        }
+    // Simple brute force approach - more reliable than spatial grid
+    for (final point in _allPoints) {
+      final distance = _calculateDistance(screenPosition, point);
+      if (distance < closestDistance) {
+        closest = point;
+        closestDistance = distance;
       }
     }
 
@@ -81,21 +69,24 @@ class InteractionDetector {
     );
   }
 
-  /// Build spatial index for efficient hit testing
-  void _buildSpatialIndex() {
-    _spatialGrid.clear();
+  /// Build index of all interactive points
+  void _buildIndex() {
+    _allPoints.clear();
 
     for (int i = 0; i < data.length; i++) {
       final point = data[i];
 
       for (final geometry in geometries) {
+        if (!geometry.interactive) continue;
+
         final indexedPoint = _createIndexedPoint(point, i, geometry);
         if (indexedPoint != null) {
-          _addToSpatialGrid(indexedPoint);
+          _allPoints.add(indexedPoint);
         }
       }
     }
 
+    debugPrint("Built interaction index with ${_allPoints.length} points");
     _indexBuilt = true;
   }
 
@@ -115,39 +106,19 @@ class InteractionDetector {
     if (xValue == null || yValue == null) return null;
 
     // Calculate screen position based on coordinate system
-    Offset screenPosition;
-    if (coordFlipped) {
-      // Horizontal charts: X becomes Y, Y becomes X
-      final numYValue = _getNumericValue(yValue);
-      final screenX = plotArea.left + activeYScale.scale(numYValue ?? 0);
+    Offset? screenPosition = _calculateScreenPosition(
+        xValue,
+        yValue,
+        xScale,
+        activeYScale
+    );
 
-      double screenY;
-      if (xScale is OrdinalScale) {
-        final ordinalScale = xScale as OrdinalScale;
-        screenY = plotArea.top + ordinalScale.bandCenter(xValue);
-      } else {
-        final numXValue = _getNumericValue(xValue);
-        screenY = plotArea.top + xScale.scale(numXValue ?? 0);
-      }
-      screenPosition = Offset(screenX, screenY);
-    } else {
-      // Normal charts
-      double screenX;
-      if (xScale is OrdinalScale) {
-        final ordinalScale = xScale as OrdinalScale;
-        screenX = plotArea.left + ordinalScale.bandCenter(xValue);
-      } else {
-        final numXValue = _getNumericValue(xValue);
-        screenX = plotArea.left + xScale.scale(numXValue ?? 0);
-      }
+    if (screenPosition == null) return null;
 
-      final numYValue = _getNumericValue(yValue);
-      final screenY = plotArea.top + activeYScale.scale(numYValue ?? 0);
-      screenPosition = Offset(screenX, screenY);
-    }
-
-    // Skip points outside plot area
-    if (!plotArea.contains(screenPosition)) {
+    // Skip points outside plot area (with some tolerance)
+    final tolerance = 10.0;
+    final expandedPlotArea = plotArea.inflate(tolerance);
+    if (!expandedPlotArea.contains(screenPosition)) {
       return null;
     }
 
@@ -163,13 +134,51 @@ class InteractionDetector {
     );
   }
 
-  /// Add point to spatial grid for fast lookups
-  void _addToSpatialGrid(_IndexedDataPoint point) {
-    final gridX = (point.screenPosition.dx / _gridSize).floor();
-    final gridY = (point.screenPosition.dy / _gridSize).floor();
-    final gridKey = _gridKey(gridX, gridY);
+  /// Calculate screen position for given data values
+  Offset? _calculateScreenPosition(
+      dynamic xValue,
+      dynamic yValue,
+      Scale xScale,
+      Scale yScale
+      ) {
+    try {
+      if (coordFlipped) {
+        // Horizontal charts: X becomes Y, Y becomes X
+        final numYValue = _getNumericValue(yValue);
+        if (numYValue == null) return null;
+        final screenX = plotArea.left + yScale.scale(numYValue);
 
-    _spatialGrid.putIfAbsent(gridKey, () => []).add(point);
+        double screenY;
+        if (xScale is OrdinalScale) {
+          final ordinalScale = xScale;
+          screenY = plotArea.top + ordinalScale.bandCenter(xValue);
+        } else {
+          final numXValue = _getNumericValue(xValue);
+          if (numXValue == null) return null;
+          screenY = plotArea.top + xScale.scale(numXValue);
+        }
+        return Offset(screenX, screenY);
+      } else {
+        // Normal charts
+        double screenX;
+        if (xScale is OrdinalScale) {
+          final ordinalScale = xScale;
+          screenX = plotArea.left + ordinalScale.bandCenter(xValue);
+        } else {
+          final numXValue = _getNumericValue(xValue);
+          if (numXValue == null) return null;
+          screenX = plotArea.left + xScale.scale(numXValue);
+        }
+
+        final numYValue = _getNumericValue(yValue);
+        if (numYValue == null) return null;
+        final screenY = plotArea.top + yScale.scale(numYValue);
+        return Offset(screenX, screenY);
+      }
+    } catch (e) {
+      debugPrint("Error calculating screen position: $e");
+      return null;
+    }
   }
 
   /// Calculate distance between screen position and data point
@@ -179,7 +188,8 @@ class InteractionDetector {
     if (geometry is PointGeometry) {
       return _distanceToPoint(screenPos, point.screenPosition);
     } else if (geometry is LineGeometry) {
-      return _distanceToLine(screenPos, point);
+      // For lines, treat each point as a circle with larger radius
+      return _distanceToPoint(screenPos, point.screenPosition);
     } else if (geometry is BarGeometry) {
       return _distanceToBar(screenPos, point);
     }
@@ -194,20 +204,14 @@ class InteractionDetector {
     return math.sqrt(dx * dx + dy * dy);
   }
 
-  /// Distance to line segment (approximated)
-  double _distanceToLine(Offset screenPos, _IndexedDataPoint point) {
-    // For line charts, we treat each point as a circle
-    // In a more complete implementation, we'd find the actual line segments
-    return _distanceToPoint(screenPos, point.screenPosition);
-  }
-
   /// Distance to bar rectangle
   double _distanceToBar(Offset screenPos, _IndexedDataPoint point) {
-    // Approximate bar bounds
+    // Create approximate bar bounds
     Rect barBounds;
+
     if (coordFlipped) {
       // Horizontal bar
-      final height = 20.0; // Approximate bar height
+      final height = 30.0; // Generous bar height for hit testing
       barBounds = Rect.fromLTWH(
         plotArea.left,
         point.screenPosition.dy - height / 2,
@@ -216,7 +220,7 @@ class InteractionDetector {
       );
     } else {
       // Vertical bar
-      final width = 20.0; // Approximate bar width
+      final width = 30.0; // Generous bar width for hit testing
       barBounds = Rect.fromLTWH(
         point.screenPosition.dx - width / 2,
         point.screenPosition.dy,
@@ -245,8 +249,7 @@ class InteractionDetector {
       return geometry.color;
     }
 
-    // Default color logic would go here
-    return Colors.blue;
+    return Colors.blue; // Default
   }
 
   /// Convert numeric value from dynamic
@@ -256,19 +259,14 @@ class InteractionDetector {
     return null;
   }
 
-  /// Generate grid key for spatial indexing
-  int _gridKey(int x, int y) {
-    return (x << 16) | (y & 0xFFFF);
-  }
-
-  /// Invalidate spatial index when data changes
+  /// Invalidate index when data changes
   void invalidate() {
     _indexBuilt = false;
-    _spatialGrid.clear();
+    _allPoints.clear();
   }
 }
 
-/// Internal class for spatial indexing
+/// Internal class for indexed points
 class _IndexedDataPoint {
   final Map<String, dynamic> data;
   final int dataIndex;
@@ -289,4 +287,9 @@ class _IndexedDataPoint {
     this.seriesName,
     this.color,
   });
+
+  @override
+  String toString() {
+    return '_IndexedDataPoint(data: $data, position: $screenPosition)';
+  }
 }

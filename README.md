@@ -471,7 +471,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.5.1** - Production ready with dual Y-axis support
+**Current Version: 0.6.1** - Production ready with dual Y-axis support
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 

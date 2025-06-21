@@ -1,3 +1,22 @@
+## 0.6.1 - 2025-06-21
+
+### Fixed
+- **Tooltip System**: Fixed tooltips disappearing instantly and getting stuck on first data point
+- **Widget Tree Lock**: Resolved "setState() called when widget tree was locked" crashes during tooltip animations
+- **Hit Detection**: Improved point detection reliability - all chart points now respond to hover interactions
+- **Touch Handling**: Fixed tooltip interference with pan gestures on mobile devices
+
+### Technical
+- Replaced spatial grid hit detection with distance-based approach for better reliability
+- Added `IgnorePointer` wrapper to prevent tooltips from blocking mouse events
+- Improved tooltip lifecycle management with proper state cleanup
+- Enhanced interaction detector with better error handling and null safety
+
+### Configuration
+- Increased default hit test radius to 30px for hover, 35px for tap interactions
+- Optimized tooltip timing: 10ms show delay, 1.5s hide delay
+- Disabled `followPointer` by default to prevent gesture conflicts
+
 ## 0.6.0 - 2025-06-21
 
 - **Major Feature: Interactive Chart Layer**

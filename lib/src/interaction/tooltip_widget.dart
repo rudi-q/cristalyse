@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import 'chart_interactions.dart';
 
 /// Abstract controller for managing the tooltip visibility.
-/// This allows other parts of the library to interact with the tooltip
-/// without needing direct access to its private state class.
 abstract class TooltipController {
   /// Hides the tooltip.
   void hideTooltip();
@@ -44,6 +41,8 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
 
   DataPointInfo? _currentPoint;
   Offset? _currentPosition;
+  bool _isVisible = false;
+  bool _shouldShow = false; // Track intended state
 
   @override
   void initState() {
@@ -63,11 +62,6 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
   }
 
   @override
-  void didUpdateWidget(ChartTooltipOverlay oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   void dispose() {
     _removeTooltip();
     _showTimer?.cancel();
@@ -79,27 +73,31 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
   /// Show tooltip for a data point
   @override
   void showTooltip(DataPointInfo point, Offset position) {
-    debugPrint("[_ChartTooltipOverlayState.showTooltip] Called. Point: $point, Position: $position");
+    // Update current state
     _currentPoint = point;
     _currentPosition = position;
+    _shouldShow = true;
 
     if (widget.config.builder == null) {
-      debugPrint("[_ChartTooltipOverlayState.showTooltip] No tooltip builder configured. Aborting.");
       return;
     }
 
-    final showDelay = widget.config.showDelay;
-    debugPrint("[_ChartTooltipOverlayState.showTooltip] Current showDelay: $showDelay");
+    // Cancel any pending hide operation
+    _hideTimer?.cancel();
+    _hideTimer = null;
 
-    if (_showTimer != null && _showTimer!.isActive) {
-      debugPrint("[_ChartTooltipOverlayState.showTooltip] Cancelling active showTimer.");
+    // If already showing a tooltip, immediately switch to new point
+    if (_isVisible && _overlayEntry != null) {
+      // Update position and recreate with new data
+      _removeTooltip();
+      _createTooltip();
+      return;
     }
+
+    // Cancel any existing show timer and start a new one
     _showTimer?.cancel();
-    _showTimer = Timer(showDelay,
-        () {
-      // This debugPrint is crucial for confirming timer execution.
-      debugPrint("[_ChartTooltipOverlayState.showTooltip] --- Timer FIRED --- _currentPoint: $_currentPoint, mounted: $mounted");
-      if (_currentPoint != null && mounted) {
+    _showTimer = Timer(widget.config.showDelay, () {
+      if (_shouldShow && _currentPoint != null && mounted) {
         _createTooltip();
       }
     });
@@ -108,49 +106,42 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
   /// Hide tooltip
   @override
   void hideTooltip() {
-    debugPrint("[_ChartTooltipOverlayState.hideTooltip] Called. Current overlayEntry: $_overlayEntry, current _hideTimer: $_hideTimer (isActive: ${_hideTimer?.isActive})");
-    _showTimer?.cancel(); // Cancel any pending show operations
+    _shouldShow = false;
 
-    if (_overlayEntry != null) {
-      if (_hideTimer != null && _hideTimer!.isActive) {
-        debugPrint("[_ChartTooltipOverlayState.hideTooltip] Cancelling active hideTimer.");
-      }
-      _hideTimer?.cancel(); // Cancel any existing hide timer
-      debugPrint("[_ChartTooltipOverlayState.hideTooltip] Starting hide timer with delay: ${widget.config.hideDelay}");
+    // Cancel any pending show operation
+    _showTimer?.cancel();
+    _showTimer = null;
+
+    // Only start hide timer if we're actually visible
+    if (_overlayEntry != null && _isVisible) {
+      _hideTimer?.cancel();
       _hideTimer = Timer(widget.config.hideDelay, () {
-        debugPrint("[_ChartTooltipOverlayState.hideTooltip] --- Hide Timer FIRED --- mounted: $mounted");
-        if (mounted) {
+        if (!_shouldShow && mounted) {
           _animationController.reverse().whenComplete(() {
-            debugPrint("[_ChartTooltipOverlayState.hideTooltip] Animation reversed. Removing overlay via _removeTooltip.");
-            _removeTooltip();
+            // Only defer the cleanup, not the animation
+            if (!_shouldShow) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!_shouldShow && mounted) {
+                  _removeTooltip();
+                }
+              });
+            }
           });
-        } else {
-          debugPrint("[_ChartTooltipOverlayState.hideTooltip] Widget not mounted when hide timer fired. Removing overlay directly via _removeTooltip.");
-          _removeTooltip(); // If not mounted, just ensure it's removed without animation
         }
       });
-    } else {
-      debugPrint("[_ChartTooltipOverlayState.hideTooltip] No overlayEntry to hide.");
     }
   }
 
   /// Create and show tooltip overlay
   void _createTooltip() {
-    debugPrint("[_ChartTooltipOverlayState._createTooltip] Called. _currentPoint: $_currentPoint, _currentPosition: $_currentPosition");
-
-    // Always remove the existing tooltip before creating a new one to ensure fresh data.
-    if (_overlayEntry != null) {
-      debugPrint("[_ChartTooltipOverlayState._createTooltip] Removing existing OverlayEntry before creating a new one.");
-      _overlayEntry!.remove(); // Remove from overlay
-      _overlayEntry = null;     // Nullify the reference
+    if (!_shouldShow || _currentPosition == null || _currentPoint == null) {
+      return;
     }
 
-    // Assert that _currentPosition and _currentPoint are not null before using them.
-    assert(_currentPosition != null, "_currentPosition must not be null in _createTooltip");
-    assert(_currentPoint != null, "_currentPoint must not be null in _createTooltip");
-    if (_currentPosition == null || _currentPoint == null || widget.config.builder == null) {
-      debugPrint("[_ChartTooltipOverlayState._createTooltip] _currentPosition, _currentPoint, or builder is null. Aborting tooltip creation.");
-      return;
+    // Remove existing tooltip
+    if (_overlayEntry != null) {
+      _overlayEntry!.remove();
+      _overlayEntry = null;
     }
 
     final Offset capturedPosition = _currentPosition!;
@@ -159,7 +150,6 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
-        debugPrint("[_ChartTooltipOverlayState._createTooltip] OverlayEntry BUILDER executing. Point: $capturedPoint, Position: $capturedPosition. Builder context: $context");
         return _TooltipPositioned(
           position: capturedPosition,
           config: capturedConfig,
@@ -171,25 +161,29 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
     );
 
     try {
-      debugPrint("[_ChartTooltipOverlayState._createTooltip] Attempting Overlay.of(context)... State context: $context");
       final overlay = Overlay.of(context);
-      debugPrint("[_ChartTooltipOverlayState._createTooltip] Overlay.of(context) successful. Overlay: $overlay. Attempting insert...");
       overlay.insert(_overlayEntry!);
-      debugPrint("[_ChartTooltipOverlayState._createTooltip] OverlayEntry INSERTED successfully.");
+      _isVisible = true;
       _animationController.forward();
-      debugPrint("[_ChartTooltipOverlayState._createTooltip] Animation controller FORWARD called.");
-    } catch (e, s) {
-      debugPrint("[_ChartTooltipOverlayState._createTooltip] Error during OverlayEntry insertion or animation: $e\n$s. Context used: $context");
+    } catch (e) {
+      debugPrint("Error creating tooltip: $e");
+      _removeTooltip();
     }
   }
 
   /// Remove tooltip overlay
   void _removeTooltip() {
-    debugPrint("[_ChartTooltipOverlayState._removeTooltip] Called. Current _overlayEntry: $_overlayEntry");
     if (_overlayEntry != null) {
       _overlayEntry!.remove();
       _overlayEntry = null;
-      debugPrint("[_ChartTooltipOverlayState._removeTooltip] OverlayEntry removed and nullified.");
+    }
+    _isVisible = false;
+    _animationController.reset();
+
+    // Clear current point reference when removing
+    if (!_shouldShow) {
+      _currentPoint = null;
+      _currentPosition = null;
     }
   }
 
@@ -216,31 +210,43 @@ class _TooltipPositioned extends AnimatedWidget {
     required this.child,
     required this.fadeAnimation,
     required this.scaleAnimation,
-  }) : super(listenable: fadeAnimation); // Listen to one for AnimatedWidget
+  }) : super(listenable: fadeAnimation);
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("[_TooltipPositioned.build] Building with position: $position, fade: ${fadeAnimation.value}, scale: ${scaleAnimation.value}");
+    final screenSize = MediaQuery.of(context).size;
+
+    // Smart positioning to avoid screen edges
+    double left = position.dx - 75; // Center tooltip horizontally
+    double top = position.dy - 80;  // Position above touch point
+
+    // Adjust if too close to edges
+    if (left < 10) left = 10;
+    if (left + 150 > screenSize.width) left = screenSize.width - 160;
+    if (top < 10) top = position.dy + 20; // Show below if too close to top
+
     return Positioned(
-      left: math.max(10, position.dx - 50), // Ensure it stays on screen
-      top: math.max(10, position.dy - 60), // Position above the point
-      child: AnimatedBuilder(
-        animation: Listenable.merge([fadeAnimation, scaleAnimation]),
-        builder: (context, child) {
-          return Opacity(
-            opacity: fadeAnimation.value,
-            child: Transform.scale(
-              scale: scaleAnimation.value,
-              child: Material( // Add Material for proper rendering
-                color: Colors.transparent,
-                child: _TooltipContainer(
-                  config: config,
-                  child: this.child,
+      left: left,
+      top: top,
+      child: IgnorePointer( // THIS IS THE KEY FIX!
+        child: AnimatedBuilder(
+          animation: Listenable.merge([fadeAnimation, scaleAnimation]),
+          builder: (context, child) {
+            return Opacity(
+              opacity: fadeAnimation.value,
+              child: Transform.scale(
+                scale: scaleAnimation.value,
+                child: Material(
+                  color: Colors.transparent,
+                  child: _TooltipContainer(
+                    config: config,
+                    child: this.child,
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -258,37 +264,32 @@ class _TooltipContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Transform.translate(
-      offset: const Offset(-50, -10), // Center above touch point
-      child: Container(
-        padding: config.padding,
-        decoration: BoxDecoration(
-          color: config.backgroundColor,
-          borderRadius: BorderRadius.circular(config.borderRadius),
-          boxShadow: config.shadow != null ? [config.shadow!] : [
-            // Add a more prominent default shadow
-            const BoxShadow(
-              color: Colors.black54,
-              blurRadius: 8.0,
-              offset: Offset(0, 2),
-            ),
-          ],
-          // Add a border for debugging
-          border: Border.all(color: Colors.white, width: 1),
-        ),
-        constraints: const BoxConstraints(
-          minWidth: 50,
-          minHeight: 30,
-          maxWidth: 200,
-        ),
-        child: DefaultTextStyle(
-          style: TextStyle(
-            color: config.textColor,
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
+    return Container(
+      padding: config.padding,
+      decoration: BoxDecoration(
+        color: config.backgroundColor,
+        borderRadius: BorderRadius.circular(config.borderRadius),
+        boxShadow: config.shadow != null ? [config.shadow!] : [
+          const BoxShadow(
+            color: Colors.black54,
+            blurRadius: 8.0,
+            offset: Offset(0, 2),
           ),
-          child: child,
+        ],
+        border: Border.all(color: Colors.white24, width: 1),
+      ),
+      constraints: const BoxConstraints(
+        minWidth: 50,
+        minHeight: 30,
+        maxWidth: 200,
+      ),
+      child: DefaultTextStyle(
+        style: TextStyle(
+          color: config.textColor,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
         ),
+        child: child,
       ),
     );
   }
@@ -304,13 +305,12 @@ class ChartTooltipProvider extends InheritedWidget {
     required super.child,
   });
 
-  /// Retrieves the [TooltipController] from the nearest [ChartTooltipProvider] ancestor.
   static TooltipController? of(BuildContext context, {bool listen = true}) {
     return listen
         ? context.dependOnInheritedWidgetOfExactType<ChartTooltipProvider>()?.state
         : (context.getElementForInheritedWidgetOfExactType<ChartTooltipProvider>()?.widget
-                as ChartTooltipProvider?)
-            ?.state;
+    as ChartTooltipProvider?)
+        ?.state;
   }
 
   @override
@@ -323,26 +323,14 @@ class ChartTooltipProvider extends InheritedWidget {
 mixin TooltipMixin {
   /// Show tooltip for a data point
   void showTooltip(BuildContext context, DataPointInfo point, Offset position) {
-    debugPrint("[TooltipMixin.showTooltip] Called. Point: $point, Position: $position");
     final provider = ChartTooltipProvider.of(context);
-    if (provider == null) {
-      debugPrint("[TooltipMixin.showTooltip] ChartTooltipProvider.of(context) returned NULL. Tooltip will not be shown.");
-      return;
-    }
-    debugPrint("[TooltipMixin.showTooltip] Provider found. Calling provider.showTooltip.");
-    provider.showTooltip(point, position);
+    provider?.showTooltip(point, position);
   }
 
   /// Hide tooltip
   void hideTooltip(BuildContext context) {
-    debugPrint("[TooltipMixin.hideTooltip] Called.");
     final provider = ChartTooltipProvider.of(context);
-    if (provider == null) {
-      debugPrint("[TooltipMixin.hideTooltip] ChartTooltipProvider.of(context) returned NULL. Cannot hide tooltip.");
-      return;
-    }
-    debugPrint("[TooltipMixin.hideTooltip] Provider found. Calling provider.hideTooltip.");
-    provider.hideTooltip();
+    provider?.hideTooltip();
   }
 }
 

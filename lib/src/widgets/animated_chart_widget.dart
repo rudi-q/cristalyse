@@ -113,7 +113,6 @@ class _AnimatedCristalyseChartWidgetState
     _animationController.dispose();
     super.dispose();
   }
-
   void _handleMouseHover(BuildContext hoverContext, PointerHoverEvent event, Rect plotArea) {
     if (!widget.interaction.enabled ||
         (widget.interaction.hover?.onHover == null &&
@@ -125,15 +124,20 @@ class _AnimatedCristalyseChartWidgetState
       _setupInteractionDetector(plotArea);
     }
 
+    // Use larger hit test radius for more forgiving detection
+    final hitRadius = math.max(
+      widget.interaction.hover?.hitTestRadius ?? 20.0,
+      25.0, // Minimum generous radius
+    );
+
     final point = _interactionDetector!.detectPoint(
       event.localPosition,
-      maxDistance: widget.interaction.hover?.hitTestRadius ?? 15.0,
+      maxDistance: hitRadius,
     );
 
     // Convert local position to global for tooltip positioning
     final RenderBox renderBox = hoverContext.findRenderObject() as RenderBox;
     final Offset globalPosition = renderBox.localToGlobal(event.localPosition);
-    debugPrint("[_handleMouseHover] localPosition: ${event.localPosition}, globalPosition: $globalPosition");
 
     // Handle hover callbacks
     widget.interaction.hover?.onHover?.call(point);
@@ -141,9 +145,10 @@ class _AnimatedCristalyseChartWidgetState
     // Handle tooltips
     if (widget.interaction.tooltip?.builder != null) {
       if (point != null) {
-        showTooltip(hoverContext, point, globalPosition); // Use globalPosition
+        // Keep showing tooltip as long as we have a valid point
+        showTooltip(hoverContext, point, globalPosition);
       } else {
-        debugPrint("[_handleMouseHover] Point is null, calling hideTooltip.");
+        // Only hide if we truly have no nearby points
         hideTooltip(hoverContext);
       }
     }
@@ -154,8 +159,8 @@ class _AnimatedCristalyseChartWidgetState
 
     widget.interaction.hover?.onExit?.call(null);
 
+    // Always hide tooltip when mouse exits the chart area
     if (widget.interaction.tooltip?.builder != null) {
-      debugPrint("[_handleMouseExit] Mouse exited, calling hideTooltip.");
       hideTooltip(exitContext);
     }
   }
@@ -171,15 +176,20 @@ class _AnimatedCristalyseChartWidgetState
       _setupInteractionDetector(plotArea);
     }
 
+    // Use even larger radius for touch interactions
+    final hitRadius = math.max(
+      widget.interaction.hover?.hitTestRadius ?? 30.0,
+      35.0, // Even more generous for touch
+    );
+
     final point = _interactionDetector!.detectPoint(
       details.localPosition,
-      maxDistance: widget.interaction.hover?.hitTestRadius ?? 15.0,
+      maxDistance: hitRadius,
     );
 
     // Convert local position to global for tooltip positioning
     final RenderBox renderBox = panContext.findRenderObject() as RenderBox;
     final Offset globalPosition = renderBox.localToGlobal(details.localPosition);
-    debugPrint("[_handlePanUpdate] localPosition: ${details.localPosition}, globalPosition: $globalPosition");
 
     // Handle hover callbacks
     widget.interaction.hover?.onHover?.call(point);
@@ -187,9 +197,8 @@ class _AnimatedCristalyseChartWidgetState
     // Handle tooltips
     if (widget.interaction.tooltip?.builder != null) {
       if (point != null && widget.interaction.tooltip!.followPointer) {
-        showTooltip(panContext, point, globalPosition); // Use globalPosition
+        showTooltip(panContext, point, globalPosition);
       } else if (point == null) {
-        debugPrint("[_handlePanUpdate] Pan point is null, calling hideTooltip.");
         hideTooltip(panContext);
       }
     }
