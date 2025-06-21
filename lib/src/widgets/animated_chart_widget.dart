@@ -1,10 +1,13 @@
-// lib/src/widgets/animated_chart_widget.dart
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../core/geometry.dart';
 import '../core/scale.dart';
+import '../interaction/chart_interactions.dart';
+import '../interaction/interaction_detector.dart';
+import '../interaction/tooltip_widget.dart';
 import '../themes/chart_theme.dart';
 
 /// Animated wrapper for the chart widget
@@ -25,6 +28,7 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
   final Duration animationDuration;
   final Curve animationCurve;
   final bool coordFlipped;
+  final ChartInteraction interaction;
 
   const AnimatedCristalyseChartWidget({
     super.key,
@@ -44,6 +48,7 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.easeInOut,
     this.coordFlipped = false,
+    this.interaction = ChartInteraction.none,
   });
 
   @override
@@ -53,9 +58,13 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
 
 class _AnimatedCristalyseChartWidgetState
     extends State<AnimatedCristalyseChartWidget>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, TooltipMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
+
+  InteractionDetector? _interactionDetector;
+
+  TooltipController? _cachedTooltipController;
 
   @override
   void initState() {
@@ -80,6 +89,7 @@ class _AnimatedCristalyseChartWidgetState
         widget.geometries != oldWidget.geometries) {
       _animationController.reset();
       _animationController.forward();
+      _interactionDetector?.invalidate();
     }
 
     if (widget.animationDuration != oldWidget.animationDuration) {
@@ -88,74 +98,546 @@ class _AnimatedCristalyseChartWidgetState
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.interaction.tooltip?.builder != null) {
+      _cachedTooltipController = ChartTooltipProvider.of(context, listen: false);
+    } else {
+      _cachedTooltipController = null;
+    }
+  }
+
+  @override
   void dispose() {
+    _cachedTooltipController?.hideTooltip();
     _animationController.dispose();
     super.dispose();
   }
 
+  void _handleMouseHover(BuildContext hoverContext, PointerHoverEvent event, Rect plotArea) {
+    if (!widget.interaction.enabled ||
+        (widget.interaction.hover?.onHover == null &&
+            widget.interaction.tooltip?.builder == null)) {
+      return;
+    }
+
+    if (_interactionDetector == null) {
+      _setupInteractionDetector(plotArea);
+    }
+
+    final point = _interactionDetector!.detectPoint(
+      event.localPosition,
+      maxDistance: widget.interaction.hover?.hitTestRadius ?? 15.0,
+    );
+
+    // Convert local position to global for tooltip positioning
+    final RenderBox renderBox = hoverContext.findRenderObject() as RenderBox;
+    final Offset globalPosition = renderBox.localToGlobal(event.localPosition);
+    debugPrint("[_handleMouseHover] localPosition: ${event.localPosition}, globalPosition: $globalPosition");
+
+    // Handle hover callbacks
+    widget.interaction.hover?.onHover?.call(point);
+
+    // Handle tooltips
+    if (widget.interaction.tooltip?.builder != null) {
+      if (point != null) {
+        showTooltip(hoverContext, point, globalPosition); // Use globalPosition
+      } else {
+        debugPrint("[_handleMouseHover] Point is null, calling hideTooltip.");
+        hideTooltip(hoverContext);
+      }
+    }
+  }
+
+  void _handleMouseExit(BuildContext exitContext, PointerExitEvent event) {
+    if (!widget.interaction.enabled) return;
+
+    widget.interaction.hover?.onExit?.call(null);
+
+    if (widget.interaction.tooltip?.builder != null) {
+      debugPrint("[_handleMouseExit] Mouse exited, calling hideTooltip.");
+      hideTooltip(exitContext);
+    }
+  }
+
+  void _handlePanUpdate(BuildContext panContext, DragUpdateDetails details, Rect plotArea) {
+    if (!widget.interaction.enabled ||
+        (widget.interaction.hover?.onHover == null &&
+            widget.interaction.tooltip?.builder == null)) {
+      return;
+    }
+
+    if (_interactionDetector == null) {
+      _setupInteractionDetector(plotArea);
+    }
+
+    final point = _interactionDetector!.detectPoint(
+      details.localPosition,
+      maxDistance: widget.interaction.hover?.hitTestRadius ?? 15.0,
+    );
+
+    // Convert local position to global for tooltip positioning
+    final RenderBox renderBox = panContext.findRenderObject() as RenderBox;
+    final Offset globalPosition = renderBox.localToGlobal(details.localPosition);
+    debugPrint("[_handlePanUpdate] localPosition: ${details.localPosition}, globalPosition: $globalPosition");
+
+    // Handle hover callbacks
+    widget.interaction.hover?.onHover?.call(point);
+
+    // Handle tooltips
+    if (widget.interaction.tooltip?.builder != null) {
+      if (point != null && widget.interaction.tooltip!.followPointer) {
+        showTooltip(panContext, point, globalPosition); // Use globalPosition
+      } else if (point == null) {
+        debugPrint("[_handlePanUpdate] Pan point is null, calling hideTooltip.");
+        hideTooltip(panContext);
+      }
+    }
+  }
+
+  void _handlePanEnd(BuildContext panEndContext, DragEndDetails details) {
+    if (!widget.interaction.enabled) return;
+
+    widget.interaction.hover?.onExit?.call(null);
+
+    if (widget.interaction.tooltip?.builder != null) {
+      debugPrint("[_handlePanEnd] Pan ended, calling hideTooltip.");
+      hideTooltip(panEndContext);
+    }
+  }
+
+  void _handleTap(BuildContext tapContext, TapUpDetails details, Rect plotArea) {
+    if (!widget.interaction.enabled || widget.interaction.click?.onTap == null) {
+      return;
+    }
+
+    if (_interactionDetector == null) {
+      _setupInteractionDetector(plotArea);
+    }
+
+    final point = _interactionDetector!.detectPoint(
+      details.localPosition,
+      maxDistance: widget.interaction.click?.hitTestRadius ?? 15.0,
+    );
+
+    // Convert local position to global for tooltip positioning
+    final RenderBox renderBox = tapContext.findRenderObject() as RenderBox;
+    final Offset globalPosition = renderBox.localToGlobal(details.localPosition);
+    debugPrint("[_handleTap] localPosition: ${details.localPosition}, globalPosition: $globalPosition");
+
+    if (point != null) {
+      widget.interaction.click!.onTap!(point);
+      if (widget.interaction.tooltip?.builder != null) {
+        showTooltip(tapContext, point, globalPosition); // Use globalPosition
+      }
+    }
+  }
+
+  void _setupInteractionDetector(Rect plotArea) {
+    final xScale = _setupXScale(
+      plotArea.width,
+      widget.geometries.any((g) => g is BarGeometry),
+    );
+    final yScale = _setupYScale(
+      plotArea.height,
+      widget.geometries.any((g) => g is BarGeometry),
+      YAxis.primary,
+    );
+    final y2Scale = _hasSecondaryYAxis()
+        ? _setupYScale(
+      plotArea.height,
+      widget.geometries.any((g) => g is BarGeometry),
+      YAxis.secondary,
+    )
+        : null;
+
+    _interactionDetector = InteractionDetector(
+      data: widget.data,
+      geometries: widget.geometries,
+      xScale: xScale,
+      yScale: yScale,
+      y2Scale: y2Scale,
+      plotArea: plotArea,
+      xColumn: widget.xColumn,
+      yColumn: widget.yColumn,
+      y2Column: widget.y2Column,
+      colorColumn: widget.colorColumn,
+      coordFlipped: widget.coordFlipped,
+    );
+  }
+
+  Widget _buildInteractiveChart(BuildContext context, Size size) {
+    final animationValue = _animation.value;
+    if (!animationValue.isFinite || animationValue.isNaN) {
+      return Container(
+        decoration: BoxDecoration(
+          color: widget.theme.backgroundColor,
+          border: Border.all(color: widget.theme.borderColor),
+        ),
+        child: CustomPaint(
+          painter: _AnimatedChartPainter(
+            data: widget.data,
+            xColumn: widget.xColumn,
+            yColumn: widget.yColumn,
+            y2Column: widget.y2Column,
+            colorColumn: widget.colorColumn,
+            sizeColumn: widget.sizeColumn,
+            geometries: widget.geometries,
+            xScale: widget.xScale,
+            yScale: widget.yScale,
+            y2Scale: widget.y2Scale,
+            colorScale: widget.colorScale,
+            sizeScale: widget.sizeScale,
+            theme: widget.theme,
+            animationProgress: 1.0,
+            coordFlipped: widget.coordFlipped,
+          ),
+          child: Container(),
+        ),
+      );
+    }
+
+    final hasSecondaryY = _hasSecondaryYAxis();
+    final rightPadding = hasSecondaryY ? 80.0 : widget.theme.padding.right;
+
+    final plotArea = Rect.fromLTWH(
+      widget.theme.padding.left,
+      widget.theme.padding.top,
+      size.width - widget.theme.padding.left - rightPadding,
+      size.height - widget.theme.padding.vertical,
+    );
+
+    final chartPainter = _AnimatedChartPainter(
+      data: widget.data,
+      xColumn: widget.xColumn,
+      yColumn: widget.yColumn,
+      y2Column: widget.y2Column,
+      colorColumn: widget.colorColumn,
+      sizeColumn: widget.sizeColumn,
+      geometries: widget.geometries,
+      xScale: widget.xScale,
+      yScale: widget.yScale,
+      y2Scale: widget.y2Scale,
+      colorScale: widget.colorScale,
+      sizeScale: widget.sizeScale,
+      theme: widget.theme,
+      animationProgress: math.max(0.0, math.min(1.0, animationValue)),
+      coordFlipped: widget.coordFlipped,
+    );
+
+    Widget chart = CustomPaint(
+      painter: chartPainter,
+      child: Container(),
+    );
+
+    // Wrap with gesture detection if interactions are enabled
+    if (widget.interaction.enabled) {
+      chart = MouseRegion(
+        onHover: (event) => _handleMouseHover(context, event, plotArea),
+        onExit: (event) => _handleMouseExit(context, event),
+        child: GestureDetector(
+          onPanUpdate: (details) => _handlePanUpdate(context, details, plotArea),
+          onPanEnd: (details) => _handlePanEnd(context, details),
+          onTapUp: (details) => _handleTap(context, details, plotArea),
+          child: chart,
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: widget.theme.backgroundColor,
+        border: Border.all(color: widget.theme.borderColor),
+      ),
+      child: chart,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
+    Widget chart = AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        final animationValue = _animation.value;
-        if (!animationValue.isFinite || animationValue.isNaN) {
-          return Container(
-            decoration: BoxDecoration(
-              color: widget.theme.backgroundColor,
-              border: Border.all(color: widget.theme.borderColor),
-            ),
-            child: CustomPaint(
-              painter: _AnimatedChartPainter(
-                data: widget.data,
-                xColumn: widget.xColumn,
-                yColumn: widget.yColumn,
-                y2Column: widget.y2Column,
-                colorColumn: widget.colorColumn,
-                sizeColumn: widget.sizeColumn,
-                geometries: widget.geometries,
-                xScale: widget.xScale,
-                yScale: widget.yScale,
-                y2Scale: widget.y2Scale,
-                colorScale: widget.colorScale,
-                sizeScale: widget.sizeScale,
-                theme: widget.theme,
-                animationProgress: 1.0,
-                coordFlipped: widget.coordFlipped,
-              ),
-              child: Container(),
-            ),
-          );
-        }
-
-        return Container(
-          decoration: BoxDecoration(
-            color: widget.theme.backgroundColor,
-            border: Border.all(color: widget.theme.borderColor),
-          ),
-          child: CustomPaint(
-            painter: _AnimatedChartPainter(
-              data: widget.data,
-              xColumn: widget.xColumn,
-              yColumn: widget.yColumn,
-              y2Column: widget.y2Column,
-              colorColumn: widget.colorColumn,
-              sizeColumn: widget.sizeColumn,
-              geometries: widget.geometries,
-              xScale: widget.xScale,
-              yScale: widget.yScale,
-              y2Scale: widget.y2Scale,
-              colorScale: widget.colorScale,
-              sizeScale: widget.sizeScale,
-              theme: widget.theme,
-              animationProgress: math.max(0.0, math.min(1.0, animationValue)),
-              coordFlipped: widget.coordFlipped,
-            ),
-            child: Container(),
-          ),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return _buildInteractiveChart(context, constraints.biggest);
+          },
         );
       },
     );
+
+    // Wrap with tooltip overlay if tooltips are enabled
+    if (widget.interaction.enabled && widget.interaction.tooltip != null) {
+      chart = ChartTooltipOverlay(
+        config: widget.interaction.tooltip!,
+        tooltipBuilder: widget.interaction.tooltip!.builder,
+        child: chart,
+      );
+    }
+
+    return chart;
+  }
+
+  bool _hasSecondaryYAxis() {
+    return widget.y2Column != null &&
+        widget.geometries.any((g) => g.yAxis == YAxis.secondary);
+  }
+
+  Scale _setupXScale(double width, bool hasBarGeometry) {
+    if (widget.coordFlipped) {
+      final preconfigured = widget.yScale;
+      final scale =
+      (preconfigured is LinearScale ? preconfigured : LinearScale());
+      final dataCol = widget.yColumn;
+
+      if (dataCol == null || widget.data.isEmpty) {
+        scale.domain =
+        scale.min != null && scale.max != null
+            ? [scale.min!, scale.max!]
+            : [0, 1];
+        scale.range = [0, width];
+        return scale;
+      }
+
+      final values =
+      widget.data
+          .map((d) => _getNumericValue(d[dataCol]))
+          .where((v) => v != null && v.isFinite)
+          .cast<double>()
+          .toList();
+
+      if (values.isNotEmpty) {
+        double domainMin = scale.min ?? values.reduce(math.min);
+        double domainMax = scale.max ?? values.reduce(math.max);
+
+        if (domainMin == domainMax) {
+          if (domainMin == 0) {
+            domainMin = -0.5;
+            domainMax = 0.5;
+          } else if (domainMin > 0) {
+            domainMax = domainMin + domainMin.abs() * 0.2;
+            domainMin = 0;
+          } else {
+            domainMin = domainMin - domainMin.abs() * 0.2;
+            domainMax = 0;
+          }
+        } else {
+          if (domainMin > 0) domainMin = 0;
+          if (domainMax < 0) domainMax = 0;
+        }
+        scale.domain = [domainMin, domainMax];
+        if (scale.domain[0] == scale.domain[1]) {
+          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+        }
+      } else {
+        scale.domain =
+        scale.min != null && scale.max != null
+            ? [scale.min!, scale.max!]
+            : [0, 1];
+      }
+      scale.range = [0, width];
+      return scale;
+    } else {
+      final preconfigured = widget.xScale;
+      final dataCol = widget.xColumn;
+      if (preconfigured is OrdinalScale ||
+          (hasBarGeometry && _isColumnCategorical(dataCol))) {
+        final scale =
+        (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+        if (dataCol == null || widget.data.isEmpty) {
+          scale.domain = [];
+          scale.range = [0, width];
+          return scale;
+        }
+        if (scale.domain.isEmpty) {
+          final distinctValues =
+          widget.data
+              .map((d) => d[dataCol])
+              .where((v) => v != null)
+              .toSet()
+              .toList();
+          scale.domain = distinctValues;
+        }
+        scale.range = [0, width];
+        return scale;
+      } else {
+        final scale =
+        (preconfigured is LinearScale ? preconfigured : LinearScale());
+        if (dataCol == null || widget.data.isEmpty) {
+          scale.domain =
+          scale.min != null && scale.max != null
+              ? [scale.min!, scale.max!]
+              : [0, 1];
+          scale.range = [0, width];
+          return scale;
+        }
+        final values =
+        widget.data
+            .map((d) => _getNumericValue(d[dataCol]))
+            .where((v) => v != null && v.isFinite)
+            .cast<double>()
+            .toList();
+
+        if (values.isNotEmpty) {
+          double domainMin = scale.min ?? values.reduce(math.min);
+          double domainMax = scale.max ?? values.reduce(math.max);
+
+          if (domainMin == domainMax) {
+            if (domainMin == 0) {
+              domainMin = -0.5;
+              domainMax = 0.5;
+            } else if (domainMin > 0) {
+              domainMax = domainMin + domainMin.abs() * 0.2;
+              domainMin = 0;
+            } else {
+              domainMin = domainMin - domainMin.abs() * 0.2;
+              domainMax = 0;
+            }
+          } else {
+            if (domainMin > 0) domainMin = 0;
+            if (domainMax < 0) domainMax = 0;
+          }
+          scale.domain = [domainMin, domainMax];
+          if (scale.domain[0] == scale.domain[1]) {
+            scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+          }
+        } else {
+          scale.domain =
+          scale.min != null && scale.max != null
+              ? [scale.min!, scale.max!]
+              : [0, 1];
+        }
+        scale.range = [0, width];
+        return scale;
+      }
+    }
+  }
+
+  Scale _setupYScale(double height, bool hasBarGeometry, YAxis axis) {
+    if (widget.coordFlipped) {
+      final preconfigured = widget.xScale;
+      final scale =
+      (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+      final dataCol = widget.xColumn;
+
+      if (dataCol == null || widget.data.isEmpty) {
+        scale.domain = [];
+        scale.range = [0, height];
+        return scale;
+      }
+      if (scale.domain.isEmpty) {
+        final distinctValues =
+        widget.data
+            .map((d) => d[dataCol])
+            .where((v) => v != null)
+            .toSet()
+            .toList();
+        scale.domain = distinctValues;
+      }
+      scale.range = [0, height];
+      return scale;
+    } else {
+      final preconfigured = axis == YAxis.primary ? widget.yScale : widget.y2Scale;
+      final dataCol = axis == YAxis.primary ? widget.yColumn : widget.y2Column;
+
+      final scale =
+      (preconfigured is LinearScale ? preconfigured : LinearScale());
+      if (dataCol == null || widget.data.isEmpty) {
+        scale.domain =
+        scale.min != null && scale.max != null
+            ? [scale.min!, scale.max!]
+            : [0, 1];
+        scale.range = [height, 0];
+        return scale;
+      }
+
+      final relevantGeometries =
+      widget.geometries.where((g) => g.yAxis == axis).toList();
+      if (relevantGeometries.isEmpty) {
+        scale.domain = [0, 1];
+        scale.range = [height, 0];
+        return scale;
+      }
+
+      final hasStackedBars = relevantGeometries.any(
+            (g) => g is BarGeometry && g.style == BarStyle.stacked,
+      );
+
+      List<double> values;
+
+      if (hasStackedBars && widget.colorColumn != null) {
+        final groups = <dynamic, double>{};
+        for (final point in widget.data) {
+          final x = point[widget.xColumn];
+          final y = _getNumericValue(point[dataCol]);
+          if (y == null || !y.isFinite || y <= 0) continue;
+
+          groups[x] = (groups[x] ?? 0) + y;
+        }
+        values = groups.values.where((v) => v.isFinite).cast<double>().toList();
+      } else {
+        values =
+            widget.data
+                .map((d) => _getNumericValue(d[dataCol]))
+                .where((v) => v != null && v.isFinite)
+                .cast<double>()
+                .toList();
+      }
+
+      if (values.isNotEmpty) {
+        double domainMin = scale.min ?? 0;
+        double domainMax = scale.max ?? values.reduce(math.max);
+
+        if (hasStackedBars) {
+          domainMax = domainMax * 1.1;
+        }
+
+        if (domainMin == domainMax) {
+          if (domainMax == 0) {
+            domainMin = -0.5;
+            domainMax = 0.5;
+          } else if (domainMax > 0) {
+            domainMax = domainMax + domainMax * 0.2;
+            domainMin = 0;
+          } else {
+            domainMin = domainMin - domainMin.abs() * 0.2;
+            domainMax = 0;
+          }
+        } else {
+          if (domainMin > 0) domainMin = 0;
+          if (domainMax < 0) domainMax = 0;
+        }
+
+        scale.domain = [domainMin, domainMax];
+        if (scale.domain[0] == scale.domain[1]) {
+          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+        }
+      } else {
+        scale.domain =
+        scale.min != null && scale.max != null
+            ? [scale.min!, scale.max!]
+            : [0, 1];
+      }
+      scale.range = [height, 0];
+      return scale;
+    }
+  }
+
+  bool _isColumnCategorical(String? column) {
+    if (column == null || widget.data.isEmpty) return false;
+    for (final row in widget.data) {
+      final value = row[column];
+      if (value != null) {
+        return value is String || value is bool;
+      }
+    }
+    return false;
+  }
+
+  double? _getNumericValue(dynamic value) {
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
   }
 }
 
@@ -197,19 +679,7 @@ class _AnimatedChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (data.isEmpty || geometries.isEmpty) {
-      final debugPaint =
-          Paint()
-            ..color = Colors.red
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 2.0;
-      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), debugPaint);
-      return;
-    }
-
-    if (!animationProgress.isFinite || animationProgress.isNaN) {
-      return;
-    }
+    if (data.isEmpty || geometries.isEmpty) return;
 
     // Adjust padding for dual Y-axis
     final hasSecondaryY = _hasSecondaryYAxis();
@@ -236,13 +706,13 @@ class _AnimatedChartPainter extends CustomPainter {
       YAxis.primary,
     );
     final y2Scale =
-        hasSecondaryY
-            ? _setupYScale(
-              plotArea.height,
-              geometries.any((g) => g is BarGeometry),
-              YAxis.secondary,
-            )
-            : null;
+    hasSecondaryY
+        ? _setupYScale(
+      plotArea.height,
+      geometries.any((g) => g is BarGeometry),
+      YAxis.secondary,
+    )
+        : null;
     final colorScale = _setupColorScale();
     final sizeScale = _setupSizeScale();
 
@@ -277,24 +747,24 @@ class _AnimatedChartPainter extends CustomPainter {
     if (coordFlipped) {
       final preconfigured = yScale;
       final scale =
-          (preconfigured is LinearScale ? preconfigured : LinearScale());
+      (preconfigured is LinearScale ? preconfigured : LinearScale());
       final dataCol = yColumn;
 
       if (dataCol == null || data.isEmpty) {
         scale.domain =
-            scale.min != null && scale.max != null
-                ? [scale.min!, scale.max!]
-                : [0, 1];
+        scale.min != null && scale.max != null
+            ? [scale.min!, scale.max!]
+            : [0, 1];
         scale.range = [0, width];
         return scale;
       }
 
       final values =
-          data
-              .map((d) => _getNumericValue(d[dataCol]))
-              .where((v) => v != null && v.isFinite)
-              .cast<double>()
-              .toList();
+      data
+          .map((d) => _getNumericValue(d[dataCol]))
+          .where((v) => v != null && v.isFinite)
+          .cast<double>()
+          .toList();
 
       if (values.isNotEmpty) {
         double domainMin = scale.min ?? values.reduce(math.min);
@@ -321,9 +791,9 @@ class _AnimatedChartPainter extends CustomPainter {
         }
       } else {
         scale.domain =
-            scale.min != null && scale.max != null
-                ? [scale.min!, scale.max!]
-                : [0, 1];
+        scale.min != null && scale.max != null
+            ? [scale.min!, scale.max!]
+            : [0, 1];
       }
       scale.range = [0, width];
       return scale;
@@ -333,7 +803,7 @@ class _AnimatedChartPainter extends CustomPainter {
       if (preconfigured is OrdinalScale ||
           (hasBarGeometry && _isColumnCategorical(dataCol))) {
         final scale =
-            (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+        (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
         if (dataCol == null || data.isEmpty) {
           scale.domain = [];
           scale.range = [0, width];
@@ -341,32 +811,32 @@ class _AnimatedChartPainter extends CustomPainter {
         }
         if (scale.domain.isEmpty) {
           final distinctValues =
-              data
-                  .map((d) => d[dataCol])
-                  .where((v) => v != null)
-                  .toSet()
-                  .toList();
+          data
+              .map((d) => d[dataCol])
+              .where((v) => v != null)
+              .toSet()
+              .toList();
           scale.domain = distinctValues;
         }
         scale.range = [0, width];
         return scale;
       } else {
         final scale =
-            (preconfigured is LinearScale ? preconfigured : LinearScale());
+        (preconfigured is LinearScale ? preconfigured : LinearScale());
         if (dataCol == null || data.isEmpty) {
           scale.domain =
-              scale.min != null && scale.max != null
-                  ? [scale.min!, scale.max!]
-                  : [0, 1];
+          scale.min != null && scale.max != null
+              ? [scale.min!, scale.max!]
+              : [0, 1];
           scale.range = [0, width];
           return scale;
         }
         final values =
-            data
-                .map((d) => _getNumericValue(d[dataCol]))
-                .where((v) => v != null && v.isFinite)
-                .cast<double>()
-                .toList();
+        data
+            .map((d) => _getNumericValue(d[dataCol]))
+            .where((v) => v != null && v.isFinite)
+            .cast<double>()
+            .toList();
 
         if (values.isNotEmpty) {
           double domainMin = scale.min ?? values.reduce(math.min);
@@ -393,9 +863,9 @@ class _AnimatedChartPainter extends CustomPainter {
           }
         } else {
           scale.domain =
-              scale.min != null && scale.max != null
-                  ? [scale.min!, scale.max!]
-                  : [0, 1];
+          scale.min != null && scale.max != null
+              ? [scale.min!, scale.max!]
+              : [0, 1];
         }
         scale.range = [0, width];
         return scale;
@@ -405,47 +875,44 @@ class _AnimatedChartPainter extends CustomPainter {
 
   Scale _setupYScale(double height, bool hasBarGeometry, YAxis axis) {
     if (coordFlipped) {
-      final preconfigured = xScale; // Use X-scale config for flipped Y-axis
+      final preconfigured = xScale;
       final scale =
-          (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
-      final dataCol =
-          xColumn; // In horizontal bars, Y shows X-column categories
+      (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+      final dataCol = xColumn;
 
       if (dataCol == null || data.isEmpty) {
         scale.domain = [];
-        scale.range = [0, height]; // Top to bottom for categories
+        scale.range = [0, height];
         return scale;
       }
       if (scale.domain.isEmpty) {
         final distinctValues =
-            data
-                .map((d) => d[dataCol])
-                .where((v) => v != null)
-                .toSet()
-                .toList();
+        data
+            .map((d) => d[dataCol])
+            .where((v) => v != null)
+            .toSet()
+            .toList();
         scale.domain = distinctValues;
       }
-      scale.range = [0, height]; // Top to bottom for horizontal bar categories
+      scale.range = [0, height];
       return scale;
     } else {
-      // VERTICAL BARS/CHARTS: Y-axis maps to yColumn data, respect the axis parameter
       final preconfigured = axis == YAxis.primary ? yScale : y2Scale;
       final dataCol = axis == YAxis.primary ? yColumn : y2Column;
 
       final scale =
-          (preconfigured is LinearScale ? preconfigured : LinearScale());
+      (preconfigured is LinearScale ? preconfigured : LinearScale());
       if (dataCol == null || data.isEmpty) {
         scale.domain =
-            scale.min != null && scale.max != null
-                ? [scale.min!, scale.max!]
-                : [0, 1];
+        scale.min != null && scale.max != null
+            ? [scale.min!, scale.max!]
+            : [0, 1];
         scale.range = [height, 0];
         return scale;
       }
 
-      // Filter data for geometries using this Y-axis
       final relevantGeometries =
-          geometries.where((g) => g.yAxis == axis).toList();
+      geometries.where((g) => g.yAxis == axis).toList();
       if (relevantGeometries.isEmpty) {
         scale.domain = [0, 1];
         scale.range = [height, 0];
@@ -453,7 +920,7 @@ class _AnimatedChartPainter extends CustomPainter {
       }
 
       final hasStackedBars = relevantGeometries.any(
-        (g) => g is BarGeometry && g.style == BarStyle.stacked,
+            (g) => g is BarGeometry && g.style == BarStyle.stacked,
       );
 
       List<double> values;
@@ -507,11 +974,11 @@ class _AnimatedChartPainter extends CustomPainter {
         }
       } else {
         scale.domain =
-            scale.min != null && scale.max != null
-                ? [scale.min!, scale.max!]
-                : [0, 1];
+        scale.min != null && scale.max != null
+            ? [scale.min!, scale.max!]
+            : [0, 1];
       }
-      scale.range = [height, 0]; // Inverted for screen Y coordinates
+      scale.range = [height, 0];
       return scale;
     }
   }
@@ -536,11 +1003,11 @@ class _AnimatedChartPainter extends CustomPainter {
   SizeScale _setupSizeScale() {
     if (sizeColumn == null) return SizeScale();
     final values =
-        data
-            .map((d) => _getNumericValue(d[sizeColumn]))
-            .where((v) => v != null)
-            .cast<double>()
-            .toList();
+    data
+        .map((d) => _getNumericValue(d[sizeColumn]))
+        .where((v) => v != null)
+        .cast<double>()
+        .toList();
     if (values.isNotEmpty) {
       return SizeScale(
         domain: [values.reduce(math.min), values.reduce(math.max)],
@@ -562,26 +1029,27 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawGrid(
-    Canvas canvas,
-    Rect plotArea,
-    Scale xScale,
-    Scale yScale,
-    Scale? y2Scale,
-  ) {
+      Canvas canvas,
+      Rect plotArea,
+      Scale xScale,
+      Scale yScale,
+      Scale? y2Scale,
+      ) {
     final paint =
-        Paint()
-          ..color = theme.gridColor.withAlpha(
-            (math.max(0.0, math.min(1.0, animationProgress * 0.5)) * 255)
-                .round(),
-          )
-          ..strokeWidth = math.max(0.1, theme.gridWidth);
+    Paint()
+      ..color = theme.gridColor.withAlpha(
+        (math.max(0.0, math.min(1.0, animationProgress * 0.5)) * 255)
+            .round(),
+      )
+      ..strokeWidth = math.max(0.1, theme.gridWidth);
 
     // Vertical grid lines
     final xTicks = xScale.getTicks(5);
     for (final tick in xTicks) {
       double x;
       if (xScale is OrdinalScale) {
-        x = plotArea.left + xScale.bandCenter(tick);
+        final ordinalScale = xScale;
+        x = plotArea.left + ordinalScale.bandCenter(tick);
       } else {
         if (tick is! num || !tick.isFinite) continue;
         x = plotArea.left + xScale.scale(tick);
@@ -603,7 +1071,8 @@ class _AnimatedChartPainter extends CustomPainter {
     for (final tick in yTicks) {
       double y;
       if (yScale is OrdinalScale) {
-        y = plotArea.top + yScale.bandCenter(tick);
+        final ordinalScale = yScale;
+        y = plotArea.top + ordinalScale.bandCenter(tick);
       } else {
         if (tick is! num || !tick.isFinite) continue;
         y = plotArea.top + yScale.scale(tick);
@@ -622,15 +1091,15 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawGeometry(
-    Canvas canvas,
-    Rect plotArea,
-    Geometry geometry,
-    Scale xScale,
-    Scale yScale,
-    ColorScale colorScale,
-    SizeScale sizeScale,
-    bool isSecondaryY,
-  ) {
+      Canvas canvas,
+      Rect plotArea,
+      Geometry geometry,
+      Scale xScale,
+      Scale yScale,
+      ColorScale colorScale,
+      SizeScale sizeScale,
+      bool isSecondaryY,
+      ) {
     if (geometry is PointGeometry) {
       _drawPointsAnimated(
         canvas,
@@ -666,14 +1135,14 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawBarsAnimated(
-    Canvas canvas,
-    Rect plotArea,
-    BarGeometry geometry,
-    Scale xScale,
-    Scale yScale,
-    ColorScale colorScale,
-    bool isSecondaryY,
-  ) {
+      Canvas canvas,
+      Rect plotArea,
+      BarGeometry geometry,
+      Scale xScale,
+      Scale yScale,
+      ColorScale colorScale,
+      bool isSecondaryY,
+      ) {
     final yCol = isSecondaryY ? y2Column : yColumn;
 
     if (colorColumn != null && geometry.style == BarStyle.grouped) {
@@ -710,14 +1179,14 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawSimpleBars(
-    Canvas canvas,
-    Rect plotArea,
-    BarGeometry geometry,
-    Scale xScale,
-    Scale yScale,
-    ColorScale colorScale,
-    String? yCol,
-  ) {
+      Canvas canvas,
+      Rect plotArea,
+      BarGeometry geometry,
+      Scale xScale,
+      Scale yScale,
+      ColorScale colorScale,
+      String? yCol,
+      ) {
     for (int i = 0; i < data.length; i++) {
       final point = data[i];
       final x = point[xColumn];
@@ -752,14 +1221,14 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawGroupedBars(
-    Canvas canvas,
-    Rect plotArea,
-    BarGeometry geometry,
-    Scale xScale,
-    Scale yScale,
-    ColorScale colorScale,
-    String? yCol,
-  ) {
+      Canvas canvas,
+      Rect plotArea,
+      BarGeometry geometry,
+      Scale xScale,
+      Scale yScale,
+      ColorScale colorScale,
+      String? yCol,
+      ) {
     final groups = <dynamic, Map<dynamic, double>>{};
     for (final point in data) {
       final x = point[xColumn];
@@ -780,7 +1249,7 @@ class _AnimatedChartPainter extends CustomPainter {
       final colorValues = groupEntry.value;
 
       final groupDelay =
-          groups.isNotEmpty ? groupIndex / groups.length * 0.2 : 0.0;
+      groups.isNotEmpty ? groupIndex / groups.length * 0.2 : 0.0;
       final groupProgress = math.max(
         0.0,
         math.min(
@@ -840,14 +1309,14 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawStackedBars(
-    Canvas canvas,
-    Rect plotArea,
-    BarGeometry geometry,
-    Scale xScale,
-    Scale yScale,
-    ColorScale colorScale,
-    String? yCol,
-  ) {
+      Canvas canvas,
+      Rect plotArea,
+      BarGeometry geometry,
+      Scale xScale,
+      Scale yScale,
+      ColorScale colorScale,
+      String? yCol,
+      ) {
     final groups = <dynamic, List<Map<String, dynamic>>>{};
     for (final point in data) {
       final x = point[xColumn];
@@ -860,7 +1329,7 @@ class _AnimatedChartPainter extends CustomPainter {
       final groupData = groupEntry.value;
 
       final groupDelay =
-          groups.isNotEmpty ? groupIndex / groups.length * 0.3 : 0.0;
+      groups.isNotEmpty ? groupIndex / groups.length * 0.3 : 0.0;
       final groupProgress = math.max(
         0.0,
         math.min(
@@ -920,31 +1389,31 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawSingleBar(
-    Canvas canvas,
-    Rect plotArea,
-    BarGeometry geometry,
-    dynamic xValForPosition,
-    double yValForBar,
-    Scale xScale,
-    Scale yScale,
-    ColorScale colorScale,
-    double animationProgress,
-    Map<String, dynamic> dataPoint, {
-    double? customX,
-    double? customWidth,
-    double yStackOffset = 0,
-  }) {
+      Canvas canvas,
+      Rect plotArea,
+      BarGeometry geometry,
+      dynamic xValForPosition,
+      double yValForBar,
+      Scale xScale,
+      Scale yScale,
+      ColorScale colorScale,
+      double animationProgress,
+      Map<String, dynamic> dataPoint, {
+        double? customX,
+        double? customWidth,
+        double yStackOffset = 0,
+      }) {
     final color =
-        colorColumn != null
-            ? colorScale.scale(dataPoint[colorColumn])
-            : (theme.colorPalette.isNotEmpty
-                ? theme.colorPalette.first
-                : theme.primaryColor);
+    colorColumn != null
+        ? colorScale.scale(dataPoint[colorColumn])
+        : (theme.colorPalette.isNotEmpty
+        ? theme.colorPalette.first
+        : theme.primaryColor);
 
     final paint =
-        Paint()
-          ..color = color.withAlpha((geometry.alpha * 255).round())
-          ..style = PaintingStyle.fill;
+    Paint()
+      ..color = color.withAlpha((geometry.alpha * 255).round())
+      ..style = PaintingStyle.fill;
 
     Rect barRect;
 
@@ -1009,12 +1478,12 @@ class _AnimatedChartPainter extends CustomPainter {
 
     if (geometry.borderWidth > 0) {
       final borderPaint =
-          Paint()
-            ..color = theme.borderColor.withAlpha(
-              (geometry.alpha * 255).round(),
-            )
-            ..strokeWidth = geometry.borderWidth
-            ..style = PaintingStyle.stroke;
+      Paint()
+        ..color = theme.borderColor.withAlpha(
+          (geometry.alpha * 255).round(),
+        )
+        ..strokeWidth = geometry.borderWidth
+        ..style = PaintingStyle.stroke;
 
       if (geometry.borderRadius != null &&
           geometry.borderRadius != BorderRadius.zero) {
@@ -1026,15 +1495,15 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawPointsAnimated(
-    Canvas canvas,
-    Rect plotArea,
-    PointGeometry geometry,
-    Scale xScale,
-    Scale yScale,
-    ColorScale colorScale,
-    SizeScale sizeScale,
-    bool isSecondaryY,
-  ) {
+      Canvas canvas,
+      Rect plotArea,
+      PointGeometry geometry,
+      Scale xScale,
+      Scale yScale,
+      ColorScale colorScale,
+      SizeScale sizeScale,
+      bool isSecondaryY,
+      ) {
     final yCol = isSecondaryY ? y2Column : yColumn;
 
     for (int i = 0; i < data.length; i++) {
@@ -1056,26 +1525,30 @@ class _AnimatedChartPainter extends CustomPainter {
       if (pointProgress <= 0) continue;
 
       final color =
-          colorColumn != null
-              ? colorScale.scale(point[colorColumn])
-              : (theme.colorPalette.isNotEmpty
-                  ? theme.colorPalette.first
-                  : theme.primaryColor);
+      colorColumn != null
+          ? colorScale.scale(point[colorColumn])
+          : (theme.colorPalette.isNotEmpty
+          ? theme.colorPalette.first
+          : theme.primaryColor);
 
       final size =
-          sizeColumn != null
-              ? sizeScale.scale(point[sizeColumn])
-              : theme.pointSizeDefault;
+      sizeColumn != null
+          ? sizeScale.scale(point[sizeColumn])
+          : theme.pointSizeDefault;
 
       final paint =
-          Paint()
-            ..color = color.withAlpha(
-              (geometry.alpha * pointProgress * 255).round(),
-            )
-            ..style = PaintingStyle.fill;
+      Paint()
+        ..color = color.withAlpha(
+          (geometry.alpha * pointProgress * 255).round(),
+        )
+        ..style = PaintingStyle.fill;
 
       final pointX = plotArea.left + xScale.scale(x);
       final pointY = plotArea.top + yScale.scale(y);
+
+      if (!pointX.isFinite || !pointY.isFinite) {
+        continue;
+      }
 
       if (geometry.shape == PointShape.circle) {
         canvas.drawCircle(Offset(pointX, pointY), size * pointProgress, paint);
@@ -1105,12 +1578,12 @@ class _AnimatedChartPainter extends CustomPainter {
 
       if (geometry.borderWidth > 0) {
         final borderPaint =
-            Paint()
-              ..color = theme.borderColor.withAlpha(
-                (geometry.alpha * pointProgress * 255).round(),
-              )
-              ..strokeWidth = geometry.borderWidth
-              ..style = PaintingStyle.stroke;
+        Paint()
+          ..color = theme.borderColor.withAlpha(
+            (geometry.alpha * pointProgress * 255).round(),
+          )
+          ..strokeWidth = geometry.borderWidth
+          ..style = PaintingStyle.stroke;
 
         if (geometry.shape == PointShape.circle) {
           canvas.drawCircle(
@@ -1146,14 +1619,14 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawLinesAnimated(
-    Canvas canvas,
-    Rect plotArea,
-    LineGeometry geometry,
-    Scale xScale,
-    Scale yScale,
-    ColorScale colorScale,
-    bool isSecondaryY,
-  ) {
+      Canvas canvas,
+      Rect plotArea,
+      LineGeometry geometry,
+      Scale xScale,
+      Scale yScale,
+      ColorScale colorScale,
+      bool isSecondaryY,
+      ) {
     final yCol = isSecondaryY ? y2Column : yColumn;
 
     if (yCol == null) {
@@ -1162,9 +1635,9 @@ class _AnimatedChartPainter extends CustomPainter {
 
     final color =
         geometry.color ??
-        (colorColumn != null
-            ? colorScale.scale(data.first[colorColumn])
-            : (theme.colorPalette.isNotEmpty
+            (colorColumn != null
+                ? colorScale.scale(data.first[colorColumn])
+                : (theme.colorPalette.isNotEmpty
                 ? theme.colorPalette.first
                 : theme.primaryColor));
 
@@ -1183,7 +1656,8 @@ class _AnimatedChartPainter extends CustomPainter {
       double screenX;
       if (xScale is OrdinalScale) {
         // For ordinal scales, use the raw string value with bandCenter
-        screenX = plotArea.left + xScale.bandCenter(xRawValue);
+        final ordinalScale = xScale;
+        screenX = plotArea.left + ordinalScale.bandCenter(xRawValue);
       } else {
         // For continuous scales, convert to number first
         final xVal = _getNumericValue(xRawValue);
@@ -1210,10 +1684,10 @@ class _AnimatedChartPainter extends CustomPainter {
     }
 
     final paint =
-        Paint()
-          ..color = color.withAlpha((geometry.alpha * 255).round())
-          ..strokeWidth = geometry.strokeWidth
-          ..style = PaintingStyle.stroke;
+    Paint()
+      ..color = color.withAlpha((geometry.alpha * 255).round())
+      ..strokeWidth = geometry.strokeWidth
+      ..style = PaintingStyle.stroke;
 
     final path = Path();
     final int numSegments = points.length - 1;
@@ -1235,10 +1709,10 @@ class _AnimatedChartPainter extends CustomPainter {
 
       final double dx =
           lastFullPoint.dx +
-          (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
+              (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
       final double dy =
           lastFullPoint.dy +
-          (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
+              (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
       path.lineTo(dx, dy);
     }
 
@@ -1249,22 +1723,22 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   void _drawAxes(
-    Canvas canvas,
-    Size size,
-    Rect plotArea,
-    Scale xScale,
-    Scale yScale,
-    Scale? y2Scale,
-  ) {
+      Canvas canvas,
+      Size size,
+      Rect plotArea,
+      Scale xScale,
+      Scale yScale,
+      Scale? y2Scale,
+      ) {
     final paint =
-        Paint()
-          ..color = theme.axisColor
-          ..strokeWidth = theme.axisWidth
-          ..style = PaintingStyle.stroke;
+    Paint()
+      ..color = theme.axisColor
+      ..strokeWidth = theme.axisWidth
+      ..style = PaintingStyle.stroke;
 
     final axisLabelStyle =
         theme.axisLabelStyle ??
-        const TextStyle(color: Colors.black, fontSize: 12);
+            const TextStyle(color: Colors.black, fontSize: 12);
 
     // Draw horizontal axis (bottom)
     canvas.drawLine(
@@ -1358,9 +1832,9 @@ class _AnimatedChartPainter extends CustomPainter {
             text: label,
             style: axisLabelStyle.copyWith(
               color:
-                  theme.colorPalette.length > 1
-                      ? theme.colorPalette[1]
-                      : theme.axisColor,
+              theme.colorPalette.length > 1
+                  ? theme.colorPalette[1]
+                  : theme.axisColor,
             ),
           ),
           textDirection: TextDirection.ltr,

@@ -22,6 +22,7 @@
 - 🎯 **Flutter-First Design** - Seamlessly integrates with your existing Flutter apps
 - 📊 **Dual Y-Axis Support** - Professional business dashboards with independent left/right scales
 - 📈 **Advanced Bar Charts** - Grouped, stacked, and horizontal variations with smooth animations
+- 👆 **Interactive Charts** - Engage users with tooltips, hover effects, and click events.
 
 ### See What You Can Build
 
@@ -94,6 +95,45 @@ class MyChart extends StatelessWidget {
   <br/>
   <em>Your first chart - clean, responsive, and cross-platform</em>
 </p>
+
+## 💡 Interactive Charts
+
+Bring your data to life with a fully interactive layer. Add rich tooltips, hover effects, and click/tap events to give users a more engaging experience.
+
+```dart
+// Add tooltips and click handlers
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'week', y: 'revenue', color: 'rep')
+  .geomPoint(size: 8.0)
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) {
+        // Build a custom widget for the tooltip
+        final category = point.getDisplayValue('rep');
+        final value = point.getDisplayValue('revenue');
+        return Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            '$category: \$$value k',
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        );
+      },
+    ),
+    click: ClickConfig(
+      onTap: (point) {
+        // Handle tap event, e.g., show a dialog
+        print('Tapped on: ${point.data}');
+      },
+    ),
+  )
+  .build();
+```
 
 ## 🎬 See It In Action
 

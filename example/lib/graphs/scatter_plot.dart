@@ -1,5 +1,5 @@
 import 'package:cristalyse/cristalyse.dart';
-import 'package:cristalyse_example/chartTheme.dart';
+import 'package:cristalyse_example/chart_theme.dart';
 import 'package:flutter/material.dart';
 
 Widget buildScatterPlotTab(ChartTheme currentTheme,
@@ -9,9 +9,9 @@ Widget buildScatterPlotTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Animated Scatter Plot'),
-        SizedBox(height: 16),
-        Container(
+        const Text('Animated Scatter Plot'),
+        const SizedBox(height: 16),
+        SizedBox(
           height: 400,
           child: CristalyseChart()
               .data(data)
@@ -23,12 +23,12 @@ Widget buildScatterPlotTab(ChartTheme currentTheme,
                 pointSizeMax: 2.0 + sliderValue * 20.0,
               ))
               .animate(
-                  duration: Duration(milliseconds: 800),
+                  duration: const Duration(milliseconds: 800),
                   curve: Curves.elasticOut)
               .build(),
         ),
-        SizedBox(height: 16),
-        Text(
+        const SizedBox(height: 16),
+        const Text(
             '• Points animate in with staggered timing\n• Size and color mapped to data\n• Smooth elastic animation curve'),
       ],
     ),

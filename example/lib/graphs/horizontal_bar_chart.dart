@@ -8,9 +8,9 @@ Widget buildHorizontalBarTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Horizontal Bar Chart'),
-        SizedBox(height: 16),
-        Container(
+        const Text('Horizontal Bar Chart'),
+        const SizedBox(height: 16),
+        SizedBox(
           height: 400,
           child: CristalyseChart()
               .data(data)
@@ -21,12 +21,12 @@ Widget buildHorizontalBarTab(ChartTheme currentTheme,
               .scaleYContinuous(min: 0)
               .theme(currentTheme)
               .animate(
-                  duration: Duration(milliseconds: 1000),
+                  duration: const Duration(milliseconds: 1000),
                   curve: Curves.easeOutQuart)
               .build(),
         ),
-        SizedBox(height: 16),
-        Text(
+        const SizedBox(height: 16),
+        const Text(
             '• Bars grow from left to right\n• Categorical Y-axis for departments\n• Great for ranking data'),
       ],
     ),

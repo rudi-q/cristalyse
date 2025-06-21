@@ -3,11 +3,6 @@ import 'package:flutter/material.dart';
 
 Widget buildDualAxisTab(ChartTheme currentTheme,
     List<Map<String, dynamic>> data, double sliderValue) {
-  if (data.isNotEmpty) {
-    // Check conversion_rate values
-    final conversionValues = data.map((d) => d['conversion_rate']).toList();
-  }
-
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
@@ -20,7 +15,7 @@ Widget buildDualAxisTab(ChartTheme currentTheme,
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(height: 16),
-        Container(
+        SizedBox(
           height: 400,
           child: CristalyseChart()
               .data(data)

@@ -1,35 +1,35 @@
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildGroupedBarTab(ChartTheme currentTheme,
+Widget buildStackedBarTab(ChartTheme currentTheme,
     List<Map<String, dynamic>> data, double sliderValue) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Grouped Bar Chart'),
+        const Text('Stacked Bar Chart'),
         const SizedBox(height: 16),
-        Container(
+        SizedBox(
           height: 400,
           child: CristalyseChart()
               .data(data)
-              .mapping(x: 'quarter', y: 'revenue', color: 'product')
+              .mapping(x: 'quarter', y: 'revenue', color: 'category')
               .geomBar(
                   width: sliderValue.clamp(0.1, 1.0),
-                  style: BarStyle.grouped,
+                  style: BarStyle.stacked, // This is the key!
                   alpha: 0.9)
               .scaleXOrdinal()
               .scaleYContinuous(min: 0)
               .theme(currentTheme)
               .animate(
-                  duration: const Duration(milliseconds: 1200),
-                  curve: Curves.easeOutCubic)
+                  duration: const Duration(milliseconds: 1400),
+                  curve: Curves.easeOutQuart)
               .build(),
         ),
         const SizedBox(height: 16),
         const Text(
-            '• Multiple series grouped side-by-side\n• Color mapping for different products\n• Coordinated group animation'),
+            '• Segments stack on top of each other\n• Each color represents a different category\n• Great for showing part-to-whole relationships\n• Animated segment-by-segment building'),
       ],
     ),
   );

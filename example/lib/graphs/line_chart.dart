@@ -8,9 +8,9 @@ Widget buildLineChartTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Animated Line Chart'),
-        SizedBox(height: 16),
-        Container(
+        const Text('Animated Line Chart'),
+        const SizedBox(height: 16),
+        SizedBox(
           height: 400,
           child: CristalyseChart()
               .data(data)
@@ -19,11 +19,11 @@ Widget buildLineChartTab(ChartTheme currentTheme,
               .scaleXContinuous()
               .scaleYContinuous()
               .theme(currentTheme)
-              .animate(duration: Duration(milliseconds: 1200))
+              .animate(duration: const Duration(milliseconds: 1200))
               .build(),
         ),
-        SizedBox(height: 16),
-        Text(
+        const SizedBox(height: 16),
+        const Text(
             '• Line draws from left to right\n• Smooth animation with partial segments\n• Responsive to theme changes'),
       ],
     ),

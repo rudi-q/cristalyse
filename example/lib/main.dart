@@ -1,19 +1,20 @@
 import 'dart:math' as math;
 
 import 'package:cristalyse/cristalyse.dart';
-import 'package:cristalyse_example/chartTheme.dart';
+import 'package:cristalyse_example/chart_theme.dart';
 import 'package:flutter/material.dart';
 
-import 'graphs/barChart.dart';
-import 'graphs/dualAxisChart.dart';
-import 'graphs/groupedBar.dart';
-import 'graphs/horizontalBarChart.dart';
-import 'graphs/lineChart.dart';
-import 'graphs/scatterPlot.dart';
-import 'graphs/stackedBarChart.dart';
+import 'graphs/bar_chart.dart';
+import 'graphs/dual_axis_chart.dart';
+import 'graphs/grouped_bar.dart';
+import 'graphs/horizontal_bar_chart.dart';
+import 'graphs/interactive_scatter.dart';
+import 'graphs/line_chart.dart';
+import 'graphs/scatter_plot.dart';
+import 'graphs/stacked_bar_chart.dart';
 
 void main() {
-  runApp(CristalyseExampleApp());
+  runApp(const CristalyseExampleApp());
 }
 
 class CristalyseExampleApp extends StatelessWidget {
@@ -41,7 +42,7 @@ class CristalyseExampleApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      home: ExampleHome(),
+      home: const ExampleHome(),
     );
   }
 }
@@ -108,7 +109,7 @@ class _ExampleHomeState extends State<ExampleHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 7, vsync: this);
+    _tabController = TabController(length: 8, vsync: this); // Updated to 8 tabs
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -290,15 +291,17 @@ class _ExampleHomeState extends State<ExampleHome>
     final index = _tabController.index;
     switch (index) {
       case 0:
+      case 1: // Both scatter plots (regular and interactive)
         final value = 2.0 + _sliderValue * 20.0;
         return 'Point Size: ${value.toStringAsFixed(1)}px';
-      case 1:
+      case 2:
         final value = 1.0 + _sliderValue * 9.0;
         return 'Line Width: ${value.toStringAsFixed(1)}px';
-      case 2:
       case 3:
       case 4:
       case 5:
+      case 6:
+      case 7:
         final value = _sliderValue.clamp(0.1, 1.0);
         return 'Bar Width: ${(value * 100).toStringAsFixed(0)}%';
       default:
@@ -309,6 +312,7 @@ class _ExampleHomeState extends State<ExampleHome>
   List<String> _getChartTitles() {
     return [
       'Sales Performance Analysis',
+      'Interactive Sales Dashboard',
       'User Growth Trends',
       'Quarterly Revenue',
       'Product Performance by Quarter',
@@ -321,6 +325,7 @@ class _ExampleHomeState extends State<ExampleHome>
   List<String> _getChartDescriptions() {
     return [
       'Enterprise clients show higher deal values with consistent growth patterns',
+      'Hover and tap for detailed insights • Rich tooltips and custom interactions',
       'Steady monthly growth with seasonal variations in user acquisition',
       'Strong Q4 performance driven by holiday sales and new partnerships',
       'Mobile app leading growth, API services showing steady adoption',
@@ -433,12 +438,12 @@ class _ExampleHomeState extends State<ExampleHome>
                               ),
                             ),
                             SliderTheme(
-                              data: SliderThemeData(
+                              data: const SliderThemeData(
                                 trackHeight: 3,
-                                thumbShape: const RoundSliderThumbShape(
+                                thumbShape: RoundSliderThumbShape(
                                   enabledThumbRadius: 6,
                                 ),
-                                overlayShape: const RoundSliderOverlayShape(
+                                overlayShape: RoundSliderOverlayShape(
                                   overlayRadius: 12,
                                 ),
                               ),
@@ -540,6 +545,7 @@ class _ExampleHomeState extends State<ExampleHome>
           labelStyle: const TextStyle(fontWeight: FontWeight.w600),
           tabs: const [
             Tab(text: 'Scatter Plot'),
+            Tab(text: 'Interactive'), // New tab
             Tab(text: 'Line Chart'),
             Tab(text: 'Bar Chart'),
             Tab(text: 'Grouped Bars'),
@@ -571,8 +577,23 @@ class _ExampleHomeState extends State<ExampleHome>
                   ],
                 ),
                 _buildChartPage(
+                  // New interactive tab
                   chartTitles[1],
                   chartDescriptions[1],
+                  buildInteractiveScatterTab(
+                      currentTheme, _scatterPlotData, _sliderValue),
+                  [
+                    _buildStatsCard(
+                        'Hover Events', '234', '+45%', Colors.purple),
+                    _buildStatsCard(
+                        'Click Events', '89', '+12%', Colors.indigo),
+                    _buildStatsCard(
+                        'Tooltip Views', '1.2k', '+67%', Colors.teal),
+                  ],
+                ),
+                _buildChartPage(
+                  chartTitles[2],
+                  chartDescriptions[2],
                   buildLineChartTab(currentTheme, _lineChartData, _sliderValue),
                   [
                     _buildStatsCard(
@@ -584,8 +605,8 @@ class _ExampleHomeState extends State<ExampleHome>
                   ],
                 ),
                 _buildChartPage(
-                  chartTitles[2],
-                  chartDescriptions[2],
+                  chartTitles[3],
+                  chartDescriptions[3],
                   buildBarChartTab(currentTheme, _barChartData, _sliderValue),
                   [
                     _buildStatsCard(
@@ -597,8 +618,8 @@ class _ExampleHomeState extends State<ExampleHome>
                   ],
                 ),
                 _buildChartPage(
-                  chartTitles[3],
-                  chartDescriptions[3],
+                  chartTitles[4],
+                  chartDescriptions[4],
                   buildGroupedBarTab(
                       currentTheme, _groupedBarData, _sliderValue),
                   [
@@ -611,8 +632,8 @@ class _ExampleHomeState extends State<ExampleHome>
                   ],
                 ),
                 _buildChartPage(
-                  chartTitles[4],
-                  chartDescriptions[4],
+                  chartTitles[5],
+                  chartDescriptions[5],
                   buildHorizontalBarTab(
                       currentTheme, _horizontalBarData, _sliderValue),
                   [
@@ -624,8 +645,8 @@ class _ExampleHomeState extends State<ExampleHome>
                   ],
                 ),
                 _buildChartPage(
-                  chartTitles[5],
-                  chartDescriptions[5],
+                  chartTitles[6],
+                  chartDescriptions[6],
                   buildStackedBarTab(
                       currentTheme, _stackedBarData, _sliderValue),
                   [
@@ -637,8 +658,8 @@ class _ExampleHomeState extends State<ExampleHome>
                   ],
                 ),
                 _buildChartPage(
-                  'Revenue vs Conversion Performance',
-                  'Revenue growth correlates with improved conversion optimization',
+                  chartTitles[7],
+                  chartDescriptions[7],
                   buildDualAxisTab(currentTheme, _dualAxisData, _sliderValue),
                   [
                     _buildStatsCard(
@@ -682,9 +703,9 @@ class _ExampleHomeState extends State<ExampleHome>
                           (_currentPaletteIndex + 1) % _colorPalettes.length;
                     });
                   },
-                  child: const Icon(Icons.color_lens),
                   backgroundColor: _colorPalettes[_currentPaletteIndex].first,
                   foregroundColor: Colors.white,
+                  child: const Icon(Icons.color_lens),
                 ),
               ],
             ),
@@ -840,42 +861,49 @@ class _ExampleHomeState extends State<ExampleHome>
           'Size and color encoding for multi-dimensional data',
           'Responsive scaling and high-DPI support'
         ];
-      case 1:
+      case 1: // Interactive scatter plot
+        return [
+          'Rich tooltip system with customizable content and styling',
+          'Hover detection with spatial indexing for smooth performance',
+          'Click interactions for navigation and custom actions',
+          'Mobile-optimized touch handling and gesture recognition'
+        ];
+      case 2:
         return [
           'Progressive line drawing with smooth transitions',
           'Multi-series support with automatic color mapping',
           'Customizable stroke width and transparency',
           'Optimized for time-series and continuous data'
         ];
-      case 2:
+      case 3:
         return [
           'Categorical data visualization with ordinal scales',
           'Staggered bar animations for visual impact',
           'Automatic baseline detection and scaling',
           'Customizable bar width and styling options'
         ];
-      case 3:
+      case 4:
         return [
           'Side-by-side comparison of multiple data series',
           'Coordinated group animations with smooth timing',
           'Automatic legend generation from color mappings',
           'Perfect for product or regional comparisons'
         ];
-      case 4:
+      case 5:
         return [
           'Coordinate system flipping for horizontal layouts',
           'Ideal for ranking and categorical comparisons',
           'Space-efficient labeling for long category names',
           'Consistent animation system across orientations'
         ];
-      case 5:
+      case 6:
         return [
           'Segment-by-segment progressive stacking animation',
           'Automatic part-to-whole relationship visualization',
           'Consistent color mapping across all segments',
           'Perfect for budget breakdowns and composition analysis'
         ];
-      case 6:
+      case 7:
         return [
           'Dual Y-axis support for different data scales',
           'Independent left and right axis scaling',

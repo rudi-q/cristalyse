@@ -6,8 +6,9 @@ enum YAxis { primary, secondary }
 /// Base class for all chart geometries
 abstract class Geometry {
   final YAxis yAxis;
+  final bool interactive;
 
-  Geometry({this.yAxis = YAxis.primary});
+  Geometry({this.yAxis = YAxis.primary, this.interactive = true});
 }
 
 /// Enum for point shapes
@@ -28,6 +29,7 @@ class PointGeometry extends Geometry {
     this.shape = PointShape.circle,
     this.borderWidth = 0.0,
     super.yAxis,
+    super.interactive,
   });
 }
 
@@ -44,6 +46,7 @@ class LineGeometry extends Geometry {
     this.alpha = 1.0,
     this.style = LineStyle.solid,
     super.yAxis,
+    super.interactive,
   });
 }
 
@@ -66,6 +69,7 @@ class BarGeometry extends Geometry {
     this.borderRadius,
     this.borderWidth = 0.0,
     super.yAxis,
+    super.interactive,
   });
 }
 

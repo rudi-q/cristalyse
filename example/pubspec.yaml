@@ -1,5 +1,6 @@
 name: cristalyse_example
 description: Example app for Cristalyse visualization library
+publish_to: 'none' # Prevent publishing to pub.dev
 
 version: 1.0.0+1
 
@@ -16,6 +17,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../interaction/chart_interactions.dart';
 import '../themes/chart_theme.dart';
 import '../widgets/animated_chart_widget.dart';
 import 'geometry.dart';
@@ -31,6 +32,9 @@ class CristalyseChart {
   Curve _animationCurve = Curves.easeInOut;
 
   bool _coordFlipped = false;
+
+  /// Interaction configuration
+  ChartInteraction _interaction = ChartInteraction.none;
 
   /// Set the data source for the chart
   ///
@@ -218,6 +222,93 @@ class CristalyseChart {
     return this;
   }
 
+  /// Configure chart interactions
+  ///
+  /// Example with simple tooltip:
+  /// ```dart
+  /// chart.interaction(
+  ///   tooltip: TooltipConfig(
+  ///     builder: DefaultTooltips.simple('revenue'),
+  ///   ),
+  /// )
+  /// ```
+  ///
+  /// Example with hover and click:
+  /// ```dart
+  /// chart.interaction(
+  ///   tooltip: TooltipConfig(
+  ///     builder: DefaultTooltips.multi({
+  ///       'revenue': 'Revenue',
+  ///       'conversion_rate': 'Conversion Rate',
+  ///     }),
+  ///   ),
+  ///   hover: HoverConfig(
+  ///     onHover: (point) => print('Hovering: ${point?.data}'),
+  ///   ),
+  ///   click: ClickConfig(
+  ///     onTap: (point) => showDetailsDialog(point),
+  ///   ),
+  /// )
+  /// ```
+  CristalyseChart interaction({
+    TooltipConfig? tooltip,
+    HoverConfig? hover,
+    ClickConfig? click,
+    bool enabled = true,
+  }) {
+    _interaction = ChartInteraction(
+      tooltip: tooltip,
+      hover: hover,
+      click: click,
+      enabled: enabled,
+    );
+    return this;
+  }
+
+  /// Quick tooltip setup for common cases
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.tooltip(DefaultTooltips.simple('revenue'))
+  /// ```
+  CristalyseChart tooltip(TooltipBuilder builder, {TooltipConfig? config}) {
+    _interaction = ChartInteraction(
+      tooltip: (config ?? TooltipConfig.defaultConfig).copyWith(
+        builder: builder,
+      ),
+      enabled: true,
+    );
+    return this;
+  }
+
+  /// Quick hover setup
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.onHover((point) => print('Hovering over: ${point?.getDisplayValue('revenue')}'))
+  /// ```
+  CristalyseChart onHover(HoverCallback callback) {
+    _interaction = ChartInteraction(
+      hover: HoverConfig(onHover: callback),
+      enabled: true,
+    );
+    return this;
+  }
+
+  /// Quick click setup
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.onClick((point) => Navigator.push(context, DetailPage(point.data)))
+  /// ```
+  CristalyseChart onClick(ClickCallback callback) {
+    _interaction = ChartInteraction(
+      click: ClickConfig(onTap: callback),
+      enabled: true,
+    );
+    return this;
+  }
+
   /// Build the chart widget
   Widget build() {
     return AnimatedCristalyseChartWidget(
@@ -237,6 +328,34 @@ class CristalyseChart {
       animationDuration: _animationDuration,
       animationCurve: _animationCurve,
       coordFlipped: _coordFlipped,
+      interaction: _interaction,
+    );
+  }
+}
+
+/// Extension for TooltipConfig to add copyWith method
+extension TooltipConfigExtension on TooltipConfig {
+  TooltipConfig copyWith({
+    TooltipBuilder? builder,
+    Duration? showDelay,
+    Duration? hideDelay,
+    bool? followPointer,
+    EdgeInsets? padding,
+    Color? backgroundColor,
+    Color? textColor,
+    double? borderRadius,
+    BoxShadow? shadow,
+  }) {
+    return TooltipConfig(
+      builder: builder ?? this.builder,
+      showDelay: showDelay ?? this.showDelay,
+      hideDelay: hideDelay ?? this.hideDelay,
+      followPointer: followPointer ?? this.followPointer,
+      padding: padding ?? this.padding,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      textColor: textColor ?? this.textColor,
+      borderRadius: borderRadius ?? this.borderRadius,
+      shadow: shadow ?? this.shadow,
     );
   }
 }

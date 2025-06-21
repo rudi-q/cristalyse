@@ -1,3 +1,34 @@
+## 0.6.0 - 2025-06-21
+
+- **Major Feature: Interactive Chart Layer**
+  - Added a new interaction system to support hover, click, and pan gestures on chart data points.
+  - Introduced `ChartInteraction` configuration for enabling and customizing user interactions.
+  - Implemented a flexible tooltip system with `TooltipConfig` for full control over tooltip appearance, content, and behavior.
+  - Added `onHover`, `onExit`, and `onTap` callbacks for developers to hook into user interaction events.
+
+- **Example App**
+  - Added a new 'Interactive' tab to the example app to showcase the new tooltip and interaction features.
+
+#### 📖 Examples Added
+
+```dart
+// Interactive Scatter Plot with Tooltips and Click Events
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'week', y: 'revenue', color: 'rep')
+  .geomPoint()
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) => MyCustomTooltip(point: point),
+      style: TooltipStyle(backgroundColor: Colors.black87),
+    ),
+    click: ClickConfig(
+      onTap: (point) => showDetailsDialog(context, point),
+    ),
+  )
+  .build();
+```
+
 ## 0.5.1 - 2025-06-14
 #### Documentation
 - Updated screenshots with latest examples
