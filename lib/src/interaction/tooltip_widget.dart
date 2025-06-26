@@ -63,9 +63,18 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
 
   @override
   void dispose() {
-    _removeTooltip();
+    // Cancel timers first
     _showTimer?.cancel();
     _hideTimer?.cancel();
+    
+    // Remove overlay without animation reset to avoid widget tree lock
+    if (_overlayEntry != null) {
+      _overlayEntry!.remove();
+      _overlayEntry = null;
+    }
+    _isVisible = false;
+    
+    // Dispose animation controller last
     _animationController.dispose();
     super.dispose();
   }
