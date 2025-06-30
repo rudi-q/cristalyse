@@ -1,6 +1,6 @@
 name: cristalyse_example
 description: Example app for Cristalyse visualization library
-publish_to: 'none' # Prevent publishing to pub.dev
+publish_to: 'none'
 
 version: 1.0.0+1
 

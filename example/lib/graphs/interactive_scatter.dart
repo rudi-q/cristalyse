@@ -3,10 +3,10 @@ import 'package:cristalyse_example/chart_theme.dart';
 import 'package:flutter/material.dart';
 
 Widget buildInteractiveScatterTab(
-    ChartTheme currentTheme,
-    List<Map<String, dynamic>> data,
-    double sliderValue,
-    ) {
+  ChartTheme currentTheme,
+  List<Map<String, dynamic>> data,
+  double sliderValue,
+) {
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
@@ -28,84 +28,90 @@ Widget buildInteractiveScatterTab(
               .data(data)
               .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
               .geomPoint(
-            alpha: 0.8,
-            size: 4.0 + sliderValue * 8.0,
-          )
+                alpha: 0.8,
+                size: 4.0 + sliderValue * 8.0,
+              )
               .scaleXContinuous()
               .scaleYContinuous()
               .theme(currentTheme.copyWith(
-            pointSizeMax: 2.0 + sliderValue * 20.0,
-          ))
+                pointSizeMax: 2.0 + sliderValue * 20.0,
+              ))
               .interaction(
-            tooltip: TooltipConfig(
-              builder: (point) {
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.white24, width: 1),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 12.0,
-                        offset: Offset(0, 4),
+                tooltip: TooltipConfig(
+                  builder: (point) {
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white24, width: 1),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 12.0,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Sales Data',
-                        style: TextStyle(
-                          color: currentTheme.primaryColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Sales Data',
+                            style: TextStyle(
+                              color: currentTheme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Week: ${point.getDisplayValue('x')}',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                          ),
+                          Text(
+                            'Revenue: \$${point.getDisplayValue('y')}k',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                          ),
+                          Text(
+                            'Segment: ${point.getDisplayValue('category')}',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                          ),
+                          Text(
+                            'Deal Size: ${point.getDisplayValue('size')}',
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 12),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Week: ${point.getDisplayValue('x')}',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                      Text(
-                        'Revenue: \$${point.getDisplayValue('y')}k',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                      Text(
-                        'Segment: ${point.getDisplayValue('category')}',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                      Text(
-                        'Deal Size: ${point.getDisplayValue('size')}',
-                        style: const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              showDelay: const Duration(milliseconds: 10), // Almost instant for smooth switching
-              hideDelay: const Duration(milliseconds: 1500), // Much longer to hide
-              followPointer: false, // Disable to prevent pan interference
-            ),
-            hover: const HoverConfig(
-              hitTestRadius: 30.0, // Very generous hit area
-              debounce: Duration(milliseconds: 50),
-            ),
-            click: ClickConfig(
-              onTap: (point) {
-                // In a real app, you'd navigate to details or show a dialog
-                debugPrint('Tapped on data point: ${point.data}');
-              },
-              hitTestRadius: 35.0, // Even more generous for taps
-            ),
-          )
+                    );
+                  },
+                  showDelay: const Duration(
+                      milliseconds: 10), // Almost instant for smooth switching
+                  hideDelay:
+                      const Duration(milliseconds: 1500), // Much longer to hide
+                  followPointer: false, // Disable to prevent pan interference
+                ),
+                hover: const HoverConfig(
+                  hitTestRadius: 30.0, // Very generous hit area
+                  debounce: Duration(milliseconds: 50),
+                ),
+                click: ClickConfig(
+                  onTap: (point) {
+                    // In a real app, you'd navigate to details or show a dialog
+                    debugPrint('Tapped on data point: ${point.data}');
+                  },
+                  hitTestRadius: 35.0, // Even more generous for taps
+                ),
+              )
               .animate(
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.elasticOut,
-          )
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.elasticOut,
+              )
               .build(),
         ),
         const SizedBox(height: 16),
@@ -221,26 +227,23 @@ class _InteractionGuide extends StatelessWidget {
 class TooltipExamples {
   /// Simple single-value tooltip
   static Widget simple() {
-    return CristalyseChart()
-        .tooltip(DefaultTooltips.simple('revenue'))
-        .build();
+    return CristalyseChart().tooltip(DefaultTooltips.simple('revenue')).build();
   }
 
   /// Multi-column tooltip
   static Widget multi() {
     return CristalyseChart()
         .tooltip(DefaultTooltips.multi({
-      'revenue': 'Revenue',
-      'deals': 'Deal Count',
-      'conversion': 'Conversion Rate',
-    }))
+          'revenue': 'Revenue',
+          'deals': 'Deal Count',
+          'conversion': 'Conversion Rate',
+        }))
         .build();
   }
 
   /// Custom tooltip with business logic
   static Widget custom() {
-    return CristalyseChart()
-        .tooltip((point) {
+    return CristalyseChart().tooltip((point) {
       final revenue = point.getDisplayValue('revenue');
       const target = 100; // Business target
       final performance = double.tryParse(revenue) ?? 0;
@@ -270,8 +273,7 @@ class TooltipExamples {
           ),
         ],
       );
-    })
-        .build();
+    }).build();
   }
 
   /// With click actions
@@ -292,7 +294,6 @@ class TooltipExamples {
           ],
         ),
       );
-    })
-        .build();
+    }).build();
   }
 }

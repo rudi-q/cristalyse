@@ -31,7 +31,8 @@ class ChartTooltipOverlay extends StatefulWidget {
 }
 
 class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
-    with SingleTickerProviderStateMixin implements TooltipController {
+    with SingleTickerProviderStateMixin
+    implements TooltipController {
   OverlayEntry? _overlayEntry;
   Timer? _showTimer;
   Timer? _hideTimer;
@@ -66,14 +67,14 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
     // Cancel timers first
     _showTimer?.cancel();
     _hideTimer?.cancel();
-    
+
     // Remove overlay without animation reset to avoid widget tree lock
     if (_overlayEntry != null) {
       _overlayEntry!.remove();
       _overlayEntry = null;
     }
     _isVisible = false;
-    
+
     // Dispose animation controller last
     _animationController.dispose();
     super.dispose();
@@ -198,10 +199,7 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
 
   @override
   Widget build(BuildContext context) {
-    return ChartTooltipProvider(
-      state: this,
-      child: widget.child,
-    );
+    return ChartTooltipProvider(state: this, child: widget.child);
   }
 }
 
@@ -227,7 +225,7 @@ class _TooltipPositioned extends AnimatedWidget {
 
     // Smart positioning to avoid screen edges
     double left = position.dx - 75; // Center tooltip horizontally
-    double top = position.dy - 80;  // Position above touch point
+    double top = position.dy - 80; // Position above touch point
 
     // Adjust if too close to edges
     if (left < 10) left = 10;
@@ -237,7 +235,8 @@ class _TooltipPositioned extends AnimatedWidget {
     return Positioned(
       left: left,
       top: top,
-      child: IgnorePointer( // THIS IS THE KEY FIX!
+      child: IgnorePointer(
+        // THIS IS THE KEY FIX!
         child: AnimatedBuilder(
           animation: Listenable.merge([fadeAnimation, scaleAnimation]),
           builder: (context, child) {
@@ -247,10 +246,7 @@ class _TooltipPositioned extends AnimatedWidget {
                 scale: scaleAnimation.value,
                 child: Material(
                   color: Colors.transparent,
-                  child: _TooltipContainer(
-                    config: config,
-                    child: this.child,
-                  ),
+                  child: _TooltipContainer(config: config, child: this.child),
                 ),
               ),
             );
@@ -266,10 +262,7 @@ class _TooltipContainer extends StatelessWidget {
   final TooltipConfig config;
   final Widget child;
 
-  const _TooltipContainer({
-    required this.config,
-    required this.child,
-  });
+  const _TooltipContainer({required this.config, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -278,13 +271,16 @@ class _TooltipContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: config.backgroundColor,
         borderRadius: BorderRadius.circular(config.borderRadius),
-        boxShadow: config.shadow != null ? [config.shadow!] : [
-          const BoxShadow(
-            color: Colors.black54,
-            blurRadius: 8.0,
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow:
+            config.shadow != null
+                ? [config.shadow!]
+                : [
+                  const BoxShadow(
+                    color: Colors.black54,
+                    blurRadius: 8.0,
+                    offset: Offset(0, 2),
+                  ),
+                ],
         border: Border.all(color: Colors.white24, width: 1),
       ),
       constraints: const BoxConstraints(
@@ -316,10 +312,16 @@ class ChartTooltipProvider extends InheritedWidget {
 
   static TooltipController? of(BuildContext context, {bool listen = true}) {
     return listen
-        ? context.dependOnInheritedWidgetOfExactType<ChartTooltipProvider>()?.state
-        : (context.getElementForInheritedWidgetOfExactType<ChartTooltipProvider>()?.widget
-    as ChartTooltipProvider?)
-        ?.state;
+        ? context
+            .dependOnInheritedWidgetOfExactType<ChartTooltipProvider>()
+            ?.state
+        : (context
+                    .getElementForInheritedWidgetOfExactType<
+                      ChartTooltipProvider
+                    >()
+                    ?.widget
+                as ChartTooltipProvider?)
+            ?.state;
   }
 
   @override
@@ -347,11 +349,11 @@ mixin TooltipMixin {
 class TooltipPositioning {
   /// Calculate optimal tooltip position to avoid screen edges
   static Offset calculatePosition(
-      Offset touchPosition,
-      Size tooltipSize,
-      Size screenSize, {
-        double margin = 16.0,
-      }) {
+    Offset touchPosition,
+    Size tooltipSize,
+    Size screenSize, {
+    double margin = 16.0,
+  }) {
     double x = touchPosition.dx;
     double y = touchPosition.dy - tooltipSize.height - 10;
 

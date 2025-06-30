@@ -39,7 +39,10 @@ class InteractionDetector {
   });
 
   /// Find the closest data point to the given screen coordinates
-  DataPointInfo? detectPoint(Offset screenPosition, {double maxDistance = 20.0}) {
+  DataPointInfo? detectPoint(
+    Offset screenPosition, {
+    double maxDistance = 20.0,
+  }) {
     if (!_indexBuilt) {
       _buildIndex();
     }
@@ -92,10 +95,10 @@ class InteractionDetector {
 
   /// Create indexed point for a given data point and geometry
   _IndexedDataPoint? _createIndexedPoint(
-      Map<String, dynamic> point,
-      int index,
-      Geometry geometry,
-      ) {
+    Map<String, dynamic> point,
+    int index,
+    Geometry geometry,
+  ) {
     final useY2 = geometry.yAxis == YAxis.secondary;
     final yCol = useY2 ? y2Column : yColumn;
     final activeYScale = useY2 ? (y2Scale ?? yScale) : yScale;
@@ -107,10 +110,10 @@ class InteractionDetector {
 
     // Calculate screen position based on coordinate system
     Offset? screenPosition = _calculateScreenPosition(
-        xValue,
-        yValue,
-        xScale,
-        activeYScale
+      xValue,
+      yValue,
+      xScale,
+      activeYScale,
     );
 
     if (screenPosition == null) return null;
@@ -136,11 +139,11 @@ class InteractionDetector {
 
   /// Calculate screen position for given data values
   Offset? _calculateScreenPosition(
-      dynamic xValue,
-      dynamic yValue,
-      Scale xScale,
-      Scale yScale
-      ) {
+    dynamic xValue,
+    dynamic yValue,
+    Scale xScale,
+    Scale yScale,
+  ) {
     try {
       if (coordFlipped) {
         // Horizontal charts: X becomes Y, Y becomes X
@@ -234,8 +237,14 @@ class InteractionDetector {
     }
 
     // Distance to closest edge
-    final dx = math.max(0, math.max(barBounds.left - screenPos.dx, screenPos.dx - barBounds.right));
-    final dy = math.max(0, math.max(barBounds.top - screenPos.dy, screenPos.dy - barBounds.bottom));
+    final dx = math.max(
+      0,
+      math.max(barBounds.left - screenPos.dx, screenPos.dx - barBounds.right),
+    );
+    final dy = math.max(
+      0,
+      math.max(barBounds.top - screenPos.dy, screenPos.dy - barBounds.bottom),
+    );
     return math.sqrt(dx * dx + dy * dy);
   }
 

@@ -10,6 +10,7 @@ import 'graphs/grouped_bar.dart';
 import 'graphs/horizontal_bar_chart.dart';
 import 'graphs/interactive_scatter.dart';
 import 'graphs/line_chart.dart';
+import 'graphs/pan_example.dart';
 import 'graphs/scatter_plot.dart';
 import 'graphs/stacked_bar_chart.dart';
 
@@ -109,7 +110,7 @@ class _ExampleHomeState extends State<ExampleHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 8, vsync: this); // Updated to 8 tabs
+    _tabController = TabController(length: 9, vsync: this); // Updated to 9 tabs
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -313,6 +314,7 @@ class _ExampleHomeState extends State<ExampleHome>
     return [
       'Sales Performance Analysis',
       'Interactive Sales Dashboard',
+      'Interactive Panning Demo',
       'User Growth Trends',
       'Quarterly Revenue',
       'Product Performance by Quarter',
@@ -326,6 +328,7 @@ class _ExampleHomeState extends State<ExampleHome>
     return [
       'Enterprise clients show higher deal values with consistent growth patterns',
       'Hover and tap for detailed insights • Rich tooltips and custom interactions',
+      'Real-time pan detection with visible range callbacks • Perfect for large datasets',
       'Steady monthly growth with seasonal variations in user acquisition',
       'Strong Q4 performance driven by holiday sales and new partnerships',
       'Mobile app leading growth, API services showing steady adoption',
@@ -545,7 +548,8 @@ class _ExampleHomeState extends State<ExampleHome>
           labelStyle: const TextStyle(fontWeight: FontWeight.w600),
           tabs: const [
             Tab(text: 'Scatter Plot'),
-            Tab(text: 'Interactive'), // New tab
+            Tab(text: 'Interactive'),
+            Tab(text: 'Panning'), // New panning tab
             Tab(text: 'Line Chart'),
             Tab(text: 'Bar Chart'),
             Tab(text: 'Grouped Bars'),
@@ -594,20 +598,19 @@ class _ExampleHomeState extends State<ExampleHome>
                 _buildChartPage(
                   chartTitles[2],
                   chartDescriptions[2],
-                  buildLineChartTab(currentTheme, _lineChartData, _sliderValue),
+                  buildPanExampleTab(currentTheme, _sliderValue),
                   [
                     _buildStatsCard(
-                        'Monthly Growth', '3.2%', '+0.4%', Colors.green),
+                        'Pan Events', '0', 'Real-time', Colors.blue),
+                    _buildStatsCard('Data Points', '1.0k', '+0%', Colors.green),
                     _buildStatsCard(
-                        'Active Users', '89.4k', '+15.2%', Colors.blue),
-                    _buildStatsCard(
-                        'Retention', '87.2%', '+1.8%', Colors.purple),
+                        'Range Updates', 'Live', 'Active', Colors.orange),
                   ],
                 ),
                 _buildChartPage(
                   chartTitles[3],
                   chartDescriptions[3],
-                  buildBarChartTab(currentTheme, _barChartData, _sliderValue),
+                  buildLineChartTab(currentTheme, _lineChartData, _sliderValue),
                   [
                     _buildStatsCard(
                         'Q4 Revenue', '\$1.2M', '+24.7%', Colors.green),
@@ -620,8 +623,7 @@ class _ExampleHomeState extends State<ExampleHome>
                 _buildChartPage(
                   chartTitles[4],
                   chartDescriptions[4],
-                  buildGroupedBarTab(
-                      currentTheme, _groupedBarData, _sliderValue),
+                  buildBarChartTab(currentTheme, _barChartData, _sliderValue),
                   [
                     _buildStatsCard(
                         'Mobile Revenue', '\$450k', '+18.2%', Colors.blue),
@@ -634,8 +636,8 @@ class _ExampleHomeState extends State<ExampleHome>
                 _buildChartPage(
                   chartTitles[5],
                   chartDescriptions[5],
-                  buildHorizontalBarTab(
-                      currentTheme, _horizontalBarData, _sliderValue),
+                  buildGroupedBarTab(
+                      currentTheme, _groupedBarData, _sliderValue),
                   [
                     _buildStatsCard('Total Team', '127', '+12', Colors.blue),
                     _buildStatsCard(
@@ -647,8 +649,8 @@ class _ExampleHomeState extends State<ExampleHome>
                 _buildChartPage(
                   chartTitles[6],
                   chartDescriptions[6],
-                  buildStackedBarTab(
-                      currentTheme, _stackedBarData, _sliderValue),
+                  buildHorizontalBarTab(
+                      currentTheme, _horizontalBarData, _sliderValue),
                   [
                     _buildStatsCard(
                         'Total Revenue', '\$385k', '+18.2%', Colors.green),
@@ -660,6 +662,20 @@ class _ExampleHomeState extends State<ExampleHome>
                 _buildChartPage(
                   chartTitles[7],
                   chartDescriptions[7],
+                  buildStackedBarTab(
+                      currentTheme, _stackedBarData, _sliderValue),
+                  [
+                    _buildStatsCard(
+                        'Avg Revenue', '\$156k', '+12.8%', Colors.blue),
+                    _buildStatsCard(
+                        'Avg Conversion', '19.2%', '+2.4%', Colors.green),
+                    _buildStatsCard(
+                        'Correlation', '0.73', '+0.12', Colors.purple),
+                  ],
+                ),
+                _buildChartPage(
+                  chartTitles[8],
+                  chartDescriptions[8],
                   buildDualAxisTab(currentTheme, _dualAxisData, _sliderValue),
                   [
                     _buildStatsCard(
@@ -868,42 +884,49 @@ class _ExampleHomeState extends State<ExampleHome>
           'Click interactions for navigation and custom actions',
           'Mobile-optimized touch handling and gesture recognition'
         ];
-      case 2:
+      case 2: // Panning demo
+        return [
+          'Real-time pan detection with visible range callbacks',
+          'Perfect for large datasets with efficient data loading',
+          'Throttled updates to prevent overwhelming the database',
+          'Coordinate transformation from screen pixels to data values'
+        ];
+      case 3: // Line chart (moved from case 2)
         return [
           'Progressive line drawing with smooth transitions',
           'Multi-series support with automatic color mapping',
           'Customizable stroke width and transparency',
           'Optimized for time-series and continuous data'
         ];
-      case 3:
+      case 4: // Bar chart (moved from case 3)
         return [
           'Categorical data visualization with ordinal scales',
           'Staggered bar animations for visual impact',
           'Automatic baseline detection and scaling',
           'Customizable bar width and styling options'
         ];
-      case 4:
+      case 5: // Grouped bars (moved from case 4)
         return [
           'Side-by-side comparison of multiple data series',
           'Coordinated group animations with smooth timing',
           'Automatic legend generation from color mappings',
           'Perfect for product or regional comparisons'
         ];
-      case 5:
+      case 6: // Horizontal bars (moved from case 5)
         return [
           'Coordinate system flipping for horizontal layouts',
           'Ideal for ranking and categorical comparisons',
           'Space-efficient labeling for long category names',
           'Consistent animation system across orientations'
         ];
-      case 6:
+      case 7: // Stacked bars (moved from case 6)
         return [
           'Segment-by-segment progressive stacking animation',
           'Automatic part-to-whole relationship visualization',
           'Consistent color mapping across all segments',
           'Perfect for budget breakdowns and composition analysis'
         ];
-      case 7:
+      case 8: // Dual Y-axis (moved from case 7)
         return [
           'Dual Y-axis support for different data scales',
           'Independent left and right axis scaling',

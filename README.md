@@ -98,6 +98,31 @@ class MyChart extends StatelessWidget {
 
 ## 💡 Interactive Charts
 
+### New: Enhanced Panning Behavior
+
+Add real-time panning capabilities to your charts with seamless range updates and smooth interaction.
+
+```dart
+CristalyseChart()
+  .data(myData)
+  .mapping(x: 'x', y: 'y')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      onPanUpdate: (info) {
+        // Handle real-time updates based on visible X range
+        print('Visible X range: \\${info.visibleMinX} - \\${info.visibleMaxX}');
+      },
+    ),
+  )
+  .build();
+```
+**Features:**
+- Maintains pan state across interactions
+- Synchronizes displayed range between header and chart axis
+- Enhanced UI for range display card
+
 Bring your data to life with a fully interactive layer. Add rich tooltips, hover effects, and click/tap events to give users a more engaging experience.
 
 ```dart
@@ -471,7 +496,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.6.2** - Production ready with dual Y-axis support
+**Current Version: 0.7.0** - Production ready with dual Y-axis support and interactive panning & tooltips
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -480,7 +505,9 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v0.3.0** - Bar charts (including horizontal) and areas
 - ✅ **v0.4.0** - Enhanced theming with custom colors and text styles, stacked bars
 - ✅ **v0.5.0** - **Dual Y-axis support** and advanced bar chart variations
-- 🚧 **v0.6.0** - Statistical layers and interactive features
+- ✅ **v0.6.0** - Interactive tooltips
+- ✅ **v0.7.0** - Interactive panning
+- 🚧 **v0.8.0** - Interactive zooming
 
 ## 🤝 Contributing
 

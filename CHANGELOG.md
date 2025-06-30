@@ -1,3 +1,100 @@
+## 0.7.0 - 2025-06-30
+
+- **Major Feature: Enhanced Interactive Panning System**
+  - Added persistent pan state that maintains chart position after pan gesture completion
+  - Implemented real-time visible range synchronization between header display and chart X-axis
+  - Introduced comprehensive `PanConfig` API for full control over pan behavior and callbacks
+  - Added `PanInfo` class providing detailed pan state information including visible ranges and delta tracking
+  - Enhanced range display card with improved visibility, contrast, and professional styling
+
+- **New Pan API Classes**
+  - `PanConfig`: Configure pan behavior with `onPanStart`, `onPanUpdate`, `onPanEnd` callbacks
+  - `PanInfo`: Access current visible X/Y ranges, pan state, and gesture deltas
+  - `PanState`: Track pan lifecycle (start, update, end) for coordinated UI updates
+  - Throttled callback system prevents database overwhelming during continuous panning
+
+- **Visual Enhancements**
+  - Redesigned range display card with enhanced contrast and primary color theming
+  - Synchronized range values between header card and chart axis labels
+  - Improved typography with monospace fonts for precise range display
+  - Professional gradient styling with stronger borders for better visibility
+
+- **Technical Improvements**
+  - Progressive pan domain accumulation for smooth, natural panning experience
+  - Persistent scale domains that maintain panned position across interactions
+  - Efficient coordinate transformation from screen pixels to data values
+  - Memory-optimized pan state management with automatic cleanup
+
+#### 📖 Examples Added
+
+```dart
+// Basic Interactive Panning with Range Updates
+CristalyseChart()
+  .data(largeDataset)  // 1000+ data points
+  .mapping(x: 'timestamp', y: 'value', color: 'series')
+  .geomLine(strokeWidth: 2.0)
+  .geomPoint(size: 4.0)
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      onPanUpdate: (info) {
+        print('Visible range: ${info.visibleMinX} - ${info.visibleMaxX}');
+        // Perfect for loading data on-demand
+        fetchDataForRange(info.visibleMinX!, info.visibleMaxX!);
+      },
+      throttle: Duration(milliseconds: 100), // Prevent database overwhelming
+    ),
+  )
+  .build();
+
+// Advanced Panning with Complete Lifecycle Management
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'date', y: 'price')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      onPanStart: (info) {
+        setState(() => isLoading = true);
+        showRangeIndicator(info.visibleMinX, info.visibleMaxX);
+      },
+      onPanUpdate: (info) {
+        updateVisibleRange(info.visibleMinX, info.visibleMaxX);
+        // Real-time data streaming based on visible window
+        streamData(info.visibleMinX!, info.visibleMaxX!);
+      },
+      onPanEnd: (info) {
+        setState(() => isLoading = false);
+        saveUserPreferences(info.visibleMinX, info.visibleMaxX);
+        // Chart maintains panned position automatically
+      },
+    ),
+  )
+  .build();
+
+// Business Dashboard: Financial Data Exploration
+CristalyseChart()
+  .data(stockData)
+  .mapping(x: 'date', y: 'price', color: 'symbol')
+  .geomLine(strokeWidth: 2.5, alpha: 0.8)
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      onPanUpdate: (info) {
+        // Update dashboard metrics for visible time range
+        updateMetrics(
+          startDate: info.visibleMinX,
+          endDate: info.visibleMaxX,
+        );
+        // Show range in header: "Viewing: Jan 2024 - Mar 2024"
+        updateHeaderRange(info.visibleMinX!, info.visibleMaxX!);
+      },
+    ),
+  )
+  .build();
+```
+
 ## 0.6.2 - 2025-06-26
 
 ### Added

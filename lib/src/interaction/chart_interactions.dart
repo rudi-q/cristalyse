@@ -144,28 +144,24 @@ class PanConfig {
 }
 
 /// Pan state information
-enum PanState {
-  start,
-  update,
-  end,
-}
+enum PanState { start, update, end }
 
 /// Information about the current pan operation
 class PanInfo {
   /// Current visible X range (data coordinates)
   final double? visibleMinX;
   final double? visibleMaxX;
-  
+
   /// Current visible Y range (data coordinates)
   final double? visibleMinY;
   final double? visibleMaxY;
-  
+
   /// Pan state (start, update, end)
   final PanState state;
-  
+
   /// Pan delta from last position (screen coordinates)
   final Offset? delta;
-  
+
   /// Total pan distance from start (screen coordinates)
   final Offset? totalDelta;
 
