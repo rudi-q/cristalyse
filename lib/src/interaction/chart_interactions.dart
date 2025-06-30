@@ -5,12 +5,14 @@ class ChartInteraction {
   final TooltipConfig? tooltip;
   final HoverConfig? hover;
   final ClickConfig? click;
+  final PanConfig? pan;
   final bool enabled;
 
   const ChartInteraction({
     this.tooltip,
     this.hover,
     this.click,
+    this.pan,
     this.enabled = true,
   });
 
@@ -118,6 +120,70 @@ class DataPointInfo {
 typedef TooltipBuilder = Widget Function(DataPointInfo point);
 typedef HoverCallback = void Function(DataPointInfo? point);
 typedef ClickCallback = void Function(DataPointInfo point);
+typedef PanCallback = void Function(PanInfo info);
+
+/// Configuration for pan interactions
+class PanConfig {
+  final bool enabled;
+  final PanCallback? onPanUpdate;
+  final PanCallback? onPanStart;
+  final PanCallback? onPanEnd;
+  final Duration throttle;
+  final bool updateXDomain;
+  final bool updateYDomain;
+
+  const PanConfig({
+    this.enabled = true,
+    this.onPanUpdate,
+    this.onPanStart,
+    this.onPanEnd,
+    this.throttle = const Duration(milliseconds: 100),
+    this.updateXDomain = false,
+    this.updateYDomain = false,
+  });
+}
+
+/// Pan state information
+enum PanState {
+  start,
+  update,
+  end,
+}
+
+/// Information about the current pan operation
+class PanInfo {
+  /// Current visible X range (data coordinates)
+  final double? visibleMinX;
+  final double? visibleMaxX;
+  
+  /// Current visible Y range (data coordinates)
+  final double? visibleMinY;
+  final double? visibleMaxY;
+  
+  /// Pan state (start, update, end)
+  final PanState state;
+  
+  /// Pan delta from last position (screen coordinates)
+  final Offset? delta;
+  
+  /// Total pan distance from start (screen coordinates)
+  final Offset? totalDelta;
+
+  const PanInfo({
+    this.visibleMinX,
+    this.visibleMaxX,
+    this.visibleMinY,
+    this.visibleMaxY,
+    required this.state,
+    this.delta,
+    this.totalDelta,
+  });
+
+  @override
+  String toString() {
+    return 'PanInfo(xRange: [$visibleMinX, $visibleMaxX], yRange: [$visibleMinY, $visibleMaxY], state: $state)';
+  }
+}
 
 /// Default tooltip builders for common use cases
 class DefaultTooltips {

@@ -6,6 +6,9 @@ abstract class Scale {
   List<dynamic> getTicks(int count);
   List<dynamic> get domain;
   List<double> get range;
+  
+  /// Inverse transformation: convert screen coordinate back to data value
+  dynamic invert(double screenValue);
 }
 
 /// Linear scale for continuous data
@@ -40,6 +43,15 @@ class LinearScale extends Scale {
     if (count <= 1) return [_domain[0]];
     final step = (_domain[1] - _domain[0]) / (count - 1);
     return List.generate(count, (i) => _domain[0] + i * step);
+  }
+  
+  /// Convert screen coordinate back to data value
+  @override
+  double invert(double screenValue) {
+    final rangeSpan = _range[1] - _range[0];
+    final domainSpan = _domain[1] - _domain[0];
+    if (rangeSpan == 0) return _domain[0];
+    return _domain[0] + (screenValue - _range[0]) / rangeSpan * domainSpan;
   }
 }
 
@@ -106,6 +118,24 @@ class OrdinalScale extends Scale {
 
     final step = _domain.length / count;
     return List.generate(count, (i) => _domain[(i * step).floor()]);
+  }
+  
+  /// Convert screen coordinate back to category value
+  @override
+  dynamic invert(double screenValue) {
+    if (_domain.isEmpty) return null;
+    
+    final totalRange = _range[1] - _range[0];
+    final paddingSpace = _padding * totalRange / 2;
+    final effectiveValue = screenValue - _range[0] - paddingSpace;
+    
+    if (effectiveValue < 0) return _domain.first;
+    
+    final bandWithPadding = _bandWidth + _padding * totalRange / _domain.length;
+    final index = (effectiveValue / bandWithPadding).floor();
+    
+    if (index >= _domain.length) return _domain.last;
+    return _domain[index];
   }
 }
 

@@ -250,16 +250,28 @@ class CristalyseChart {
   ///   ),
   /// )
   /// ```
+  ///
+  /// Example with panning:
+  /// ```dart
+  /// chart.interaction(
+  ///   pan: PanConfig(
+  ///     enabled: true,
+  ///     onPanUpdate: (info) => print('Visible X: ${info.visibleMinX} - ${info.visibleMaxX}'),
+  ///   ),
+  /// )
+  /// ```
   CristalyseChart interaction({
     TooltipConfig? tooltip,
     HoverConfig? hover,
     ClickConfig? click,
+    PanConfig? pan,
     bool enabled = true,
   }) {
     _interaction = ChartInteraction(
       tooltip: tooltip,
       hover: hover,
       click: click,
+      pan: pan,
       enabled: enabled,
     );
     return this;
@@ -290,6 +302,28 @@ class CristalyseChart {
   CristalyseChart onHover(HoverCallback callback) {
     _interaction = ChartInteraction(
       hover: HoverConfig(onHover: callback),
+      enabled: true,
+    );
+    return this;
+  }
+
+  /// Quick pan setup
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.onPan((info) => {
+  ///   print('Panning - X range: ${info.visibleMinX} to ${info.visibleMaxX}'),
+  ///   // Update your data source based on visible range
+  ///   fetchDataForRange(info.visibleMinX, info.visibleMaxX),
+  /// })
+  /// ```
+  CristalyseChart onPan(PanCallback callback, {Duration? throttle}) {
+    _interaction = ChartInteraction(
+      pan: PanConfig(
+        enabled: true,
+        onPanUpdate: callback,
+        throttle: throttle ?? const Duration(milliseconds: 100),
+      ),
       enabled: true,
     );
     return this;

@@ -65,6 +65,11 @@ class _AnimatedCristalyseChartWidgetState
   InteractionDetector? _interactionDetector;
 
   TooltipController? _cachedTooltipController;
+  
+  /// Pan state tracking
+  DateTime? _lastPanCallback;
+  Offset? _panStartPosition;
+  Offset? _panCurrentPosition;
 
   @override
   void initState() {
@@ -165,47 +170,86 @@ class _AnimatedCristalyseChartWidgetState
     }
   }
 
+  void _handlePanStart(BuildContext panContext, DragStartDetails details, Rect plotArea) {
+    _panStartPosition = details.localPosition;
+    _panCurrentPosition = details.localPosition;
+    
+    // Handle pan start callback
+    if (widget.interaction.pan?.enabled == true && widget.interaction.pan?.onPanStart != null) {
+      final panInfo = _calculatePanInfo(plotArea, PanState.start, details.localPosition);
+      widget.interaction.pan!.onPanStart!(panInfo);
+    }
+  }
+
   void _handlePanUpdate(BuildContext panContext, DragUpdateDetails details, Rect plotArea) {
-    if (!widget.interaction.enabled ||
-        (widget.interaction.hover?.onHover == null &&
-            widget.interaction.tooltip?.builder == null)) {
+    final panConfig = widget.interaction.pan;
+    final hasTooltips = widget.interaction.hover?.onHover != null || widget.interaction.tooltip?.builder != null;
+    
+    if (!widget.interaction.enabled || (panConfig?.enabled != true && !hasTooltips)) {
       return;
     }
 
-    if (_interactionDetector == null) {
-      _setupInteractionDetector(plotArea);
+    _panCurrentPosition = details.localPosition;
+
+    // Handle pan update callback with throttling
+    if (panConfig?.enabled == true && panConfig?.onPanUpdate != null) {
+      final now = DateTime.now();
+      if (_lastPanCallback == null || 
+          now.difference(_lastPanCallback!) >= panConfig!.throttle) {
+        _lastPanCallback = now;
+        final panInfo = _calculatePanInfo(plotArea, PanState.update, details.localPosition, details.delta);
+        panConfig!.onPanUpdate!(panInfo);
+      }
     }
 
-    // Use even larger radius for touch interactions
-    final hitRadius = math.max(
-      widget.interaction.hover?.hitTestRadius ?? 30.0,
-      35.0, // Even more generous for touch
-    );
+    // Handle tooltip/hover interactions (existing logic)
+    if (hasTooltips) {
+      if (_interactionDetector == null) {
+        _setupInteractionDetector(plotArea);
+      }
 
-    final point = _interactionDetector!.detectPoint(
-      details.localPosition,
-      maxDistance: hitRadius,
-    );
+      // Use even larger radius for touch interactions
+      final hitRadius = math.max(
+        widget.interaction.hover?.hitTestRadius ?? 30.0,
+        35.0, // Even more generous for touch
+      );
 
-    // Convert local position to global for tooltip positioning
-    final RenderBox renderBox = panContext.findRenderObject() as RenderBox;
-    final Offset globalPosition = renderBox.localToGlobal(details.localPosition);
+      final point = _interactionDetector!.detectPoint(
+        details.localPosition,
+        maxDistance: hitRadius,
+      );
 
-    // Handle hover callbacks
-    widget.interaction.hover?.onHover?.call(point);
+      // Convert local position to global for tooltip positioning
+      final RenderBox renderBox = panContext.findRenderObject() as RenderBox;
+      final Offset globalPosition = renderBox.localToGlobal(details.localPosition);
 
-    // Handle tooltips
-    if (widget.interaction.tooltip?.builder != null) {
-      if (point != null && widget.interaction.tooltip!.followPointer) {
-        showTooltip(panContext, point, globalPosition);
-      } else if (point == null) {
-        hideTooltip(panContext);
+      // Handle hover callbacks
+      widget.interaction.hover?.onHover?.call(point);
+
+      // Handle tooltips
+      if (widget.interaction.tooltip?.builder != null) {
+        if (point != null && widget.interaction.tooltip!.followPointer) {
+          showTooltip(panContext, point, globalPosition);
+        } else if (point == null) {
+          hideTooltip(panContext);
+        }
       }
     }
   }
 
-  void _handlePanEnd(BuildContext panEndContext, DragEndDetails details) {
+  void _handlePanEnd(BuildContext panEndContext, DragEndDetails details, Rect plotArea) {
     if (!widget.interaction.enabled) return;
+
+    // Handle pan end callback
+    if (widget.interaction.pan?.enabled == true && widget.interaction.pan?.onPanEnd != null) {
+      final panInfo = _calculatePanInfo(plotArea, PanState.end, _panCurrentPosition ?? Offset.zero);
+      widget.interaction.pan!.onPanEnd!(panInfo);
+    }
+
+    // Reset pan tracking
+    _panStartPosition = null;
+    _panCurrentPosition = null;
+    _lastPanCallback = null;
 
     widget.interaction.hover?.onExit?.call(null);
 
@@ -345,8 +389,9 @@ class _AnimatedCristalyseChartWidgetState
         onHover: (event) => _handleMouseHover(context, event, plotArea),
         onExit: (event) => _handleMouseExit(context, event),
         child: GestureDetector(
+          onPanStart: (details) => _handlePanStart(context, details, plotArea),
           onPanUpdate: (details) => _handlePanUpdate(context, details, plotArea),
-          onPanEnd: (details) => _handlePanEnd(context, details),
+          onPanEnd: (details) => _handlePanEnd(context, details, plotArea),
           onTapUp: (details) => _handleTap(context, details, plotArea),
           child: chart,
         ),
@@ -647,6 +692,56 @@ class _AnimatedCristalyseChartWidgetState
     if (value is num) return value.toDouble();
     if (value is String) return double.tryParse(value);
     return null;
+  }
+  
+  /// Calculate pan information for callbacks
+  PanInfo _calculatePanInfo(Rect plotArea, PanState state, Offset currentPosition, [Offset? delta]) {
+    // Calculate visible X range by inverting screen coordinates to data coordinates
+    final xScale = _setupXScale(
+      plotArea.width,
+      widget.geometries.any((g) => g is BarGeometry),
+    );
+    final yScale = _setupYScale(
+      plotArea.height,
+      widget.geometries.any((g) => g is BarGeometry),
+      YAxis.primary,
+    );
+    
+    double? visibleMinX, visibleMaxX, visibleMinY, visibleMaxY;
+    
+    try {
+      if (widget.coordFlipped) {
+        // Horizontal charts: X becomes Y, Y becomes X
+        visibleMinY = yScale.invert(0);
+        visibleMaxY = yScale.invert(plotArea.height);
+        visibleMinX = xScale.invert(plotArea.width);
+        visibleMaxX = xScale.invert(0);
+      } else {
+        // Normal charts
+        visibleMinX = xScale.invert(0);
+        visibleMaxX = xScale.invert(plotArea.width);
+        visibleMinY = yScale.invert(plotArea.height);
+        visibleMaxY = yScale.invert(0);
+      }
+    } catch (e) {
+      // If scales don't support invert (like OrdinalScale in some cases),
+      // provide null values
+      debugPrint('Could not calculate pan range: $e');
+    }
+    
+    final totalDelta = _panStartPosition != null 
+        ? currentPosition - _panStartPosition!
+        : null;
+    
+    return PanInfo(
+      visibleMinX: visibleMinX,
+      visibleMaxX: visibleMaxX,
+      visibleMinY: visibleMinY,
+      visibleMaxY: visibleMaxY,
+      state: state,
+      delta: delta,
+      totalDelta: totalDelta,
+    );
   }
 }
 
