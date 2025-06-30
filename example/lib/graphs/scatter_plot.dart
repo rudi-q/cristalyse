@@ -17,7 +17,7 @@ Widget buildScatterPlotTab(ChartTheme currentTheme,
               .data(data)
               .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
               .geomPoint(alpha: 0.8)
-              .scaleXContinuous(min: 0, max: 50)
+              .scaleXContinuous()
               .scaleYContinuous()
               .theme(currentTheme.copyWith(
                 pointSizeMax: 2.0 + sliderValue * 20.0,

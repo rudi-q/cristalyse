@@ -1,3 +1,23 @@
+## 0.6.2 - 2025-06-26
+
+### Added
+- **Comprehensive Test Suite**: Restored complete test coverage with 81+ test cases across multiple files
+  - `interaction_test.dart`: Interactive features testing for all chart types (scatter, line, bar, grouped, stacked, horizontal, dual Y-axis)
+  - `performance_test.dart`: Large dataset performance testing (1000+ points), memory management, and animation performance
+  - `tooltip_test.dart`: Tooltip system testing with default builders, custom configurations, and business use cases
+  - Edge case testing for empty data, null values, disabled interactions, and rapid theme changes
+
+### Fixed
+- **Critical Tooltip Crash**: Fixed animation reset crash during widget disposal in tooltip system
+- **Test Coverage**: All 81 tests now passing with comprehensive coverage across the codebase
+- **Memory Leaks**: Improved tooltip lifecycle management to prevent memory leaks during disposal
+
+### Technical
+- Enhanced tooltip widget disposal process to prevent animation controller crashes
+- Maintained compatibility with previous tooltip rendering improvements from commit 3ed06f9
+- Added stress testing for rapid interaction changes and theme switching
+- Improved test reliability across different chart configurations
+
 ## 0.6.1 - 2025-06-21
 
 ### Fixed
