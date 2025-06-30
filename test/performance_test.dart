@@ -547,7 +547,7 @@ void main() {
                       builder: (point) => Text('Conflict test: ${point.getDisplayValue('y')}'),
                     ),
                     click: ClickConfig(
-                      onTap: (point) => print('Chart tapped'),
+                      onTap: (point) => debugPrint('Chart tapped'),
                     ),
                   )
                   .build(),
