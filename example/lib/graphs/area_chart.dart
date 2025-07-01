@@ -51,9 +51,10 @@ class _AreaChartExampleState extends State<AreaChartExample> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
         const Text(
           'Area Chart - Website Traffic',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
@@ -286,6 +287,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
               .build(),
         ),
       ],
+      ),
     );
   }
 
