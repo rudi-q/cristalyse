@@ -356,12 +356,52 @@ CristalyseChart()
 - **Large dataset support** - Optimized for 1000+ data points
 - **Real-time updates** - Smooth transitions when data changes
 
+## 📸 Chart Export
+
+**Export your charts as high-quality PNG or SVG images** for reports, presentations, and documentation.
+
+```dart
+// Simple PNG export
+final result = await chart.exportAsPng(
+  width: 1200,
+  height: 800,
+  filename: 'sales_report',
+  quality: 0.95,
+);
+print('Chart saved to: ${result.filePath}');
+
+// SVG export for scalable graphics
+final svgResult = await chart.exportAsSvg(
+  width: 1200,
+  height: 800,
+  filename: 'revenue_chart',
+);
+
+// Advanced configuration
+final config = ExportConfig(
+  width: 1920,
+  height: 1080,
+  format: ExportFormat.png,
+  quality: 1.0,
+  transparentBackground: true,
+  filename: 'high_res_dashboard',
+);
+final result = await chart.export(config);
+```
+
+**Export Features:**
+- ✅ **PNG Export** - High-quality raster images with customizable resolution
+- ✅ **SVG Export** - Scalable vector graphics for presentations
+- ✅ **Transparent Backgrounds** - Perfect for overlaying on other content
+- ✅ **Custom Resolution** - Export at any size up to 4K and beyond
+- ✅ **Quality Control** - Adjustable compression for optimal file sizes
+- ✅ **Automatic File Management** - Saves to Documents directory with timestamp
+
 ### 🚧 Coming Soon (Next Releases)
-- Area charts with stacking and filling options
 - Statistical overlays (regression lines, confidence intervals)
-- Interactive pan and zoom capabilities
+- Interactive zoom capabilities with scale persistence
 - Faceting for small multiples and grid layouts
-- Export to PNG/SVG with high-DPI support
+- Enhanced SVG export with full chart rendering
 
 ## 🎯 Real-World Examples
 

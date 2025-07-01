@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../export/chart_export.dart';
 import '../interaction/chart_interactions.dart';
 import '../themes/chart_theme.dart';
 import '../widgets/animated_chart_widget.dart';
@@ -368,6 +369,89 @@ class CristalyseChart {
       enabled: true,
     );
     return this;
+  }
+
+  /// Export the chart as PNG image
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await chart.exportAsPng(
+  ///   width: 1200,
+  ///   height: 800,
+  ///   filename: 'sales_chart',
+  ///   transparentBackground: true,
+  /// );
+  /// print('Chart exported to: ${result.filePath}');
+  /// ```
+  Future<ExportResult> exportAsPng({
+    double width = 800,
+    double height = 600,
+    double quality = 1.0,
+    Color? backgroundColor,
+    String? filename,
+    String? customPath,
+    bool transparentBackground = false,
+  }) async {
+    final chartWidget = build();
+    return chartWidget.exportAsPng(
+      width: width,
+      height: height,
+      quality: quality,
+      backgroundColor: backgroundColor ?? _theme.backgroundColor,
+      filename: filename,
+      customPath: customPath,
+      transparentBackground: transparentBackground,
+    );
+  }
+
+  /// Export the chart as SVG image
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await chart.exportAsSvg(
+  ///   width: 1200,
+  ///   height: 800,
+  ///   filename: 'sales_chart',
+  /// );
+  /// print('Chart exported to: ${result.filePath}');
+  /// ```
+  Future<ExportResult> exportAsSvg({
+    double width = 800,
+    double height = 600,
+    Color? backgroundColor,
+    String? filename,
+    String? customPath,
+  }) async {
+    final chartWidget = build();
+    return chartWidget.exportAsSvg(
+      width: width,
+      height: height,
+      backgroundColor: backgroundColor ?? _theme.backgroundColor,
+      filename: filename,
+      customPath: customPath,
+    );
+  }
+
+  /// Export the chart with custom configuration
+  ///
+  /// Example:
+  /// ```dart
+  /// final config = ExportConfig(
+  ///   width: 1920,
+  ///   height: 1080,
+  ///   format: ExportFormat.png,
+  ///   quality: 0.95,
+  ///   filename: 'high_res_chart',
+  /// );
+  /// final result = await chart.export(config);
+  /// ```
+  Future<ExportResult> export(ExportConfig config, {String? customPath}) async {
+    final chartWidget = build();
+    return ChartExporter.exportChart(
+      chartWidget: chartWidget,
+      config: config,
+      customPath: customPath,
+    );
   }
 
   /// Build the chart widget

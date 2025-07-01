@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'graphs/area_chart.dart';
 import 'graphs/bar_chart.dart';
 import 'graphs/dual_axis_chart.dart';
+import 'graphs/export_demo.dart';
 import 'graphs/grouped_bar.dart';
 import 'graphs/horizontal_bar_chart.dart';
 import 'graphs/interactive_scatter.dart';
@@ -112,7 +113,7 @@ class _ExampleHomeState extends State<ExampleHome>
   void initState() {
     super.initState();
     _tabController =
-        TabController(length: 10, vsync: this); // Updated to 10 tabs
+        TabController(length: 11, vsync: this); // Updated to 11 tabs
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -347,9 +348,9 @@ class _ExampleHomeState extends State<ExampleHome>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
+        color: color.withAlpha(26),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
+        border: Border.all(color: color.withAlpha(51)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -397,7 +398,7 @@ class _ExampleHomeState extends State<ExampleHome>
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
+                    color: Colors.black.withAlpha(26),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -561,6 +562,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Horizontal Bars'),
             Tab(text: 'Stacked Bars'),
             Tab(text: 'Dual Y-Axis'),
+            Tab(text: 'Export'), // New export tab
           ],
         ),
       ),
@@ -707,6 +709,22 @@ class _ExampleHomeState extends State<ExampleHome>
                         'Correlation', '0.73', '+0.12', Colors.purple),
                   ],
                 ),
+                _buildChartPage(
+                  'Chart Export Demo',
+                  'Export your charts as high-quality PNG or SVG images for reports and presentations',
+                  ExportDemo(
+                    theme: currentTheme,
+                    colorPalette: _colorPalettes[_currentPaletteIndex],
+                  ),
+                  [
+                    _buildStatsCard(
+                        'Export Formats', '2', 'PNG & SVG', Colors.blue),
+                    _buildStatsCard(
+                        'Max Resolution', '1920p', 'High-DPI', Colors.green),
+                    _buildStatsCard(
+                        'Quality', '100%', 'Lossless', Colors.purple),
+                  ],
+                ),
               ],
             ),
           ),
@@ -800,7 +818,7 @@ class _ExampleHomeState extends State<ExampleHome>
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Colors.black.withAlpha(26),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),
@@ -821,7 +839,7 @@ class _ExampleHomeState extends State<ExampleHome>
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                color: Theme.of(context).dividerColor.withAlpha(26),
               ),
             ),
             child: Column(
@@ -960,6 +978,13 @@ class _ExampleHomeState extends State<ExampleHome>
           'Independent left and right axis scaling',
           'Combined bar and line visualizations',
           'Perfect for correlating volume vs efficiency metrics'
+        ];
+      case 10: // Export demo
+        return [
+          'Export charts as high-quality PNG or SVG images',
+          'Customizable resolution and quality settings',
+          'Transparent background support for presentations',
+          'Perfect for reports, presentations, and documentation'
         ];
       default:
         return [];
