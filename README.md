@@ -496,7 +496,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.7.0** - Production ready with dual Y-axis support and interactive panning & tooltips
+**Current Version: 0.8.0** - Production ready with comprehensive area chart support and full interactive capabilities
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -507,7 +507,8 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v0.5.0** - **Dual Y-axis support** and advanced bar chart variations
 - ✅ **v0.6.0** - Interactive tooltips
 - ✅ **v0.7.0** - Interactive panning
-- 🚧 **v0.8.0** - Interactive zooming
+- ✅ **v0.8.0** - **Area chart support** with animations and multi-series capabilities
+- 🚧 **v0.9.0** - Interactive zooming
 
 ## 🤝 Contributing
 

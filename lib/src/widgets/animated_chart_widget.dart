@@ -2156,9 +2156,10 @@ class _AnimatedChartPainter extends CustomPainter {
 
       // Draw filled area if enabled
       if (geometry.fillArea) {
-        final fillPaint = Paint()
-          ..color = color.withAlpha((geometry.alpha * 255).round())
-          ..style = PaintingStyle.fill;
+        final fillPaint =
+            Paint()
+              ..color = color.withAlpha((geometry.alpha * 255).round())
+              ..style = PaintingStyle.fill;
         canvas.drawPath(areaPath, fillPaint);
       }
 
@@ -2171,7 +2172,8 @@ class _AnimatedChartPainter extends CustomPainter {
           strokePath.lineTo(points[i + 1].dx, points[i + 1].dy);
         }
 
-        if (partialSegmentProgress > 0.001 && fullyDrawnSegments < numSegments) {
+        if (partialSegmentProgress > 0.001 &&
+            fullyDrawnSegments < numSegments) {
           final Offset lastFullPoint = points[fullyDrawnSegments];
           final Offset nextPoint = points[fullyDrawnSegments + 1];
 
@@ -2184,12 +2186,13 @@ class _AnimatedChartPainter extends CustomPainter {
           strokePath.lineTo(dx, dy);
         }
 
-        final strokePaint = Paint()
-          ..color = color.withAlpha(255) // Full opacity for stroke
-          ..strokeWidth = geometry.strokeWidth
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round;
+        final strokePaint =
+            Paint()
+              ..color = color.withAlpha(255) // Full opacity for stroke
+              ..strokeWidth = geometry.strokeWidth
+              ..style = PaintingStyle.stroke
+              ..strokeCap = StrokeCap.round
+              ..strokeJoin = StrokeJoin.round;
 
         canvas.drawPath(strokePath, strokePaint);
       }

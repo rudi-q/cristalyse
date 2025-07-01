@@ -1,3 +1,80 @@
+## 0.8.0 - 2025-07-02
+
+- **Major Feature: Area Chart Support**
+  - Added comprehensive `AreaGeometry` class with customizable stroke width, fill opacity, and styling options
+  - Implemented `geomArea()` method following grammar of graphics patterns for seamless API integration
+  - Progressive area chart animations with smooth fill transitions revealing data over time
+  - Full support for multi-series area charts with automatic color mapping and overlapping transparency
+  - Dual Y-axis compatibility for complex business dashboards combining area charts with other geometries
+  - Combined visualizations: area + line + point charts for enhanced data storytelling
+  - Interactive tooltip support with hover detection optimized for area chart geometries
+  - Ordinal and continuous X-scale compatibility maintaining consistency with existing chart types
+
+- **Enhanced Example App**
+  - Added comprehensive "Area Chart" tab showcasing three distinct area chart implementations
+  - Single area chart example with website traffic analytics and smooth fill animations
+  - Multi-series area chart demonstrating mobile vs desktop traffic with color-coded transparency
+  - Combined area + line + point visualization showing layered data representation techniques
+  - Full theme integration with color palette toggling support across all area chart variants
+  - Interactive tooltips with custom styling and platform-specific data display
+
+- **Technical Improvements**
+  - Efficient area path rendering with baseline calculation and progressive animation support
+  - Memory-optimized rendering pipeline leveraging existing line chart infrastructure
+  - Comprehensive test coverage with 85+ passing tests including new area chart interaction tests
+  - Backward compatibility maintained - zero breaking changes to existing API surface
+  - Performance optimizations for large datasets with smooth 60fps area fill animations
+
+#### 📖 Examples Added
+
+```dart
+// Basic Area Chart with Custom Styling
+CristalyseChart()
+  .data(trafficData)
+  .mapping(x: 'month', y: 'visitors')
+  .geomArea(
+    strokeWidth: 2.0,
+    alpha: 0.3,
+    fillArea: true,
+    color: Colors.blue,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .animate(duration: Duration(milliseconds: 1200))
+  .build();
+
+// Multi-Series Area Chart
+CristalyseChart()
+  .data(platformData)
+  .mapping(x: 'month', y: 'users', color: 'platform')
+  .geomArea(strokeWidth: 1.5, alpha: 0.4)
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) => CustomTooltip(point: point),
+    ),
+  )
+  .build();
+
+// Combined Area + Line + Points
+CristalyseChart()
+  .data(analyticsData)
+  .mapping(x: 'date', y: 'value')
+  .geomArea(alpha: 0.2, strokeWidth: 0)     // Background fill
+  .geomLine(strokeWidth: 3.0)               // Trend line
+  .geomPoint(size: 6.0)                     // Data points
+  .build();
+
+// Dual Y-Axis Area Charts
+CristalyseChart()
+  .data(businessData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .mappingY2('efficiency')
+  .geomArea(yAxis: YAxis.primary, alpha: 0.3)
+  .geomArea(yAxis: YAxis.secondary, alpha: 0.3)
+  .scaleY2Continuous(min: 0, max: 100)
+  .build();
+```
+
 ## 0.7.0 - 2025-06-30
 
 - **Major Feature: Enhanced Interactive Panning System**

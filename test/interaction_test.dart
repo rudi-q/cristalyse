@@ -41,20 +41,21 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(sampleData)
-                .mapping(x: 'x', y: 'y', color: 'category')
-                .geomPoint(size: 8.0)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) {
-                      tooltipShown = true;
-                      hoveredPoint = point;
-                      return Text('Value: ${point.getDisplayValue('y')}');
-                    },
-                  ),
-                )
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(sampleData)
+                    .mapping(x: 'x', y: 'y', color: 'category')
+                    .geomPoint(size: 8.0)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder: (point) {
+                          tooltipShown = true;
+                          hoveredPoint = point;
+                          return Text('Value: ${point.getDisplayValue('y')}');
+                        },
+                      ),
+                    )
+                    .build(),
           ),
         );
 
@@ -66,7 +67,9 @@ void main() {
         expect(chartFinder, findsWidgets);
 
         // Simulate hover near a data point (approximate center of chart)
-        final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+        final gesture = await tester.createGesture(
+          kind: PointerDeviceKind.mouse,
+        );
         await gesture.addPointer(location: Offset.zero);
         addTearDown(gesture.removePointer);
 
@@ -76,7 +79,7 @@ void main() {
         // Note: In actual usage, tooltip would show, but in tests we can verify
         // the interaction system is set up correctly by checking the chart builds
         expect(chartFinder, findsWidgets);
-        
+
         // Variables are used in closure but linter may not detect it
         // ignore: unused_local_variable
         expect(tooltipShown, isA<bool>());
@@ -90,18 +93,19 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(sampleData)
-                .mapping(x: 'x', y: 'y')
-                .geomPoint(size: 10.0)
-                .interaction(
-                  click: ClickConfig(
-                    onTap: (point) {
-                      clickedPoint = point;
-                    },
-                  ),
-                )
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(sampleData)
+                    .mapping(x: 'x', y: 'y')
+                    .geomPoint(size: 10.0)
+                    .interaction(
+                      click: ClickConfig(
+                        onTap: (point) {
+                          clickedPoint = point;
+                        },
+                      ),
+                    )
+                    .build(),
           ),
         );
 
@@ -114,28 +118,34 @@ void main() {
 
         // Chart should build successfully with click interactions
         expect(chartFinder, findsWidgets);
-        
+
         // Variable is used in closure but linter may not detect it
         // ignore: unused_local_variable
         expect(clickedPoint, isA<DataPointInfo?>());
       });
 
-      testWidgets('should combine tooltips and clicks', (WidgetTester tester) async {
+      testWidgets('should combine tooltips and clicks', (
+        WidgetTester tester,
+      ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(sampleData)
-                .mapping(x: 'x', y: 'y', color: 'category')
-                .geomPoint()
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('${point.getDisplayValue('category')}: ${point.getDisplayValue('y')}'),
-                  ),
-                  click: ClickConfig(
-                    onTap: (point) => debugPrint('Clicked: ${point.data}'),
-                  ),
-                )
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(sampleData)
+                    .mapping(x: 'x', y: 'y', color: 'category')
+                    .geomPoint()
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Text(
+                              '${point.getDisplayValue('category')}: ${point.getDisplayValue('y')}',
+                            ),
+                      ),
+                      click: ClickConfig(
+                        onTap: (point) => debugPrint('Clicked: ${point.data}'),
+                      ),
+                    )
+                    .build(),
           ),
         );
 
@@ -147,22 +157,28 @@ void main() {
     });
 
     group('Line Chart Interactions', () {
-      testWidgets('should support hover on line charts', (WidgetTester tester) async {
+      testWidgets('should support hover on line charts', (
+        WidgetTester tester,
+      ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(lineData)
-                .mapping(x: 'month', y: 'users')
-                .geomLine(strokeWidth: 2.0)
-                .geomPoint(size: 6.0) // Add points for easier interaction
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('${point.getDisplayValue('month')}: ${point.getDisplayValue('users')} users'),
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous()
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(lineData)
+                    .mapping(x: 'month', y: 'users')
+                    .geomLine(strokeWidth: 2.0)
+                    .geomPoint(size: 6.0) // Add points for easier interaction
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Text(
+                              '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')} users',
+                            ),
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous()
+                    .build(),
           ),
         );
 
@@ -172,7 +188,9 @@ void main() {
         expect(find.byType(CustomPaint), findsWidgets);
       });
 
-      testWidgets('should support multi-series line interactions', (WidgetTester tester) async {
+      testWidgets('should support multi-series line interactions', (
+        WidgetTester tester,
+      ) async {
         final multiSeriesData = [
           {'month': 'Jan', 'users': 100.0, 'platform': 'Mobile'},
           {'month': 'Jan', 'users': 80.0, 'platform': 'Web'},
@@ -182,25 +200,29 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(multiSeriesData)
-                .mapping(x: 'month', y: 'users', color: 'platform')
-                .geomLine(strokeWidth: 3.0)
-                .geomPoint(size: 8.0)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(point.getDisplayValue('platform')),
-                        Text('${point.getDisplayValue('month')}: ${point.getDisplayValue('users')}'),
-                      ],
-                    ),
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous()
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(multiSeriesData)
+                    .mapping(x: 'month', y: 'users', color: 'platform')
+                    .geomLine(strokeWidth: 3.0)
+                    .geomPoint(size: 8.0)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(point.getDisplayValue('platform')),
+                                Text(
+                                  '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')}',
+                                ),
+                              ],
+                            ),
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous()
+                    .build(),
           ),
         );
 
@@ -212,21 +234,27 @@ void main() {
     });
 
     group('Area Chart Interactions', () {
-      testWidgets('should support hover on area charts', (WidgetTester tester) async {
+      testWidgets('should support hover on area charts', (
+        WidgetTester tester,
+      ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(lineData)
-                .mapping(x: 'month', y: 'users')
-                .geomArea(strokeWidth: 2.0, alpha: 0.3)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('${point.getDisplayValue('month')}: ${point.getDisplayValue('users')} users'),
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous()
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(lineData)
+                    .mapping(x: 'month', y: 'users')
+                    .geomArea(strokeWidth: 2.0, alpha: 0.3)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Text(
+                              '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')} users',
+                            ),
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous()
+                    .build(),
           ),
         );
 
@@ -236,7 +264,9 @@ void main() {
         expect(find.byType(CustomPaint), findsWidgets);
       });
 
-      testWidgets('should support multi-series area interactions', (WidgetTester tester) async {
+      testWidgets('should support multi-series area interactions', (
+        WidgetTester tester,
+      ) async {
         final multiSeriesData = [
           {'month': 'Jan', 'users': 100.0, 'platform': 'Mobile'},
           {'month': 'Jan', 'users': 80.0, 'platform': 'Web'},
@@ -246,24 +276,28 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(multiSeriesData)
-                .mapping(x: 'month', y: 'users', color: 'platform')
-                .geomArea(strokeWidth: 2.0, alpha: 0.3)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(point.getDisplayValue('platform')),
-                        Text('${point.getDisplayValue('month')}: ${point.getDisplayValue('users')}'),
-                      ],
-                    ),
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous()
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(multiSeriesData)
+                    .mapping(x: 'month', y: 'users', color: 'platform')
+                    .geomArea(strokeWidth: 2.0, alpha: 0.3)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(point.getDisplayValue('platform')),
+                                Text(
+                                  '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')}',
+                                ),
+                              ],
+                            ),
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous()
+                    .build(),
           ),
         );
 
@@ -273,7 +307,9 @@ void main() {
         expect(find.byType(CustomPaint), findsWidgets);
       });
 
-      testWidgets('should support area charts with dual Y-axis', (WidgetTester tester) async {
+      testWidgets('should support area charts with dual Y-axis', (
+        WidgetTester tester,
+      ) async {
         final dualAxisData = [
           {'month': 'Jan', 'revenue': 100.0, 'conversion': 15.0},
           {'month': 'Feb', 'revenue': 120.0, 'conversion': 18.0},
@@ -282,33 +318,42 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(dualAxisData)
-                .mapping(x: 'month', y: 'revenue')
-                .mappingY2('conversion')
-                .geomArea(yAxis: YAxis.primary, alpha: 0.3)
-                .geomArea(yAxis: YAxis.secondary, alpha: 0.3)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) {
-                      final hasRevenue = point.data.containsKey('revenue');
-                      final hasConversion = point.data.containsKey('conversion');
-                      
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(point.getDisplayValue('month')),
-                          if (hasRevenue) Text('Revenue: \$${point.getDisplayValue('revenue')}k'),
-                          if (hasConversion) Text('Conversion: ${point.getDisplayValue('conversion')}%'),
-                        ],
-                      );
-                    },
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous(min: 0)
-                .scaleY2Continuous(min: 0, max: 30)
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(dualAxisData)
+                    .mapping(x: 'month', y: 'revenue')
+                    .mappingY2('conversion')
+                    .geomArea(yAxis: YAxis.primary, alpha: 0.3)
+                    .geomArea(yAxis: YAxis.secondary, alpha: 0.3)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder: (point) {
+                          final hasRevenue = point.data.containsKey('revenue');
+                          final hasConversion = point.data.containsKey(
+                            'conversion',
+                          );
+
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(point.getDisplayValue('month')),
+                              if (hasRevenue)
+                                Text(
+                                  'Revenue: \$${point.getDisplayValue('revenue')}k',
+                                ),
+                              if (hasConversion)
+                                Text(
+                                  'Conversion: ${point.getDisplayValue('conversion')}%',
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous(min: 0)
+                    .scaleY2Continuous(min: 0, max: 30)
+                    .build(),
           ),
         );
 
@@ -320,21 +365,27 @@ void main() {
     });
 
     group('Bar Chart Interactions', () {
-      testWidgets('should support hover on bar charts', (WidgetTester tester) async {
+      testWidgets('should support hover on bar charts', (
+        WidgetTester tester,
+      ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(barData)
-                .mapping(x: 'quarter', y: 'revenue')
-                .geomBar(width: 0.8)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k'),
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous(min: 0)
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(barData)
+                    .mapping(x: 'quarter', y: 'revenue')
+                    .geomBar(width: 0.8)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Text(
+                              '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
+                            ),
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous(min: 0)
+                    .build(),
           ),
         );
 
@@ -344,7 +395,9 @@ void main() {
         expect(find.byType(CustomPaint), findsWidgets);
       });
 
-      testWidgets('should support grouped bar interactions', (WidgetTester tester) async {
+      testWidgets('should support grouped bar interactions', (
+        WidgetTester tester,
+      ) async {
         final groupedData = [
           {'quarter': 'Q1', 'revenue': 100.0, 'product': 'A'},
           {'quarter': 'Q1', 'revenue': 80.0, 'product': 'B'},
@@ -354,24 +407,30 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(groupedData)
-                .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                .geomBar(style: BarStyle.grouped, width: 0.8)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Product ${point.getDisplayValue('product')}'),
-                        Text('${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k'),
-                      ],
-                    ),
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous(min: 0)
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(groupedData)
+                    .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                    .geomBar(style: BarStyle.grouped, width: 0.8)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Product ${point.getDisplayValue('product')}',
+                                ),
+                                Text(
+                                  '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
+                                ),
+                              ],
+                            ),
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous(min: 0)
+                    .build(),
           ),
         );
 
@@ -381,7 +440,9 @@ void main() {
         expect(find.byType(CustomPaint), findsWidgets);
       });
 
-      testWidgets('should support stacked bar interactions', (WidgetTester tester) async {
+      testWidgets('should support stacked bar interactions', (
+        WidgetTester tester,
+      ) async {
         final stackedData = [
           {'quarter': 'Q1', 'revenue': 60.0, 'category': 'Product'},
           {'quarter': 'Q1', 'revenue': 40.0, 'category': 'Services'},
@@ -391,18 +452,22 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(stackedData)
-                .mapping(x: 'quarter', y: 'revenue', color: 'category')
-                .geomBar(style: BarStyle.stacked, width: 0.8)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('${point.getDisplayValue('category')}: \$${point.getDisplayValue('revenue')}k'),
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous(min: 0)
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(stackedData)
+                    .mapping(x: 'quarter', y: 'revenue', color: 'category')
+                    .geomBar(style: BarStyle.stacked, width: 0.8)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Text(
+                              '${point.getDisplayValue('category')}: \$${point.getDisplayValue('revenue')}k',
+                            ),
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous(min: 0)
+                    .build(),
           ),
         );
 
@@ -412,22 +477,28 @@ void main() {
         expect(find.byType(CustomPaint), findsWidgets);
       });
 
-      testWidgets('should support horizontal bar interactions', (WidgetTester tester) async {
+      testWidgets('should support horizontal bar interactions', (
+        WidgetTester tester,
+      ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(barData)
-                .mapping(x: 'quarter', y: 'revenue')
-                .geomBar()
-                .coordFlip()
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k'),
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous(min: 0)
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(barData)
+                    .mapping(x: 'quarter', y: 'revenue')
+                    .geomBar()
+                    .coordFlip()
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Text(
+                              '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
+                            ),
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous(min: 0)
+                    .build(),
           ),
         );
 
@@ -439,7 +510,9 @@ void main() {
     });
 
     group('Dual Y-Axis Interactions', () {
-      testWidgets('should support interactions on dual y-axis charts', (WidgetTester tester) async {
+      testWidgets('should support interactions on dual y-axis charts', (
+        WidgetTester tester,
+      ) async {
         final dualAxisData = [
           {'month': 'Jan', 'revenue': 100.0, 'conversion': 15.0},
           {'month': 'Feb', 'revenue': 120.0, 'conversion': 18.0},
@@ -448,35 +521,44 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(dualAxisData)
-                .mapping(x: 'month', y: 'revenue')
-                .mappingY2('conversion')
-                .geomBar(yAxis: YAxis.primary)
-                .geomLine(yAxis: YAxis.secondary, strokeWidth: 3.0)
-                .geomPoint(yAxis: YAxis.secondary, size: 8.0)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) {
-                      // Smart tooltip that shows relevant data based on geometry
-                      final hasRevenue = point.data.containsKey('revenue');
-                      final hasConversion = point.data.containsKey('conversion');
-                      
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(point.getDisplayValue('month')),
-                          if (hasRevenue) Text('Revenue: \$${point.getDisplayValue('revenue')}k'),
-                          if (hasConversion) Text('Conversion: ${point.getDisplayValue('conversion')}%'),
-                        ],
-                      );
-                    },
-                  ),
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous(min: 0)
-                .scaleY2Continuous(min: 0, max: 30)
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(dualAxisData)
+                    .mapping(x: 'month', y: 'revenue')
+                    .mappingY2('conversion')
+                    .geomBar(yAxis: YAxis.primary)
+                    .geomLine(yAxis: YAxis.secondary, strokeWidth: 3.0)
+                    .geomPoint(yAxis: YAxis.secondary, size: 8.0)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder: (point) {
+                          // Smart tooltip that shows relevant data based on geometry
+                          final hasRevenue = point.data.containsKey('revenue');
+                          final hasConversion = point.data.containsKey(
+                            'conversion',
+                          );
+
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(point.getDisplayValue('month')),
+                              if (hasRevenue)
+                                Text(
+                                  'Revenue: \$${point.getDisplayValue('revenue')}k',
+                                ),
+                              if (hasConversion)
+                                Text(
+                                  'Conversion: ${point.getDisplayValue('conversion')}%',
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    )
+                    .scaleXOrdinal()
+                    .scaleYContinuous(min: 0)
+                    .scaleY2Continuous(min: 0, max: 30)
+                    .build(),
           ),
         );
 
@@ -488,25 +570,34 @@ void main() {
     });
 
     group('Combined Chart Interactions', () {
-      testWidgets('should support interactions on combined geometries', (WidgetTester tester) async {
+      testWidgets('should support interactions on combined geometries', (
+        WidgetTester tester,
+      ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(sampleData)
-                .mapping(x: 'x', y: 'y', color: 'category')
-                .geomLine(strokeWidth: 2.0, alpha: 0.8)
-                .geomPoint(size: 6.0, alpha: 1.0)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('${point.getDisplayValue('category')}: (${point.getDisplayValue('x')}, ${point.getDisplayValue('y')})'),
-                  ),
-                  click: ClickConfig(
-                    onTap: (point) => debugPrint('Combined chart clicked: ${point.data}'),
-                  ),
-                )
-                .scaleXContinuous()
-                .scaleYContinuous()
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(sampleData)
+                    .mapping(x: 'x', y: 'y', color: 'category')
+                    .geomLine(strokeWidth: 2.0, alpha: 0.8)
+                    .geomPoint(size: 6.0, alpha: 1.0)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Text(
+                              '${point.getDisplayValue('category')}: (${point.getDisplayValue('x')}, ${point.getDisplayValue('y')})',
+                            ),
+                      ),
+                      click: ClickConfig(
+                        onTap:
+                            (point) => debugPrint(
+                              'Combined chart clicked: ${point.data}',
+                            ),
+                      ),
+                    )
+                    .scaleXContinuous()
+                    .scaleYContinuous()
+                    .build(),
           ),
         );
 
@@ -518,19 +609,20 @@ void main() {
     });
 
     group('Interaction Edge Cases', () {
-      testWidgets('should handle empty data gracefully', (WidgetTester tester) async {
+      testWidgets('should handle empty data gracefully', (
+        WidgetTester tester,
+      ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data([])
-                .mapping(x: 'x', y: 'y')
-                .geomPoint()
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('Empty'),
-                  ),
-                )
-                .build(),
+            body:
+                CristalyseChart()
+                    .data([])
+                    .mapping(x: 'x', y: 'y')
+                    .geomPoint()
+                    .interaction(
+                      tooltip: TooltipConfig(builder: (point) => Text('Empty')),
+                    )
+                    .build(),
           ),
         );
 
@@ -540,7 +632,9 @@ void main() {
         expect(find.byType(CustomPaint), findsWidgets);
       });
 
-      testWidgets('should handle null data values', (WidgetTester tester) async {
+      testWidgets('should handle null data values', (
+        WidgetTester tester,
+      ) async {
         final dataWithNulls = [
           {'x': 1.0, 'y': null, 'category': 'A'},
           {'x': null, 'y': 2.0, 'category': 'B'},
@@ -549,16 +643,19 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(dataWithNulls)
-                .mapping(x: 'x', y: 'y', color: 'category')
-                .geomPoint()
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('Value: ${point.getDisplayValue('y')}'),
-                  ),
-                )
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(dataWithNulls)
+                    .mapping(x: 'x', y: 'y', color: 'category')
+                    .geomPoint()
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) =>
+                                Text('Value: ${point.getDisplayValue('y')}'),
+                      ),
+                    )
+                    .build(),
           ),
         );
 
@@ -568,20 +665,23 @@ void main() {
         expect(find.byType(CustomPaint), findsWidgets);
       });
 
-      testWidgets('should handle disabled interactions', (WidgetTester tester) async {
+      testWidgets('should handle disabled interactions', (
+        WidgetTester tester,
+      ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(sampleData)
-                .mapping(x: 'x', y: 'y')
-                .geomPoint()
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('Should not show'),
-                  ),
-                  enabled: false, // Disable interactions
-                )
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(sampleData)
+                    .mapping(x: 'x', y: 'y')
+                    .geomPoint()
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder: (point) => Text('Should not show'),
+                      ),
+                      enabled: false, // Disable interactions
+                    )
+                    .build(),
           ),
         );
 
@@ -592,24 +692,30 @@ void main() {
       });
 
       testWidgets('should handle large datasets', (WidgetTester tester) async {
-        final largeData = List.generate(500, (i) => {
-          'x': i.toDouble(),
-          'y': (i * 2).toDouble(),
-          'category': 'Group${i % 5}',
-        });
+        final largeData = List.generate(
+          500,
+          (i) => {
+            'x': i.toDouble(),
+            'y': (i * 2).toDouble(),
+            'category': 'Group${i % 5}',
+          },
+        );
 
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(largeData)
-                .mapping(x: 'x', y: 'y', color: 'category')
-                .geomPoint(size: 2.0)
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('Point ${point.getDisplayValue('x')}'),
-                  ),
-                )
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(largeData)
+                    .mapping(x: 'x', y: 'y', color: 'category')
+                    .geomPoint(size: 2.0)
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) =>
+                                Text('Point ${point.getDisplayValue('x')}'),
+                      ),
+                    )
+                    .build(),
           ),
         );
 
@@ -621,21 +727,26 @@ void main() {
     });
 
     group('Performance Tests', () {
-      testWidgets('should handle rapid hover events', (WidgetTester tester) async {
+      testWidgets('should handle rapid hover events', (
+        WidgetTester tester,
+      ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body: CristalyseChart()
-                .data(sampleData)
-                .mapping(x: 'x', y: 'y')
-                .geomPoint()
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: (point) => Text('Rapid: ${point.getDisplayValue('y')}'),
-                    showDelay: Duration(milliseconds: 10), // Very fast
-                    hideDelay: Duration(milliseconds: 100),
-                  ),
-                )
-                .build(),
+            body:
+                CristalyseChart()
+                    .data(sampleData)
+                    .mapping(x: 'x', y: 'y')
+                    .geomPoint()
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) =>
+                                Text('Rapid: ${point.getDisplayValue('y')}'),
+                        showDelay: Duration(milliseconds: 10), // Very fast
+                        hideDelay: Duration(milliseconds: 100),
+                      ),
+                    )
+                    .build(),
           ),
         );
 
@@ -643,7 +754,9 @@ void main() {
         await tester.pumpAndSettle();
 
         // Simulate rapid movement
-        final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+        final gesture = await tester.createGesture(
+          kind: PointerDeviceKind.mouse,
+        );
         await gesture.addPointer(location: Offset.zero);
         addTearDown(gesture.removePointer);
 
@@ -652,10 +765,12 @@ void main() {
 
         // Rapid hover across chart
         for (int i = 0; i < 10; i++) {
-          await gesture.moveTo(Offset(
-            chartRect.left + (chartRect.width * i / 10),
-            chartRect.center.dy,
-          ));
+          await gesture.moveTo(
+            Offset(
+              chartRect.left + (chartRect.width * i / 10),
+              chartRect.center.dy,
+            ),
+          );
           await tester.pump(Duration(milliseconds: 10));
         }
 

@@ -111,7 +111,8 @@ class _ExampleHomeState extends State<ExampleHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 10, vsync: this); // Updated to 10 tabs
+    _tabController =
+        TabController(length: 10, vsync: this); // Updated to 10 tabs
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -640,7 +641,7 @@ class _ExampleHomeState extends State<ExampleHome>
                         'Avg Session', '4:32', '+12s', Colors.orange),
                   ],
                 ),
-_buildChartPage(
+                _buildChartPage(
                   chartTitles[5],
                   chartDescriptions[5],
                   buildBarChartTab(currentTheme, _barChartData, _sliderValue),
@@ -911,7 +912,7 @@ _buildChartPage(
           'Throttled updates to prevent overwhelming the database',
           'Coordinate transformation from screen pixels to data values'
         ];
-      case 3: // Line chart 
+      case 3: // Line chart
         return [
           'Progressive line drawing with smooth transitions',
           'Multi-series support with automatic color mapping',
