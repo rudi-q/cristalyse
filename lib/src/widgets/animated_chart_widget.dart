@@ -1392,6 +1392,16 @@ class _AnimatedChartPainter extends CustomPainter {
         colorScale,
         isSecondaryY,
       );
+    } else if (geometry is AreaGeometry) {
+      _drawAreasAnimated(
+        canvas,
+        plotArea,
+        geometry,
+        xScale,
+        yScale,
+        colorScale,
+        isSecondaryY,
+      );
     } else if (geometry is BarGeometry) {
       _drawBarsAnimated(
         canvas,
@@ -1990,6 +2000,199 @@ class _AnimatedChartPainter extends CustomPainter {
     if (fullyDrawnSegments > 0 ||
         (partialSegmentProgress > 0.001 && fullyDrawnSegments < numSegments)) {
       canvas.drawPath(path, paint);
+    }
+  }
+
+  void _drawAreasAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    AreaGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+    bool isSecondaryY,
+  ) {
+    final yCol = isSecondaryY ? y2Column : yColumn;
+
+    if (yCol == null) {
+      return;
+    }
+
+    if (colorColumn != null) {
+      // Group by color and draw separate areas
+      final groupedData = <dynamic, List<Map<String, dynamic>>>{};
+      for (final point in data) {
+        final colorValue = point[colorColumn];
+        groupedData.putIfAbsent(colorValue, () => []).add(point);
+      }
+
+      for (final entry in groupedData.entries) {
+        final colorValue = entry.key;
+        final groupData = entry.value;
+        final areaColor = geometry.color ?? colorScale.scale(colorValue);
+        _drawSingleArea(
+          canvas,
+          plotArea,
+          groupData,
+          xScale,
+          yScale,
+          areaColor,
+          geometry,
+          yCol,
+        );
+      }
+    } else {
+      // Draw single area for all data
+      final areaColor = geometry.color ?? theme.primaryColor;
+      _drawSingleArea(
+        canvas,
+        plotArea,
+        data,
+        xScale,
+        yScale,
+        areaColor,
+        geometry,
+        yCol,
+      );
+    }
+  }
+
+  void _drawSingleArea(
+    Canvas canvas,
+    Rect plotArea,
+    List<Map<String, dynamic>> areaData,
+    Scale xScale,
+    Scale yScale,
+    Color color,
+    AreaGeometry geometry,
+    String yCol,
+  ) {
+    // Sort data by x value for proper area connection
+    final sortedData = List<Map<String, dynamic>>.from(areaData);
+    sortedData.sort((a, b) {
+      final aX = _getNumericValue(a[xColumn]) ?? 0;
+      final bX = _getNumericValue(b[xColumn]) ?? 0;
+      return aX.compareTo(bX);
+    });
+
+    final points = <Offset>[];
+    for (int i = 0; i < sortedData.length; i++) {
+      final point = sortedData[i];
+      final xRawValue = point[xColumn];
+      final yVal = _getNumericValue(point[yCol]);
+
+      if (xRawValue == null || yVal == null) continue;
+
+      // Handle both ordinal and continuous X-scales
+      double screenX;
+      if (xScale is OrdinalScale) {
+        // For ordinal scales, use the raw string value with bandCenter
+        final ordinalScale = xScale;
+        screenX = plotArea.left + ordinalScale.bandCenter(xRawValue);
+      } else {
+        // For continuous scales, convert to number first
+        final xVal = _getNumericValue(xRawValue);
+        if (xVal == null) continue;
+        screenX = plotArea.left + xScale.scale(xVal);
+      }
+
+      final screenY = plotArea.top + yScale.scale(yVal);
+
+      if (!screenX.isFinite || !screenY.isFinite) {
+        continue;
+      }
+
+      points.add(Offset(screenX, screenY));
+    }
+
+    if (points.length < 2) return;
+
+    final areaProgress = math.max(0.0, math.min(1.0, animationProgress));
+    if (areaProgress <= 0.001) {
+      return;
+    }
+
+    // Create path for area fill
+    final areaPath = Path();
+    final int numSegments = points.length - 1;
+    final double totalProgressiveSegments = numSegments * areaProgress;
+    final int fullyDrawnSegments = totalProgressiveSegments.floor();
+    final double partialSegmentProgress =
+        totalProgressiveSegments - fullyDrawnSegments;
+
+    if (fullyDrawnSegments > 0 || partialSegmentProgress > 0.001) {
+      // Start from bottom of first point
+      final baselineY = plotArea.top + yScale.scale(0);
+      areaPath.moveTo(points[0].dx, baselineY);
+      areaPath.lineTo(points[0].dx, points[0].dy);
+
+      // Draw line to all fully drawn points
+      for (int i = 0; i < fullyDrawnSegments; i++) {
+        areaPath.lineTo(points[i + 1].dx, points[i + 1].dy);
+      }
+
+      // Handle partial segment
+      if (partialSegmentProgress > 0.001 && fullyDrawnSegments < numSegments) {
+        final Offset lastFullPoint = points[fullyDrawnSegments];
+        final Offset nextPoint = points[fullyDrawnSegments + 1];
+
+        final double dx =
+            lastFullPoint.dx +
+            (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
+        final double dy =
+            lastFullPoint.dy +
+            (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
+        areaPath.lineTo(dx, dy);
+
+        // Close area back to baseline
+        areaPath.lineTo(dx, baselineY);
+      } else if (fullyDrawnSegments > 0) {
+        // Close area back to baseline from last full point
+        final lastPoint = points[fullyDrawnSegments];
+        areaPath.lineTo(lastPoint.dx, baselineY);
+      }
+
+      areaPath.close();
+
+      // Draw filled area if enabled
+      if (geometry.fillArea) {
+        final fillPaint = Paint()
+          ..color = color.withAlpha((geometry.alpha * 255).round())
+          ..style = PaintingStyle.fill;
+        canvas.drawPath(areaPath, fillPaint);
+      }
+
+      // Draw stroke on top of fill
+      if (geometry.strokeWidth > 0) {
+        final strokePath = Path();
+        strokePath.moveTo(points[0].dx, points[0].dy);
+
+        for (int i = 0; i < fullyDrawnSegments; i++) {
+          strokePath.lineTo(points[i + 1].dx, points[i + 1].dy);
+        }
+
+        if (partialSegmentProgress > 0.001 && fullyDrawnSegments < numSegments) {
+          final Offset lastFullPoint = points[fullyDrawnSegments];
+          final Offset nextPoint = points[fullyDrawnSegments + 1];
+
+          final double dx =
+              lastFullPoint.dx +
+              (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
+          final double dy =
+              lastFullPoint.dy +
+              (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
+          strokePath.lineTo(dx, dy);
+        }
+
+        final strokePaint = Paint()
+          ..color = color.withAlpha(255) // Full opacity for stroke
+          ..strokeWidth = geometry.strokeWidth
+          ..style = PaintingStyle.stroke
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round;
+
+        canvas.drawPath(strokePath, strokePaint);
+      }
     }
   }
 

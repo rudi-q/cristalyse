@@ -211,6 +211,114 @@ void main() {
       });
     });
 
+    group('Area Chart Interactions', () {
+      testWidgets('should support hover on area charts', (WidgetTester tester) async {
+        final chart = MaterialApp(
+          home: Scaffold(
+            body: CristalyseChart()
+                .data(lineData)
+                .mapping(x: 'month', y: 'users')
+                .geomArea(strokeWidth: 2.0, alpha: 0.3)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text('${point.getDisplayValue('month')}: ${point.getDisplayValue('users')} users'),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous()
+                .build(),
+          ),
+        );
+
+        await tester.pumpWidget(chart);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(CustomPaint), findsWidgets);
+      });
+
+      testWidgets('should support multi-series area interactions', (WidgetTester tester) async {
+        final multiSeriesData = [
+          {'month': 'Jan', 'users': 100.0, 'platform': 'Mobile'},
+          {'month': 'Jan', 'users': 80.0, 'platform': 'Web'},
+          {'month': 'Feb', 'users': 120.0, 'platform': 'Mobile'},
+          {'month': 'Feb', 'users': 90.0, 'platform': 'Web'},
+        ];
+
+        final chart = MaterialApp(
+          home: Scaffold(
+            body: CristalyseChart()
+                .data(multiSeriesData)
+                .mapping(x: 'month', y: 'users', color: 'platform')
+                .geomArea(strokeWidth: 2.0, alpha: 0.3)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(point.getDisplayValue('platform')),
+                        Text('${point.getDisplayValue('month')}: ${point.getDisplayValue('users')}'),
+                      ],
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous()
+                .build(),
+          ),
+        );
+
+        await tester.pumpWidget(chart);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(CustomPaint), findsWidgets);
+      });
+
+      testWidgets('should support area charts with dual Y-axis', (WidgetTester tester) async {
+        final dualAxisData = [
+          {'month': 'Jan', 'revenue': 100.0, 'conversion': 15.0},
+          {'month': 'Feb', 'revenue': 120.0, 'conversion': 18.0},
+          {'month': 'Mar', 'revenue': 110.0, 'conversion': 16.0},
+        ];
+
+        final chart = MaterialApp(
+          home: Scaffold(
+            body: CristalyseChart()
+                .data(dualAxisData)
+                .mapping(x: 'month', y: 'revenue')
+                .mappingY2('conversion')
+                .geomArea(yAxis: YAxis.primary, alpha: 0.3)
+                .geomArea(yAxis: YAxis.secondary, alpha: 0.3)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) {
+                      final hasRevenue = point.data.containsKey('revenue');
+                      final hasConversion = point.data.containsKey('conversion');
+                      
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(point.getDisplayValue('month')),
+                          if (hasRevenue) Text('Revenue: \$${point.getDisplayValue('revenue')}k'),
+                          if (hasConversion) Text('Conversion: ${point.getDisplayValue('conversion')}%'),
+                        ],
+                      );
+                    },
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
+                .scaleY2Continuous(min: 0, max: 30)
+                .build(),
+          ),
+        );
+
+        await tester.pumpWidget(chart);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(CustomPaint), findsWidgets);
+      });
+    });
+
     group('Bar Chart Interactions', () {
       testWidgets('should support hover on bar charts', (WidgetTester tester) async {
         final chart = MaterialApp(

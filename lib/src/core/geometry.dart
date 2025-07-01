@@ -84,3 +84,22 @@ enum BarStyle {
   grouped, // Multiple series side-by-side
   stacked, // Multiple series stacked on top
 }
+
+/// Area geometry for area charts
+class AreaGeometry extends Geometry {
+  final double strokeWidth;
+  final Color? color;
+  final double alpha;
+  final LineStyle style;
+  final bool fillArea;
+
+  AreaGeometry({
+    this.strokeWidth = 2.0,
+    this.color,
+    this.alpha = 0.3,
+    this.style = LineStyle.solid,
+    this.fillArea = true,
+    super.yAxis,
+    super.interactive,
+  });
+}

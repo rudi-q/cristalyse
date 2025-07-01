@@ -4,6 +4,7 @@ import 'package:cristalyse/cristalyse.dart';
 import 'package:cristalyse_example/chart_theme.dart';
 import 'package:flutter/material.dart';
 
+import 'graphs/area_chart.dart';
 import 'graphs/bar_chart.dart';
 import 'graphs/dual_axis_chart.dart';
 import 'graphs/grouped_bar.dart';
@@ -110,7 +111,7 @@ class _ExampleHomeState extends State<ExampleHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 9, vsync: this); // Updated to 9 tabs
+    _tabController = TabController(length: 10, vsync: this); // Updated to 10 tabs
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -316,6 +317,7 @@ class _ExampleHomeState extends State<ExampleHome>
       'Interactive Sales Dashboard',
       'Interactive Panning Demo',
       'User Growth Trends',
+      'Website Traffic Analytics',
       'Quarterly Revenue',
       'Product Performance by Quarter',
       'Team Size by Department',
@@ -330,6 +332,7 @@ class _ExampleHomeState extends State<ExampleHome>
       'Hover and tap for detailed insights • Rich tooltips and custom interactions',
       'Real-time pan detection with visible range callbacks • Perfect for large datasets',
       'Steady monthly growth with seasonal variations in user acquisition',
+      'Smooth area fills with progressive animation • Multi-series support with transparency',
       'Strong Q4 performance driven by holiday sales and new partnerships',
       'Mobile app leading growth, API services showing steady adoption',
       'Engineering team expansion supporting our product development goals',
@@ -551,6 +554,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Interactive'),
             Tab(text: 'Panning'), // New panning tab
             Tab(text: 'Line Chart'),
+            Tab(text: 'Area Chart'), // New area chart tab
             Tab(text: 'Bar Chart'),
             Tab(text: 'Grouped Bars'),
             Tab(text: 'Horizontal Bars'),
@@ -623,6 +627,22 @@ class _ExampleHomeState extends State<ExampleHome>
                 _buildChartPage(
                   chartTitles[4],
                   chartDescriptions[4],
+                  AreaChartExample(
+                    theme: currentTheme,
+                    colorPalette: _colorPalettes[_currentPaletteIndex],
+                  ),
+                  [
+                    _buildStatsCard(
+                        'Total Traffic', '68.2k', '+15.3%', Colors.blue),
+                    _buildStatsCard(
+                        'Mobile Share', '62%', '+4.1%', Colors.green),
+                    _buildStatsCard(
+                        'Avg Session', '4:32', '+12s', Colors.orange),
+                  ],
+                ),
+_buildChartPage(
+                  chartTitles[5],
+                  chartDescriptions[5],
                   buildBarChartTab(currentTheme, _barChartData, _sliderValue),
                   [
                     _buildStatsCard(
@@ -891,42 +911,49 @@ class _ExampleHomeState extends State<ExampleHome>
           'Throttled updates to prevent overwhelming the database',
           'Coordinate transformation from screen pixels to data values'
         ];
-      case 3: // Line chart (moved from case 2)
+      case 3: // Line chart 
         return [
           'Progressive line drawing with smooth transitions',
           'Multi-series support with automatic color mapping',
           'Customizable stroke width and transparency',
           'Optimized for time-series and continuous data'
         ];
-      case 4: // Bar chart (moved from case 3)
+      case 4: // Area chart
+        return [
+          'Smooth area fills with customizable transparency',
+          'Progressive animation revealing data over time',
+          'Multi-series support with overlapping transparency',
+          'Combined area + line + point visualizations'
+        ];
+      case 5: // Bar chart
         return [
           'Categorical data visualization with ordinal scales',
           'Staggered bar animations for visual impact',
           'Automatic baseline detection and scaling',
           'Customizable bar width and styling options'
         ];
-      case 5: // Grouped bars (moved from case 4)
+      case 6: // Grouped bars
         return [
           'Side-by-side comparison of multiple data series',
           'Coordinated group animations with smooth timing',
           'Automatic legend generation from color mappings',
           'Perfect for product or regional comparisons'
         ];
-      case 6: // Horizontal bars (moved from case 5)
+      case 7: // Horizontal bars
         return [
           'Coordinate system flipping for horizontal layouts',
           'Ideal for ranking and categorical comparisons',
           'Space-efficient labeling for long category names',
           'Consistent animation system across orientations'
         ];
-      case 7: // Stacked bars (moved from case 6)
+      case 8: // Stacked bars
         return [
           'Segment-by-segment progressive stacking animation',
           'Automatic part-to-whole relationship visualization',
           'Consistent color mapping across all segments',
           'Perfect for budget breakdowns and composition analysis'
         ];
-      case 8: // Dual Y-axis (moved from case 7)
+      case 9: // Dual Y-axis
         return [
           'Dual Y-axis support for different data scales',
           'Independent left and right axis scaling',

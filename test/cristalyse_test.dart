@@ -54,6 +54,17 @@ void main() {
         expect(widget, isA<Widget>());
       });
 
+      test('should create chart with area plot', () {
+        final chart = CristalyseChart()
+            .data(sampleData)
+            .mapping(x: 'x', y: 'y', color: 'category')
+            .geomArea(strokeWidth: 2.0, alpha: 0.3, fillArea: true);
+
+        expect(chart, isNotNull);
+        final widget = chart.build();
+        expect(widget, isA<Widget>());
+      });
+
       test('should create chart with bar plot', () {
         final chart = CristalyseChart()
             .data(categoricalData)

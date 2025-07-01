@@ -127,6 +127,33 @@ class CristalyseChart {
     return this;
   }
 
+  /// Add area chart
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.geomArea(strokeWidth: 2.0, alpha: 0.3, yAxis: YAxis.secondary)
+  /// ```
+  CristalyseChart geomArea({
+    double? strokeWidth,
+    Color? color,
+    double? alpha,
+    LineStyle? style,
+    bool? fillArea,
+    YAxis? yAxis,
+  }) {
+    _geometries.add(
+      AreaGeometry(
+        strokeWidth: strokeWidth ?? 2.0,
+        color: color,
+        alpha: alpha ?? 0.3,
+        style: style ?? LineStyle.solid,
+        fillArea: fillArea ?? true,
+        yAxis: yAxis ?? YAxis.primary,
+      ),
+    );
+    return this;
+  }
+
   /// Add bar chart
   ///
   /// Example:
