@@ -44,12 +44,12 @@ class TooltipConfig {
   });
 
   static TooltipConfig get defaultConfig => const TooltipConfig(
-    shadow: BoxShadow(
-      color: Color(0x44000000),
-      blurRadius: 8.0,
-      offset: Offset(0, 2),
-    ),
-  );
+        shadow: BoxShadow(
+          color: Color(0x44000000),
+          blurRadius: 8.0,
+          offset: Offset(0, 2),
+        ),
+      );
 }
 
 /// Configuration for hover interactions
@@ -201,16 +201,15 @@ class DefaultTooltips {
       return Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children:
-            columnLabels.entries.map((entry) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 1),
-                child: Text(
-                  '${entry.value}: ${point.getDisplayValue(entry.key)}',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              );
-            }).toList(),
+        children: columnLabels.entries.map((entry) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 1),
+            child: Text(
+              '${entry.value}: ${point.getDisplayValue(entry.key)}',
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+            ),
+          );
+        }).toList(),
       );
     };
   }

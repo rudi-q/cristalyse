@@ -15,8 +15,7 @@ void main() {
           1000,
           (i) => {
             'x': i.toDouble(),
-            'y':
-                math.sin(i * 0.1) * 50 +
+            'y': math.sin(i * 0.1) * 50 +
                 100 +
                 (math.Random().nextDouble() - 0.5) * 20,
             'category': 'Group${i % 5}',
@@ -28,21 +27,19 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(largeData)
-                    .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
-                    .geomPoint(alpha: 0.7)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              'Point ${point.getDisplayValue('x')}: ${point.getDisplayValue('y')}',
-                            ),
-                        showDelay: Duration(milliseconds: 100),
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(largeData)
+                .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
+                .geomPoint(alpha: 0.7)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      'Point ${point.getDisplayValue('x')}: ${point.getDisplayValue('y')}',
+                    ),
+                    showDelay: Duration(milliseconds: 100),
+                  ),
+                )
+                .build(),
           ),
         );
 
@@ -70,22 +67,20 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(largeBarData)
-                    .mapping(x: 'category', y: 'value', color: 'group')
-                    .geomBar(style: BarStyle.grouped, width: 0.8)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              '${point.getDisplayValue('category')}: ${point.getDisplayValue('value')}',
-                            ),
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(min: 0)
-                    .build(),
+            body: CristalyseChart()
+                .data(largeBarData)
+                .mapping(x: 'category', y: 'value', color: 'group')
+                .geomBar(style: BarStyle.grouped, width: 0.8)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      '${point.getDisplayValue('category')}: ${point.getDisplayValue('value')}',
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
+                .build(),
           ),
         );
 
@@ -120,9 +115,8 @@ void main() {
                     .geomPoint()
                     .interaction(
                       tooltip: TooltipConfig(
-                        builder:
-                            (point) =>
-                                Text('Value: ${point.getDisplayValue('y')}'),
+                        builder: (point) =>
+                            Text('Value: ${point.getDisplayValue('y')}'),
                       ),
                     )
                     .build();
@@ -166,22 +160,20 @@ void main() {
 
           final chart = MaterialApp(
             home: Scaffold(
-              body:
-                  CristalyseChart()
-                      .data(data)
-                      .mapping(x: 'x', y: 'y')
-                      .geomPoint(size: 10.0)
-                      .interaction(
-                        tooltip: TooltipConfig(
-                          builder:
-                              (point) => Text(
-                                'Memory test: ${point.getDisplayValue('y')}',
-                              ),
-                          showDelay: Duration(milliseconds: 10),
-                          hideDelay: Duration(milliseconds: 50),
-                        ),
-                      )
-                      .build(),
+              body: CristalyseChart()
+                  .data(data)
+                  .mapping(x: 'x', y: 'y')
+                  .geomPoint(size: 10.0)
+                  .interaction(
+                    tooltip: TooltipConfig(
+                      builder: (point) => Text(
+                        'Memory test: ${point.getDisplayValue('y')}',
+                      ),
+                      showDelay: Duration(milliseconds: 10),
+                      hideDelay: Duration(milliseconds: 50),
+                    ),
+                  )
+                  .build(),
             ),
           );
 
@@ -223,17 +215,16 @@ void main() {
         Widget buildChart() {
           return MaterialApp(
             home: Scaffold(
-              body:
-                  CristalyseChart()
-                      .data(data)
-                      .mapping(x: 'x', y: 'y')
-                      .geomPoint()
-                      .interaction(
-                        tooltip: TooltipConfig(
-                          builder: (point) => Text('Disposal test'),
-                        ),
-                      )
-                      .build(),
+              body: CristalyseChart()
+                  .data(data)
+                  .mapping(x: 'x', y: 'y')
+                  .geomPoint()
+                  .interaction(
+                    tooltip: TooltipConfig(
+                      builder: (point) => Text('Disposal test'),
+                    ),
+                  )
+                  .build(),
             ),
           );
         }
@@ -267,20 +258,18 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(extremeData)
-                    .mapping(x: 'x', y: 'y')
-                    .geomPoint()
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              'Extreme: ${point.getDisplayValue('x')}, ${point.getDisplayValue('y')}',
-                            ),
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(extremeData)
+                .mapping(x: 'x', y: 'y')
+                .geomPoint()
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      'Extreme: ${point.getDisplayValue('x')}, ${point.getDisplayValue('y')}',
+                    ),
+                  ),
+                )
+                .build(),
           ),
         );
 
@@ -303,19 +292,17 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(invalidData)
-                    .mapping(x: 'x', y: 'y')
-                    .geomPoint()
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) =>
-                                Text('Value: ${point.getDisplayValue('y')}'),
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(invalidData)
+                .mapping(x: 'x', y: 'y')
+                .geomPoint()
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) =>
+                        Text('Value: ${point.getDisplayValue('y')}'),
+                  ),
+                )
+                .build(),
           ),
         );
 
@@ -343,30 +330,28 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(mixedData)
-                    .mapping(x: 'x', y: 'y', color: 'category')
-                    .geomPoint()
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text('X: ${point.getDisplayValue('x')}'),
-                                Text('Y: ${point.getDisplayValue('y')}'),
-                                Text(
-                                  'Category: ${point.getDisplayValue('category')}',
-                                ),
-                                Text(
-                                  'Active: ${point.getDisplayValue('active')}',
-                                ),
-                              ],
-                            ),
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(mixedData)
+                .mapping(x: 'x', y: 'y', color: 'category')
+                .geomPoint()
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('X: ${point.getDisplayValue('x')}'),
+                        Text('Y: ${point.getDisplayValue('y')}'),
+                        Text(
+                          'Category: ${point.getDisplayValue('category')}',
+                        ),
+                        Text(
+                          'Active: ${point.getDisplayValue('active')}',
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .build(),
           ),
         );
 
@@ -392,24 +377,22 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(data)
-                    .mapping(x: 'x', y: 'y', color: 'category')
-                    .geomPoint(size: 6.0)
-                    .geomLine(strokeWidth: 2.0)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) =>
-                                Text('Animated: ${point.getDisplayValue('y')}'),
-                      ),
-                    )
-                    .animate(
-                      duration: Duration(milliseconds: 2000),
-                      curve: Curves.elasticOut,
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(data)
+                .mapping(x: 'x', y: 'y', color: 'category')
+                .geomPoint(size: 6.0)
+                .geomLine(strokeWidth: 2.0)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) =>
+                        Text('Animated: ${point.getDisplayValue('y')}'),
+                  ),
+                )
+                .animate(
+                  duration: Duration(milliseconds: 2000),
+                  curve: Curves.elasticOut,
+                )
+                .build(),
           ),
         );
 
@@ -440,24 +423,22 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(data)
-                    .mapping(x: 'x', y: 'y')
-                    .geomPoint(size: 8.0)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              'During animation: ${point.getDisplayValue('y')}',
-                            ),
-                      ),
-                    )
-                    .animate(
-                      duration: Duration(milliseconds: 1000),
-                      curve: Curves.bounceOut,
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(data)
+                .mapping(x: 'x', y: 'y')
+                .geomPoint(size: 8.0)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      'During animation: ${point.getDisplayValue('y')}',
+                    ),
+                  ),
+                )
+                .animate(
+                  duration: Duration(milliseconds: 1000),
+                  curve: Curves.bounceOut,
+                )
+                .build(),
           ),
         );
 
@@ -505,20 +486,18 @@ void main() {
 
           final chart = MaterialApp(
             home: Scaffold(
-              body:
-                  CristalyseChart()
-                      .data(data)
-                      .mapping(x: 'x', y: 'y')
-                      .geomPoint()
-                      .interaction(
-                        tooltip: TooltipConfig(
-                          builder:
-                              (point) => Text(
-                                'Size test: ${point.getDisplayValue('y')}',
-                              ),
-                        ),
-                      )
-                      .build(),
+              body: CristalyseChart()
+                  .data(data)
+                  .mapping(x: 'x', y: 'y')
+                  .geomPoint()
+                  .interaction(
+                    tooltip: TooltipConfig(
+                      builder: (point) => Text(
+                        'Size test: ${point.getDisplayValue('y')}',
+                      ),
+                    ),
+                  )
+                  .build(),
             ),
           );
 
@@ -548,20 +527,18 @@ void main() {
 
           final chart = MaterialApp(
             home: Scaffold(
-              body:
-                  CristalyseChart()
-                      .data(data)
-                      .mapping(x: 'x', y: 'y')
-                      .geomPoint()
-                      .interaction(
-                        tooltip: TooltipConfig(
-                          builder:
-                              (point) => Text(
-                                'Density test: ${point.getDisplayValue('y')}',
-                              ),
-                        ),
-                      )
-                      .build(),
+              body: CristalyseChart()
+                  .data(data)
+                  .mapping(x: 'x', y: 'y')
+                  .geomPoint()
+                  .interaction(
+                    tooltip: TooltipConfig(
+                      builder: (point) => Text(
+                        'Density test: ${point.getDisplayValue('y')}',
+                      ),
+                    ),
+                  )
+                  .build(),
             ),
           );
 
@@ -606,10 +583,9 @@ void main() {
                     .geomPoint()
                     .interaction(
                       tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              'Theme test: ${point.getDisplayValue('y')}',
-                            ),
+                        builder: (point) => Text(
+                          'Theme test: ${point.getDisplayValue('y')}',
+                        ),
                       ),
                     )
                     .theme(themes[currentThemeIndex])
@@ -646,23 +622,21 @@ void main() {
           home: Scaffold(
             body: GestureDetector(
               onTap: () {}, // Competing gesture detector
-              child:
-                  CristalyseChart()
-                      .data(data)
-                      .mapping(x: 'x', y: 'y')
-                      .geomPoint()
-                      .interaction(
-                        tooltip: TooltipConfig(
-                          builder:
-                              (point) => Text(
-                                'Conflict test: ${point.getDisplayValue('y')}',
-                              ),
-                        ),
-                        click: ClickConfig(
-                          onTap: (point) => debugPrint('Chart tapped'),
-                        ),
-                      )
-                      .build(),
+              child: CristalyseChart()
+                  .data(data)
+                  .mapping(x: 'x', y: 'y')
+                  .geomPoint()
+                  .interaction(
+                    tooltip: TooltipConfig(
+                      builder: (point) => Text(
+                        'Conflict test: ${point.getDisplayValue('y')}',
+                      ),
+                    ),
+                    click: ClickConfig(
+                      onTap: (point) => debugPrint('Chart tapped'),
+                    ),
+                  )
+                  .build(),
             ),
           ),
         );

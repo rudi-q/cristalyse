@@ -1,3 +1,25 @@
+## 0.9.0 - 2025-07-02
+
+- **Enhanced SVG Export Implementation**
+  - Improved SVG export with complete chart rendering pipeline
+  - Added support for all chart types: points, lines, bars, areas
+  - Proper color mapping, scaling, and axis rendering in SVG format
+  - Professional-quality vector graphics output with small file sizes
+  - Perfect for presentations, reports, and high-quality documentation
+
+- **API Simplification**
+  - `ExportFormat` enum now contains only `svg`
+  - `ExportConfig` defaults to SVG format
+  - Simplified export API focused on reliable functionality
+  - All export documentation updated to reflect SVG-only capabilities
+
+**Benefits of SVG Export:**
+- ✅ **Scalable vector graphics** - Infinite zoom without quality loss
+- ✅ **Small file sizes** - Efficient for web and print
+- ✅ **Professional quality** - Perfect for presentations and reports
+- ✅ **Cross-platform reliability** - Works consistently on all platforms
+- ✅ **Design software compatibility** - Editable in Figma, Adobe Illustrator, etc.
+
 ## 0.8.0 - 2025-07-02
 
 - **Major Feature: Area Chart Support**

@@ -33,13 +33,29 @@ class _ExportDemoState extends State<ExportDemo> {
   void _generateSampleData() {
     _chartData = List.generate(12, (i) {
       final month = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
       ][i];
-      
-      final revenue = 50 + i * 8 + math.sin(i * 0.5) * 15 + (math.Random().nextDouble() - 0.5) * 10;
-      final users = 1000 + i * 120 + math.cos(i * 0.4) * 200 + (math.Random().nextDouble() - 0.5) * 100;
-      
+
+      final revenue = 50 +
+          i * 8 +
+          math.sin(i * 0.5) * 15 +
+          (math.Random().nextDouble() - 0.5) * 10;
+      final users = 1000 +
+          i * 120 +
+          math.cos(i * 0.4) * 200 +
+          (math.Random().nextDouble() - 0.5) * 100;
+
       return {
         'month': month,
         'revenue': revenue.round().toDouble(),
@@ -107,50 +123,6 @@ class _ExportDemoState extends State<ExportDemo> {
         );
   }
 
-  Future<void> _exportAsPng() async {
-    setState(() {
-      _isExporting = true;
-      _lastExportResult = null;
-    });
-
-    try {
-      final result = await _chart.exportAsPng(
-        width: 1200,
-        height: 800,
-        filename: 'revenue_users_chart_${DateTime.now().millisecondsSinceEpoch}',
-        quality: 0.95,
-      );
-
-      setState(() {
-        _lastExportResult = result;
-        _isExporting = false;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Chart exported successfully!\nSaved to: ${result.filePath}'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _isExporting = false;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Export failed: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
   Future<void> _exportAsSvg() async {
     setState(() {
       _isExporting = true;
@@ -161,7 +133,8 @@ class _ExportDemoState extends State<ExportDemo> {
       final result = await _chart.exportAsSvg(
         width: 1200,
         height: 800,
-        filename: 'revenue_users_chart_${DateTime.now().millisecondsSinceEpoch}',
+        filename:
+            'revenue_users_chart_${DateTime.now().millisecondsSinceEpoch}',
       );
 
       setState(() {
@@ -172,55 +145,8 @@ class _ExportDemoState extends State<ExportDemo> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Chart exported successfully!\nSaved to: ${result.filePath}'),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _isExporting = false;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Export failed: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<void> _exportWithCustomConfig() async {
-    setState(() {
-      _isExporting = true;
-      _lastExportResult = null;
-    });
-
-    try {
-      final config = ExportConfig(
-        width: 1920,
-        height: 1080,
-        format: ExportFormat.png,
-        quality: 1.0,
-        filename: 'high_res_revenue_chart_${DateTime.now().millisecondsSinceEpoch}',
-        transparentBackground: true,
-      );
-
-      final result = await _chart.export(config);
-
-      setState(() {
-        _lastExportResult = result;
-        _isExporting = false;
-      });
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('High-res chart exported!\nSaved to: ${result.filePath}'),
+            content: Text(
+                'Chart exported successfully!\nSaved to: ${result.filePath}'),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 4),
           ),
@@ -255,7 +181,7 @@ class _ExportDemoState extends State<ExportDemo> {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Export your charts as high-quality PNG or SVG images for reports and presentations.',
+            'Export your charts as scalable SVG vector graphics for reports and presentations.',
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
           const SizedBox(height: 24),
@@ -288,40 +214,22 @@ class _ExportDemoState extends State<ExportDemo> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  
-                  // Export Buttons
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: _isExporting ? null : _exportAsPng,
-                        icon: const Icon(Icons.image),
-                        label: const Text('Export as PNG'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.colorPalette[0],
-                          foregroundColor: Colors.white,
-                        ),
+
+                  // Export Buttons - SVG Only
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: _isExporting ? null : _exportAsSvg,
+                      icon: const Icon(Icons.photo_filter),
+                      label: const Text('Export as SVG'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: widget.colorPalette[1],
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        textStyle: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600),
                       ),
-                      ElevatedButton.icon(
-                        onPressed: _isExporting ? null : _exportAsSvg,
-                        icon: const Icon(Icons.photo_filter),
-                        label: const Text('Export as SVG'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.colorPalette[1],
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: _isExporting ? null : _exportWithCustomConfig,
-                        icon: const Icon(Icons.high_quality),
-                        label: const Text('Export High-Res'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: widget.colorPalette[2],
-                          foregroundColor: Colors.white,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
 
                   if (_isExporting) ...[
@@ -356,9 +264,12 @@ class _ExportDemoState extends State<ExportDemo> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
-                          Text('Format: ${_lastExportResult!.format.name.toUpperCase()}'),
-                          Text('Dimensions: ${_lastExportResult!.dimensions.width.toInt()} × ${_lastExportResult!.dimensions.height.toInt()}'),
-                          Text('File Size: ${(_lastExportResult!.fileSizeBytes / 1024).toStringAsFixed(1)} KB'),
+                          Text(
+                              'Format: ${_lastExportResult!.format.name.toUpperCase()}'),
+                          Text(
+                              'Dimensions: ${_lastExportResult!.dimensions.width.toInt()} × ${_lastExportResult!.dimensions.height.toInt()}'),
+                          Text(
+                              'File Size: ${(_lastExportResult!.fileSizeBytes / 1024).toStringAsFixed(1)} KB'),
                           Text(
                             'Path: ${_lastExportResult!.filePath}',
                             style: const TextStyle(fontSize: 12),
@@ -388,7 +299,6 @@ class _ExportDemoState extends State<ExportDemo> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -399,34 +309,32 @@ class _ExportDemoState extends State<ExportDemo> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Simple PNG Export:',
+                          'Simple SVG Export:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'final result = await chart.exportAsPng(\n'
-                          '  width: 1200,\n'
-                          '  height: 800,\n'
-                          '  filename: "my_chart",\n'
+                          'final result = await chart.exportAsSvg(\\n'
+                          '  width: 1200,\\n'
+                          '  height: 800,\\n'
+                          '  filename: "my_chart",\\n'
                           ');',
-                          style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                          style:
+                              TextStyle(fontFamily: 'monospace', fontSize: 12),
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'Custom Configuration:',
+                          'SVG Benefits:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'final config = ExportConfig(\n'
-                          '  width: 1920,\n'
-                          '  height: 1080,\n'
-                          '  format: ExportFormat.png,\n'
-                          '  quality: 0.95,\n'
-                          '  transparentBackground: true,\n'
-                          ');\n'
-                          'final result = await chart.export(config);',
-                          style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                          '• Scalable vector graphics\\n'
+                          '• Small file sizes\\n'
+                          '• Perfect for presentations\\n'
+                          '• Editable in design software\\n'
+                          '• Professional quality output',
+                          style: TextStyle(fontSize: 12),
                         ),
                       ],
                     ),

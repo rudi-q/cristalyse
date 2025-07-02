@@ -133,11 +133,10 @@ class _ChartPainter extends CustomPainter {
 
   LinearScale _setupXScale(double width) {
     final scale = (xScale as LinearScale?) ?? LinearScale();
-    final values =
-        data
-            .map((d) => _getNumericValue(d[xColumn]))
-            .where((v) => v != null)
-            .cast<double>();
+    final values = data
+        .map((d) => _getNumericValue(d[xColumn]))
+        .where((v) => v != null)
+        .cast<double>();
     if (values.isNotEmpty) {
       scale.domain = [
         scale.min ?? values.reduce(math.min),
@@ -150,11 +149,10 @@ class _ChartPainter extends CustomPainter {
 
   LinearScale _setupYScale(double height) {
     final scale = (yScale as LinearScale?) ?? LinearScale();
-    final values =
-        data
-            .map((d) => _getNumericValue(d[yColumn]))
-            .where((v) => v != null)
-            .cast<double>();
+    final values = data
+        .map((d) => _getNumericValue(d[yColumn]))
+        .where((v) => v != null)
+        .cast<double>();
     if (values.isNotEmpty) {
       scale.domain = [
         scale.min ?? values.reduce(math.min),
@@ -175,11 +173,10 @@ class _ChartPainter extends CustomPainter {
   SizeScale _setupSizeScale() {
     if (sizeColumn == null) return SizeScale();
 
-    final values =
-        data
-            .map((d) => _getNumericValue(d[sizeColumn]))
-            .where((v) => v != null)
-            .cast<double>();
+    final values = data
+        .map((d) => _getNumericValue(d[sizeColumn]))
+        .where((v) => v != null)
+        .cast<double>();
     if (values.isNotEmpty) {
       return SizeScale(
         domain: [values.reduce(math.min), values.reduce(math.max)],
@@ -206,10 +203,9 @@ class _ChartPainter extends CustomPainter {
     LinearScale xScale,
     LinearScale yScale,
   ) {
-    final paint =
-        Paint()
-          ..color = theme.gridColor
-          ..strokeWidth = theme.gridWidth;
+    final paint = Paint()
+      ..color = theme.gridColor
+      ..strokeWidth = theme.gridWidth;
 
     // Vertical grid lines
     final xTicks = xScale.getTicks(5);
@@ -277,21 +273,18 @@ class _ChartPainter extends CustomPainter {
       final screenY = plotArea.top + yScale.scale(y);
 
       // Determine point properties
-      final pointColor =
-          geometry.color ??
+      final pointColor = geometry.color ??
           (colorColumn != null
               ? colorScale.scale(point[colorColumn])
               : theme.primaryColor);
-      final pointSize =
-          geometry.size ??
+      final pointSize = geometry.size ??
           (sizeColumn != null
               ? sizeScale.scale(_getNumericValue(point[sizeColumn]) ?? 0)
               : theme.pointSizeDefault);
 
-      final paint =
-          Paint()
-            ..color = pointColor.withValues(alpha: geometry.alpha)
-            ..style = PaintingStyle.fill;
+      final paint = Paint()
+        ..color = pointColor.withValues(alpha: geometry.alpha)
+        ..style = PaintingStyle.fill;
 
       canvas.drawCircle(Offset(screenX, screenY), pointSize, paint);
     }
@@ -373,13 +366,12 @@ class _ChartPainter extends CustomPainter {
 
     if (points.length < 2) return;
 
-    final paint =
-        Paint()
-          ..color = color.withValues(alpha: geometry.alpha)
-          ..strokeWidth = geometry.strokeWidth
-          ..style = PaintingStyle.stroke
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round;
+    final paint = Paint()
+      ..color = color.withValues(alpha: geometry.alpha)
+      ..strokeWidth = geometry.strokeWidth
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
     path.moveTo(points.first.dx, points.first.dy);
@@ -397,10 +389,9 @@ class _ChartPainter extends CustomPainter {
     LinearScale xScale,
     LinearScale yScale,
   ) {
-    final paint =
-        Paint()
-          ..color = theme.axisColor
-          ..strokeWidth = theme.axisWidth;
+    final paint = Paint()
+      ..color = theme.axisColor
+      ..strokeWidth = theme.axisWidth;
 
     // X axis
     canvas.drawLine(

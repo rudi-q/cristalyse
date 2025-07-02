@@ -711,18 +711,18 @@ class _ExampleHomeState extends State<ExampleHome>
                 ),
                 _buildChartPage(
                   'Chart Export Demo',
-                  'Export your charts as high-quality PNG or SVG images for reports and presentations',
+                  'Export your charts as scalable SVG vector graphics for reports and presentations',
                   ExportDemo(
                     theme: currentTheme,
                     colorPalette: _colorPalettes[_currentPaletteIndex],
                   ),
                   [
                     _buildStatsCard(
-                        'Export Formats', '2', 'PNG & SVG', Colors.blue),
+                        'Export Format', 'SVG', 'Vector Graphics', Colors.blue),
                     _buildStatsCard(
-                        'Max Resolution', '1920p', 'High-DPI', Colors.green),
+                        'Scalability', '∞', 'Infinite Zoom', Colors.green),
                     _buildStatsCard(
-                        'Quality', '100%', 'Lossless', Colors.purple),
+                        'File Size', 'Small', 'Compact', Colors.purple),
                   ],
                 ),
               ],
@@ -981,10 +981,10 @@ class _ExampleHomeState extends State<ExampleHome>
         ];
       case 10: // Export demo
         return [
-          'Export charts as high-quality PNG or SVG images',
-          'Customizable resolution and quality settings',
-          'Transparent background support for presentations',
-          'Perfect for reports, presentations, and documentation'
+          'Export charts as scalable SVG vector graphics',
+          'Infinite zoom and professional quality output',
+          'Small file sizes perfect for web and print',
+          'Editable in design software and ideal for presentations'
         ];
       default:
         return [];

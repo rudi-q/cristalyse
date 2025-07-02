@@ -32,11 +32,10 @@ void main() {
 
     group('Basic Chart Creation', () {
       test('should create chart with scatter plot', () {
-        final chart =
-            CristalyseChart()
-                .data(sampleData)
-                .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
-                .geomPoint();
+        final chart = CristalyseChart()
+            .data(sampleData)
+            .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
+            .geomPoint();
 
         expect(chart, isNotNull);
         final widget = chart.build();
@@ -190,18 +189,17 @@ void main() {
       });
 
       test('should apply bar geometry properties', () {
-        final chart =
-            CristalyseChart()
-                .data(categoricalData)
-                .mapping(x: 'quarter', y: 'revenue')
-                .geomBar(
-                  width: 0.6,
-                  alpha: 0.8,
-                  borderRadius: BorderRadius.circular(4),
-                  borderWidth: 1.0,
-                )
-                .scaleXOrdinal()
-                .scaleYContinuous();
+        final chart = CristalyseChart()
+            .data(categoricalData)
+            .mapping(x: 'quarter', y: 'revenue')
+            .geomBar(
+              width: 0.6,
+              alpha: 0.8,
+              borderRadius: BorderRadius.circular(4),
+              borderWidth: 1.0,
+            )
+            .scaleXOrdinal()
+            .scaleYContinuous();
 
         expect(chart, isNotNull);
         final widget = chart.build();
@@ -271,26 +269,24 @@ void main() {
       });
 
       test('should handle different animation curves', () {
-        final charts =
-            [
-                  Curves.easeInOut,
-                  Curves.bounceOut,
-                  Curves.elasticOut,
-                  Curves.easeOutBack,
-                ]
-                .map(
-                  (curve) =>
-                      CristalyseChart()
-                          .data(sampleData)
-                          .mapping(x: 'x', y: 'y')
-                          .geomLine()
-                          .animate(
-                            duration: const Duration(milliseconds: 500),
-                            curve: curve,
-                          )
-                          .build(),
-                )
-                .toList();
+        final charts = [
+          Curves.easeInOut,
+          Curves.bounceOut,
+          Curves.elasticOut,
+          Curves.easeOutBack,
+        ]
+            .map(
+              (curve) => CristalyseChart()
+                  .data(sampleData)
+                  .mapping(x: 'x', y: 'y')
+                  .geomLine()
+                  .animate(
+                    duration: const Duration(milliseconds: 500),
+                    curve: curve,
+                  )
+                  .build(),
+            )
+            .toList();
 
         expect(charts.length, equals(4));
         for (final chart in charts) {
@@ -301,14 +297,13 @@ void main() {
 
     group('Combined Visualizations', () {
       test('should combine multiple geometries', () {
-        final chart =
-            CristalyseChart()
-                .data(sampleData)
-                .mapping(x: 'x', y: 'y', color: 'category')
-                .geomLine(strokeWidth: 2.0, alpha: 0.8)
-                .geomPoint(size: 6.0, alpha: 1.0)
-                .scaleXContinuous()
-                .scaleYContinuous();
+        final chart = CristalyseChart()
+            .data(sampleData)
+            .mapping(x: 'x', y: 'y', color: 'category')
+            .geomLine(strokeWidth: 2.0, alpha: 0.8)
+            .geomPoint(size: 6.0, alpha: 1.0)
+            .scaleXContinuous()
+            .scaleYContinuous();
 
         expect(chart, isNotNull);
         final widget = chart.build();
@@ -486,11 +481,10 @@ void main() {
         {'x': 1, 'y': 2}, // Valid data point
       ];
 
-      final chart =
-          CristalyseChart()
-              .data(invalidData)
-              .mapping(x: 'x', y: 'y')
-              .geomPoint();
+      final chart = CristalyseChart()
+          .data(invalidData)
+          .mapping(x: 'x', y: 'y')
+          .geomPoint();
 
       expect(chart, isNotNull);
       final widget = chart.build();
@@ -498,11 +492,10 @@ void main() {
     });
 
     test('should handle missing columns', () {
-      final chart =
-          CristalyseChart()
-              .data(sampleData)
-              .mapping(x: 'nonexistent', y: 'y')
-              .geomPoint();
+      final chart = CristalyseChart()
+          .data(sampleData)
+          .mapping(x: 'nonexistent', y: 'y')
+          .geomPoint();
 
       expect(chart, isNotNull);
       final widget = chart.build();
@@ -516,11 +509,10 @@ void main() {
         {'x': 3, 'y': 4, 'category': 123}, // Non-string category
       ];
 
-      final chart =
-          CristalyseChart()
-              .data(mixedData)
-              .mapping(x: 'x', y: 'y', color: 'category')
-              .geomPoint();
+      final chart = CristalyseChart()
+          .data(mixedData)
+          .mapping(x: 'x', y: 'y', color: 'category')
+          .geomPoint();
 
       expect(chart, isNotNull);
       final widget = chart.build();
@@ -534,13 +526,12 @@ void main() {
         {'x': 0, 'y': 0},
       ];
 
-      final chart =
-          CristalyseChart()
-              .data(extremeData)
-              .mapping(x: 'x', y: 'y')
-              .geomPoint()
-              .scaleXContinuous()
-              .scaleYContinuous();
+      final chart = CristalyseChart()
+          .data(extremeData)
+          .mapping(x: 'x', y: 'y')
+          .geomPoint()
+          .scaleXContinuous()
+          .scaleYContinuous();
 
       expect(chart, isNotNull);
       final widget = chart.build();
@@ -559,13 +550,12 @@ void main() {
         },
       );
 
-      final chart =
-          CristalyseChart()
-              .data(largeData)
-              .mapping(x: 'x', y: 'y', color: 'category')
-              .geomPoint(size: 2.0)
-              .scaleXContinuous()
-              .scaleYContinuous();
+      final chart = CristalyseChart()
+          .data(largeData)
+          .mapping(x: 'x', y: 'y', color: 'category')
+          .geomPoint(size: 2.0)
+          .scaleXContinuous()
+          .scaleYContinuous();
 
       expect(chart, isNotNull);
       final widget = chart.build();
@@ -574,12 +564,11 @@ void main() {
 
     test('should handle rapid chart recreation', () {
       for (int i = 0; i < 100; i++) {
-        final chart =
-            CristalyseChart()
-                .data(sampleData)
-                .mapping(x: 'x', y: 'y')
-                .geomPoint()
-                .build();
+        final chart = CristalyseChart()
+            .data(sampleData)
+            .mapping(x: 'x', y: 'y')
+            .geomPoint()
+            .build();
 
         expect(chart, isA<Widget>());
       }

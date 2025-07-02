@@ -41,21 +41,19 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(sampleData)
-                    .mapping(x: 'x', y: 'y', color: 'category')
-                    .geomPoint(size: 8.0)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder: (point) {
-                          tooltipShown = true;
-                          hoveredPoint = point;
-                          return Text('Value: ${point.getDisplayValue('y')}');
-                        },
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(sampleData)
+                .mapping(x: 'x', y: 'y', color: 'category')
+                .geomPoint(size: 8.0)
+                .interaction(
+              tooltip: TooltipConfig(
+                builder: (point) {
+                  tooltipShown = true;
+                  hoveredPoint = point;
+                  return Text('Value: ${point.getDisplayValue('y')}');
+                },
+              ),
+            ).build(),
           ),
         );
 
@@ -93,19 +91,17 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(sampleData)
-                    .mapping(x: 'x', y: 'y')
-                    .geomPoint(size: 10.0)
-                    .interaction(
-                      click: ClickConfig(
-                        onTap: (point) {
-                          clickedPoint = point;
-                        },
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(sampleData)
+                .mapping(x: 'x', y: 'y')
+                .geomPoint(size: 10.0)
+                .interaction(
+              click: ClickConfig(
+                onTap: (point) {
+                  clickedPoint = point;
+                },
+              ),
+            ).build(),
           ),
         );
 
@@ -129,23 +125,21 @@ void main() {
       ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(sampleData)
-                    .mapping(x: 'x', y: 'y', color: 'category')
-                    .geomPoint()
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              '${point.getDisplayValue('category')}: ${point.getDisplayValue('y')}',
-                            ),
-                      ),
-                      click: ClickConfig(
-                        onTap: (point) => debugPrint('Clicked: ${point.data}'),
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(sampleData)
+                .mapping(x: 'x', y: 'y', color: 'category')
+                .geomPoint()
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      '${point.getDisplayValue('category')}: ${point.getDisplayValue('y')}',
+                    ),
+                  ),
+                  click: ClickConfig(
+                    onTap: (point) => debugPrint('Clicked: ${point.data}'),
+                  ),
+                )
+                .build(),
           ),
         );
 
@@ -162,23 +156,21 @@ void main() {
       ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(lineData)
-                    .mapping(x: 'month', y: 'users')
-                    .geomLine(strokeWidth: 2.0)
-                    .geomPoint(size: 6.0) // Add points for easier interaction
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')} users',
-                            ),
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous()
-                    .build(),
+            body: CristalyseChart()
+                .data(lineData)
+                .mapping(x: 'month', y: 'users')
+                .geomLine(strokeWidth: 2.0)
+                .geomPoint(size: 6.0) // Add points for easier interaction
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')} users',
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous()
+                .build(),
           ),
         );
 
@@ -200,29 +192,27 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(multiSeriesData)
-                    .mapping(x: 'month', y: 'users', color: 'platform')
-                    .geomLine(strokeWidth: 3.0)
-                    .geomPoint(size: 8.0)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(point.getDisplayValue('platform')),
-                                Text(
-                                  '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')}',
-                                ),
-                              ],
-                            ),
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous()
-                    .build(),
+            body: CristalyseChart()
+                .data(multiSeriesData)
+                .mapping(x: 'month', y: 'users', color: 'platform')
+                .geomLine(strokeWidth: 3.0)
+                .geomPoint(size: 8.0)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(point.getDisplayValue('platform')),
+                        Text(
+                          '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')}',
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous()
+                .build(),
           ),
         );
 
@@ -239,22 +229,20 @@ void main() {
       ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(lineData)
-                    .mapping(x: 'month', y: 'users')
-                    .geomArea(strokeWidth: 2.0, alpha: 0.3)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')} users',
-                            ),
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous()
-                    .build(),
+            body: CristalyseChart()
+                .data(lineData)
+                .mapping(x: 'month', y: 'users')
+                .geomArea(strokeWidth: 2.0, alpha: 0.3)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')} users',
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous()
+                .build(),
           ),
         );
 
@@ -276,28 +264,26 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(multiSeriesData)
-                    .mapping(x: 'month', y: 'users', color: 'platform')
-                    .geomArea(strokeWidth: 2.0, alpha: 0.3)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(point.getDisplayValue('platform')),
-                                Text(
-                                  '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')}',
-                                ),
-                              ],
-                            ),
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous()
-                    .build(),
+            body: CristalyseChart()
+                .data(multiSeriesData)
+                .mapping(x: 'month', y: 'users', color: 'platform')
+                .geomArea(strokeWidth: 2.0, alpha: 0.3)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(point.getDisplayValue('platform')),
+                        Text(
+                          '${point.getDisplayValue('month')}: ${point.getDisplayValue('users')}',
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous()
+                .build(),
           ),
         );
 
@@ -318,42 +304,41 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(dualAxisData)
-                    .mapping(x: 'month', y: 'revenue')
-                    .mappingY2('conversion')
-                    .geomArea(yAxis: YAxis.primary, alpha: 0.3)
-                    .geomArea(yAxis: YAxis.secondary, alpha: 0.3)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder: (point) {
-                          final hasRevenue = point.data.containsKey('revenue');
-                          final hasConversion = point.data.containsKey(
-                            'conversion',
-                          );
+            body: CristalyseChart()
+                .data(dualAxisData)
+                .mapping(x: 'month', y: 'revenue')
+                .mappingY2('conversion')
+                .geomArea(yAxis: YAxis.primary, alpha: 0.3)
+                .geomArea(yAxis: YAxis.secondary, alpha: 0.3)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) {
+                      final hasRevenue = point.data.containsKey('revenue');
+                      final hasConversion = point.data.containsKey(
+                        'conversion',
+                      );
 
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(point.getDisplayValue('month')),
-                              if (hasRevenue)
-                                Text(
-                                  'Revenue: \$${point.getDisplayValue('revenue')}k',
-                                ),
-                              if (hasConversion)
-                                Text(
-                                  'Conversion: ${point.getDisplayValue('conversion')}%',
-                                ),
-                            ],
-                          );
-                        },
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(min: 0)
-                    .scaleY2Continuous(min: 0, max: 30)
-                    .build(),
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(point.getDisplayValue('month')),
+                          if (hasRevenue)
+                            Text(
+                              'Revenue: \$${point.getDisplayValue('revenue')}k',
+                            ),
+                          if (hasConversion)
+                            Text(
+                              'Conversion: ${point.getDisplayValue('conversion')}%',
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
+                .scaleY2Continuous(min: 0, max: 30)
+                .build(),
           ),
         );
 
@@ -370,22 +355,20 @@ void main() {
       ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(barData)
-                    .mapping(x: 'quarter', y: 'revenue')
-                    .geomBar(width: 0.8)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
-                            ),
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(min: 0)
-                    .build(),
+            body: CristalyseChart()
+                .data(barData)
+                .mapping(x: 'quarter', y: 'revenue')
+                .geomBar(width: 0.8)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
+                .build(),
           ),
         );
 
@@ -407,30 +390,28 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(groupedData)
-                    .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                    .geomBar(style: BarStyle.grouped, width: 0.8)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Product ${point.getDisplayValue('product')}',
-                                ),
-                                Text(
-                                  '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
-                                ),
-                              ],
-                            ),
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(min: 0)
-                    .build(),
+            body: CristalyseChart()
+                .data(groupedData)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(style: BarStyle.grouped, width: 0.8)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Product ${point.getDisplayValue('product')}',
+                        ),
+                        Text(
+                          '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
+                .build(),
           ),
         );
 
@@ -452,22 +433,20 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(stackedData)
-                    .mapping(x: 'quarter', y: 'revenue', color: 'category')
-                    .geomBar(style: BarStyle.stacked, width: 0.8)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              '${point.getDisplayValue('category')}: \$${point.getDisplayValue('revenue')}k',
-                            ),
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(min: 0)
-                    .build(),
+            body: CristalyseChart()
+                .data(stackedData)
+                .mapping(x: 'quarter', y: 'revenue', color: 'category')
+                .geomBar(style: BarStyle.stacked, width: 0.8)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      '${point.getDisplayValue('category')}: \$${point.getDisplayValue('revenue')}k',
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
+                .build(),
           ),
         );
 
@@ -482,23 +461,21 @@ void main() {
       ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(barData)
-                    .mapping(x: 'quarter', y: 'revenue')
-                    .geomBar()
-                    .coordFlip()
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
-                            ),
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(min: 0)
-                    .build(),
+            body: CristalyseChart()
+                .data(barData)
+                .mapping(x: 'quarter', y: 'revenue')
+                .geomBar()
+                .coordFlip()
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
+                    ),
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
+                .build(),
           ),
         );
 
@@ -521,44 +498,43 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(dualAxisData)
-                    .mapping(x: 'month', y: 'revenue')
-                    .mappingY2('conversion')
-                    .geomBar(yAxis: YAxis.primary)
-                    .geomLine(yAxis: YAxis.secondary, strokeWidth: 3.0)
-                    .geomPoint(yAxis: YAxis.secondary, size: 8.0)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder: (point) {
-                          // Smart tooltip that shows relevant data based on geometry
-                          final hasRevenue = point.data.containsKey('revenue');
-                          final hasConversion = point.data.containsKey(
-                            'conversion',
-                          );
+            body: CristalyseChart()
+                .data(dualAxisData)
+                .mapping(x: 'month', y: 'revenue')
+                .mappingY2('conversion')
+                .geomBar(yAxis: YAxis.primary)
+                .geomLine(yAxis: YAxis.secondary, strokeWidth: 3.0)
+                .geomPoint(yAxis: YAxis.secondary, size: 8.0)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) {
+                      // Smart tooltip that shows relevant data based on geometry
+                      final hasRevenue = point.data.containsKey('revenue');
+                      final hasConversion = point.data.containsKey(
+                        'conversion',
+                      );
 
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(point.getDisplayValue('month')),
-                              if (hasRevenue)
-                                Text(
-                                  'Revenue: \$${point.getDisplayValue('revenue')}k',
-                                ),
-                              if (hasConversion)
-                                Text(
-                                  'Conversion: ${point.getDisplayValue('conversion')}%',
-                                ),
-                            ],
-                          );
-                        },
-                      ),
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(min: 0)
-                    .scaleY2Continuous(min: 0, max: 30)
-                    .build(),
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(point.getDisplayValue('month')),
+                          if (hasRevenue)
+                            Text(
+                              'Revenue: \$${point.getDisplayValue('revenue')}k',
+                            ),
+                          if (hasConversion)
+                            Text(
+                              'Conversion: ${point.getDisplayValue('conversion')}%',
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(min: 0)
+                .scaleY2Continuous(min: 0, max: 30)
+                .build(),
           ),
         );
 
@@ -575,29 +551,26 @@ void main() {
       ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(sampleData)
-                    .mapping(x: 'x', y: 'y', color: 'category')
-                    .geomLine(strokeWidth: 2.0, alpha: 0.8)
-                    .geomPoint(size: 6.0, alpha: 1.0)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Text(
-                              '${point.getDisplayValue('category')}: (${point.getDisplayValue('x')}, ${point.getDisplayValue('y')})',
-                            ),
-                      ),
-                      click: ClickConfig(
-                        onTap:
-                            (point) => debugPrint(
-                              'Combined chart clicked: ${point.data}',
-                            ),
-                      ),
-                    )
-                    .scaleXContinuous()
-                    .scaleYContinuous()
-                    .build(),
+            body: CristalyseChart()
+                .data(sampleData)
+                .mapping(x: 'x', y: 'y', color: 'category')
+                .geomLine(strokeWidth: 2.0, alpha: 0.8)
+                .geomPoint(size: 6.0, alpha: 1.0)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text(
+                      '${point.getDisplayValue('category')}: (${point.getDisplayValue('x')}, ${point.getDisplayValue('y')})',
+                    ),
+                  ),
+                  click: ClickConfig(
+                    onTap: (point) => debugPrint(
+                      'Combined chart clicked: ${point.data}',
+                    ),
+                  ),
+                )
+                .scaleXContinuous()
+                .scaleYContinuous()
+                .build(),
           ),
         );
 
@@ -614,15 +587,14 @@ void main() {
       ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data([])
-                    .mapping(x: 'x', y: 'y')
-                    .geomPoint()
-                    .interaction(
-                      tooltip: TooltipConfig(builder: (point) => Text('Empty')),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data([])
+                .mapping(x: 'x', y: 'y')
+                .geomPoint()
+                .interaction(
+                  tooltip: TooltipConfig(builder: (point) => Text('Empty')),
+                )
+                .build(),
           ),
         );
 
@@ -643,19 +615,17 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(dataWithNulls)
-                    .mapping(x: 'x', y: 'y', color: 'category')
-                    .geomPoint()
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) =>
-                                Text('Value: ${point.getDisplayValue('y')}'),
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(dataWithNulls)
+                .mapping(x: 'x', y: 'y', color: 'category')
+                .geomPoint()
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) =>
+                        Text('Value: ${point.getDisplayValue('y')}'),
+                  ),
+                )
+                .build(),
           ),
         );
 
@@ -670,18 +640,17 @@ void main() {
       ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(sampleData)
-                    .mapping(x: 'x', y: 'y')
-                    .geomPoint()
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder: (point) => Text('Should not show'),
-                      ),
-                      enabled: false, // Disable interactions
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(sampleData)
+                .mapping(x: 'x', y: 'y')
+                .geomPoint()
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Text('Should not show'),
+                  ),
+                  enabled: false, // Disable interactions
+                )
+                .build(),
           ),
         );
 
@@ -703,19 +672,17 @@ void main() {
 
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(largeData)
-                    .mapping(x: 'x', y: 'y', color: 'category')
-                    .geomPoint(size: 2.0)
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) =>
-                                Text('Point ${point.getDisplayValue('x')}'),
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(largeData)
+                .mapping(x: 'x', y: 'y', color: 'category')
+                .geomPoint(size: 2.0)
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) =>
+                        Text('Point ${point.getDisplayValue('x')}'),
+                  ),
+                )
+                .build(),
           ),
         );
 
@@ -732,21 +699,19 @@ void main() {
       ) async {
         final chart = MaterialApp(
           home: Scaffold(
-            body:
-                CristalyseChart()
-                    .data(sampleData)
-                    .mapping(x: 'x', y: 'y')
-                    .geomPoint()
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) =>
-                                Text('Rapid: ${point.getDisplayValue('y')}'),
-                        showDelay: Duration(milliseconds: 10), // Very fast
-                        hideDelay: Duration(milliseconds: 100),
-                      ),
-                    )
-                    .build(),
+            body: CristalyseChart()
+                .data(sampleData)
+                .mapping(x: 'x', y: 'y')
+                .geomPoint()
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) =>
+                        Text('Rapid: ${point.getDisplayValue('y')}'),
+                    showDelay: Duration(milliseconds: 10), // Very fast
+                    hideDelay: Duration(milliseconds: 100),
+                  ),
+                )
+                .build(),
           ),
         );
 

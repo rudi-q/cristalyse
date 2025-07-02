@@ -271,16 +271,15 @@ class _TooltipContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: config.backgroundColor,
         borderRadius: BorderRadius.circular(config.borderRadius),
-        boxShadow:
-            config.shadow != null
-                ? [config.shadow!]
-                : [
-                  const BoxShadow(
-                    color: Colors.black54,
-                    blurRadius: 8.0,
-                    offset: Offset(0, 2),
-                  ),
-                ],
+        boxShadow: config.shadow != null
+            ? [config.shadow!]
+            : [
+                const BoxShadow(
+                  color: Colors.black54,
+                  blurRadius: 8.0,
+                  offset: Offset(0, 2),
+                ),
+              ],
         border: Border.all(color: Colors.white24, width: 1),
       ),
       constraints: const BoxConstraints(
@@ -316,11 +315,8 @@ class ChartTooltipProvider extends InheritedWidget {
             .dependOnInheritedWidgetOfExactType<ChartTooltipProvider>()
             ?.state
         : (context
-                    .getElementForInheritedWidgetOfExactType<
-                      ChartTooltipProvider
-                    >()
-                    ?.widget
-                as ChartTooltipProvider?)
+                .getElementForInheritedWidgetOfExactType<ChartTooltipProvider>()
+                ?.widget as ChartTooltipProvider?)
             ?.state;
   }
 
