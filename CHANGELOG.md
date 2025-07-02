@@ -3,6 +3,76 @@
 - **Extended Example App Platform Support**
   - macOS, Linux, Web, iOS, Android
 
+## 0.8.2 - 2025-07-02
+
+- **Major Enhancement: Advanced Pan Control System**
+  - **Fixed chart position reset bug** - Charts now maintain their panned position across multiple pan gestures
+  - **Intelligent boundary detection** - Prevents over-panning beyond reasonable data limits with 50% extended range buffer
+  - **Selective axis panning control** - Independent X and Y axis panning with `updateXDomain` and `updateYDomain` boolean parameters
+  - **Enhanced pan domain persistence** - Pan state is properly maintained and doesn't reset to original position on subsequent interactions
+
+- **New Pan Configuration Options**
+  - `updateXDomain: true/false` - Enable/disable horizontal (X-axis) panning independently
+  - `updateYDomain: true/false` - Enable/disable vertical (Y-axis) panning independently
+  - Smart boundary checking with configurable limits to prevent chart from panning into unusable ranges
+  - Improved pan delta calculations for smoother, more natural panning experience
+
+- **Developer Experience Improvements**
+  - **Granular panning control**: Choose horizontal-only, vertical-only, both directions, or no panning
+  - **Time series optimization**: Perfect for time-based charts that only need horizontal scrolling
+  - **Scatter plot flexibility**: Enable both axes for full 2D exploration
+  - **Dashboard compatibility**: Configure different pan behaviors for different chart types in the same app
+  - **Backward compatibility**: Existing pan configurations continue to work without changes
+
+#### 📖 Usage Examples
+
+```dart
+// Horizontal-only panning (perfect for time series)
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'date', y: 'value')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      updateXDomain: true,   // ✅ Allow horizontal panning
+      updateYDomain: false,  // ❌ Disable vertical panning
+      onPanUpdate: (info) {
+        print('Horizontal range: ${info.visibleMinX} - ${info.visibleMaxX}');
+      },
+    ),
+  )
+  .build();
+
+// Vertical-only panning (useful for ranking charts)
+CristalyseChart()
+  .data(rankingData)
+  .mapping(x: 'category', y: 'score')
+  .geomBar()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      updateXDomain: false,  // ❌ Disable horizontal panning
+      updateYDomain: true,   // ✅ Allow vertical panning
+    ),
+  )
+  .build();
+
+// Full 2D panning (ideal for scatter plots)
+CristalyseChart()
+  .data(scatterData)
+  .mapping(x: 'xValue', y: 'yValue', color: 'category')
+  .geomPoint()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      updateXDomain: true,   // ✅ Allow horizontal panning
+      updateYDomain: true,   // ✅ Allow vertical panning
+    ),
+  )
+  .build();
+```
+
 ## 0.9.0 - 2025-07-02
 
 - **Enhanced SVG Export Implementation**

@@ -75,6 +75,10 @@ class _AnimatedCristalyseChartWidgetState
   List<double>? _panXDomain;
   List<double>? _panYDomain;
 
+  /// Original domain boundaries for pan limits
+  List<double>? _originalXDomain;
+  List<double>? _originalYDomain;
+
   @override
   void initState() {
     super.initState();
@@ -203,10 +207,16 @@ class _AnimatedCristalyseChartWidgetState
       );
 
       if (xScale is LinearScale) {
-        _panXDomain = List.from(xScale.domain);
+        // Initialize pan domain if not already set
+        _panXDomain ??= List.from(xScale.domain);
+        // Store original domain boundaries for pan limits
+        _originalXDomain ??= List.from(xScale.domain);
       }
       if (yScale is LinearScale) {
-        _panYDomain = List.from(yScale.domain);
+        // Initialize pan domain if not already set
+        _panYDomain ??= List.from(yScale.domain);
+        // Store original domain boundaries for pan limits
+        _originalYDomain ??= List.from(yScale.domain);
       }
     }
 
@@ -782,19 +792,49 @@ class _AnimatedCristalyseChartWidgetState
     final xDataDelta =
         -delta.dx / pixelsPerXUnit; // Negative for natural pan direction
 
-    // Update the pan domain progressively
-    _panXDomain![0] += xDataDelta;
-    _panXDomain![1] += xDataDelta;
+    // Update the pan domain progressively with boundary checks
+    if (widget.interaction.pan?.updateXDomain != false) { // Default to true if not specified
+      final newXMin = _panXDomain![0] + xDataDelta;
+      final newXMax = _panXDomain![1] + xDataDelta;
 
-    // Optionally handle Y panning too
-    if (_panYDomain != null) {
+      // Check boundaries to prevent panning beyond reasonable limits
+      // Allow panning as long as some portion of the original data is visible
+      final originalRange = _originalXDomain![1] - _originalXDomain![0];
+      final panRange = newXMax - newXMin;
+      
+      // Allow panning within a reasonable extended range
+      final minBoundary = _originalXDomain![0] - originalRange * 0.5;
+      final maxBoundary = _originalXDomain![1] + originalRange * 0.5;
+      
+      if (newXMin >= minBoundary && newXMax <= maxBoundary) {
+        _panXDomain![0] = newXMin;
+        _panXDomain![1] = newXMax;
+      }
+    }
+
+    // Optionally handle Y panning too with boundary checks
+    if (widget.interaction.pan?.updateYDomain == true && _panYDomain != null) {
       final yRange = _panYDomain![1] - _panYDomain![0];
       final pixelsPerYUnit = plotArea.height / yRange;
       final yDataDelta =
           delta.dy / pixelsPerYUnit; // Positive for natural pan direction
 
-      _panYDomain![0] += yDataDelta;
-      _panYDomain![1] += yDataDelta;
+      final newYMin = _panYDomain![0] + yDataDelta;
+      final newYMax = _panYDomain![1] + yDataDelta;
+
+      // Check boundaries to prevent panning beyond reasonable limits
+      // Allow panning as long as some portion of the original data is visible
+      final originalRange = _originalYDomain![1] - _originalYDomain![0];
+      final panRange = newYMax - newYMin;
+      
+      // Allow panning within a reasonable extended range
+      final minBoundary = _originalYDomain![0] - originalRange * 0.5;
+      final maxBoundary = _originalYDomain![1] + originalRange * 0.5;
+      
+      if (newYMin >= minBoundary && newYMax <= maxBoundary) {
+        _panYDomain![0] = newYMin;
+        _panYDomain![1] = newYMax;
+      }
     }
   }
 
