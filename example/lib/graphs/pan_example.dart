@@ -170,8 +170,9 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                   .interaction(
                     pan: PanConfig(
                       enabled: true,
-                      updateXDomain: true,  // Enable X-axis panning
-                      updateYDomain: false, // Disable Y-axis panning for this example
+                      updateXDomain: true, // Enable X-axis panning
+                      updateYDomain:
+                          false, // Disable Y-axis panning for this example
                       onPanStart: _handlePanStart,
                       onPanUpdate: _handlePanUpdate,
                       onPanEnd: _handlePanEnd,

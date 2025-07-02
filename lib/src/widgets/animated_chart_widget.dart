@@ -792,27 +792,18 @@ class _AnimatedCristalyseChartWidgetState
     final xDataDelta =
         -delta.dx / pixelsPerXUnit; // Negative for natural pan direction
 
-    // Update the pan domain progressively with boundary checks
-    if (widget.interaction.pan?.updateXDomain != false) { // Default to true if not specified
+    // Update the pan domain progressively - allow infinite panning
+    if (widget.interaction.pan?.updateXDomain != false) {
+      // Default to true if not specified
       final newXMin = _panXDomain![0] + xDataDelta;
       final newXMax = _panXDomain![1] + xDataDelta;
 
-      // Check boundaries to prevent panning beyond reasonable limits
-      // Allow panning as long as some portion of the original data is visible
-      final originalRange = _originalXDomain![1] - _originalXDomain![0];
-      final panRange = newXMax - newXMin;
-      
-      // Allow panning within a reasonable extended range
-      final minBoundary = _originalXDomain![0] - originalRange * 0.5;
-      final maxBoundary = _originalXDomain![1] + originalRange * 0.5;
-      
-      if (newXMin >= minBoundary && newXMax <= maxBoundary) {
-        _panXDomain![0] = newXMin;
-        _panXDomain![1] = newXMax;
-      }
+      // Always allow panning - no blocking, visual clipping will handle boundaries
+      _panXDomain![0] = newXMin;
+      _panXDomain![1] = newXMax;
     }
 
-    // Optionally handle Y panning too with boundary checks
+    // Optionally handle Y panning too - allow infinite panning
     if (widget.interaction.pan?.updateYDomain == true && _panYDomain != null) {
       final yRange = _panYDomain![1] - _panYDomain![0];
       final pixelsPerYUnit = plotArea.height / yRange;
@@ -822,19 +813,9 @@ class _AnimatedCristalyseChartWidgetState
       final newYMin = _panYDomain![0] + yDataDelta;
       final newYMax = _panYDomain![1] + yDataDelta;
 
-      // Check boundaries to prevent panning beyond reasonable limits
-      // Allow panning as long as some portion of the original data is visible
-      final originalRange = _originalYDomain![1] - _originalYDomain![0];
-      final panRange = newYMax - newYMin;
-      
-      // Allow panning within a reasonable extended range
-      final minBoundary = _originalYDomain![0] - originalRange * 0.5;
-      final maxBoundary = _originalYDomain![1] + originalRange * 0.5;
-      
-      if (newYMin >= minBoundary && newYMax <= maxBoundary) {
-        _panYDomain![0] = newYMin;
-        _panYDomain![1] = newYMax;
-      }
+      // Always allow panning - visual clipping will handle boundaries
+      _panYDomain![0] = newYMin;
+      _panYDomain![1] = newYMax;
     }
   }
 
@@ -1003,6 +984,10 @@ class _AnimatedChartPainter extends CustomPainter {
     _drawBackground(canvas, plotArea);
     _drawGrid(canvas, plotArea, xScale, yScale, y2Scale);
 
+    // Clip rendering to plot area to prevent drawing over axis labels
+    canvas.save();
+    canvas.clipRect(plotArea);
+
     for (final geometry in geometries) {
       final useY2 = geometry.yAxis == YAxis.secondary;
       final activeYScale = useY2 ? y2Scale ?? yScale : yScale;
@@ -1018,6 +1003,9 @@ class _AnimatedChartPainter extends CustomPainter {
         useY2,
       );
     }
+
+    // Restore canvas state to draw axes outside clipped area
+    canvas.restore();
 
     _drawAxes(canvas, size, plotArea, xScale, yScale, y2Scale);
   }

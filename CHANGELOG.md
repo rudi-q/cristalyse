@@ -1,28 +1,48 @@
-## 0.9.1 - 2025-07-05
+## 0.9.2 - 2025-07-03
 
-- **Extended Example App Platform Support**
-  - macOS, Linux, Web, iOS, Android
-
-## 0.8.2 - 2025-07-02
-
-- **Major Enhancement: Advanced Pan Control System**
+- **Major Enhancement: Advanced Pan Control System with Visual Clipping**
   - **Fixed chart position reset bug** - Charts now maintain their panned position across multiple pan gestures
-  - **Intelligent boundary detection** - Prevents over-panning beyond reasonable data limits with 50% extended range buffer
+  - **Infinite panning capability** - Users can now pan infinitely in any direction without hitting boundaries
+  - **Visual clipping implementation** - Data points that would appear outside the plot area are cleanly cut off
+  - **Professional chart boundaries** - Prevents data rendering over Y-axis labels while maintaining smooth pan experience
   - **Selective axis panning control** - Independent X and Y axis panning with `updateXDomain` and `updateYDomain` boolean parameters
   - **Enhanced pan domain persistence** - Pan state is properly maintained and doesn't reset to original position on subsequent interactions
 
 - **New Pan Configuration Options**
   - `updateXDomain: true/false` - Enable/disable horizontal (X-axis) panning independently
   - `updateYDomain: true/false` - Enable/disable vertical (Y-axis) panning independently
-  - Smart boundary checking with configurable limits to prevent chart from panning into unusable ranges
+  - **Canvas clipping optimization** - Efficient rendering pipeline that clips geometries to plot area without affecting axes
+  - **No more pan blocking** - Removed restrictive boundary checks that prevented natural panning behavior
   - Improved pan delta calculations for smoother, more natural panning experience
 
-- **Developer Experience Improvements**
+- **Enhanced Pan User Experience**
+  - **Smooth infinite exploration** - Users can explore data ranges far beyond original dataset boundaries
+  - **Clean visual presentation** - Chart maintains professional appearance with proper axis label visibility
+  - **Responsive performance** - Clipping operations are optimized for smooth 60fps panning
   - **Granular panning control**: Choose horizontal-only, vertical-only, both directions, or no panning
   - **Time series optimization**: Perfect for time-based charts that only need horizontal scrolling
   - **Scatter plot flexibility**: Enable both axes for full 2D exploration
   - **Dashboard compatibility**: Configure different pan behaviors for different chart types in the same app
   - **Backward compatibility**: Existing pan configurations continue to work without changes
+
+#### 🎯 Technical Implementation
+
+```dart
+// Canvas clipping ensures clean boundaries
+canvas.save();
+canvas.clipRect(plotArea);  // Clip all geometries to plot area
+
+// Draw all chart geometries (points, lines, bars, areas)
+for (final geometry in geometries) {
+  _drawGeometry(canvas, plotArea, geometry, ...);
+}
+
+// Restore canvas state for axis rendering
+canvas.restore();
+_drawAxes(canvas, size, plotArea, xScale, yScale, y2Scale);
+```
+
+**Result**: Perfect balance between infinite panning freedom and professional visual boundaries.
 
 #### 📖 Usage Examples
 
@@ -72,6 +92,11 @@ CristalyseChart()
   )
   .build();
 ```
+
+## 0.9.1 - 2025-07-02
+
+- **Extended Example App Platform Support**
+  - macOS, Linux, Web, iOS, Android
 
 ## 0.9.0 - 2025-07-02
 
