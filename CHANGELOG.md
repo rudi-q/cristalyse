@@ -1,3 +1,8 @@
+## 0.9.1 - 2025-07-05
+
+- **Extended Example App Platform Support**
+  - macOS, Linux, Web, iOS, Android
+
 ## 0.9.0 - 2025-07-02
 
 - **Enhanced SVG Export Implementation**

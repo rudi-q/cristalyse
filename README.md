@@ -526,7 +526,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.9.0** - Production ready with enhanced dual Y-axis SVG export and comprehensive interactive capabilities
+**Current Version: 0.9.1** - Production ready with enhanced dual Y-axis SVG export and comprehensive interactive capabilities
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
