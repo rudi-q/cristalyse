@@ -1,6 +1,6 @@
 <p>
   <a href="https://docs.cristalyse.com">
-    <img src="docs/logo/logo.svg" alt="Cristalyse" width="400"/>
+    <img src="doc/logo/logo.svg" alt="Cristalyse" width="400"/>
   </a>
 </p>
 
@@ -24,7 +24,7 @@
 
 <p align="center" style="padding-left: 5em;">
   <a href="https://docs.cristalyse.com">
-    <img src="docs/logo/dark.svg" alt="Cristalyse Documentation" width="400"/>
+    <img src="doc/logo/dark.svg" alt="Cristalyse Documentation" width="400"/>
   </a>
 </p>
 
@@ -63,7 +63,7 @@
 
 <p align="center">
   <a href="https://docs.cristalyse.com">
-    <img src="docs/images/documentation.png" alt="Cristalyse Documentation Screenshot" width="70%"/>
+    <img src="doc/images/documentation.png" alt="Cristalyse Documentation Screenshot" width="70%"/>
   </a>
   <br/>
   <em>Comprehensive guides, examples, and API reference</em>
@@ -117,7 +117,7 @@
 <td width="50%">
 
 <p align="center">
-  <img src="docs/images/hero-dark.png" alt="Cristalyse Chart Showcase" width="400"/>
+  <img src="doc/images/hero-dark.png" alt="Cristalyse Chart Showcase" width="400"/>
   <br/>
   <em>Build stunning, interactive charts with the power of grammar of graphics</em>
 </p>

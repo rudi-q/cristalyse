@@ -6,7 +6,7 @@
   - Professional documentation site with enhanced visual examples and comprehensive chart type coverage
 
 <p align="center">
-  <img src="docs/images/documentation.png" alt="Cristalyse Documentation Site" width="600"/>
+  <img src="doc/images/documentation.png" alt="Cristalyse Documentation Site" width="600"/>
   <br/>
   <em>👉 Visit <a href="https://docs.cristalyse.com">docs.cristalyse.com</a> for complete guides and examples</em>
 </p>
