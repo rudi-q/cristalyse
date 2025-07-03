@@ -1,4 +1,8 @@
-# 🔮 Cristalyse
+<p>
+  <a href="https://docs.cristalyse.com">
+    <img src="docs/logo/logo.svg" alt="Cristalyse" width="400"/>
+  </a>
+</p>
 
 **The grammar of graphics visualization library that Flutter developers have been waiting for.**
 
@@ -7,9 +11,69 @@
 [![likes](https://img.shields.io/pub/likes/cristalyse)](https://pub.dev/packages/cristalyse/score)
 [![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-blue)](https://flutter.dev/)
 [![Flutter support](https://img.shields.io/badge/Flutter-1.17%2B-blue)](https://flutter.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Dart support](https://img.shields.io/badge/Dart-3.0%2B-blue)](https://dart.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 > Finally, create beautiful data visualizations in Flutter without fighting against chart widgets or settling for web-based solutions.
+
+---
+
+<table>
+<tr>
+<td width="45%">
+
+<p align="center" style="padding-left: 5em;">
+  <a href="https://docs.cristalyse.com">
+    <img src="docs/logo/dark.svg" alt="Cristalyse Documentation" width="400"/>
+  </a>
+</p>
+
+<p>
+  <strong>Visit our complete documentation for step-by-step guides, interactive examples,<br/>and everything you need to master data visualization in Flutter.</strong>
+</p>
+
+<p align="center">
+  <a href="https://docs.cristalyse.com">
+    <img src="https://img.shields.io/badge/📖_Read_Docs-2D3748?style=for-the-badge&logoColor=white&labelColor=2D3748" alt="Read Documentation"/>
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://docs.cristalyse.com/quickstart">
+    <img src="https://img.shields.io/badge/⚡_Quick_Start-4A5568?style=for-the-badge&logoColor=white&labelColor=4A5568" alt="Quick Start Guide"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://docs.cristalyse.com/examples">
+    <img src="https://img.shields.io/badge/🎨_Examples-718096?style=for-the-badge&logoColor=white&labelColor=718096" alt="View Examples"/>
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://github.com/rudrankriyam/cristalyse">
+    <img src="https://img.shields.io/badge/📦_View_Source-8B9DC3?style=for-the-badge&logoColor=white&labelColor=8B9DC3" alt="View Source Code"/>
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://cristalyse.com">
+    <img src="https://img.shields.io/badge/🌐_Visit_Website-A0AEC0?style=for-the-badge&logoColor=white&labelColor=A0AEC0" alt="Visit Website"/>
+  </a>
+</p>
+
+</td>
+<td width="55%">
+
+<p align="center">
+  <a href="https://docs.cristalyse.com">
+    <img src="docs/images/documentation.png" alt="Cristalyse Documentation Screenshot" width="70%"/>
+  </a>
+  <br/>
+  <em>Comprehensive guides, examples, and API reference</em>
+</p>
+
+</td>
+</tr>
+</table>
+
+---
 
 ## ✨ Why Cristalyse?
 
@@ -38,12 +102,29 @@
   <em>Progressive line drawing with customizable themes and multi-series support</em>
 </p>
 
+<table>
+<tr>
+<td width="50%">
+
 ## 🎯 Perfect For
 
 - **Flutter developers** building data-driven apps who need more than basic chart widgets
 - **Data scientists** who want to deploy interactive visualizations to mobile without learning Swift/Kotlin
 - **Enterprise teams** building dashboards that need consistent UX across all platforms
 - **Business analysts** creating professional reports with dual Y-axis charts and advanced visualizations
+
+</td>
+<td width="50%">
+
+<p align="center">
+  <img src="docs/images/hero-dark.png" alt="Cristalyse Chart Showcase" width="400"/>
+  <br/>
+  <em>Build stunning, interactive charts with the power of grammar of graphics</em>
+</p>
+
+</td>
+</tr>
+</table>
 
 ## 🚀 Quick Start
 
@@ -526,7 +607,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 0.9.2** - Production ready with enhanced dual Y-axis SVG export and comprehensive interactive capabilities
+**Current Version: 0.9.3** - Production ready with enhanced dual Y-axis SVG export and comprehensive interactive capabilities
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 

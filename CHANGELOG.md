@@ -1,3 +1,16 @@
+## 0.9.3 - 2025-07-03
+
+- **📖 Comprehensive Documentation Site Now Live**
+  - **[docs.cristalyse.com](https://docs.cristalyse.com)** is now available with complete guides, examples, and API reference
+  - Step-by-step tutorials, and everything you need to master data visualization in Flutter
+  - Professional documentation site with enhanced visual examples and comprehensive chart type coverage
+
+<p align="center">
+  <img src="docs/images/documentation.png" alt="Cristalyse Documentation Site" width="600"/>
+  <br/>
+  <em>👉 Visit <a href="https://docs.cristalyse.com">docs.cristalyse.com</a> for complete guides and examples</em>
+</p>
+
 ## 0.9.2 - 2025-07-03
 
 - **Major Enhancement: Advanced Pan Control System with Visual Clipping**

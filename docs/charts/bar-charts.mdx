@@ -7,6 +7,13 @@ description: "Categorical data visualization with multiple variations"
 
 Bar charts are ideal for comparing categorical data. Cristalyse supports vertical, horizontal, grouped, and stacked bar charts with smooth animations and customizable styling.
 
+<div align="center">
+  <img src="/images/cristalyse_bar_chart.gif" alt="Animated Bar Chart" width="400"/>
+  <img src="/images/cristalyse_horizontal_bar_chart.gif" alt="Horizontal Bar Chart" width="400"/>
+  <br/>
+  <em>Vertical and horizontal bar charts with staggered animations</em>
+</div>
+
 ## Basic Bar Chart
 
 Create a simple vertical bar chart:
@@ -37,6 +44,12 @@ CristalyseChart()
 
 Compare multiple series side-by-side:
 
+<div align="center">
+  <img src="/images/cristalyse_grouped_bar_chart.gif" alt="Grouped Bar Chart" width="600"/>
+  <br/>
+  <em>Grouped bar charts for comparing multiple series side-by-side</em>
+</div>
+
 ```dart
 final productData = [
   {'quarter': 'Q1', 'revenue': 120, 'product': 'Widget A'},
@@ -62,6 +75,12 @@ CristalyseChart()
 ## Stacked Bar Charts
 
 Show composition and totals:
+
+<div align="center">
+  <img src="/images/cristalyse_stacked_bar_chart.gif" alt="Stacked Bar Chart" width="600"/>
+  <br/>
+  <em>Stacked bars with segment-by-segment progressive animation</em>
+</div>
 
 ```dart
 final budgetData = [
