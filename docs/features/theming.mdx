@@ -1,0 +1,381 @@
+---
+title: "Theming"
+description: "Customize visual appearance with comprehensive theming system"
+---
+
+## Overview
+
+Cristalyse's theming system provides complete control over chart appearance. Choose from built-in themes or create custom designs that match your brand perfectly.
+
+## Built-in Themes
+
+### Default Light Theme
+
+Perfect for standard applications with clean, professional aesthetics:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'revenue')
+  .geomBar()
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+### Dark Theme  
+
+Optimized for dark mode interfaces and low-light environments:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .geomLine(strokeWidth: 3.0)
+  .theme(ChartTheme.darkTheme())
+  .build()
+```
+
+### Solarized Light
+
+Based on the popular Solarized color scheme, easy on the eyes:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'metric', color: 'series')
+  .geomPoint(size: 6.0)
+  .theme(ChartTheme.solarizedLightTheme())
+  .build()
+```
+
+### Solarized Dark
+
+Dark variant of Solarized for comfortable night viewing:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'date', y: 'price')
+  .geomArea(alpha: 0.4)
+  .theme(ChartTheme.solarizedDarkTheme())
+  .build()
+```
+
+## Theme Properties
+
+<Tabs>
+  <Tab title="Colors">
+    - `backgroundColor` - Chart container background
+    - `plotBackgroundColor` - Data plotting area background  
+    - `primaryColor` - Default geometry color
+    - `borderColor` - Chart borders and outlines
+    - `gridColor` - Grid line color
+    - `axisColor` - Axis lines and labels
+    - `colorPalette` - Array of colors for multi-series data
+  </Tab>
+  
+  <Tab title="Dimensions">
+    - `gridWidth` - Thickness of grid lines
+    - `axisWidth` - Thickness of axis lines
+    - `pointSizeDefault` - Default point size
+    - `pointSizeMin` - Minimum point size for scaling
+    - `pointSizeMax` - Maximum point size for scaling
+    - `padding` - Chart margins and spacing
+  </Tab>
+  
+  <Tab title="Typography">
+    - `axisTextStyle` - Style for axis tick labels
+    - `axisLabelStyle` - Style for axis titles
+  </Tab>
+</Tabs>
+
+## Creating Custom Themes
+
+### Corporate Branding
+
+Create themes that match your brand colors:
+
+```dart
+final brandTheme = ChartTheme(
+  backgroundColor: const Color(0xFFF8F9FA),
+  plotBackgroundColor: Colors.white,
+  primaryColor: const Color(0xFF007ACC), // Brand blue
+  borderColor: const Color(0xFFE1E5E9),
+  gridColor: const Color(0xFFF1F3F4),
+  axisColor: const Color(0xFF5F6368),
+  gridWidth: 0.5,
+  axisWidth: 1.2,
+  pointSizeDefault: 5.0,
+  pointSizeMin: 3.0,
+  pointSizeMax: 15.0,
+  colorPalette: [
+    const Color(0xFF007ACC), // Primary blue
+    const Color(0xFFFF6B35), // Orange accent
+    const Color(0xFF28A745), // Success green  
+    const Color(0xFFDC3545), // Warning red
+    const Color(0xFF6F42C1), // Purple
+    const Color(0xFF20C997), // Teal
+  ],
+  padding: const EdgeInsets.fromLTRB(60, 20, 30, 50),
+  axisTextStyle: const TextStyle(
+    fontSize: 11,
+    color: Color(0xFF5F6368),
+    fontWeight: FontWeight.w500,
+  ),
+  axisLabelStyle: const TextStyle(
+    fontSize: 13,
+    color: Color(0xFF202124),
+    fontWeight: FontWeight.w600,
+  ),
+);
+
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'region')
+  .geomBar(style: BarStyle.grouped)
+  .theme(brandTheme)
+  .build()
+```
+
+### High Contrast Accessibility
+
+Optimize for users with visual impairments:
+
+```dart
+final accessibleTheme = ChartTheme(
+  backgroundColor: Colors.white,
+  plotBackgroundColor: Colors.white,
+  primaryColor: Colors.black,
+  borderColor: Colors.black,
+  gridColor: const Color(0xFF666666),
+  axisColor: Colors.black,
+  gridWidth: 1.0,
+  axisWidth: 2.0,
+  pointSizeDefault: 8.0,
+  pointSizeMin: 6.0,
+  pointSizeMax: 20.0,
+  colorPalette: [
+    Colors.black,
+    const Color(0xFF0066CC), // High contrast blue
+    const Color(0xFFCC0000), // High contrast red
+    const Color(0xFF009900), // High contrast green
+    const Color(0xFFFF6600), // High contrast orange
+  ],
+  padding: const EdgeInsets.all(20),
+  axisTextStyle: const TextStyle(
+    fontSize: 14,
+    color: Colors.black,
+    fontWeight: FontWeight.bold,
+  ),
+);
+```
+
+### Minimal Theme
+
+Clean design for modern interfaces:
+
+```dart
+final minimalTheme = ChartTheme(
+  backgroundColor: Colors.transparent,
+  plotBackgroundColor: Colors.transparent,
+  primaryColor: const Color(0xFF2196F3),
+  borderColor: Colors.transparent,
+  gridColor: const Color(0x1A000000),
+  axisColor: const Color(0xFF757575),
+  gridWidth: 0.5,
+  axisWidth: 0.8,
+  pointSizeDefault: 4.0,
+  pointSizeMin: 2.0,
+  pointSizeMax: 10.0,
+  colorPalette: [
+    const Color(0xFF2196F3),
+    const Color(0xFFFF5722),
+    const Color(0xFF4CAF50),
+    const Color(0xFFFFC107),
+    const Color(0xFF9C27B0),
+  ],
+  padding: const EdgeInsets.fromLTRB(40, 10, 10, 30),
+  axisTextStyle: const TextStyle(
+    fontSize: 10,
+    color: Color(0xFF757575),
+  ),
+);
+```
+
+## Theme Modifications
+
+### Using copyWith()
+
+Modify existing themes while preserving most properties:
+
+```dart
+// Customize default theme colors
+final customTheme = ChartTheme.defaultTheme().copyWith(
+  primaryColor: Colors.deepPurple,
+  colorPalette: [
+    Colors.deepPurple,
+    Colors.amber,
+    Colors.teal,
+    Colors.pink,
+  ],
+);
+
+// Adjust dark theme spacing
+final spaciousTheme = ChartTheme.darkTheme().copyWith(
+  padding: const EdgeInsets.all(40),
+  pointSizeDefault: 8.0,
+);
+
+// Update typography
+final boldTheme = ChartTheme.solarizedLightTheme().copyWith(
+  axisTextStyle: const TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.bold,
+    color: Color(0xFF586e75),
+  ),
+);
+```
+
+### Dynamic Theme Selection
+
+Switch themes based on app state:
+
+```dart
+class ThemeAwareChart extends StatelessWidget {
+  final bool isDarkMode;
+  final List<Map<String, dynamic>> data;
+
+  const ThemeAwareChart({
+    required this.isDarkMode,
+    required this.data,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = isDarkMode 
+        ? ChartTheme.darkTheme()
+        : ChartTheme.defaultTheme();
+    
+    return CristalyseChart()
+      .data(data)
+      .mapping(x: 'x', y: 'y')
+      .geomLine()
+      .theme(theme)
+      .animate(duration: const Duration(milliseconds: 300))
+      .build();
+  }
+}
+```
+
+## Advanced Theming Patterns
+
+### Conditional Color Palettes
+
+Adapt colors based on data characteristics:
+
+```dart
+ChartTheme adaptiveTheme(List<Map<String, dynamic>> data) {
+  final categories = data.map((d) => d['category']).toSet().length;
+  
+  // Use different palettes based on data complexity
+  final palette = categories <= 3
+      ? [Colors.blue, Colors.orange, Colors.green]
+      : [
+          Colors.blue[400]!, Colors.blue[600]!, Colors.blue[800]!,
+          Colors.orange[400]!, Colors.orange[600]!, Colors.orange[800]!,
+          Colors.green[400]!, Colors.green[600]!, Colors.green[800]!,
+        ];
+        
+  return ChartTheme.defaultTheme().copyWith(
+    colorPalette: palette,
+  );
+}
+```
+
+### Responsive Theme Sizing
+
+Adjust theme properties based on screen size:
+
+```dart
+ChartTheme responsiveTheme(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final isSmallScreen = screenWidth < 600;
+  
+  return ChartTheme.defaultTheme().copyWith(
+    padding: EdgeInsets.all(isSmallScreen ? 16 : 32),
+    axisTextStyle: TextStyle(
+      fontSize: isSmallScreen ? 10 : 12,
+      color: Colors.black87,
+    ),
+    pointSizeDefault: isSmallScreen ? 3.0 : 5.0,
+    gridWidth: isSmallScreen ? 0.3 : 0.5,
+  );
+}
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Color Accessibility">
+    - Ensure sufficient contrast ratios (4.5:1 minimum)
+    - Test with colorblind-friendly palettes
+    - Provide alternative visual cues beyond color
+    - Consider WCAG 2.1 guidelines for data visualization
+  </Accordion>
+  
+  <Accordion title="Consistency">
+    - Use the same theme across related charts
+    - Maintain consistent color meanings (red = danger, green = success)
+    - Keep typography hierarchy consistent
+    - Align with your app's overall design system
+  </Accordion>
+  
+  <Accordion title="Performance">
+    - Reuse theme objects rather than creating new ones
+    - Cache theme calculations for dynamic themes
+    - Use `copyWith()` for minor modifications
+    - Consider theme switching animation performance
+  </Accordion>
+  
+  <Accordion title="Customization">
+    - Start with built-in themes as foundation
+    - Test themes with various data types and sizes
+    - Consider responsive design for different screen sizes
+    - Document custom theme usage for team members
+  </Accordion>
+</AccordionGroup>
+
+## Theme Gallery
+
+<CardGroup cols={2}>
+  <Card title="Corporate Blue" icon="palette">
+    Professional theme with brand-focused blue palette and clean typography
+  </Card>
+  <Card title="High Contrast" icon="accessibility">
+    WCAG-compliant theme optimized for visual accessibility
+  </Card>
+  <Card title="Minimal Dark" icon="moon">
+    Clean dark theme perfect for modern dashboards
+  </Card>
+  <Card title="Scientific" icon="chart-line">
+    High-precision theme designed for scientific data visualization
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Interactions" icon="hand-pointer" href="/features/interactions">
+    Add hover effects and user interactions to themed charts
+  </Card>
+  <Card title="Animations" icon="sparkles" href="/features/animations">
+    Animate theme transitions and chart rendering
+  </Card>
+  <Card title="Export" icon="download" href="/features/export">
+    Export themed charts with consistent styling
+  </Card>
+  <Card title="Custom Themes" icon="brush" href="/advanced/custom-themes">
+    Advanced techniques for creating complex theme systems
+  </Card>
+</CardGroup>

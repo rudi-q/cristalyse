@@ -1,0 +1,118 @@
+---
+title: 'Quick Start'
+description: 'Create your first chart in 30 seconds'
+---
+
+## Your First Chart in 30 Seconds
+
+Let's create a beautiful scatter plot with just a few lines of code.
+
+<Steps>
+  <Step title="Import Cristalyse">
+    Add the import to your Dart file:
+    ```dart
+    import 'package:cristalyse/cristalyse.dart';
+    import 'package:flutter/material.dart';
+    ```
+  </Step>
+  
+  <Step title="Prepare Your Data">
+    Create a simple dataset:
+    ```dart
+    final data = [
+      {'x': 1, 'y': 2, 'category': 'A'},
+      {'x': 2, 'y': 3, 'category': 'B'},
+      {'x': 3, 'y': 1, 'category': 'A'},
+      {'x': 4, 'y': 4, 'category': 'C'},
+    ];
+    ```
+  </Step>
+  
+  <Step title="Build Your Chart">
+    Create the chart with grammar of graphics:
+    ```dart
+    CristalyseChart()
+      .data(data)
+      .mapping(x: 'x', y: 'y', color: 'category')
+      .geomPoint(
+        size: 8.0,
+        alpha: 0.8,
+        shape: PointShape.triangle,
+        borderWidth: 1.5,
+      )
+      .scaleXContinuous()
+      .scaleYContinuous()
+      .theme(ChartTheme.defaultTheme())
+      .build()
+    ```
+  </Step>
+</Steps>
+
+## Complete Example
+
+Here's the full widget ready to use:
+
+```dart
+import 'package:cristalyse/cristalyse.dart';
+import 'package:flutter/material.dart';
+
+class MyFirstChart extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final data = [
+      {'x': 1, 'y': 2, 'category': 'A'},
+      {'x': 2, 'y': 3, 'category': 'B'},
+      {'x': 3, 'y': 1, 'category': 'A'},
+      {'x': 4, 'y': 4, 'category': 'C'},
+    ];
+
+    return Scaffold(
+      appBar: AppBar(title: Text('My First Chart')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: CristalyseChart()
+          .data(data)
+          .mapping(x: 'x', y: 'y', color: 'category')
+          .geomPoint(
+            size: 8.0,
+            alpha: 0.8,
+            shape: PointShape.triangle,
+            borderWidth: 1.5,
+          )
+          .scaleXContinuous()
+          .scaleYContinuous()
+          .theme(ChartTheme.defaultTheme())
+          .build(),
+      ),
+    );
+  }
+}
+```
+
+**Result:** A beautiful, animated scatter plot with color-coded categories!
+
+## Understanding the Grammar
+
+Cristalyse follows the **Grammar of Graphics** pattern:
+
+<AccordionGroup>
+  <Accordion title="📊 Data">
+    `.data()` - Your dataset as a List of Map objects
+  </Accordion>
+  
+  <Accordion title="🎨 Mapping">
+    `.mapping()` - Connect data columns to visual properties (x, y, color, size)
+  </Accordion>
+  
+  <Accordion title="⭐ Geometry">
+    `.geomPoint()`, `.geomLine()`, `.geomBar()` - How to visualize the data
+  </Accordion>
+  
+  <Accordion title="📏 Scales">
+    `.scaleXContinuous()`, `.scaleYContinuous()` - Transform data to screen coordinates
+  </Accordion>
+  
+  <Accordion title="🎨 Theme">
+    `.theme()` - Colors, fonts, and visual styling
+  </Accordion>
+</AccordionGroup>

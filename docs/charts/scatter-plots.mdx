@@ -1,0 +1,362 @@
+---
+title: "Scatter Plots"
+description: "Point-based visualizations with size and color mapping"
+---
+
+## Overview
+
+Scatter plots are perfect for exploring relationships between two continuous variables. Cristalyse's scatter plots support multi-dimensional encoding through color, size, and shape mappings.
+
+## Basic Scatter Plot
+
+The simplest scatter plot maps X and Y coordinates to data:
+
+```dart
+final data = [
+  {'x': 1, 'y': 2},
+  {'x': 2, 'y': 3},
+  {'x': 3, 'y': 1},
+  {'x': 4, 'y': 4},
+];
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .scaleXContinuous()
+  .scaleYContinuous()
+  .build()
+```
+
+## Color Mapping
+
+Add categorical grouping with color:
+
+```dart
+final data = [
+  {'x': 1, 'y': 2, 'category': 'A'},
+  {'x': 2, 'y': 3, 'category': 'B'},
+  {'x': 3, 'y': 1, 'category': 'A'},
+  {'x': 4, 'y': 4, 'category': 'C'},
+];
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint(size: 8.0, alpha: 0.8)
+  .scaleXContinuous()
+  .scaleYContinuous()
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Size Mapping
+
+Encode a third dimension with point size:
+
+```dart
+final salesData = [
+  {'revenue': 100, 'deals': 25, 'region': 'North', 'team_size': 5},
+  {'revenue': 150, 'deals': 30, 'region': 'South', 'team_size': 8},
+  {'revenue': 80, 'deals': 20, 'region': 'East', 'team_size': 3},
+  {'revenue': 200, 'deals': 35, 'region': 'West', 'team_size': 12},
+];
+
+CristalyseChart()
+  .data(salesData)
+  .mapping(
+    x: 'revenue', 
+    y: 'deals', 
+    color: 'region', 
+    size: 'team_size'
+  )
+  .geomPoint(alpha: 0.7)
+  .scaleXContinuous(min: 0)
+  .scaleYContinuous(min: 0)
+  .build()
+```
+
+## Point Styling
+
+### Shape Options
+
+Customize point shapes for different data categories:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint(
+    size: 10.0,
+    shape: PointShape.triangle,  // circle, square, triangle, diamond
+    borderWidth: 2.0,
+    alpha: 0.8,
+  )
+  .build()
+```
+
+Available shapes:
+- `PointShape.circle` (default)
+- `PointShape.square`
+- `PointShape.triangle`
+- `PointShape.diamond`
+
+### Advanced Styling
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint(
+    size: 12.0,
+    alpha: 0.8,
+    shape: PointShape.circle,
+    borderWidth: 1.5,        // Border thickness
+    color: Colors.blue,      // Override color mapping
+  )
+  .build()
+```
+
+## Multi-Dimensional Analysis
+
+### Business Intelligence Example
+
+Analyze sales performance across multiple dimensions:
+
+```dart
+final performanceData = [
+  {
+    'revenue': 150000,
+    'customer_satisfaction': 4.2,
+    'region': 'North America',
+    'deal_count': 45,
+    'rep_experience': 3.5,
+  },
+  {
+    'revenue': 120000,
+    'customer_satisfaction': 3.8,
+    'region': 'Europe',
+    'deal_count': 38,
+    'rep_experience': 2.1,
+  },
+  {
+    'revenue': 180000,
+    'customer_satisfaction': 4.6,
+    'region': 'Asia Pacific',
+    'deal_count': 52,
+    'rep_experience': 5.2,
+  },
+];
+
+CristalyseChart()
+  .data(performanceData)
+  .mapping(
+    x: 'revenue',
+    y: 'customer_satisfaction',
+    color: 'region',
+    size: 'deal_count',
+  )
+  .geomPoint(alpha: 0.7, borderWidth: 1.0)
+  .scaleXContinuous(min: 0)
+  .scaleYContinuous(min: 1, max: 5)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Interactive Scatter Plots
+
+### Tooltips
+
+Add rich hover information:
+
+```dart
+CristalyseChart()
+  .data(performanceData)
+  .mapping(x: 'revenue', y: 'customer_satisfaction', color: 'region')
+  .geomPoint(size: 8.0)
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) {
+        final region = point.getDisplayValue('region');
+        final revenue = point.getDisplayValue('revenue');
+        final satisfaction = point.getDisplayValue('customer_satisfaction');
+        
+        return Container(
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                region,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                'Revenue: \$${revenue}',
+                style: TextStyle(color: Colors.white),
+              ),
+              Text(
+                'Satisfaction: ${satisfaction}/5',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  )
+  .build()
+```
+
+### Click Handlers
+
+React to point selection:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint(size: 8.0)
+  .interaction(
+    click: ClickConfig(
+      onTap: (point) {
+        print('Selected point: ${point.data}');
+        // Navigate to detail view
+        // Show dialog
+        // Update other charts
+      },
+    ),
+  )
+  .build()
+```
+
+## Animation
+
+### Entrance Animation
+
+Animate points appearing:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint(size: 8.0, alpha: 0.8)
+  .animate(
+    duration: Duration(milliseconds: 800),
+    curve: Curves.elasticOut,
+  )
+  .build()
+```
+
+### Staggered Animation
+
+Points appear in sequence:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint(size: 10.0)
+  .animate(
+    duration: Duration(milliseconds: 1200),
+    curve: Curves.easeInOutCubic,
+  )
+  .build()
+```
+
+## Dual Y-Axis Support
+
+Use scatter plots on secondary Y-axis:
+
+```dart
+final mixedData = [
+  {'quarter': 'Q1', 'revenue': 120, 'efficiency': 85, 'satisfaction': 4.2},
+  {'quarter': 'Q2', 'revenue': 150, 'efficiency': 92, 'satisfaction': 4.5},
+  {'quarter': 'Q3', 'revenue': 110, 'efficiency': 78, 'satisfaction': 3.9},
+];
+
+CristalyseChart()
+  .data(mixedData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .mappingY2('satisfaction')
+  .geomBar(yAxis: YAxis.primary)  // Revenue bars
+  .geomPoint(                     // Satisfaction points
+    yAxis: YAxis.secondary,
+    size: 10.0,
+    color: Colors.orange,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .scaleY2Continuous(min: 1, max: 5)
+  .build()
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Data Point Density">
+    - Use alpha (transparency) for overlapping points
+    - Consider point size relative to data density
+    - For 1000+ points, reduce size and increase alpha
+  </Accordion>
+  
+  <Accordion title="Color Encoding">
+    - Limit color categories to 8-10 for readability
+    - Use consistent color palettes across charts
+    - Consider colorblind-friendly palettes
+  </Accordion>
+  
+  <Accordion title="Size Encoding">
+    - Use size for quantitative variables only
+    - Ensure size differences are perceptually meaningful
+    - Avoid extreme size ratios (keep within 2:1 to 5:1)
+  </Accordion>
+  
+  <Accordion title="Performance">
+    - For large datasets (1000+ points), disable borders
+    - Use lower alpha values for dense datasets
+    - Consider data sampling for very large datasets
+  </Accordion>
+</AccordionGroup>
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Correlation Analysis" icon="chart-scatter">
+    Explore relationships between variables
+  </Card>
+  <Card title="Outlier Detection" icon="magnifying-glass">
+    Identify unusual data points visually
+  </Card>
+  <Card title="Clustering" icon="object-group">
+    Discover natural groupings in data
+  </Card>
+  <Card title="Multi-variate Analysis" icon="cubes">
+    Analyze 3-4 dimensions simultaneously
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Line Charts" icon="chart-line" href="/charts/line-charts">
+    Connect data points with lines
+  </Card>
+  <Card title="Interactions" icon="hand-pointer" href="/features/interactions">
+    Add tooltips and click handlers
+  </Card>
+  <Card title="Animations" icon="play" href="/features/animations">
+    Smooth entrance and transition effects
+  </Card>
+  <Card title="Theming" icon="palette" href="/features/theming">
+    Customize colors and visual styles
+  </Card>
+</CardGroup>

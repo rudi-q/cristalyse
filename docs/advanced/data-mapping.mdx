@@ -1,0 +1,115 @@
+---
+title: "Data Mapping"
+description: "Map data fields to visual properties for flexible visualization"
+---
+
+## Overview
+
+Data mapping in Cristalyse allows you to flexibly bind data columns to visual chart properties like axis, color, and size, making it easy to represent complex datasets meaningfully.
+
+## Basic Mapping
+
+### Mapping Axes
+
+Bind data fields to the X and Y axes:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'date', y: 'temperature')
+  .geomLine()
+  .build()
+```
+
+### Multi-Field Mapping
+
+Visualize multiple metrics simultaneously:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'revenue', size: 'profit', color: 'region')
+  .geomPoint()
+  .build()
+```
+
+## Advanced Data Mapping
+
+### Dynamic Mapping
+
+Change mappings at runtime to reflect dynamic data changes:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(
+    x: 'week',
+    y: 'growth',
+    color: isRevenue ? 'revenue' : 'profit',
+  )
+  .geomLine()
+  .build()
+```
+
+## Best Practices
+
+### Consistent Scales
+
+- Maintain consistency in axis mapping across related charts.
+- Utilize color mapping for quick insights in comparison charts.
+
+### Real-Time Mapping
+
+- Allow dynamic mapping for real-time data presentations.
+- Prepare data transformations before passing to chart mapping.
+
+## Combining Mappings
+
+Combine color, size, and shape mappings for detailed insights:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(
+    x: 'hour',
+    y: 'traffic',
+    size: 'conversions',
+    color: 'channel',
+  )
+  .geomPoint()
+  .build()
+```
+
+## Example Gallery
+
+<CardGroup cols={2}>
+  <Card title="Sales Analysis" icon="trending-up">
+    Map sales data to both revenue and profit margins.
+  </Card>
+  <Card title="Real-Time Sensor Data" icon="sensor">
+    Dynamic mapping for fluctuating environmental data.
+  </Card>
+  <Card title="Market Segmentation" icon="pie-chart">
+    Visualize customer segments using size and color mapping.
+  </Card>
+  <Card title="Project Timelines" icon="timeline">
+    Use time mapping to align tasks with deadlines.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Scales" icon="bar-chart" href="/advanced/scales">
+    Master scale transformations for enhanced data storytelling.
+  </Card>
+  <Card title="Interactive Mapping" icon="cursor" href="/features/interactions">
+    Enhance user interaction through responsive mapping.
+  </Card>
+  <Card title="Custom Themes" icon="brush" href="/advanced/custom-themes">
+    Style mappings to fit branding needs.
+  </Card>
+  <Card title="Performance Mapping" icon="dashboard" href="/advanced/performance">
+    Optimize mapping for scalable application.
+  </Card>
+</CardGroup>

@@ -1,0 +1,128 @@
+---
+title: "Line Charts"
+description: "Time series and trend analysis with multi-series support"
+---
+
+## Overview
+
+Line charts are essential for displaying trends and patterns in data over a period. Cristalyse provides an elegant API for crafting intuitive line charts.
+
+## Basic Line Chart
+
+Display a simple line chart to show trends:
+
+```dart
+data = [
+  {'month': 'Jan', 'value': 30},
+  {'month': 'Feb', 'value': 45},
+  {'month': 'Mar', 'value': 60},
+];
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'value')
+  .geomLine(strokeWidth: 2.0, color: Colors.blue)
+  .scaleXOrdinal()
+  .scaleYContinuous()
+  .build();
+```
+
+## Multi-Series Line Chart
+
+Compare series by plotting multiple lines:
+
+```dart
+data = [
+  {'month': 'Jan', 'platform': 'iOS', 'users': 1200},
+  {'month': 'Jan', 'platform': 'Android', 'users': 800},
+  {'month': 'Feb', 'platform': 'iOS', 'users': 1350},
+  {'month': 'Feb', 'platform': 'Android', 'users': 950},
+];
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'users', color: 'platform')
+  .geomLine(strokeWidth: 3.0)
+  .geomPoint(size: 4.0)
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build();
+```
+
+## Progressive Drawing
+
+Animate lines progressively from start to end:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'value')
+  .geomLine(strokeWidth: 2.0)
+  .animate(duration: Duration(milliseconds: 1500))
+  .build();
+```
+
+## Styling Lines
+
+### Dashed and Dotted Lines
+
+Change line styles for variety and emphasis:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'value')
+  .geomLine(
+    strokeWidth: 3.0,
+    style: LineStyle.dashed,
+  )
+  .build();
+```
+
+### Highlighting Points
+
+Enhance visual storytelling by emphasizing points:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'value')
+  .geomLine(strokeWidth: 2.0)
+  .geomPoint(size: 6.0, color: Colors.red)
+  .build();
+```
+
+## Interactive Features
+
+### Tooltips
+
+Provide context with informative tooltips:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'value')
+  .geomLine()
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) {
+        return Text(
+          'Value: ${point.getDisplayValue('value')}',
+          style: TextStyle(color: Colors.white),
+        );
+      },
+    ),
+  )
+  .build();
+```
+
+## Performance Optimizations
+
+Cristalyse is designed to handle large datasets efficiently. For optimal performance:
+
+- Keep stroke width moderate
+- Use lightweight themes
+- Optimize data points and mapping categories
+
+Ready to explore more chart types? [Back to Chart Gallery](charts/area-charts)

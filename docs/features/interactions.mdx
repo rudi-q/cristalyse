@@ -1,0 +1,587 @@
+---
+title: "Interactions"
+description: "Add tooltips, hover effects, clicks, and panning to your charts"
+---
+
+## Overview
+
+Cristalyse provides rich interaction capabilities that make your charts engaging and informative. From simple tooltips to complex pan and zoom operations, every interaction is optimized for performance and accessibility.
+
+## Tooltip Interactions
+
+### Basic Tooltips
+
+Show contextual information when users hover over data points:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'revenue')
+  .geomPoint()
+  .tooltip(DefaultTooltips.simple('revenue'))
+  .build()
+```
+
+### Multi-Column Tooltips
+
+Display multiple data fields in formatted tooltips:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'week', y: 'sales', color: 'region')
+  .geomBar()
+  .tooltip(DefaultTooltips.multi({
+    'week': 'Week',
+    'sales': 'Sales ($)',
+    'region': 'Region',
+    'growth': 'Growth Rate',
+  }))
+  .build()
+```
+
+### Custom Tooltip Builders
+
+Create rich, branded tooltips with custom styling:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'date', y: 'price', color: 'symbol')
+  .geomLine()
+  .tooltip((point) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white24),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 12.0,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '${point.getDisplayValue('symbol')}',
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Price: \$${point.getDisplayValue('price')}',
+            style: const TextStyle(color: Colors.white),
+          ),
+          Text(
+            'Date: ${point.getDisplayValue('date')}',
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  })
+  .build()
+```
+
+### Tooltip Configuration
+
+Fine-tune tooltip behavior and appearance:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: DefaultTooltips.simple('value'),
+      showDelay: const Duration(milliseconds: 100),
+      hideDelay: const Duration(milliseconds: 500),
+      followPointer: true,
+      backgroundColor: const Color(0xFF323232),
+      textColor: Colors.white,
+      borderRadius: 8.0,
+      padding: const EdgeInsets.all(12),
+      shadow: const BoxShadow(
+        color: Colors.black26,
+        blurRadius: 8.0,
+        offset: Offset(0, 2),
+      ),
+    ),
+  )
+  .build()
+```
+
+## Hover Interactions
+
+### Basic Hover Detection
+
+Respond to mouse hover events on data points:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .geomBar()
+  .onHover((point) {
+    if (point != null) {
+      print('Hovering over: ${point.getDisplayValue('category')}');
+    } else {
+      print('No longer hovering');
+    }
+  })
+  .build()
+```
+
+### Advanced Hover Configuration
+
+Control hover sensitivity and debouncing:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint(size: 8.0)
+  .interaction(
+    hover: HoverConfig(
+      onHover: (point) {
+        // Handle hover start
+        if (point != null) {
+          setState(() {
+            hoveredPoint = point;
+          });
+        }
+      },
+      onExit: (point) {
+        // Handle hover end
+        setState(() {
+          hoveredPoint = null;
+        });
+      },
+      hitTestRadius: 20.0, // Generous hit area
+      debounce: const Duration(milliseconds: 50),
+    ),
+  )
+  .build()
+```
+
+## Click Interactions
+
+### Simple Click Handlers
+
+Handle tap events on data points:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'revenue')
+  .geomBar()
+  .onClick((point) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DetailPage(data: point.data),
+      ),
+    );
+  })
+  .build()
+```
+
+### Multiple Click Types
+
+Support different interaction patterns:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint()
+  .interaction(
+    click: ClickConfig(
+      onTap: (point) {
+        showBottomSheet(
+          context: context,
+          builder: (context) => DataPointDetails(point: point),
+        );
+      },
+      onDoubleTap: (point) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Edit Data Point'),
+            content: EditDataPointForm(point: point),
+          ),
+        );
+      },
+      onLongPress: (point) {
+        Clipboard.setData(ClipboardData(
+          text: 'Value: ${point.getDisplayValue('y')}',
+        ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Copied to clipboard')),
+        );
+      },
+      hitTestRadius: 15.0,
+    ),
+  )
+  .build()
+```
+
+## Pan and Zoom Interactions
+
+### Basic Panning
+
+Enable horizontal scrolling through large datasets:
+
+```dart
+CristalyseChart()
+  .data(largeTimeSeriesData)
+  .mapping(x: 'timestamp', y: 'value')
+  .geomLine()
+  .onPan((info) {
+    print('Visible range: ${info.visibleMinX} to ${info.visibleMaxX}');
+    // Update data source or trigger lazy loading
+    if (info.state == PanState.end) {
+      fetchDataForRange(info.visibleMinX, info.visibleMaxX);
+    }
+  })
+  .build()
+```
+
+### Advanced Pan Configuration
+
+Full control over pan behavior:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'metric')
+  .geomLine()
+  .geomPoint()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      updateXDomain: true,  // Enable X-axis panning
+      updateYDomain: false, // Disable Y-axis panning
+      onPanStart: (info) {
+        setState(() {
+          isPanning = true;
+        });
+      },
+      onPanUpdate: (info) {
+        setState(() {
+          visibleRange = '${info.visibleMinX?.toStringAsFixed(1)} - ${info.visibleMaxX?.toStringAsFixed(1)}';
+        });
+      },
+      onPanEnd: (info) {
+        setState(() {
+          isPanning = false;
+        });
+        // Fetch new data for visible range
+        loadDataForVisibleRange(info.visibleMinX, info.visibleMaxX);
+      },
+      throttle: const Duration(milliseconds: 16), // 60 FPS
+    ),
+  )
+  .build()
+```
+
+### Pan with Data Loading
+
+Implement infinite scrolling patterns:
+
+```dart
+class PanningChart extends StatefulWidget {
+  @override
+  _PanningChartState createState() => _PanningChartState();
+}
+
+class _PanningChartState extends State<PanningChart> {
+  List<Map<String, dynamic>> visibleData = [];
+  double currentMinX = 0;
+  double currentMaxX = 100;
+
+  @override
+  void initState() {
+    super.initState();
+    loadDataForRange(currentMinX, currentMaxX);
+  }
+
+  void loadDataForRange(double? minX, double? maxX) async {
+    if (minX == null || maxX == null) return;
+    
+    // Simulate API call
+    final newData = await fetchTimeSeriesData(minX, maxX);
+    setState(() {
+      visibleData = newData;
+      currentMinX = minX;
+      currentMaxX = maxX;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CristalyseChart()
+      .data(visibleData)
+      .mapping(x: 'timestamp', y: 'value', color: 'series')
+      .geomLine(strokeWidth: 2.0)
+      .scaleXContinuous(min: currentMinX, max: currentMaxX)
+      .interaction(
+        pan: PanConfig(
+          enabled: true,
+          updateXDomain: true,
+          onPanEnd: (info) => loadDataForRange(
+            info.visibleMinX, 
+            info.visibleMaxX,
+          ),
+        ),
+        tooltip: TooltipConfig(
+          builder: DefaultTooltips.multi({
+            'timestamp': 'Time',
+            'value': 'Value',
+            'series': 'Series',
+          }),
+        ),
+      )
+      .build();
+  }
+}
+```
+
+## Combined Interactions
+
+### Rich Interactive Dashboard
+
+Combine multiple interaction types for powerful user experience:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'date', y: 'price', color: 'symbol', size: 'volume')
+  .geomPoint(alpha: 0.8)
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) => RichTooltip(
+        title: point.getDisplayValue('symbol'),
+        fields: {
+          'price': 'Price',
+          'volume': 'Volume',
+          'change': 'Change %',
+        },
+        point: point,
+      ),
+      showDelay: const Duration(milliseconds: 50),
+      hideDelay: const Duration(milliseconds: 300),
+    ),
+    hover: HoverConfig(
+      onHover: (point) => highlightRelatedPoints(point),
+      onExit: (point) => clearHighlights(),
+      hitTestRadius: 12.0,
+    ),
+    click: ClickConfig(
+      onTap: (point) => showStockDetails(point),
+      onDoubleTap: (point) => addToWatchlist(point),
+    ),
+    pan: PanConfig(
+      enabled: true,
+      updateXDomain: true,
+      onPanUpdate: (info) => updateVisibleTimeRange(info),
+    ),
+  )
+  .build()
+```
+
+## Performance Optimization
+
+### Large Dataset Interactions
+
+Optimize interactions for thousands of data points:
+
+```dart
+CristalyseChart()
+  .data(largeDataset) // 10,000+ points
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint(size: 3.0, alpha: 0.7)
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: DefaultTooltips.simple('y'),
+      showDelay: const Duration(milliseconds: 10), // Fast response
+    ),
+    hover: HoverConfig(
+      hitTestRadius: 8.0, // Smaller hit area for performance
+      debounce: const Duration(milliseconds: 16), // 60 FPS
+    ),
+    pan: PanConfig(
+      enabled: true,
+      throttle: const Duration(milliseconds: 32), // 30 FPS for panning
+    ),
+  )
+  .build()
+```
+
+### Memory-Efficient Tooltips
+
+Reuse tooltip widgets to reduce memory allocation:
+
+```dart
+class PerformantTooltips {
+  static final _tooltipPool = <Widget>[];
+  
+  static Widget pooled(DataPointInfo point) {
+    // Reuse existing tooltip widgets when possible
+    return Text('Value: ${point.getDisplayValue('value')}');
+  }
+}
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .tooltip(PerformantTooltips.pooled)
+  .build()
+```
+
+## Accessibility
+
+### Screen Reader Support
+
+Ensure interactions work with assistive technologies:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'revenue')
+  .geomBar()
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) => Semantics(
+        label: 'Revenue for ${point.getDisplayValue('month')}: \$${point.getDisplayValue('revenue')}k',
+        child: DefaultTooltips.simple('revenue')(point),
+      ),
+    ),
+    click: ClickConfig(
+      onTap: (point) {
+        // Announce selection to screen readers
+        SemanticsService.announce(
+          'Selected ${point.getDisplayValue('month')} with revenue \$${point.getDisplayValue('revenue')}k',
+          TextDirection.ltr,
+        );
+      },
+    ),
+  )
+  .build()
+```
+
+### Keyboard Navigation
+
+Support keyboard-only users:
+
+```dart
+class KeyboardNavigableChart extends StatefulWidget {
+  @override
+  _KeyboardNavigableChartState createState() => _KeyboardNavigableChartState();
+}
+
+class _KeyboardNavigableChartState extends State<KeyboardNavigableChart> {
+  int? selectedIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      onKey: (node, event) {
+        if (event is RawKeyDownEvent) {
+          if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+            setState(() {
+              selectedIndex = (selectedIndex ?? -1) + 1;
+              selectedIndex = selectedIndex!.clamp(0, data.length - 1);
+            });
+            return KeyEventResult.handled;
+          }
+          // Handle other keys...
+        }
+        return KeyEventResult.ignored;
+      },
+      child: CristalyseChart()
+        .data(data)
+        .mapping(x: 'x', y: 'y')
+        .geomPoint()
+        .build(),
+    );
+  }
+}
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Hit Areas">
+    - Use generous hit test radii (15-30px) for touch devices
+    - Smaller hit areas (8-15px) for mouse-only interfaces
+    - Consider overlapping points in dense visualizations
+    - Test on actual devices for optimal sizing
+  </Accordion>
+  
+  <Accordion title="Performance">
+    - Debounce rapid interactions to prevent performance issues
+    - Use throttling for pan operations (16-32ms intervals)
+    - Optimize tooltip rendering for large datasets
+    - Consider disabling interactions during animations
+  </Accordion>
+  
+  <Accordion title="User Experience">
+    - Provide immediate visual feedback for all interactions
+    - Use consistent interaction patterns across charts
+    - Show loading states during data fetch operations
+    - Implement undo/redo for destructive actions
+  </Accordion>
+  
+  <Accordion title="Accessibility">
+    - Support keyboard navigation where appropriate
+    - Provide alternative text for screen readers
+    - Ensure sufficient color contrast in tooltips
+    - Test with assistive technologies
+  </Accordion>
+</AccordionGroup>
+
+## Interaction Examples
+
+<CardGroup cols={2}>
+  <Card title="Rich Tooltips" icon="message-circle">
+    Multi-column tooltips with custom styling and animations
+  </Card>
+  <Card title="Click Actions" icon="mouse-pointer">
+    Navigation, details, and context menus triggered by clicks
+  </Card>
+  <Card title="Pan & Zoom" icon="move">
+    Explore large datasets with smooth panning interactions
+  </Card>
+  <Card title="Hover Effects" icon="eye">
+    Visual highlights and data previews on mouse hover
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Animations" icon="sparkles" href="/features/animations">
+    Combine interactions with smooth animations
+  </Card>
+  <Card title="Theming" icon="palette" href="/features/theming">
+    Style interaction elements to match your design
+  </Card>
+  <Card title="Performance" icon="gauge" href="/advanced/performance">
+    Optimize interactions for large datasets
+  </Card>
+  <Card title="Export" icon="download" href="/features/export">
+    Export charts while preserving interaction data
+  </Card>
+</CardGroup>

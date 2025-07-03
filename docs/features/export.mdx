@@ -1,0 +1,554 @@
+---
+title: "Export"
+description: "Export charts as high-quality vector graphics and images"
+---
+
+## Overview
+
+Cristalyse provides powerful export capabilities, allowing you to save charts as scalable vector graphics (SVG) for use in presentations, reports, and publications. All visual elements, styling, and data are preserved in the exported format.
+
+## SVG Export
+
+### Basic SVG Export
+
+Export charts as scalable vector graphics with perfect quality at any size:
+
+```dart
+// Create your chart
+final chart = CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'revenue')
+  .geomBar()
+  .theme(ChartTheme.defaultTheme())
+  .build();
+
+// Export as SVG
+final result = await chart.exportAsSvg(
+  width: 800,
+  height: 600,
+  filename: 'revenue_chart',
+);
+
+print('Chart exported to: ${result.filePath}');
+```
+
+### Advanced Export Configuration
+
+Customize export settings for different use cases:
+
+```dart
+final exportConfig = ExportConfig(
+  width: 1920,           // High resolution for presentations
+  height: 1080,
+  format: ExportFormat.svg,
+  backgroundColor: Colors.white,
+  filename: 'dashboard_chart',
+  quality: 1.0,          // Maximum quality
+  transparentBackground: false,
+);
+
+final result = await chart.export(exportConfig);
+```
+
+### Export with Custom Dimensions
+
+Optimize for different output formats:
+
+```dart
+// For presentations (16:9 aspect ratio)
+await chart.exportAsSvg(
+  width: 1920,
+  height: 1080,
+  filename: 'presentation_chart',
+);
+
+// For print documents (300 DPI equivalent)
+await chart.exportAsSvg(
+  width: 2400,
+  height: 1800,
+  filename: 'print_chart',
+);
+
+// For web thumbnails
+await chart.exportAsSvg(
+  width: 400,
+  height: 300,
+  filename: 'thumbnail_chart',
+);
+```
+
+## Export Examples
+
+### Dashboard Export
+
+Export complex multi-chart dashboards:
+
+```dart
+class DashboardExporter {
+  static Future<List<ExportResult>> exportDashboard(
+    List<CristalyseChart> charts,
+  ) async {
+    final results = <ExportResult>[];
+    
+    for (int i = 0; i < charts.length; i++) {
+      final result = await charts[i].exportAsSvg(
+        width: 800,
+        height: 600,
+        filename: 'dashboard_chart_$i',
+      );
+      results.add(result);
+    }
+    
+    return results;
+  }
+}
+
+// Usage
+final charts = [revenueChart, usersChart, conversionChart];
+final exportResults = await DashboardExporter.exportDashboard(charts);
+
+for (final result in exportResults) {
+  print('Exported: ${result.filePath} (${result.fileSizeBytes} bytes)');
+}
+```
+
+### Themed Export
+
+Export charts with consistent branding:
+
+```dart
+class BrandedExporter {
+  static final brandTheme = ChartTheme(
+    backgroundColor: const Color(0xFFF8F9FA),
+    primaryColor: const Color(0xFF007ACC),
+    colorPalette: [
+      const Color(0xFF007ACC),
+      const Color(0xFFFF6B35),
+      const Color(0xFF28A745),
+      const Color(0xFFDC3545),
+    ],
+    // ... other brand properties
+  );
+  
+  static Future<ExportResult> exportBrandedChart({
+    required List<Map<String, dynamic>> data,
+    required String xColumn,
+    required String yColumn,
+    required String filename,
+  }) async {
+    final chart = CristalyseChart()
+      .data(data)
+      .mapping(x: xColumn, y: yColumn)
+      .geomBar()
+      .theme(brandTheme)
+      .build();
+    
+    return await chart.exportAsSvg(
+      width: 1200,
+      height: 800,
+      backgroundColor: brandTheme.backgroundColor,
+      filename: filename,
+    );
+  }
+}
+```
+
+### Batch Export
+
+Export multiple chart variations efficiently:
+
+```dart
+class BatchExporter {
+  static Future<void> exportChartVariations({
+    required List<Map<String, dynamic>> data,
+    required String baseFilename,
+  }) async {
+    final themes = [
+      ChartTheme.defaultTheme(),
+      ChartTheme.darkTheme(),
+      ChartTheme.solarizedLightTheme(),
+    ];
+    
+    final themeNames = ['light', 'dark', 'solarized'];
+    
+    for (int i = 0; i < themes.length; i++) {
+      final chart = CristalyseChart()
+        .data(data)
+        .mapping(x: 'month', y: 'value')
+        .geomLine(strokeWidth: 3.0)
+        .geomPoint(size: 6.0)
+        .theme(themes[i])
+        .build();
+      
+      await chart.exportAsSvg(
+        width: 800,
+        height: 600,
+        filename: '${baseFilename}_${themeNames[i]}',
+      );
+    }
+  }
+}
+```
+
+## Export Quality & Optimization
+
+### Vector Benefits
+
+SVG exports provide numerous advantages:
+
+- **Infinite Scalability**: Perfect quality at any size
+- **Small File Sizes**: Efficient vector representation
+- **Editable**: Can be modified in vector graphics software
+- **Web Ready**: Direct embedding in HTML
+- **Print Quality**: Crisp output at any resolution
+
+### File Size Optimization
+
+Control output file size for different use cases:
+
+```dart
+// Minimal file size for web
+await chart.exportAsSvg(
+  width: 600,
+  height: 400,
+  filename: 'web_optimized',
+);
+
+// High quality for print
+await chart.exportAsSvg(
+  width: 2400,
+  height: 1600,
+  filename: 'print_quality',
+);
+```
+
+### Performance Considerations
+
+Optimize export performance for large datasets:
+
+```dart
+class PerformantExporter {
+  static Future<ExportResult> exportLargeDataset({
+    required List<Map<String, dynamic>> data,
+    required String filename,
+  }) async {
+    // Simplify data for export if needed
+    final exportData = data.length > 1000 
+        ? _downsampleData(data, 1000)
+        : data;
+    
+    final chart = CristalyseChart()
+      .data(exportData)
+      .mapping(x: 'x', y: 'y')
+      .geomLine(strokeWidth: 2.0)
+      .build();
+    
+    return await chart.exportAsSvg(
+      width: 1200,
+      height: 800,
+      filename: filename,
+    );
+  }
+  
+  static List<Map<String, dynamic>> _downsampleData(
+    List<Map<String, dynamic>> data, 
+    int targetCount,
+  ) {
+    final step = data.length / targetCount;
+    final result = <Map<String, dynamic>>[];
+    
+    for (int i = 0; i < data.length; i += step.ceil()) {
+      result.add(data[i]);
+    }
+    
+    return result;
+  }
+}
+```
+
+## Export Integration
+
+### File Management
+
+Handle exported files efficiently:
+
+```dart
+class ExportManager {
+  static const String exportDirectory = 'chart_exports';
+  
+  static Future<Directory> getExportDirectory() async {
+    final documentsDir = await getApplicationDocumentsDirectory();
+    final exportDir = Directory('${documentsDir.path}/$exportDirectory');
+    
+    if (!await exportDir.exists()) {
+      await exportDir.create(recursive: true);
+    }
+    
+    return exportDir;
+  }
+  
+  static Future<ExportResult> exportWithTimestamp({
+    required CristalyseChart chart,
+    required String baseName,
+  }) async {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final filename = '${baseName}_$timestamp';
+    
+    final exportDir = await getExportDirectory();
+    final customPath = '${exportDir.path}/$filename.svg';
+    
+    return await chart.exportAsSvg(
+      width: 1200,
+      height: 800,
+      filename: filename,
+      customPath: customPath,
+    );
+  }
+}
+```
+
+### Share Integration
+
+Export and share charts directly:
+
+```dart
+class ShareableExporter {
+  static Future<void> exportAndShare({
+    required CristalyseChart chart,
+    required String title,
+    required BuildContext context,
+  }) async {
+    try {
+      // Export chart
+      final result = await chart.exportAsSvg(
+        width: 1200,
+        height: 800,
+        filename: 'shared_chart',
+      );
+      
+      // Share the exported file
+      await Share.shareFiles(
+        [result.filePath],
+        text: title,
+        subject: 'Chart Export',
+      );
+      
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Export failed: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+}
+```
+
+### Cloud Storage Integration
+
+Upload exports to cloud storage:
+
+```dart
+class CloudExporter {
+  static Future<String> exportToCloud({
+    required CristalyseChart chart,
+    required String cloudPath,
+  }) async {
+    // Export locally first
+    final result = await chart.exportAsSvg(
+      width: 1200,
+      height: 800,
+      filename: 'temp_export',
+    );
+    
+    // Upload to cloud storage (example with Firebase)
+    final file = File(result.filePath);
+    final storageRef = FirebaseStorage.instance.ref().child(cloudPath);
+    
+    final uploadTask = await storageRef.putFile(file);
+    final downloadUrl = await uploadTask.ref.getDownloadURL();
+    
+    // Clean up local file
+    await file.delete();
+    
+    return downloadUrl;
+  }
+}
+```
+
+## Error Handling
+
+### Robust Export Operations
+
+Handle export failures gracefully:
+
+```dart
+class SafeExporter {
+  static Future<ExportResult?> safeExport({
+    required CristalyseChart chart,
+    required String filename,
+    required VoidCallback? onSuccess,
+    required Function(String)? onError,
+  }) async {
+    try {
+      final result = await chart.exportAsSvg(
+        width: 1200,
+        height: 800,
+        filename: filename,
+      );
+      
+      onSuccess?.call();
+      return result;
+      
+    } on ChartExportException catch (e) {
+      onError?.call('Export failed: ${e.message}');
+      return null;
+    } catch (e) {
+      onError?.call('Unexpected error: $e');
+      return null;
+    }
+  }
+}
+
+// Usage
+await SafeExporter.safeExport(
+  chart: myChart,
+  filename: 'report_chart',
+  onSuccess: () => showSuccessMessage(),
+  onError: (error) => showErrorDialog(error),
+);
+```
+
+### Export Validation
+
+Verify export results:
+
+```dart
+class ExportValidator {
+  static bool validateExportResult(ExportResult result) {
+    // Check file exists
+    final file = File(result.filePath);
+    if (!file.existsSync()) return false;
+    
+    // Check file size is reasonable
+    if (result.fileSizeBytes < 100) return false; // Too small
+    if (result.fileSizeBytes > 10 * 1024 * 1024) return false; // Too large
+    
+    // Check dimensions
+    if (result.dimensions.width <= 0 || result.dimensions.height <= 0) {
+      return false;
+    }
+    
+    return true;
+  }
+}
+```
+
+## Export Formats & Use Cases
+
+<Tabs>
+  <Tab title="SVG Vector Graphics">
+    **Best for:**
+    - Presentations and reports
+    - Web embedding
+    - Print publications
+    - Scalable graphics
+    
+    **Features:**
+    - Infinite scalability
+    - Small file sizes
+    - Editable in vector software
+    - Perfect text rendering
+  </Tab>
+  
+  <Tab title="High Resolution">
+    **Dimensions:**
+    - 4K: 3840×2160
+    - Print: 300 DPI equivalent
+    - Poster: 5000×3000+
+    
+    **Applications:**
+    - Large format printing
+    - High-DPI displays
+    - Professional publications
+  </Tab>
+  
+  <Tab title="Web Optimized">
+    **Specifications:**
+    - Standard: 800×600
+    - Thumbnail: 400×300
+    - Banner: 1200×400
+    
+    **Benefits:**
+    - Fast loading
+    - Responsive design
+    - SEO friendly
+  </Tab>
+</Tabs>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="File Organization">
+    - Use descriptive filenames with timestamps
+    - Organize exports in dedicated directories
+    - Include chart metadata in filenames
+    - Implement cleanup routines for old exports
+  </Accordion>
+  
+  <Accordion title="Quality Control">
+    - Validate export results before use
+    - Test exports at different scales
+    - Verify color accuracy across formats
+    - Check text readability at target sizes
+  </Accordion>
+  
+  <Accordion title="Performance">
+    - Batch exports for efficiency
+    - Downsample large datasets when appropriate
+    - Use appropriate dimensions for use case
+    - Clean up temporary files promptly
+  </Accordion>
+  
+  <Accordion title="User Experience">
+    - Provide progress indicators for long exports
+    - Show clear success/failure messages
+    - Offer preview before final export
+    - Enable easy sharing and storage options
+  </Accordion>
+</AccordionGroup>
+
+## Export Examples
+
+<CardGroup cols={2}>
+  <Card title="Presentation Ready" icon="presentation">
+    High-resolution exports optimized for professional presentations
+  </Card>
+  <Card title="Web Integration" icon="globe">
+    Lightweight SVG files perfect for web embedding
+  </Card>
+  <Card title="Print Quality" icon="printer">
+    High-DPI exports suitable for professional printing
+  </Card>
+  <Card title="Batch Processing" icon="layers">
+    Efficient batch export workflows for multiple charts
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Theming" icon="palette" href="/features/theming">
+    Export charts with consistent branding and styling
+  </Card>
+  <Card title="Interactions" icon="hand-pointer" href="/features/interactions">
+    Preserve interactive elements in static exports
+  </Card>
+  <Card title="Performance" icon="gauge" href="/advanced/performance">
+    Optimize export performance for large datasets
+  </Card>
+  <Card title="Custom Themes" icon="brush" href="/advanced/custom-themes">
+    Create export-optimized theme variations
+  </Card>
+</CardGroup>

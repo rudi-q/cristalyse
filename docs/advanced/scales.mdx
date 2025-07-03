@@ -1,0 +1,173 @@
+---
+title: "Scales"
+description: "Comprehensive guide on scales in Cristalyse"
+---
+
+## Overview
+
+Scales in Cristalyse transform data values to visual positions or dimensions on a chart. They handle both continuous and categorical data, ensuring intuitive and precise data representation.
+
+## Linear Scales
+
+Linear scales map continuous data to a range, such as pixels:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'value')
+  .scaleXContinuous(min: 0, max: 100) // X-axis
+  .scaleYContinuous(min: 0, max: 200) // Y-axis
+  .geomLine()
+  .build()
+```
+
+### Configuration
+
+- **Domain**: Data range mapped to chart space.
+- **Range**: Pixel space where the data is plotted.
+- **Invertible**: Values can map back to the data space.
+
+## Ordinal Scales
+
+Ordinal scales map categorical data to discrete locations:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .scaleXOrdinal() // X-axis for categories
+  .geomBar()
+  .build()
+```
+
+### Configuration
+
+- **Domain**: List of categories.
+- **Range**: Space for categories to be displayed.
+- **BandWidth**: Space allocated to each category.
+
+## Color Scales
+
+Color scales are used to encode data using color gradients:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'intensity')
+  .geomPoint()
+  .theme(
+    ChartTheme.defaultTheme().copyWith(
+      colorPalette: [Colors.blue, Colors.red], // Gradient
+    ),
+  )
+  .build()
+```
+
+## Size Scales
+
+Size scales map data values to sizes, useful for scatter plots:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', size: 'value')
+  .geomPoint()
+  .build()
+```
+
+## Scale Customization
+
+Customize scales to fit your data representation needs:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'day', y: 'hours')
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0, max: 24) // Range of working hours per day
+  .build()
+```
+
+## Best Practices
+
+### Scaling Data
+
+- Choose linear scales for time-series and numerical data.
+- Use ordinal scales for categorical data like labels or segments.
+- Opt for consistent scale units across charts.
+
+### Performance
+
+- Ensure domain and range values are correctly configured.
+- Minimize dynamic scale recalculation for better performance.
+- Use scale inversions in interactive applications for better feedback.
+
+## Advanced Usage
+
+### Dual Axis Charts
+
+Implement dual axes for complex comparisons:
+
+```dart
+CristalyseChart()
+  .data(dualAxisData)
+  .mapping(x: 'month', y: 'revenue')
+  .mappingY2('conversion_rate')
+  .scaleYContinuous(min: 0, max: 100)
+  .scaleY2Continuous(min: 0, max: 1)
+  .geomBar(yAxis: YAxis.primary)
+  .geomLine(yAxis: YAxis.secondary)
+  .build()
+```
+
+### Conditional Scales
+
+Dynamically adjust scales based on data:
+
+```dart
+CristalyseChart()
+  .data(dynamicData)
+  .mapping(x: 'date', y: 'value')
+  .scaleXContinuous(min: startDate, max: endDate)
+  .scaleYContinuous(min: minValue, max: maxValue)
+  .geomArea()
+  .build()
+```
+
+## Example Gallery
+
+<CardGroup cols={2}>
+  <Card title="Time-Series Analysis" icon="clock">
+    Vivid depiction of temporal trends and changes over time.
+  </Card>
+  <Card title="Categorical Comparison" icon="bar-chart">
+    Clear comparison of discrete categories using ordinal scaling.
+  </Card>
+  <Card title="Revenue vs. Conversion" icon="exchange">
+    Dual-axis chart illustrating financial performance metrics.
+  </Card>
+  <Card title="Dynamic Data Scaling" icon="sliders">
+    Interactive scales adapting to real-time data changes.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Data Mapping" icon="shuffle" href="/advanced/data-mapping">
+    Effective data field-to-visual property mapping techniques.
+  </Card>
+  <Card title="Custom Themes" icon="brush" href="/advanced/custom-themes">
+    Create custom themes to match brand identity.
+  </Card>
+  <Card title="Performance Scaling" icon="chart-line" href="/advanced/performance">
+    Optimize visual performance with tailored scaling strategies.
+  </Card>
+  <Card title="Interactions" icon="hand-pointer" href="/features/interactions">
+    Engage users with interactive scaled charts.
+  </Card>
+</CardGroup>
+
+## Technical Details
+
+Review the source code behind scale transformations and extend as needed within the `scale.dart` file.

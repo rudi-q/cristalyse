@@ -1,0 +1,106 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "Data Visualization Library Flutter Guide",
+  "colors": {
+    "primary": "#4a9999",
+    "light": "#8dd3d3",
+    "dark": "#3d8080"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "index",
+              "installation",
+              "quickstart",
+              "examples"
+            ]
+          },
+          {
+            "group": "Chart Types",
+            "pages": [
+              "charts/scatter-plots",
+              "charts/line-charts",
+              "charts/bar-charts",
+              "charts/area-charts",
+              "charts/dual-axis"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/animations",
+              "features/theming",
+              "features/interactions",
+              "features/export"
+            ]
+          },
+          {
+            "group": "Advanced",
+            "pages": [
+              "advanced/scales",
+              "advanced/data-mapping",
+              "advanced/performance",
+              "advanced/custom-themes"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "GitHub",
+          "href": "https://github.com/rudi-q/cristalyse",
+          "icon": "github"
+        },
+        {
+          "anchor": "Pub.dev",
+          "href": "https://pub.dev/packages/cristalyse",
+          "icon": "cube"
+        },
+        {
+          "anchor": "Visit Website",
+          "href": "https://cristalyse.com",
+          "icon": "browser"
+        },
+        {
+          "anchor": "Feature Requests",
+          "href": "https://github.com/rudi-q/cristalyse/issues",
+          "icon": "hand-point-up"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Star us on GitHub",
+        "href": "https://github.com/rudi-q/cristalyse",
+        "icon": "star"
+      },
+      {
+        "label": "Like us on Pub.dev",
+        "href": "https://pub.dev/packages/cristalyse",
+        "icon": "thumbs-up"
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "website": "https://cristalyse.com",
+      "github": "https://github.com/rudi-q",
+      "x-twitter": "https://x.com/lofifounder"
+    }
+  }
+}

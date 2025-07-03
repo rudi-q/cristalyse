@@ -1,0 +1,86 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Premium gradient for main crystal -->
+    <linearGradient id="crystalMain" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7dd3fc"/>
+      <stop offset="25%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#0ea5e9"/>
+      <stop offset="75%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    
+    <!-- Left facet gradient -->
+    <linearGradient id="crystalLeft" x1="8" y1="8" x2="16" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </linearGradient>
+    
+    <!-- Right facet gradient -->
+    <linearGradient id="crystalRight" x1="24" y1="8" x2="16" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#67e8f9"/>
+      <stop offset="50%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#0891b2"/>
+    </linearGradient>
+    
+    <!-- Top highlight -->
+    <linearGradient id="crystalHighlight" x1="16" y1="4" x2="16" y2="12" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    
+    <!-- Premium shadow -->
+    <filter id="premiumShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge> 
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/> 
+      </feMerge>
+    </filter>
+    
+    <!-- Subtle glow -->
+    <filter id="premiumGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main crystal body (center facet) -->
+  <path d="M16 4 L24 12 L16 28 L8 12 Z" 
+        fill="url(#crystalMain)" 
+        filter="url(#premiumShadow)"/>
+  
+  <!-- Left crystal facet -->
+  <path d="M4 16 L8 12 L16 28 L8 24 Z" 
+        fill="url(#crystalLeft)" 
+        opacity="0.9"/>
+  
+  <!-- Right crystal facet -->
+  <path d="M28 16 L24 12 L16 28 L24 24 Z" 
+        fill="url(#crystalRight)" 
+        opacity="0.9"/>
+  
+  <!-- Top highlight plane -->
+  <path d="M16 4 L24 12 L16 16 L8 12 Z" 
+        fill="url(#crystalHighlight)" 
+        filter="url(#premiumGlow)"/>
+  
+  <!-- Ultra-sharp edge lines for definition -->
+  <path d="M16 4 L24 12 M16 4 L8 12 M8 12 L16 28 M24 12 L16 28" 
+        stroke="#ffffff" 
+        stroke-width="0.5" 
+        stroke-opacity="0.3" 
+        fill="none"/>
+  
+  <!-- Premium accent dot -->
+  <circle cx="16" cy="10" r="1" 
+          fill="#ffffff" 
+          opacity="0.8"/>
+</svg>

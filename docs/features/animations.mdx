@@ -1,0 +1,357 @@
+---
+title: "Animations"
+description: "Smooth 60fps transitions and progressive rendering"
+---
+
+## Overview
+
+Cristalyse leverages Flutter's animation engine to deliver buttery-smooth 60fps animations. Every chart type supports customizable animations with different curves, durations, and effects.
+
+## Basic Animation
+
+Add smooth entrance animations to any chart:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .animate(
+    duration: Duration(milliseconds: 800),
+    curve: Curves.easeInOut,
+  )
+  .build()
+```
+
+## Animation Curves
+
+Choose from Flutter's extensive curve library:
+
+### Elastic Effects
+
+Perfect for playful interfaces:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .geomBar()
+  .animate(
+    duration: Duration(milliseconds: 1200),
+    curve: Curves.elasticOut,
+  )
+  .build()
+```
+
+### Bounce Animation
+
+Add character to your visualizations:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint(size: 8.0)
+  .animate(
+    duration: Duration(milliseconds: 1000),
+    curve: Curves.bounceOut,
+  )
+  .build()
+```
+
+### Smooth Transitions
+
+For professional dashboards:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'value')
+  .geomLine(strokeWidth: 3.0)
+  .animate(
+    duration: Duration(milliseconds: 1500),
+    curve: Curves.easeInOutCubic,
+  )
+  .build()
+```
+
+## Chart-Specific Animations
+
+### Progressive Line Drawing
+
+Lines animate from start to finish:
+
+```dart
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'date', y: 'price')
+  .geomLine(strokeWidth: 2.0)
+  .animate(duration: Duration(milliseconds: 2000))
+  .build()
+```
+
+### Staggered Bar Growth
+
+Bars animate individually with delays:
+
+```dart
+CristalyseChart()
+  .data(categoryData)
+  .mapping(x: 'category', y: 'value')
+  .geomBar()
+  .animate(
+    duration: Duration(milliseconds: 1400),
+    curve: Curves.easeInOutBack,
+  )
+  .build()
+```
+
+### Point Emergence
+
+Scatter plot points appear progressively:
+
+```dart
+CristalyseChart()
+  .data(scatterData)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint(size: 6.0, alpha: 0.8)
+  .animate(
+    duration: Duration(milliseconds: 800),
+    curve: Curves.elasticOut,
+  )
+  .build()
+```
+
+### Area Fill Animation
+
+Area charts fill progressively:
+
+```dart
+CristalyseChart()
+  .data(volumeData)
+  .mapping(x: 'month', y: 'volume')
+  .geomArea(alpha: 0.3, strokeWidth: 2.0)
+  .animate(
+    duration: Duration(milliseconds: 1600),
+    curve: Curves.easeInOutCubic,
+  )
+  .build()
+```
+
+## Advanced Animation Techniques
+
+### Layered Animations
+
+Combine multiple geometries with different timings:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'week', y: 'engagement')
+  .geomArea(alpha: 0.2, strokeWidth: 0)     // Background area
+  .geomLine(strokeWidth: 3.0)               // Trend line
+  .geomPoint(size: 6.0)                     // Data points
+  .animate(
+    duration: Duration(milliseconds: 1800),
+    curve: Curves.easeInOutCubic,
+  )
+  .build()
+```
+
+### Stacked Bar Segments
+
+Each segment animates individually:
+
+```dart
+CristalyseChart()
+  .data(stackedData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'category')
+  .geomBar(style: BarStyle.stacked)
+  .animate(
+    duration: Duration(milliseconds: 1600),
+    curve: Curves.easeInOutQuart,
+  )
+  .build()
+```
+
+### Dual Axis Coordination
+
+Synchronize animations across different Y-axes:
+
+```dart
+CristalyseChart()
+  .data(businessData)
+  .mapping(x: 'month', y: 'revenue')
+  .mappingY2('conversion_rate')
+  .geomBar(yAxis: YAxis.primary)
+  .geomLine(yAxis: YAxis.secondary, strokeWidth: 3.0)
+  .animate(
+    duration: Duration(milliseconds: 1400),
+    curve: Curves.easeInOutCubic,
+  )
+  .build()
+```
+
+## Animation Curves Reference
+
+<Tabs>
+  <Tab title="Ease Curves">
+    - `Curves.easeIn` - Slow start, fast finish
+    - `Curves.easeOut` - Fast start, slow finish  
+    - `Curves.easeInOut` - Slow start and finish
+    - `Curves.easeInOutCubic` - Smooth S-curve
+  </Tab>
+  
+  <Tab title="Elastic & Bounce">
+    - `Curves.elasticIn` - Spring compression
+    - `Curves.elasticOut` - Spring release
+    - `Curves.bounceIn` - Bouncing entrance
+    - `Curves.bounceOut` - Bouncing exit
+  </Tab>
+  
+  <Tab title="Back Curves">
+    - `Curves.easeInBack` - Slight overshoot at start
+    - `Curves.easeOutBack` - Slight overshoot at end
+    - `Curves.easeInOutBack` - Overshoot both ends
+  </Tab>
+  
+  <Tab title="Specialized">
+    - `Curves.fastOutSlowIn` - Material Design standard
+    - `Curves.slowMiddle` - Fast start/end, slow middle
+    - `Curves.decelerate` - Quick deceleration
+  </Tab>
+</Tabs>
+
+## Performance Optimization
+
+### Duration Guidelines
+
+Choose appropriate durations for different chart types:
+
+- **Scatter plots**: 600-1000ms
+- **Line charts**: 1000-2000ms  
+- **Bar charts**: 800-1400ms
+- **Area charts**: 1200-1800ms
+- **Complex dual-axis**: 1400-2200ms
+
+### Memory Efficiency
+
+Cristalyse animations are optimized for:
+
+- ✅ **GPU acceleration** - Leverages Flutter's rendering pipeline
+- ✅ **Minimal redraws** - Only animates changing elements
+- ✅ **Smooth 60fps** - Consistent frame rates across devices
+- ✅ **Memory efficient** - Automatic cleanup after animation
+
+## Interactive Animation
+
+### Data Updates
+
+Smooth transitions when data changes:
+
+```dart
+class AnimatedDashboard extends StatefulWidget {
+  @override
+  _AnimatedDashboardState createState() => _AnimatedDashboardState();
+}
+
+class _AnimatedDashboardState extends State<AnimatedDashboard> {
+  List<Map<String, dynamic>> data = initialData;
+
+  void updateData() {
+    setState(() {
+      data = newData; // Chart automatically animates to new data
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CristalyseChart()
+      .data(data)
+      .mapping(x: 'month', y: 'value')
+      .geomLine(strokeWidth: 3.0)
+      .animate(duration: Duration(milliseconds: 800))
+      .build();
+  }
+}
+```
+
+### Theme Transitions
+
+Smooth theme changes:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .theme(isDark ? ChartTheme.darkTheme() : ChartTheme.defaultTheme())
+  .animate(duration: Duration(milliseconds: 600))
+  .build()
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Duration Selection">
+    - Short animations (300-600ms) for simple interactions
+    - Medium animations (800-1400ms) for chart rendering
+    - Long animations (1500-2500ms) for complex visualizations
+    - Avoid animations longer than 3 seconds
+  </Accordion>
+  
+  <Accordion title="Curve Selection">
+    - Use `easeInOutCubic` for professional dashboards
+    - Use `elasticOut` for engaging presentations
+    - Use `fastOutSlowIn` for Material Design consistency
+    - Avoid jarring curves like `bounceIn` for serious data
+  </Accordion>
+  
+  <Accordion title="Performance">
+    - Test on slower devices to ensure 60fps
+    - Consider reducing animation complexity for large datasets
+    - Use `shouldRepaint` optimization for static elements
+    - Profile animation performance during development
+  </Accordion>
+  
+  <Accordion title="Accessibility">
+    - Respect user's reduced motion preferences
+    - Provide option to disable animations
+    - Ensure animations don't interfere with screen readers
+    - Use appropriate duration for cognitive accessibility
+  </Accordion>
+</AccordionGroup>
+
+## Animation Showcase
+
+<CardGroup cols={2}>
+  <Card title="Progressive Line Drawing" icon="chart-line">
+    Lines draw smoothly from start to finish, perfect for revealing trends
+  </Card>
+  <Card title="Staggered Bar Growth" icon="chart-column">
+    Bars grow individually with delays, creating engaging sequences
+  </Card>
+  <Card title="Point Emergence" icon="chart-scatter">
+    Scatter plot points appear progressively with elastic effects
+  </Card>
+  <Card title="Area Fill Animation" icon="chart-area">
+    Areas fill smoothly with coordinated stroke and fill animations
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Theming" icon="palette" href="/features/theming">
+    Customize visual styles and color schemes
+  </Card>
+  <Card title="Interactions" icon="hand-pointer" href="/features/interactions">
+    Add tooltips, hover effects, and user interactions
+  </Card>
+  <Card title="Performance" icon="gauge" href="/advanced/performance">
+    Optimize charts for large datasets and smooth rendering
+  </Card>
+  <Card title="Export" icon="download" href="/features/export">
+    Export animated charts as high-quality graphics
+  </Card>
+</CardGroup>

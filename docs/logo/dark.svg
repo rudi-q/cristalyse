@@ -1,0 +1,71 @@
+<svg width="177" height="24" viewBox="0 0 177 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Main text gradient (3D effect for dark mode) -->
+    <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8dd3d3;stop-opacity:1" />
+      <stop offset="15%" style="stop-color:#7ac7c7;stop-opacity:1" />
+      <stop offset="40%" style="stop-color:#5fb3b3;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#4a9999;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3d8080;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Text highlight/shine for dark mode -->
+    <linearGradient id="textShine" x1="20%" y1="10%" x2="80%" y2="90%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="30%" style="stop-color:#ffffff;stop-opacity:0.2" />
+      <stop offset="70%" style="stop-color:#ffffff;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </linearGradient>
+
+    <!-- Glow effects for dark mode -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Text shadow for dark mode -->
+    <filter id="textShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
+      <feOffset dx="1" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.5"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Main logo text "Cristalyse" with 3D effect -->
+  <text x="8" y="12"
+        font-family="Arial, sans-serif"
+        font-size="17"
+        font-weight="600"
+        fill="url(#textGradient)"
+        text-anchor="start"
+        dominant-baseline="middle"
+        filter="url(#textShadow)">Cristalyse</text>
+
+  <!-- Text highlight overlay for "Cristalyse" -->
+  <text x="8" y="12"
+        font-family="Arial, sans-serif"
+        font-size="17"
+        font-weight="600"
+        fill="url(#textShine)"
+        text-anchor="start"
+        dominant-baseline="middle"
+        filter="url(#glow)">Cristalyse</text>
+
+  <!-- "Docs" text in different color for dark mode -->
+  <text x="95" y="12"
+        font-family="Arial, sans-serif"
+        font-size="17"
+        font-weight="400"
+        fill="#9ca3af"
+        text-anchor="start"
+        dominant-baseline="middle">Docs</text>
+</svg>

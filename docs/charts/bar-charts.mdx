@@ -1,0 +1,336 @@
+---
+title: "Bar Charts"
+description: "Categorical data visualization with multiple variations"
+---
+
+## Overview
+
+Bar charts are ideal for comparing categorical data. Cristalyse supports vertical, horizontal, grouped, and stacked bar charts with smooth animations and customizable styling.
+
+## Basic Bar Chart
+
+Create a simple vertical bar chart:
+
+```dart
+final data = [
+  {'quarter': 'Q1', 'revenue': 120},
+  {'quarter': 'Q2', 'revenue': 150},
+  {'quarter': 'Q3', 'revenue': 110},
+  {'quarter': 'Q4', 'revenue': 180},
+];
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'quarter', y: 'revenue')
+  .geomBar(
+    width: 0.8,
+    alpha: 0.9,
+    borderRadius: BorderRadius.circular(4),
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Grouped Bar Charts
+
+Compare multiple series side-by-side:
+
+```dart
+final productData = [
+  {'quarter': 'Q1', 'revenue': 120, 'product': 'Widget A'},
+  {'quarter': 'Q2', 'revenue': 150, 'product': 'Widget A'},
+  {'quarter': 'Q1', 'revenue': 80, 'product': 'Widget B'},
+  {'quarter': 'Q2', 'revenue': 110, 'product': 'Widget B'},
+];
+
+CristalyseChart()
+  .data(productData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(
+    style: BarStyle.grouped,
+    width: 0.8,
+    alpha: 0.9,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Stacked Bar Charts
+
+Show composition and totals:
+
+```dart
+final budgetData = [
+  {'department': 'Marketing', 'amount': 50, 'category': 'Personnel'},
+  {'department': 'Marketing', 'amount': 30, 'category': 'Technology'},
+  {'department': 'Marketing', 'amount': 20, 'category': 'Travel'},
+  {'department': 'Sales', 'amount': 80, 'category': 'Personnel'},
+  {'department': 'Sales', 'amount': 25, 'category': 'Technology'},
+];
+
+CristalyseChart()
+  .data(budgetData)
+  .mapping(x: 'department', y: 'amount', color: 'category')
+  .geomBar(
+    style: BarStyle.stacked,
+    width: 0.8,
+    alpha: 0.9,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Horizontal Bar Charts
+
+Perfect for long category names or ranking data:
+
+```dart
+final departmentData = [
+  {'department': 'Engineering', 'headcount': 45},
+  {'department': 'Product', 'headcount': 25},
+  {'department': 'Sales', 'headcount': 35},
+  {'department': 'Marketing', 'headcount': 20},
+  {'department': 'Customer Success', 'headcount': 15},
+];
+
+CristalyseChart()
+  .data(departmentData)
+  .mapping(x: 'department', y: 'headcount')
+  .geomBar(
+    borderRadius: BorderRadius.circular(4),
+    borderWidth: 1.0,
+  )
+  .coordFlip() // Makes it horizontal
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Styling Options
+
+### Rounded Corners
+
+Add modern styling with border radius:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .geomBar(
+    borderRadius: BorderRadius.circular(8),
+    alpha: 0.8,
+  )
+  .build()
+```
+
+### Borders
+
+Add definition with borders:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .geomBar(
+    borderWidth: 2.0,
+    alpha: 0.7,
+  )
+  .build()
+```
+
+### Custom Colors
+
+Override default color mapping:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .geomBar(
+    color: Colors.deepPurple,
+    alpha: 0.8,
+  )
+  .build()
+```
+
+## Animation Types
+
+### Progressive Bar Growth
+
+Bars animate from bottom to top:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .geomBar()
+  .animate(
+    duration: Duration(milliseconds: 1200),
+    curve: Curves.easeInOutCubic,
+  )
+  .build()
+```
+
+### Staggered Animation
+
+Each bar animates with a slight delay:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .geomBar()
+  .animate(
+    duration: Duration(milliseconds: 1400),
+    curve: Curves.elasticOut,
+  )
+  .build()
+```
+
+## Dual Y-Axis Bar Charts
+
+Combine bars with different scales:
+
+```dart
+final mixedData = [
+  {'quarter': 'Q1', 'revenue': 120, 'efficiency': 85},
+  {'quarter': 'Q2', 'revenue': 150, 'efficiency': 92},
+  {'quarter': 'Q3', 'revenue': 110, 'efficiency': 78},
+];
+
+CristalyseChart()
+  .data(mixedData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .mappingY2('efficiency')
+  .geomBar(yAxis: YAxis.primary)  // Revenue bars
+  .geomLine(
+    yAxis: YAxis.secondary,        // Efficiency line
+    strokeWidth: 3.0,
+    color: Colors.orange,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .scaleY2Continuous(min: 0, max: 100)
+  .build()
+```
+
+## Interactive Bar Charts
+
+### Hover Effects
+
+Add rich tooltips on hover:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'quarter', y: 'revenue')
+  .geomBar()
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) {
+        return Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
+            style: TextStyle(color: Colors.white),
+          ),
+        );
+      },
+    ),
+  )
+  .build()
+```
+
+### Click Handlers
+
+React to bar selection:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'quarter', y: 'revenue')
+  .geomBar()
+  .interaction(
+    click: ClickConfig(
+      onTap: (point) {
+        print('Clicked: ${point.data}');
+        // Navigate to detail view
+        showQuarterDetails(point.data);
+      },
+    ),
+  )
+  .build()
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Bar Width">
+    - Use width 0.6-0.8 for optimal readability
+    - Avoid very thin bars (< 0.3) or very thick bars (> 0.9)
+    - Grouped bars automatically adjust width
+  </Accordion>
+  
+  <Accordion title="Color Choices">
+    - Use consistent color palettes
+    - Consider colorblind-friendly schemes
+    - Limit categories to 8-10 colors maximum
+  </Accordion>
+  
+  <Accordion title="Stacked Bars">
+    - Ensure data values are positive
+    - Order categories consistently
+    - Consider total height for readability
+  </Accordion>
+  
+  <Accordion title="Performance">
+    - Limit to 50-100 bars for optimal performance
+    - Use simpler borders for large datasets
+    - Consider data aggregation for very large sets
+  </Accordion>
+</AccordionGroup>
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Sales Comparison" icon="chart-column">
+    Compare performance across regions or time periods
+  </Card>
+  <Card title="Budget Analysis" icon="coins">
+    Show spending breakdown with stacked bars
+  </Card>
+  <Card title="Survey Results" icon="list">
+    Display categorical survey responses
+  </Card>
+  <Card title="Performance Metrics" icon="trophy">
+    Rank teams or products by metrics
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Area Charts" icon="chart-area" href="/charts/area-charts">
+    Visualize volume and cumulative data
+  </Card>
+  <Card title="Dual Y-Axis" icon="chart-mixed" href="/charts/dual-axis">
+    Combine different metrics on independent scales
+  </Card>
+  <Card title="Animations" icon="play" href="/features/animations">
+    Add smooth transitions and effects
+  </Card>
+  <Card title="Interactions" icon="hand-pointer" href="/features/interactions">
+    Make charts interactive with tooltips and events
+  </Card>
+</CardGroup>

@@ -1,0 +1,473 @@
+---
+title: "Examples"
+description: "Real-world chart examples and use cases"
+---
+
+## Chart Gallery
+
+Explore different chart types and their use cases with complete code examples.
+
+<CardGroup cols={2}>
+  <Card title="Scatter Plots" icon="chart-scatter" href="#scatter-plots">
+    Point-based visualizations with size and color mapping
+  </Card>
+  <Card title="Line Charts" icon="chart-line" href="#line-charts">
+    Time series and trend analysis
+  </Card>
+  <Card title="Bar Charts" icon="chart-column" href="#bar-charts">
+    Categorical data with multiple variations
+  </Card>
+  <Card title="Area Charts" icon="chart-area" href="#area-charts">
+    Volume and cumulative data visualization
+  </Card>
+  <Card title="Dual Y-Axis" icon="chart-mixed" href="#dual-y-axis">
+    Business dashboards with multiple metrics
+  </Card>
+  <Card title="Interactive" icon="hand-pointer" href="#interactive-charts">
+    Tooltips, pan/zoom, and click handlers
+  </Card>
+</CardGroup>
+
+## Scatter Plots
+
+### Basic Scatter Plot
+
+Perfect for exploring relationships between two variables:
+
+```dart
+final data = [
+  {'x': 1, 'y': 2.3, 'category': 'A'},
+  {'x': 2, 'y': 3.1, 'category': 'B'},
+  {'x': 3, 'y': 1.8, 'category': 'A'},
+  {'x': 4, 'y': 4.2, 'category': 'C'},
+  {'x': 5, 'y': 2.9, 'category': 'B'},
+];
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint(
+    size: 8.0,
+    alpha: 0.8,
+    shape: PointShape.circle,
+    borderWidth: 1.5,
+  )
+  .scaleXContinuous()
+  .scaleYContinuous()
+  .theme(ChartTheme.defaultTheme())
+  .animate(duration: Duration(milliseconds: 800))
+  .build()
+```
+
+### Multi-Dimensional Scatter Plot
+
+Using size to encode a third dimension:
+
+```dart
+final salesData = [
+  {'revenue': 100, 'deals': 25, 'region': 'North', 'rep_count': 5},
+  {'revenue': 150, 'deals': 30, 'region': 'South', 'rep_count': 8},
+  {'revenue': 80, 'deals': 20, 'region': 'East', 'rep_count': 3},
+  {'revenue': 200, 'deals': 35, 'region': 'West', 'rep_count': 12},
+];
+
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'revenue', y: 'deals', color: 'region', size: 'rep_count')
+  .geomPoint(alpha: 0.7)
+  .scaleXContinuous(min: 0)
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Line Charts
+
+### Time Series
+
+Classic time series visualization:
+
+```dart
+final timeSeriesData = [
+  {'month': 'Jan', 'users': 1200, 'platform': 'iOS'},
+  {'month': 'Feb', 'users': 1350, 'platform': 'iOS'},
+  {'month': 'Mar', 'users': 1100, 'platform': 'iOS'},
+  {'month': 'Jan', 'users': 800, 'platform': 'Android'},
+  {'month': 'Feb', 'users': 950, 'platform': 'Android'},
+  {'month': 'Mar', 'users': 1200, 'platform': 'Android'},
+];
+
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'month', y: 'users', color: 'platform')
+  .geomLine(strokeWidth: 3.0)
+  .geomPoint(size: 6.0)
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .animate(duration: Duration(milliseconds: 1200))
+  .build()
+```
+
+### Combined Line + Points
+
+Enhanced visualization with both lines and points:
+
+```dart
+CristalyseChart()
+  .data(analyticsData)
+  .mapping(x: 'week', y: 'engagement')
+  .geomLine(strokeWidth: 2.0, alpha: 0.8)
+  .geomPoint(size: 5.0, alpha: 0.9)
+  .scaleXContinuous()
+  .scaleYContinuous()
+  .theme(ChartTheme.darkTheme())
+  .build()
+```
+
+## Bar Charts
+
+### Vertical Bar Chart
+
+Standard categorical data visualization:
+
+```dart
+final revenueData = [
+  {'quarter': 'Q1', 'revenue': 120},
+  {'quarter': 'Q2', 'revenue': 150},
+  {'quarter': 'Q3', 'revenue': 110},
+  {'quarter': 'Q4', 'revenue': 180},
+];
+
+CristalyseChart()
+  .data(revenueData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .geomBar(
+    width: 0.8,
+    alpha: 0.9,
+    borderRadius: BorderRadius.circular(4),
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+### Grouped Bar Chart
+
+Compare multiple series side-by-side:
+
+```dart
+final productData = [
+  {'quarter': 'Q1', 'revenue': 120, 'product': 'Widget A'},
+  {'quarter': 'Q2', 'revenue': 150, 'product': 'Widget A'},
+  {'quarter': 'Q1', 'revenue': 80, 'product': 'Widget B'},
+  {'quarter': 'Q2', 'revenue': 110, 'product': 'Widget B'},
+];
+
+CristalyseChart()
+  .data(productData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(
+    style: BarStyle.grouped,
+    width: 0.8,
+    alpha: 0.9,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+### Stacked Bar Chart
+
+Show composition and totals:
+
+```dart
+final budgetData = [
+  {'department': 'Marketing', 'amount': 50, 'category': 'Personnel'},
+  {'department': 'Marketing', 'amount': 30, 'category': 'Technology'},
+  {'department': 'Marketing', 'amount': 20, 'category': 'Travel'},
+  {'department': 'Sales', 'amount': 80, 'category': 'Personnel'},
+  {'department': 'Sales', 'amount': 25, 'category': 'Technology'},
+];
+
+CristalyseChart()
+  .data(budgetData)
+  .mapping(x: 'department', y: 'amount', color: 'category')
+  .geomBar(
+    style: BarStyle.stacked,
+    width: 0.8,
+    alpha: 0.9,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+### Horizontal Bar Chart
+
+Great for long category names:
+
+```dart
+CristalyseChart()
+  .data(departmentData)
+  .mapping(x: 'department', y: 'headcount')
+  .geomBar(
+    borderRadius: BorderRadius.circular(4),
+    borderWidth: 1.0,
+  )
+  .coordFlip() // Makes it horizontal
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Area Charts
+
+### Basic Area Chart
+
+Perfect for showing volume over time:
+
+```dart
+final trafficData = [
+  {'month': 'Jan', 'visitors': 1200},
+  {'month': 'Feb', 'visitors': 1350},
+  {'month': 'Mar', 'visitors': 1100},
+  {'month': 'Apr', 'visitors': 1800},
+  {'month': 'May', 'visitors': 1650},
+];
+
+CristalyseChart()
+  .data(trafficData)
+  .mapping(x: 'month', y: 'visitors')
+  .geomArea(
+    strokeWidth: 2.0,
+    alpha: 0.3,
+    fillArea: true,
+    color: Colors.blue,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .animate(duration: Duration(milliseconds: 1200))
+  .build()
+```
+
+### Multi-Series Area Chart
+
+Compare multiple categories:
+
+```dart
+final platformData = [
+  {'month': 'Jan', 'users': 800, 'platform': 'Mobile'},
+  {'month': 'Feb', 'users': 900, 'platform': 'Mobile'},
+  {'month': 'Jan', 'users': 400, 'platform': 'Desktop'},
+  {'month': 'Feb', 'users': 450, 'platform': 'Desktop'},
+];
+
+CristalyseChart()
+  .data(platformData)
+  .mapping(x: 'month', y: 'users', color: 'platform')
+  .geomArea(strokeWidth: 1.5, alpha: 0.4)
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .build()
+```
+
+### Combined Area + Line + Points
+
+Layered visualization for rich data stories:
+
+```dart
+CristalyseChart()
+  .data(analyticsData)
+  .mapping(x: 'date', y: 'value')
+  .geomArea(alpha: 0.2, strokeWidth: 0)  // Background fill
+  .geomLine(strokeWidth: 3.0)             // Trend line
+  .geomPoint(size: 6.0)                   // Data points
+  .scaleXContinuous()
+  .scaleYContinuous(min: 0)
+  .build()
+```
+
+## Dual Y-Axis
+
+### Business Dashboard
+
+Revenue vs conversion rate on independent scales:
+
+```dart
+final businessData = [
+  {'month': 'Jan', 'revenue': 120, 'conversion_rate': 2.3},
+  {'month': 'Feb', 'revenue': 150, 'conversion_rate': 2.8},
+  {'month': 'Mar', 'revenue': 110, 'conversion_rate': 2.1},
+  {'month': 'Apr', 'revenue': 180, 'conversion_rate': 3.2},
+];
+
+CristalyseChart()
+  .data(businessData)
+  .mapping(x: 'month', y: 'revenue')        // Primary Y-axis
+  .mappingY2('conversion_rate')             // Secondary Y-axis
+  .geomBar(
+    yAxis: YAxis.primary,                   // Revenue bars (left scale)
+    alpha: 0.7,
+  )
+  .geomLine(
+    yAxis: YAxis.secondary,                 // Conversion line (right scale)
+    strokeWidth: 3.0,
+    color: Colors.orange,
+  )
+  .geomPoint(
+    yAxis: YAxis.secondary,                 // Points on conversion line
+    size: 8.0,
+    color: Colors.orange,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)                 // Left axis: Revenue
+  .scaleY2Continuous(min: 0, max: 5)        // Right axis: Percentage
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+### Sales Volume vs Customer Satisfaction
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'week', y: 'sales_volume')
+  .mappingY2('satisfaction_score')
+  .geomBar(yAxis: YAxis.primary)            // Volume bars
+  .geomLine(yAxis: YAxis.secondary)         // Satisfaction trend
+  .scaleY2Continuous(min: 1, max: 5)        // Rating scale
+  .build()
+```
+
+## Interactive Charts
+
+### Tooltips and Click Handlers
+
+Add rich interactivity to your charts:
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'week', y: 'revenue', color: 'rep')
+  .geomPoint(size: 8.0)
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) {
+        final category = point.getDisplayValue('rep');
+        final value = point.getDisplayValue('revenue');
+        return Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            '$category: \$${value}k',
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        );
+      },
+    ),
+    click: ClickConfig(
+      onTap: (point) {
+        print('Tapped on: ${point.data}');
+        // Show dialog, navigate, etc.
+      },
+    ),
+  )
+  .build()
+```
+
+### Panning for Large Datasets
+
+Interactive exploration of time series data:
+
+```dart
+CristalyseChart()
+  .data(largeTimeSeriesData)
+  .mapping(x: 'timestamp', y: 'value', color: 'series')
+  .geomLine(strokeWidth: 2.0)
+  .geomPoint(size: 4.0)
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      updateXDomain: true,  // Allow horizontal panning
+      updateYDomain: false, // Disable vertical panning
+      onPanUpdate: (info) {
+        print('Visible range: ${info.visibleMinX} - ${info.visibleMaxX}');
+        // Load more data, update UI, etc.
+      },
+    ),
+  )
+  .build()
+```
+
+## Theming Examples
+
+### Dark Theme
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .theme(ChartTheme.darkTheme())
+  .build()
+```
+
+### Custom Theme
+
+```dart
+final customTheme = ChartTheme(
+  backgroundColor: Colors.grey[50]!,
+  primaryColor: Colors.deepPurple,
+  colorPalette: [Colors.blue, Colors.red, Colors.green],
+  gridColor: Colors.grey[300]!,
+  axisTextStyle: TextStyle(fontSize: 14, color: Colors.black87),
+  padding: EdgeInsets.all(40),
+);
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .theme(customTheme)
+  .build()
+```
+
+## Animation Examples
+
+### Elastic Animation
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .animate(
+    duration: Duration(milliseconds: 1200),
+    curve: Curves.elasticOut,
+  )
+  .build()
+```
+
+### Staggered Bar Animation
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'value')
+  .geomBar()
+  .animate(
+    duration: Duration(milliseconds: 1400),
+    curve: Curves.easeInOutCubic,
+  )
+  .build()
+```
+
+Ready to build your own charts? Start with the [Quick Start Guide](/quickstart) or explore specific [Chart Types](/charts/scatter-plots)!

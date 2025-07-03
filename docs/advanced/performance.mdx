@@ -1,0 +1,267 @@
+---
+title: "Performance"
+description: "Optimize charting for high performance and responsiveness"
+---
+
+## Overview
+
+Cristalyse is designed to handle complex charts with large datasets efficiently. Performance optimization ensures smooth rendering, quick interactions, and responsive updates.
+
+## Rendering Performance
+
+### Efficient Data Handling
+
+Reduce data points for visualization without losing insights:
+
+```dart
+List<Map<String, dynamic>> downsampleData(List<Map<String, dynamic>> data, int targetCount) {
+  final step = data.length / targetCount;
+  return List.generate(targetCount, (i) => data[(i * step).floor()]);
+}
+
+CristalyseChart()
+  .data(downsampleData(originalData, 1000))
+  .mapping(x: 'x', y: 'y')
+  .geomLine()
+  .build()
+```
+
+### Asynchronous Operations
+
+Load data and build charts asynchronously:
+
+```dart
+Future<void> loadDataAndBuild() async {
+  final data = await fetchDataAsync();
+  setState(() {
+    CristalyseChart()
+      .data(data)
+      .mapping(x: 'time', y: 'value')
+      .geomLine()
+      .build();
+  });
+}
+```
+
+### Memory Management
+
+Use efficient data structures and dispose of unnecessary elements:
+
+```dart
+class EfficientChart extends StatefulWidget {
+  @override
+  _EfficientChartState createState() => _EfficientChartState();
+}
+
+class _EfficientChartState extends State<EfficientChart> with AutomaticKeepAliveClientMixin {
+  List<Map<String, dynamic>>? cachedData;
+
+  @override
+  void dispose() {
+    cachedData = null; // Release memory
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return CristalyseChart()
+      .data(cachedData ?? [] )
+      .mapping(x: 'x', y: 'value')
+      .geomBar()
+      .build();
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+```
+
+## Interactive Performance
+
+### Debouncing Interactions
+
+Control frequency of interaction events for better performance:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .interaction(
+    hover: HoverConfig(
+      debounce: const Duration(milliseconds: 50),
+      onHover: (point) => {
+        if (point != null) print('Hovered ${point.getDisplayValue('x')}')
+      },
+    ),
+  )
+  .build()
+```
+
+### Throttling Panning
+
+Smooth pan interactions with controlled update frequency:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'metric')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      throttle: const Duration(milliseconds: 32), // 30 FPS
+      onPanUpdate: (info) => handleUpdate(info.visibleMinX, info.visibleMaxX),
+    ),
+  )
+  .build()
+```
+
+## UI Performance
+
+### Lazily Build Complex Widgets
+
+Render parts of your UI only when needed:
+
+```dart
+List<Widget> buildWidgets() {
+  return List.generate(100, (index) => LazyWidget(data: data[index]));
+}
+
+ListView(
+  children: buildWidgets(),
+)
+```
+
+### Render Performance Insights
+
+Monitor and optimize paint times:
+
+```dart
+class RenderProfiler extends StatefulWidget {
+  @override
+  _RenderProfilerState createState() => _RenderProfilerState();
+}
+
+class _RenderProfilerState extends State<RenderProfiler> {
+  DateTime? _lastPaint;
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: CristalyseChart()
+        .data(data)
+        .mapping(x: 'time', y: 'value')
+        .geomArea()
+        .build(),
+      onRepaint: () {
+        final now = DateTime.now();
+        if (_lastPaint != null) {
+          print('Time since last repaint: ${now.difference(_lastPaint!).inMilliseconds}ms');
+        }
+        _lastPaint = now;
+      },
+    );
+  }
+}
+```
+
+## Performance Considerations
+
+### Key Considerations
+
+- Use `async/await` for data loading to prevent UI blocking.
+- Downsample large datasets to improve responsiveness.
+- Profile interaction and rendering performance using profiling tools.
+
+## Performance Techniques
+
+### Combined Techniques
+
+Integrate various performance methods to maximize efficiency:
+
+```dart
+CristalyseChart()
+  .data(downsampleData(originalData, 2000))
+  .mapping(x: 'timestamp', y: 'value')
+  .geomLine()
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) => Text('${point.getDisplayValue('value')}'),
+      showDelay: Duration.zero, // Instantaneous
+    ),
+    pan: PanConfig(
+      enabled: true,
+      throttle: Duration(milliseconds: 16),
+    ),
+  )
+  .build()
+```
+
+### Animation Performance
+
+Handle animations efficiently for better visual fluidity:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomLine()
+  .animate(
+    duration: const Duration(milliseconds: 1500),
+    curve: Curves.easeInOut,
+  )
+  .interaction(
+    hover: HoverConfig(
+      debounce: const Duration(milliseconds: 10),
+    ),
+  )
+  .build()
+```
+
+## Example Gallery
+
+<CardGroup cols={2}>
+  <Card title="Real-Time Updates" icon="clock">
+    Efficiently handle continuous real-time data streams.
+  </Card>
+  <Card title="Interactive Dashboards" icon="dashboard">
+    Develop fluid, responsive dashboards with fast interactions.
+  </Card>
+  <Card title="Complex Scenarios" icon="layers">
+    Tackle interdependent charts with shared data sources.
+  </Card>
+  <Card title="Minimal Resource Usage" icon="battery">
+    Achieve smooth performance with minimal computing resources.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Scales" icon="bar-chart" href="/advanced/scales">
+    Master performance techniques related to scaling algorithms.
+  </Card>
+  <Card title="Export" icon="download" href="/features/export">
+    Optimize chart exporting for better performance on large datasets.
+  </Card>
+  <Card title="Animations" icon="sparkles" href="/features/animations">
+    Combine performance optimization with elegant animations.
+  </Card>
+  <Card title="Data Mapping" icon="map" href="/advanced/data-mapping">
+    Efficiently map data fields to maximize responsiveness.
+  </Card>
+</CardGroup>
+
+## Advanced Tools
+
+Utilize Flutter's build-in performance and rendering tools:
+
+- **DevTools**: An advanced suite to debug and analyze UI performance.
+- **Flame Graphs**: Visualize rendering performance and identify bottlenecks.
+- **Repaint Rainbow**: Find unnecessary paint calls and optimize rendering.
+
+Explore these tools to gain deeper insights into app performance and enhance the efficiency of your charts. By mastering these tools and techniques, you ensure your Cristalyse visualizations remain engaging, reliable, and performant even as complexity increases.  
+
+Explore these tools to increase your knowledge and efficiency when building high-performance visualizations with Cristalyse.

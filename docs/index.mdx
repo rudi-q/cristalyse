@@ -1,0 +1,158 @@
+---
+title: "Cristalyse Docs"
+description: "The grammar of graphics visualization library that Flutter developers have been waiting for"
+---
+
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.png"
+  alt="Cristalyse Hero Light"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.png"
+  alt="Cristalyse Hero Dark"
+/>
+
+## Welcome to Cristalyse
+
+**Finally, create beautiful data visualizations in Flutter without fighting against chart widgets or settling for web-based solutions.**
+
+Cristalyse brings the power of grammar of graphics (think ggplot2) to Flutter with buttery-smooth 60fps animations and true cross-platform deployment.
+
+<CardGroup cols={2}>
+  <Card
+    title="Quick Start"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Get your first chart running in 30 seconds
+  </Card>
+  <Card
+    title="Chart Types"
+    icon="chart-line"
+    href="/charts/scatter-plots"
+  >
+    Explore scatter plots, line charts, bars, and more
+  </Card>
+  <Card
+    title="Interactive Features"
+    icon="hand-pointer"
+    href="/features/interactions"
+  >
+    Add tooltips, pan/zoom, and click handlers
+  </Card>
+  <Card
+    title="Chart Gallery"
+    icon="images"
+    href="/examples"
+  >
+    Real-world examples and complete code samples
+  </Card>
+</CardGroup>
+
+## Why Choose Cristalyse?
+
+<AccordionGroup>
+  <Accordion title="Grammar of Graphics API">
+    Familiar syntax if you've used ggplot2 or plotly. Build charts by layering data, mappings, and geometries instead of wrestling with rigid chart widgets.
+  </Accordion>
+  
+  <Accordion title="Native 60fps Performance">
+    Leverages Flutter's rendering engine, not DOM manipulation. GPU-accelerated performance that handles large datasets without breaking a sweat.
+  </Accordion>
+  
+  <Accordion title="True Cross-Platform">
+    One codebase → Mobile, Web, Desktop, all looking identical. No platform-specific chart libraries or inconsistent rendering.
+  </Accordion>
+  
+  <Accordion title="Professional Features">
+    Dual Y-axis support, stacked/grouped bars, interactive tooltips, SVG export, and custom theming for business-grade dashboards.
+  </Accordion>
+</AccordionGroup>
+
+## Quick Example
+
+Here's how easy it is to create your first chart:
+
+```dart
+import 'package:cristalyse/cristalyse.dart';
+import 'package:flutter/material.dart';
+
+class MyChart extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final data = [
+      {'x': 1, 'y': 2, 'category': 'A'},
+      {'x': 2, 'y': 3, 'category': 'B'},
+      {'x': 3, 'y': 1, 'category': 'A'},
+      {'x': 4, 'y': 4, 'category': 'C'},
+    ];
+
+    return CristalyseChart()
+      .data(data)
+      .mapping(x: 'x', y: 'y', color: 'category')
+      .geomPoint(
+        size: 8.0,
+        alpha: 0.8,
+        shape: PointShape.triangle,
+        borderWidth: 1.5,
+      )
+      .scaleXContinuous()
+      .scaleYContinuous()
+      .theme(ChartTheme.defaultTheme())
+      .build();
+  }
+}
+```
+
+**Result:** A beautiful, animated scatter plot that works identically on iOS, Android, Web, and Desktop.
+
+## What You Can Build
+
+<CardGroup cols={3}>
+  <Card title="Business Dashboards" icon="chart-area">
+    Revenue vs conversion rate with dual Y-axis support
+  </Card>
+  <Card title="Data Analytics" icon="magnifying-glass-chart">
+    Interactive scatter plots with hover tooltips
+  </Card>
+  <Card title="Time Series" icon="chart-line">
+    Multi-series line charts with smooth animations
+  </Card>
+  <Card title="Financial Reports" icon="coins">
+    Stacked bar charts for budget breakdowns
+  </Card>
+  <Card title="User Metrics" icon="users">
+    Area charts showing engagement over time
+  </Card>
+  <Card title="Mobile Apps" icon="mobile">
+    Touch-friendly charts with pan and zoom
+  </Card>
+</CardGroup>
+
+## Perfect For
+
+- **Flutter developers** building data-driven apps who need more than basic chart widgets
+- **Data scientists** who want to deploy interactive visualizations to mobile without learning Swift/Kotlin
+- **Enterprise teams** building dashboards that need consistent UX across all platforms
+- **Business analysts** creating professional reports with dual Y-axis charts and advanced visualizations
+
+## Getting Started
+
+<Steps>
+  <Step title="Installation">
+    Add Cristalyse to your Flutter project with a single command
+  </Step>
+  <Step title="First Chart">
+    Create your first scatter plot in under 30 seconds
+  </Step>
+  <Step title="Explore Features">
+    Discover animations, theming, and interactive capabilities
+  </Step>
+  <Step title="Build Something Amazing">
+    Create production-ready data visualizations
+  </Step>
+</Steps>
+
+Ready to get started? [Install Cristalyse](/installation) and create your first chart!

@@ -1,0 +1,209 @@
+---
+title: "Custom Themes"
+description: "Create and apply custom themes for personalized chart aesthetics."
+---
+
+## Overview
+
+Custom themes in Cristalyse offer complete flexibility to express your brand's unique style. Design themes with specific colors, typography, spacing, and other visual elements to ensure consistency across all charts.
+
+## Designing a Custom Theme
+
+### Theme Properties
+
+Customize various properties:
+
+- **Colors**: Define primary, secondary, background, and accent colors.
+- **Typography**: Adjust fonts, sizes, and weights.
+- **Dimensions**: Set padding, margins, and element sizes.
+
+### Creating Themes
+
+Design a theme matching your brand:
+
+```dart
+final customTheme = ChartTheme(
+  backgroundColor: const Color(0xFFF0F0F0),
+  plotBackgroundColor: Colors.white,
+  primaryColor: const Color(0xFF0050AC), // Brand primary
+  borderColor: const Color(0xFFCCCCCC),
+  gridColor: const Color(0xFFE0E0E0),
+  axisColor: const Color(0xFF333333),
+  gridWidth: 1.0,
+  axisWidth: 1.5,
+  pointSizeDefault: 6.0,
+  colorPalette: [
+    const Color(0xFF0050AC), // Primary
+    const Color(0xFFFF9500), // Accent
+    const Color(0xFF5A2EA6), // Secondary
+    const Color(0xFF34C759), // Success
+  ],
+  padding: const EdgeInsets.all(20),
+  axisTextStyle: const TextStyle(
+    fontSize: 12,
+    color: Color(0xFF333333),
+    fontWeight: FontWeight.w400,
+  ),
+);
+```
+
+## Applying Themes
+
+Apply themes in charts:
+
+```dart
+CristalyseChart()
+  .data(chartData)
+  .mapping(x: 'month', y: 'visitors')
+  .geomBar()
+  .theme(customTheme)
+  .build()
+```
+
+## Theme Variants
+
+### Light and Dark Modes
+
+Create matching themes for light and dark modes:
+
+```dart
+final lightTheme = ChartTheme.defaultTheme();
+final darkTheme = ChartTheme.darkTheme();
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'category', y: 'count')
+  .geomBar()
+  .theme(isDarkMode ? darkTheme : lightTheme)
+  .build();
+```
+
+### Responsive Themes
+
+Adjust theme properties based on screen size:
+
+```dart
+ChartTheme responsiveTheme(BuildContext context) {
+  final width = MediaQuery.of(context).size.width;
+  if (width > 1200) { // Desktop
+    return ChartTheme.defaultTheme().copyWith(
+      padding: const EdgeInsets.all(32),
+      axisTextStyle: const TextStyle(fontSize: 14),
+    );
+  } else if (width > 800) { // Tablet
+    return ChartTheme.defaultTheme().copyWith(
+      padding: const EdgeInsets.all(24),
+    );
+  } else { // Mobile
+    return ChartTheme.defaultTheme().copyWith(
+      padding: const EdgeInsets.all(16),
+      axisTextStyle: const TextStyle(fontSize: 10),
+    );
+  }
+}
+```
+
+## Advanced Customization
+
+### Theme Extensions
+
+Add additional properties using extensions:
+
+```dart
+extension ChartThemeExtras on ChartTheme {
+  ChartTheme get withCustomColors => copyWith(
+    primaryColor: Colors.teal,
+    colorPalette: [Colors.teal, Colors.amber, Colors.purple],
+  );
+}
+
+final extendedTheme = ChartTheme.defaultTheme().withCustomColors;
+```
+
+### Dynamic Themes
+
+Change themes in response to user actions and preferences:
+
+```dart
+class ThemeSwitcher extends StatefulWidget {
+  final ChartTheme lightTheme;
+  final ChartTheme darkTheme;
+  final List<Map<String, dynamic>> data;
+
+  const ThemeSwitcher({
+    required this.lightTheme,
+    required this.darkTheme,
+    required this.data,
+    super.key,
+  });
+
+  @override
+  _ThemeSwitcherState createState() => _ThemeSwitcherState();
+}
+
+class _ThemeSwitcherState extends State<ThemeSwitcher> {
+  bool isDark = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Switch(
+          value: isDark,
+          onChanged: (value) {
+            setState(() {
+              isDark = value;
+            });
+          },
+        ),
+        Expanded(
+          child: CristalyseChart()
+            .data(widget.data)
+            .mapping(x: 'time', y: 'value')
+            .geomLine()
+            .theme(isDark ? widget.darkTheme : widget.lightTheme)
+            .build(),
+        ),
+      ],
+    );
+  }
+}
+```
+
+## Example Gallery
+
+<CardGroup cols={2}>
+  <Card title="Corporate Branding" icon="building">
+    Match your organization's color scheme and brand identity.
+  </Card>
+  <Card title="Responsive Design" icon="mobile">
+    Automatic adjustments for different device sizes and resolutions.
+  </Card>
+  <Card title="Theme Persistence" icon="save">
+    Save and restore user preferences for consistent experiences.
+  </Card>
+  <Card title="Interactive Theming" icon="magic">
+    Real-time adjustments and theme switching based on user actions.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Performance" icon="gauge" href="/advanced/performance">
+    Enhance theme application with performance optimizations.
+  </Card>
+  <Card title="Export" icon="download" href="/features/export">
+    Export charts with customized themes for visual consistency.
+  </Card>
+  <Card title="Data Mapping" icon="map" href="/advanced/data-mapping">
+    Explore data mapping techniques for thematic accuracy.
+  </Card>
+  <Card title="Animations" icon="sparkles" href="/features/animations">
+    Combine custom themes with dynamic animations for engaging visuals.
+  </Card>
+</CardGroup>
+
+## Conclusion
+
+Utilize custom themes to ensure charts are a seamless part of your application's visual identity. By leveraging Cristalyse's flexible theming capabilities, create charts that not only convey data but also resonate with your brand's aesthetics.
