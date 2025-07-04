@@ -20,10 +20,10 @@ Future<ExportResult> exportChartPlatform({
 
 /// Export chart as SVG for mobile/desktop platforms
 Future<ExportResult> _exportToSvg(
-    Widget chartWidget,
-    ExportConfig config,
-    String? customPath,
-    ) async {
+  Widget chartWidget,
+  ExportConfig config,
+  String? customPath,
+) async {
   // For SVG export, we'll create a custom painter that outputs SVG commands
   final SvgExportPainter painter = SvgExportPainter(
     width: config.width,
@@ -51,9 +51,9 @@ Future<ExportResult> _exportToSvg(
 
 /// Get the default export path using path_provider
 Future<String> _getExportPath(
-    ExportConfig config,
-    String extension,
-    ) async {
+  ExportConfig config,
+  String extension,
+) async {
   final Directory directory = await getApplicationDocumentsDirectory();
   if (directory.path.isEmpty) {
     throw const ChartExportException('Could not access documents directory');
@@ -84,8 +84,8 @@ class SvgExportPainter {
     buffer.writeln('<?xml version="1.0" encoding="UTF-8"?>');
     buffer.writeln(
       '<svg width="$width" height="$height" '
-          'xmlns="http://www.w3.org/2000/svg" '
-          'xmlns:xlink="http://www.w3.org/1999/xlink">',
+      'xmlns="http://www.w3.org/2000/svg" '
+      'xmlns:xlink="http://www.w3.org/1999/xlink">',
     );
 
     // Background
@@ -110,8 +110,8 @@ class SvgExportPainter {
       // Fallback for unsupported chart types
       buffer.writeln(
         '  <text x="50%" y="50%" text-anchor="middle" '
-            'dominant-baseline="middle" font-family="Arial, sans-serif" '
-            'font-size="16" fill="#666">',
+        'dominant-baseline="middle" font-family="Arial, sans-serif" '
+        'font-size="16" fill="#666">',
       );
       buffer.writeln('    Chart SVG Export');
       buffer.writeln('  </text>');
@@ -172,7 +172,10 @@ class SvgExportPainter {
       return _LinearScale(domain: [0, 1], range: [0, plotWidth]);
     }
 
-    final xValues = chartData.data.map((d) => d[chartData.xColumn]).where((v) => v != null).toList();
+    final xValues = chartData.data
+        .map((d) => d[chartData.xColumn])
+        .where((v) => v != null)
+        .toList();
 
     if (xValues.isEmpty) {
       return _LinearScale(domain: [0, 1], range: [0, plotWidth]);
@@ -196,7 +199,10 @@ class SvgExportPainter {
       return _LinearScale(domain: [0, 1], range: [plotHeight, 0]);
     }
 
-    final yValues = chartData.data.map((d) => d[chartData.yColumn]).where((v) => v != null).toList();
+    final yValues = chartData.data
+        .map((d) => d[chartData.yColumn])
+        .where((v) => v != null)
+        .toList();
 
     if (yValues.isEmpty) {
       return _LinearScale(domain: [0, 1], range: [plotHeight, 0]);
@@ -209,7 +215,8 @@ class SvgExportPainter {
     // Add some padding
     final range = max - min;
     final padding = range * 0.1;
-    return _LinearScale(domain: [min - padding, max + padding], range: [plotHeight, 0]);
+    return _LinearScale(
+        domain: [min - padding, max + padding], range: [plotHeight, 0]);
   }
 
   _Scale? _setupY2Scale(_ChartData chartData, double plotHeight) {
@@ -217,7 +224,10 @@ class SvgExportPainter {
       return null;
     }
 
-    final y2Values = chartData.data.map((d) => d[chartData.y2Column]).where((v) => v != null).toList();
+    final y2Values = chartData.data
+        .map((d) => d[chartData.y2Column])
+        .where((v) => v != null)
+        .toList();
 
     if (y2Values.isEmpty) {
       return null;
@@ -229,7 +239,8 @@ class SvgExportPainter {
 
     final range = max - min;
     final padding = range * 0.1;
-    return _LinearScale(domain: [min - padding, max + padding], range: [plotHeight, 0]);
+    return _LinearScale(
+        domain: [min - padding, max + padding], range: [plotHeight, 0]);
   }
 
   Map<String, String> _setupColorScale(_ChartData chartData) {
@@ -238,11 +249,23 @@ class SvgExportPainter {
       return colorMap;
     }
 
-    final colorValues = chartData.data.map((d) => d[chartData.colorColumn]).where((v) => v != null).toSet().toList();
-    final defaultColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b'];
+    final colorValues = chartData.data
+        .map((d) => d[chartData.colorColumn])
+        .where((v) => v != null)
+        .toSet()
+        .toList();
+    final defaultColors = [
+      '#1f77b4',
+      '#ff7f0e',
+      '#2ca02c',
+      '#d62728',
+      '#9467bd',
+      '#8c564b'
+    ];
 
     for (int i = 0; i < colorValues.length; i++) {
-      colorMap[colorValues[i].toString()] = defaultColors[i % defaultColors.length];
+      colorMap[colorValues[i].toString()] =
+          defaultColors[i % defaultColors.length];
     }
 
     return colorMap;
@@ -254,7 +277,10 @@ class SvgExportPainter {
       return sizeMap;
     }
 
-    final sizeValues = chartData.data.map((d) => d[chartData.sizeColumn]).where((v) => v != null).toList();
+    final sizeValues = chartData.data
+        .map((d) => d[chartData.sizeColumn])
+        .where((v) => v != null)
+        .toList();
     if (sizeValues.isEmpty) {
       return sizeMap;
     }
@@ -274,10 +300,12 @@ class SvgExportPainter {
 
   void _renderBackground(StringBuffer buffer, _Rect plotArea, dynamic theme) {
     // Render plot area background if needed
-    buffer.writeln('  <rect x="${plotArea.left}" y="${plotArea.top}" width="${plotArea.width}" height="${plotArea.height}" fill="none"/>');
+    buffer.writeln(
+        '  <rect x="${plotArea.left}" y="${plotArea.top}" width="${plotArea.width}" height="${plotArea.height}" fill="none"/>');
   }
 
-  void _renderGrid(StringBuffer buffer, _Rect plotArea, _Scale xScale, _Scale yScale, dynamic theme) {
+  void _renderGrid(StringBuffer buffer, _Rect plotArea, _Scale xScale,
+      _Scale yScale, dynamic theme) {
     final gridColor = '#e0e0e0';
 
     // Vertical grid lines
@@ -285,7 +313,8 @@ class SvgExportPainter {
       final ticks = _getTicks(xScale.domain[0], xScale.domain[1], 5);
       for (final tick in ticks) {
         final x = plotArea.left + xScale.scale(tick);
-        buffer.writeln('  <line x1="$x" y1="${plotArea.top}" x2="$x" y2="${plotArea.top + plotArea.height}" stroke="$gridColor" stroke-width="1"/>');
+        buffer.writeln(
+            '  <line x1="$x" y1="${plotArea.top}" x2="$x" y2="${plotArea.top + plotArea.height}" stroke="$gridColor" stroke-width="1"/>');
       }
     }
 
@@ -294,24 +323,26 @@ class SvgExportPainter {
       final ticks = _getTicks(yScale.domain[0], yScale.domain[1], 5);
       for (final tick in ticks) {
         final y = plotArea.top + yScale.scale(tick);
-        buffer.writeln('  <line x1="${plotArea.left}" y1="$y" x2="${plotArea.left + plotArea.width}" y2="$y" stroke="$gridColor" stroke-width="1"/>');
+        buffer.writeln(
+            '  <line x1="${plotArea.left}" y1="$y" x2="${plotArea.left + plotArea.width}" y2="$y" stroke="$gridColor" stroke-width="1"/>');
       }
     }
   }
 
   void _renderGeometries(
-      StringBuffer buffer,
-      _Rect plotArea,
-      _ChartData chartData,
-      _Scale xScale,
-      _Scale yScale,
-      _Scale? y2Scale,
-      Map<String, String> colorScale,
-      Map<String, double> sizeScale,
-      ) {
+    StringBuffer buffer,
+    _Rect plotArea,
+    _ChartData chartData,
+    _Scale xScale,
+    _Scale yScale,
+    _Scale? y2Scale,
+    Map<String, String> colorScale,
+    Map<String, double> sizeScale,
+  ) {
     for (final geometry in chartData.geometries) {
       if (geometry.toString().contains('Point')) {
-        _renderPoints(buffer, plotArea, chartData, xScale, yScale, colorScale, sizeScale);
+        _renderPoints(
+            buffer, plotArea, chartData, xScale, yScale, colorScale, sizeScale);
       } else if (geometry.toString().contains('Line')) {
         _renderLines(buffer, plotArea, chartData, xScale, yScale, colorScale);
       } else if (geometry.toString().contains('Bar')) {
@@ -320,18 +351,27 @@ class SvgExportPainter {
     }
   }
 
-  void _renderPoints(StringBuffer buffer, _Rect plotArea, _ChartData chartData, _Scale xScale, _Scale yScale, Map<String, String> colorScale, Map<String, double> sizeScale) {
+  void _renderPoints(
+      StringBuffer buffer,
+      _Rect plotArea,
+      _ChartData chartData,
+      _Scale xScale,
+      _Scale yScale,
+      Map<String, String> colorScale,
+      Map<String, double> sizeScale) {
     for (final point in chartData.data) {
       final x = plotArea.left + xScale.scale(point[chartData.xColumn]);
       final y = plotArea.top + yScale.scale(point[chartData.yColumn]);
-      final color = colorScale[point[chartData.colorColumn]?.toString()] ?? '#1f77b4';
+      final color =
+          colorScale[point[chartData.colorColumn]?.toString()] ?? '#1f77b4';
       final size = sizeScale[point[chartData.sizeColumn]?.toString()] ?? 3.0;
 
       buffer.writeln('  <circle cx="$x" cy="$y" r="$size" fill="$color"/>');
     }
   }
 
-  void _renderLines(StringBuffer buffer, _Rect plotArea, _ChartData chartData, _Scale xScale, _Scale yScale, Map<String, String> colorScale) {
+  void _renderLines(StringBuffer buffer, _Rect plotArea, _ChartData chartData,
+      _Scale xScale, _Scale yScale, Map<String, String> colorScale) {
     if (chartData.data.length < 2) return;
 
     final points = chartData.data.map((point) {
@@ -340,40 +380,48 @@ class SvgExportPainter {
       return '$x,$y';
     }).join(' ');
 
-    final color = colorScale.values.isNotEmpty ? colorScale.values.first : '#1f77b4';
-    buffer.writeln('  <polyline points="$points" stroke="$color" stroke-width="2" fill="none"/>');
+    final color =
+        colorScale.values.isNotEmpty ? colorScale.values.first : '#1f77b4';
+    buffer.writeln(
+        '  <polyline points="$points" stroke="$color" stroke-width="2" fill="none"/>');
   }
 
-  void _renderBars(StringBuffer buffer, _Rect plotArea, _ChartData chartData, _Scale xScale, _Scale yScale, Map<String, String> colorScale) {
+  void _renderBars(StringBuffer buffer, _Rect plotArea, _ChartData chartData,
+      _Scale xScale, _Scale yScale, Map<String, String> colorScale) {
     final barWidth = plotArea.width / chartData.data.length * 0.8;
 
     for (int i = 0; i < chartData.data.length; i++) {
       final point = chartData.data[i];
-      final x = plotArea.left + xScale.scale(point[chartData.xColumn]) - barWidth / 2;
+      final x =
+          plotArea.left + xScale.scale(point[chartData.xColumn]) - barWidth / 2;
       final yValue = yScale.scale(point[chartData.yColumn]);
       final y = plotArea.top + yValue;
       final height = plotArea.height - yValue;
-      final color = colorScale[point[chartData.colorColumn]?.toString()] ?? '#1f77b4';
+      final color =
+          colorScale[point[chartData.colorColumn]?.toString()] ?? '#1f77b4';
 
-      buffer.writeln('  <rect x="$x" y="$y" width="$barWidth" height="$height" fill="$color"/>');
+      buffer.writeln(
+          '  <rect x="$x" y="$y" width="$barWidth" height="$height" fill="$color"/>');
     }
   }
 
   void _renderAxes(
-      StringBuffer buffer,
-      _Rect plotArea,
-      _Scale xScale,
-      _Scale yScale,
-      _Scale? y2Scale,
-      dynamic theme,
-      ) {
+    StringBuffer buffer,
+    _Rect plotArea,
+    _Scale xScale,
+    _Scale yScale,
+    _Scale? y2Scale,
+    dynamic theme,
+  ) {
     final axisColor = '#333333';
 
     // X axis
-    buffer.writeln('  <line x1="${plotArea.left}" y1="${plotArea.top + plotArea.height}" x2="${plotArea.left + plotArea.width}" y2="${plotArea.top + plotArea.height}" stroke="$axisColor" stroke-width="1"/>');
+    buffer.writeln(
+        '  <line x1="${plotArea.left}" y1="${plotArea.top + plotArea.height}" x2="${plotArea.left + plotArea.width}" y2="${plotArea.top + plotArea.height}" stroke="$axisColor" stroke-width="1"/>');
 
     // Y axis
-    buffer.writeln('  <line x1="${plotArea.left}" y1="${plotArea.top}" x2="${plotArea.left}" y2="${plotArea.top + plotArea.height}" stroke="$axisColor" stroke-width="1"/>');
+    buffer.writeln(
+        '  <line x1="${plotArea.left}" y1="${plotArea.top}" x2="${plotArea.left}" y2="${plotArea.top + plotArea.height}" stroke="$axisColor" stroke-width="1"/>');
 
     // X axis labels
     if (xScale is _LinearScale) {
@@ -381,7 +429,8 @@ class SvgExportPainter {
       for (final tick in ticks) {
         final x = plotArea.left + xScale.scale(tick);
         final y = plotArea.top + plotArea.height + 20;
-        buffer.writeln('  <text x="$x" y="$y" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="$axisColor">');
+        buffer.writeln(
+            '  <text x="$x" y="$y" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="$axisColor">');
         buffer.writeln('    ${_formatNumber(tick)}');
         buffer.writeln('  </text>');
       }
@@ -390,7 +439,8 @@ class SvgExportPainter {
         final category = xScale.categories[i];
         final x = plotArea.left + xScale.scale(category);
         final y = plotArea.top + plotArea.height + 20;
-        buffer.writeln('  <text x="$x" y="$y" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="$axisColor">');
+        buffer.writeln(
+            '  <text x="$x" y="$y" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="$axisColor">');
         buffer.writeln('    $category');
         buffer.writeln('  </text>');
       }
@@ -402,7 +452,8 @@ class SvgExportPainter {
       for (final tick in ticks) {
         final x = plotArea.left - 10;
         final y = plotArea.top + yScale.scale(tick) + 4;
-        buffer.writeln('  <text x="$x" y="$y" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="$axisColor">');
+        buffer.writeln(
+            '  <text x="$x" y="$y" text-anchor="end" font-family="Arial, sans-serif" font-size="12" fill="$axisColor">');
         buffer.writeln('    ${_formatNumber(tick)}');
         buffer.writeln('  </text>');
       }
@@ -424,7 +475,10 @@ class SvgExportPainter {
   }
 
   String _colorToHex(Color color) {
-    return '#${color.value.toRadixString(16).padLeft(8, '0').substring(2)}';
+    final r = (color.r * 255).round();
+    final g = (color.g * 255).round();
+    final b = (color.b * 255).round();
+    return '#${r.toRadixString(16).padLeft(2, '0')}${g.toRadixString(16).padLeft(2, '0')}${b.toRadixString(16).padLeft(2, '0')}';
   }
 }
 
@@ -479,7 +533,7 @@ class _LinearScale extends _Scale {
   @override
   double scale(dynamic value) {
     final numValue =
-    value is num ? value.toDouble() : double.tryParse(value.toString());
+        value is num ? value.toDouble() : double.tryParse(value.toString());
     if (numValue == null) return range[0];
 
     final domainRange = domain[1] - domain[0];
