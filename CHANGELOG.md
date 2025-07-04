@@ -1,3 +1,6 @@
+## 0.9.4 - 2025-07-04
+* Improved web wasm compatibility and documentation
+
 ## 0.9.3 - 2025-07-03
 
 - **📖 Comprehensive Documentation Site Now Live**

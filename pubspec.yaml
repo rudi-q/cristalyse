@@ -1,10 +1,19 @@
 name: cristalyse
 description: "Cristalyse is a high-performance data visualization library for Dart/Flutter that implements grammar of graphics principles with native rendering capabilities."
-version: 0.9.3
-homepage: https://github.com/rudi-q/cristalyse
+version: 0.9.4
+homepage: https://cristalyse.com
+documentation: https://docs.cristalyse.com
 repository: https://github.com/rudi-q/cristalyse
 issue_tracker: https://github.com/rudi-q/cristalyse/issues
-documentation: https://github.com/rudi-q/cristalyse#readme
+example: https://example.cristalyse.com
+
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
 
 screenshots:
   - description: 'Dual Y-axis Example with custom theme'
@@ -40,6 +49,7 @@ dependencies:
     sdk: flutter
   path_provider: ^2.1.4
   flutter_svg: ^2.0.10+1
+  universal_html: ^2.2.4
 
 dev_dependencies:
   flutter_test:
