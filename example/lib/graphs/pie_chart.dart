@@ -23,7 +23,8 @@ Widget buildPieChartTab(ChartTheme currentTheme,
               .data(pieData)
               .mappingPie(value: 'revenue', category: 'category')
               .geomPie(
-                outerRadius: 100.0 + sliderValue * 50.0, // Use slider for radius
+                outerRadius:
+                    100.0 + sliderValue * 50.0, // Use slider for radius
                 strokeWidth: 2.0,
                 strokeColor: Colors.white,
                 showLabels: true,
@@ -39,7 +40,6 @@ Widget buildPieChartTab(ChartTheme currentTheme,
         const Text(
             '• Slices animate in with staggered timing\n• Percentages shown on labels\n• Smooth elastic animation curve'),
         const SizedBox(height: 32),
-        
         const Text('Donut Chart Example'),
         const SizedBox(height: 16),
         SizedBox(
@@ -48,7 +48,7 @@ Widget buildPieChartTab(ChartTheme currentTheme,
               .data(pieData)
               .mappingPie(value: 'users', category: 'category')
               .geomPie(
-                innerRadius: 40.0, // Creates donut hole
+                innerRadius: 60.0, // Creates larger donut hole
                 outerRadius: 120.0,
                 strokeWidth: 3.0,
                 strokeColor: Colors.white,

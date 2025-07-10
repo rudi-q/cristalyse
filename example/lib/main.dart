@@ -13,6 +13,7 @@ import 'graphs/horizontal_bar_chart.dart';
 import 'graphs/interactive_scatter.dart';
 import 'graphs/line_chart.dart';
 import 'graphs/pan_example.dart';
+import 'graphs/pie_chart.dart';
 import 'graphs/scatter_plot.dart';
 import 'graphs/stacked_bar_chart.dart';
 
@@ -113,7 +114,7 @@ class _ExampleHomeState extends State<ExampleHome>
   void initState() {
     super.initState();
     _tabController =
-        TabController(length: 11, vsync: this); // Updated to 11 tabs
+        TabController(length: 12, vsync: this); // Updated to 12 tabs
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -306,8 +307,12 @@ class _ExampleHomeState extends State<ExampleHome>
       case 5:
       case 6:
       case 7:
+      case 8:
         final value = _sliderValue.clamp(0.1, 1.0);
         return 'Bar Width: ${(value * 100).toStringAsFixed(0)}%';
+      case 9: // Pie chart
+        final value = 100.0 + _sliderValue * 50.0;
+        return 'Pie Radius: ${value.toStringAsFixed(0)}px';
       default:
         return _sliderValue.toStringAsFixed(2);
     }
@@ -324,6 +329,7 @@ class _ExampleHomeState extends State<ExampleHome>
       'Product Performance by Quarter',
       'Team Size by Department',
       'Revenue Breakdown by Category',
+      'Platform Revenue Distribution',
       'Revenue vs Conversion Performance',
     ];
   }
@@ -339,6 +345,7 @@ class _ExampleHomeState extends State<ExampleHome>
       'Mobile app leading growth, API services showing steady adoption',
       'Engineering team expansion supporting our product development goals',
       'Product sales continue to drive growth, with subscriptions showing strong momentum',
+      'Mobile dominates with 45% share, desktop and tablet showing steady growth',
       'Revenue growth correlates with improved conversion optimization',
     ];
   }
@@ -561,6 +568,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Grouped Bars'),
             Tab(text: 'Horizontal Bars'),
             Tab(text: 'Stacked Bars'),
+            Tab(text: 'Pie Chart'), // New pie chart tab
             Tab(text: 'Dual Y-Axis'),
             Tab(text: 'Export'), // New export tab
           ],
@@ -697,8 +705,22 @@ class _ExampleHomeState extends State<ExampleHome>
                   ],
                 ),
                 _buildChartPage(
-                  chartTitles[8],
-                  chartDescriptions[8],
+                  chartTitles[9],
+                  chartDescriptions[9],
+                  buildPieChartTab(
+                      currentTheme, _scatterPlotData, _sliderValue),
+                  [
+                    _buildStatsCard(
+                        'Mobile Share', '45.2%', '+2.3%', Colors.blue),
+                    _buildStatsCard(
+                        'Desktop Share', '32.8%', '+1.1%', Colors.green),
+                    _buildStatsCard(
+                        'Tablet Share', '22.0%', '+0.8%', Colors.orange),
+                  ],
+                ),
+                _buildChartPage(
+                  chartTitles[10],
+                  chartDescriptions[10],
                   buildDualAxisTab(currentTheme, _dualAxisData, _sliderValue),
                   [
                     _buildStatsCard(
@@ -972,14 +994,21 @@ class _ExampleHomeState extends State<ExampleHome>
           'Consistent color mapping across all segments',
           'Perfect for budget breakdowns and composition analysis'
         ];
-      case 9: // Dual Y-axis
+      case 9: // Pie charts
+        return [
+          'Smooth slice animations with staggered timing',
+          'Donut chart support with configurable inner radius',
+          'Smart label positioning with percentage display',
+          'Exploded slices for emphasis and visual impact'
+        ];
+      case 10: // Dual Y-axis
         return [
           'Dual Y-axis support for different data scales',
           'Independent left and right axis scaling',
           'Combined bar and line visualizations',
           'Perfect for correlating volume vs efficiency metrics'
         ];
-      case 10: // Export demo
+      case 11: // Export demo
         return [
           'Export charts as scalable SVG vector graphics',
           'Infinite zoom and professional quality output',

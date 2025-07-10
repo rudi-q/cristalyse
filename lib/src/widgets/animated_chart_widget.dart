@@ -993,8 +993,14 @@ class _AnimatedChartPainter extends CustomPainter {
     final colorScale = _setupColorScale();
     final sizeScale = _setupSizeScale();
 
+    final hasPieChart = geometries.any((g) => g is PieGeometry);
+
     _drawBackground(canvas, plotArea);
-    _drawGrid(canvas, plotArea, xScale, yScale, y2Scale);
+
+    // Skip grid and axes for pie charts
+    if (!hasPieChart) {
+      _drawGrid(canvas, plotArea, xScale, yScale, y2Scale);
+    }
 
     // Clip rendering to plot area to prevent drawing over axis labels
     canvas.save();
@@ -1019,7 +1025,10 @@ class _AnimatedChartPainter extends CustomPainter {
     // Restore canvas state to draw axes outside clipped area
     canvas.restore();
 
-    _drawAxes(canvas, size, plotArea, xScale, yScale, y2Scale);
+    // Skip axes for pie charts
+    if (!hasPieChart) {
+      _drawAxes(canvas, size, plotArea, xScale, yScale, y2Scale);
+    }
   }
 
   bool _hasSecondaryYAxis() {
@@ -1281,8 +1290,14 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   ColorScale _setupColorScale() {
-    if (colorColumn == null) return ColorScale();
-    final values = data.map((d) => d[colorColumn]).toSet().toList();
+    // For pie charts, use category column; otherwise use color column
+    final hasPieChart = geometries.any((g) => g is PieGeometry);
+    final columnToUse = hasPieChart && pieCategoryColumn != null
+        ? pieCategoryColumn
+        : colorColumn;
+
+    if (columnToUse == null) return ColorScale();
+    final values = data.map((d) => d[columnToUse]).toSet().toList();
     return ColorScale(values: values, colors: theme.colorPalette);
   }
 
@@ -2337,7 +2352,7 @@ class _AnimatedChartPainter extends CustomPainter {
     // Use pie-specific columns or fall back to regular columns
     final valueColumn = pieValueColumn ?? yColumn;
     final categoryColumn = pieCategoryColumn ?? colorColumn ?? xColumn;
-    
+
     if (valueColumn == null || categoryColumn == null || data.isEmpty) {
       return;
     }
@@ -2348,13 +2363,15 @@ class _AnimatedChartPainter extends CustomPainter {
       plotArea.top + plotArea.height / 2,
     );
 
-    // Calculate radius based on plot area (leave some margin for labels)
-    final maxRadius = math.min(plotArea.width, plotArea.height) / 2 - 40;
+    // Calculate radius based on plot area (leave margin for labels)
+    final maxRadius = math.min(plotArea.width, plotArea.height) / 2 - 50;
     final outerRadius = math.min(geometry.outerRadius, maxRadius);
-    final innerRadius = math.min(geometry.innerRadius, outerRadius);
+    final innerRadius = math.min(geometry.innerRadius,
+        outerRadius * 0.8); // Ensure inner radius isn't too close to outer
 
     // Extract and calculate values
-    final values = data.map((d) => _getNumericValue(d[valueColumn]) ?? 0).toList();
+    final values =
+        data.map((d) => _getNumericValue(d[valueColumn]) ?? 0).toList();
     final total = values.fold<double>(0, (sum, val) => sum + val);
 
     if (total <= 0) return;
@@ -2365,17 +2382,18 @@ class _AnimatedChartPainter extends CustomPainter {
 
     // Draw pie slices
     double currentAngle = geometry.startAngle;
-    
+
     for (int i = 0; i < data.length; i++) {
       final value = values[i];
       if (value <= 0) continue;
-      
+
       final sweepAngle = (value / total) * 2 * math.pi;
       final category = data[i][categoryColumn];
       final sliceColor = colorScale.scale(category);
 
       // Animation: each slice grows with a slight delay
-      final sliceDelay = i / data.length * 0.3; // 30% of animation for staggering
+      final sliceDelay =
+          i / data.length * 0.3; // 30% of animation for staggering
       final sliceProgress = math.max(
         0.0,
         math.min(
@@ -2404,17 +2422,48 @@ class _AnimatedChartPainter extends CustomPainter {
       // Create slice path
       final path = Path();
       if (innerRadius > 0) {
-        // Donut chart
-        path.addArc(
+        // Donut chart - create proper donut slice path
+        final outerStartX =
+            sliceCenter.dx + math.cos(currentAngle) * outerRadius;
+        final outerStartY =
+            sliceCenter.dy + math.sin(currentAngle) * outerRadius;
+        final outerEndX = sliceCenter.dx +
+            math.cos(currentAngle + animatedSweepAngle) * outerRadius;
+        final outerEndY = sliceCenter.dy +
+            math.sin(currentAngle + animatedSweepAngle) * outerRadius;
+
+        final innerStartX =
+            sliceCenter.dx + math.cos(currentAngle) * innerRadius;
+        final innerStartY =
+            sliceCenter.dy + math.sin(currentAngle) * innerRadius;
+        final innerEndX = sliceCenter.dx +
+            math.cos(currentAngle + animatedSweepAngle) * innerRadius;
+        final innerEndY = sliceCenter.dy +
+            math.sin(currentAngle + animatedSweepAngle) * innerRadius;
+
+        // Start at outer edge
+        path.moveTo(outerStartX, outerStartY);
+
+        // Draw outer arc
+        path.arcTo(
           Rect.fromCircle(center: sliceCenter, radius: outerRadius),
           currentAngle,
           animatedSweepAngle,
+          false,
         );
-        path.addArc(
+
+        // Draw line to inner edge
+        path.lineTo(innerEndX, innerEndY);
+
+        // Draw inner arc (in reverse)
+        path.arcTo(
           Rect.fromCircle(center: sliceCenter, radius: innerRadius),
           currentAngle + animatedSweepAngle,
           -animatedSweepAngle,
+          false,
         );
+
+        // Close the path
         path.close();
       } else {
         // Full pie chart
@@ -2500,11 +2549,11 @@ class _AnimatedChartPainter extends CustomPainter {
       textPainter.width + 8,
       textPainter.height + 4,
     );
-    
+
     final backgroundPaint = Paint()
-      ..color = Colors.white.withOpacity(0.8)
+      ..color = Colors.white.withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
-    
+
     canvas.drawRRect(
       RRect.fromRectAndRadius(labelRect, const Radius.circular(4)),
       backgroundPaint,

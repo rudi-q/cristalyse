@@ -350,6 +350,82 @@ CristalyseChart()
   .build()
 ```
 
+## 🥧 Pie Charts and Donut Charts
+
+**Perfect for part-to-whole relationships** - visualize market share, revenue distribution, user demographics, and any categorical data where proportions matter.
+
+### Basic Pie Chart
+```dart
+// Revenue Distribution by Platform
+CristalyseChart()
+  .data([
+    {'category': 'Mobile', 'revenue': 45.2},
+    {'category': 'Desktop', 'revenue': 32.8},
+    {'category': 'Tablet', 'revenue': 22.0},
+  ])
+  .mappingPie(value: 'revenue', category: 'category')
+  .geomPie(
+    outerRadius: 120.0,
+    strokeWidth: 2.0,
+    strokeColor: Colors.white,
+    showLabels: true,
+    showPercentages: true,
+  )
+  .theme(ChartTheme.defaultTheme())
+  .animate(
+    duration: Duration(milliseconds: 1200),
+    curve: Curves.elasticOut,
+  )
+  .build()
+```
+
+### Donut Charts
+```dart
+// User Analytics with Donut Visualization
+CristalyseChart()
+  .data(userPlatformData)
+  .mappingPie(value: 'users', category: 'platform')
+  .geomPie(
+    innerRadius: 60.0,        // Creates donut hole
+    outerRadius: 120.0,
+    strokeWidth: 3.0,
+    strokeColor: Colors.white,
+    showLabels: true,
+    showPercentages: false,   // Show actual values
+  )
+  .theme(ChartTheme.darkTheme())
+  .animate(
+    duration: Duration(milliseconds: 1500),
+    curve: Curves.easeOutBack,
+  )
+  .build()
+```
+
+### Advanced Pie Charts with Custom Styling
+```dart
+// Market Share Analysis with Exploded Slices
+CristalyseChart()
+  .data(marketShareData)
+  .mappingPie(value: 'market_share', category: 'product')
+  .geomPie(
+    outerRadius: 150.0,
+    strokeWidth: 2.0,
+    strokeColor: Colors.white,
+    showLabels: true,
+    showPercentages: true,
+    explodeSlices: true,      // Explode slices for emphasis
+    explodeDistance: 15.0,
+    labelRadius: 180.0,       // Position labels further out
+    labelStyle: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+      color: Colors.black87,
+    ),
+  )
+  .theme(ChartTheme.solarizedLightTheme())
+  .build()
+```
+
 ## 🎯 Dual Y-Axis Charts
 
 **Perfect for business dashboards** - correlate volume metrics with efficiency metrics on independent scales.
@@ -416,7 +492,9 @@ CristalyseChart()
 ### ✅ Chart Types
 - **Scatter plots** with size and color mapping
 - **Line charts** with multi-series support and progressive drawing
+- **Area charts** with smooth fills and multi-series transparency
 - **Bar charts** (vertical, horizontal, grouped, stacked) with smooth animations
+- **Pie charts and donut charts** with exploded slices and smart label positioning
 - **Dual Y-axis charts** for professional business dashboards
 - **Combined visualizations** (bars + lines, points + lines, etc.)
 
@@ -504,6 +582,31 @@ Widget buildEngagementScatter() {
       .scaleYContinuous()
       .theme(isDarkMode ? ChartTheme.darkTheme() : ChartTheme.defaultTheme())
       .animate(duration: Duration(milliseconds: 800), curve: Curves.elasticOut)
+      .build();
+}
+```
+
+### Market Share Analysis
+```dart
+Widget buildMarketSharePie() {
+  return CristalyseChart()
+      .data(marketData)
+      .mappingPie(value: 'market_share', category: 'product')
+      .geomPie(
+        outerRadius: 140.0,
+        strokeWidth: 3.0,
+        strokeColor: Colors.white,
+        showLabels: true,
+        showPercentages: true,
+        explodeSlices: true,                  // Emphasize key segments
+        explodeDistance: 12.0,
+        labelStyle: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+      )
+      .theme(ChartTheme.defaultTheme())
+      .animate(duration: Duration(milliseconds: 1200), curve: Curves.elasticOut)
       .build();
 }
 ```

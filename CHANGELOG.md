@@ -1,3 +1,158 @@
+## 1.1.0 - 2025-07-10
+
+- **🥧 Major Feature: Comprehensive Pie Chart and Donut Chart Support**
+  - **Full pie chart implementation** with smooth slice animations and staggered timing
+  - **Donut chart support** with configurable inner radius for ring-style visualizations
+  - **Smart label positioning** with percentage or value display options
+  - **Exploded slice functionality** for emphasis and visual impact
+  - **Grammar of graphics integration** with new `.mappingPie()` and `.geomPie()` API methods
+  - **Responsive radius sizing** with automatic plot area detection and margin calculation
+  - **Professional stroke customization** with configurable colors and widths
+  - **Theme system integration** works seamlessly with all existing themes and color palettes
+
+- **🎨 Enhanced Visual Experience**
+  - **Clean rendering pipeline** - automatically hides axes and grids for pie charts
+  - **Optimized donut path construction** - eliminates rendering artifacts and ensures smooth ring geometry
+  - **Staggered slice animations** with 30% animation delay distribution for visual impact
+  - **Label background rendering** with rounded corners for improved readability
+  - **Smart color scale detection** - automatically uses pie category columns for proper color mapping
+
+- **⚡ Performance & Animation Optimizations**
+  - **60fps smooth animations** with configurable curves (elastic, bounce, ease, etc.)
+  - **Memory-efficient rendering** using existing Canvas infrastructure
+  - **Progressive slice appearance** with individual slice animation timing
+  - **Coordinate system optimization** - polar coordinate calculations for precise slice positioning
+
+- **🧪 Comprehensive Testing & Documentation**
+  - **5 new test cases** covering basic pie charts, donut charts, custom styling, and edge cases
+  - **Example app integration** with new "Pie Chart" tab showcasing both pie and donut variants
+  - **Interactive controls** - slider control for dynamic radius adjustment
+  - **Multiple animation examples** demonstrating different curves and timing
+
+#### 📖 New API Methods
+
+```dart
+// Pie chart data mapping
+CristalyseChart()
+  .mappingPie(value: 'revenue', category: 'department')
+
+// Basic pie chart
+.geomPie(
+  outerRadius: 120.0,
+  strokeWidth: 2.0,
+  strokeColor: Colors.white,
+  showLabels: true,
+  showPercentages: true,
+)
+
+// Donut chart configuration
+.geomPie(
+  innerRadius: 60.0,     // Creates donut hole
+  outerRadius: 120.0,
+  explodeSlices: true,   // Explode for emphasis
+  explodeDistance: 15.0,
+)
+```
+
+#### 🎯 Example Implementations
+
+```dart
+// Basic Pie Chart with Revenue Distribution
+CristalyseChart()
+  .data([
+    {'category': 'Mobile', 'revenue': 45.2},
+    {'category': 'Desktop', 'revenue': 32.8},
+    {'category': 'Tablet', 'revenue': 22.0},
+  ])
+  .mappingPie(value: 'revenue', category: 'category')
+  .geomPie(
+    outerRadius: 120.0,
+    strokeWidth: 2.0,
+    strokeColor: Colors.white,
+    showLabels: true,
+    showPercentages: true,
+  )
+  .theme(ChartTheme.defaultTheme())
+  .animate(
+    duration: Duration(milliseconds: 1200),
+    curve: Curves.elasticOut,
+  )
+  .build();
+
+// Advanced Donut Chart with User Analytics
+CristalyseChart()
+  .data(userPlatformData)
+  .mappingPie(value: 'users', category: 'platform')
+  .geomPie(
+    innerRadius: 60.0,        // Creates prominent donut hole
+    outerRadius: 120.0,
+    strokeWidth: 3.0,
+    strokeColor: Colors.white,
+    showLabels: true,
+    showPercentages: false,   // Show actual values
+    explodeSlices: true,      // Explode slices for emphasis
+    explodeDistance: 10.0,
+  )
+  .theme(ChartTheme.darkTheme())
+  .animate(
+    duration: Duration(milliseconds: 1500),
+    curve: Curves.easeOutBack,
+  )
+  .build();
+
+// Business Dashboard Integration
+CristalyseChart()
+  .data(marketShareData)
+  .mappingPie(value: 'market_share', category: 'product')
+  .geomPie(
+    outerRadius: 150.0,
+    labelRadius: 180.0,       // Position labels further out
+    showLabels: true,
+    showPercentages: true,
+    labelStyle: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+    ),
+  )
+  .theme(ChartTheme.solarizedLightTheme())
+  .build();
+```
+
+#### 🔧 Technical Implementation Details
+
+- **Polar Coordinate Mathematics**: Precise angle calculations for slice positioning and label placement
+- **Path Construction**: Manual donut path creation eliminates rendering artifacts and ensures smooth geometry
+- **Animation Engine**: Leverages existing 60fps animation system with slice-specific timing
+- **Color Scale Intelligence**: Automatic detection of pie chart geometries for proper color column mapping
+- **Responsive Design**: Dynamic radius calculation based on plot area with configurable margins
+- **Clean Integration**: Seamless integration with existing grammar of graphics API patterns
+
+#### 🎨 Visual Enhancements
+
+- **Automatic UI Adaptation**: Pie charts automatically hide coordinate grids and axes for clean presentation
+- **Smart Label Backgrounds**: Semi-transparent rounded backgrounds improve label readability
+- **Stroke Customization**: Configurable stroke colors and widths for professional slice separation
+- **Theme Compatibility**: Full integration with all existing themes (Default, Dark, Solarized Light/Dark)
+- **Color Palette Support**: Automatic color assignment from theme palettes with proper slice differentiation
+
+#### 🧪 Quality Assurance
+
+- **Comprehensive Test Coverage**: 5 new test cases covering all pie chart scenarios
+- **Edge Case Handling**: Robust handling of empty data, missing columns, and invalid values
+- **Memory Management**: Efficient rendering pipeline with no memory leaks
+- **Cross-Platform Testing**: Verified on iOS, Android, Web, Windows, macOS, and Linux
+- **Performance Validation**: Maintains 60fps animations with large datasets
+
+#### 🚀 Use Cases Unlocked
+
+- **Business Dashboards**: Market share analysis, revenue distribution, customer segmentation
+- **Analytics Platforms**: User demographics, traffic sources, conversion funnels
+- **Financial Reports**: Portfolio allocation, expense categories, budget breakdowns
+- **E-commerce Insights**: Product sales distribution, regional performance, payment methods
+- **Survey Visualizations**: Poll results, satisfaction ratings, preference distributions
+
+**This release establishes Cristalyse as a comprehensive charting solution with full pie/donut chart capabilities, maintaining our commitment to grammar of graphics principles and 60fps performance.** 🎯
+
 ## 0.9.4 - 2025-07-04
 * Improved web wasm compatibility and documentation
 
