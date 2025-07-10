@@ -2427,15 +2427,6 @@ class _AnimatedChartPainter extends CustomPainter {
             sliceCenter.dx + math.cos(currentAngle) * outerRadius;
         final outerStartY =
             sliceCenter.dy + math.sin(currentAngle) * outerRadius;
-        final outerEndX = sliceCenter.dx +
-            math.cos(currentAngle + animatedSweepAngle) * outerRadius;
-        final outerEndY = sliceCenter.dy +
-            math.sin(currentAngle + animatedSweepAngle) * outerRadius;
-
-        final innerStartX =
-            sliceCenter.dx + math.cos(currentAngle) * innerRadius;
-        final innerStartY =
-            sliceCenter.dy + math.sin(currentAngle) * innerRadius;
         final innerEndX = sliceCenter.dx +
             math.cos(currentAngle + animatedSweepAngle) * innerRadius;
         final innerEndY = sliceCenter.dy +

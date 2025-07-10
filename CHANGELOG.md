@@ -1,4 +1,4 @@
-## 1.1.0 - 2025-07-10
+## 1.0.0 - 2025-07-10
 
 - **🥧 Major Feature: Comprehensive Pie Chart and Donut Chart Support**
   - **Full pie chart implementation** with smooth slice animations and staggered timing
