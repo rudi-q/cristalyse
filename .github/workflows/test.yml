@@ -33,5 +33,11 @@ jobs:
     - name: Check formatting
       run: dart format --output=none --set-exit-if-changed .
       
-    - name: Run widget tests
-      run: flutter test test/widget/
+    - name: Run all tests
+      run: flutter test
+      
+    - name: Check pub publish readiness
+      run: flutter pub publish --dry-run
+      
+    - name: Check dependencies
+      run: flutter pub deps
