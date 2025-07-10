@@ -18,6 +18,8 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
   final String? y2Column; // Secondary Y column
   final String? colorColumn;
   final String? sizeColumn;
+  final String? pieValueColumn; // Pie chart value column
+  final String? pieCategoryColumn; // Pie chart category column
   final List<Geometry> geometries;
   final Scale? xScale;
   final Scale? yScale;
@@ -38,6 +40,8 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
     this.y2Column,
     this.colorColumn,
     this.sizeColumn,
+    this.pieValueColumn,
+    this.pieCategoryColumn,
     required this.geometries,
     this.xScale,
     this.yScale,
@@ -431,6 +435,8 @@ class _AnimatedCristalyseChartWidgetState
             y2Column: widget.y2Column,
             colorColumn: widget.colorColumn,
             sizeColumn: widget.sizeColumn,
+            pieValueColumn: widget.pieValueColumn,
+            pieCategoryColumn: widget.pieCategoryColumn,
             geometries: widget.geometries,
             xScale: widget.xScale,
             yScale: widget.yScale,
@@ -463,6 +469,8 @@ class _AnimatedCristalyseChartWidgetState
       y2Column: widget.y2Column,
       colorColumn: widget.colorColumn,
       sizeColumn: widget.sizeColumn,
+      pieValueColumn: widget.pieValueColumn,
+      pieCategoryColumn: widget.pieCategoryColumn,
       geometries: widget.geometries,
       xScale: widget.xScale,
       yScale: widget.yScale,
@@ -911,6 +919,8 @@ class _AnimatedChartPainter extends CustomPainter {
   final String? y2Column;
   final String? colorColumn;
   final String? sizeColumn;
+  final String? pieValueColumn;
+  final String? pieCategoryColumn;
   final List<Geometry> geometries;
   final Scale? xScale;
   final Scale? yScale;
@@ -930,6 +940,8 @@ class _AnimatedChartPainter extends CustomPainter {
     this.y2Column,
     this.colorColumn,
     this.sizeColumn,
+    this.pieValueColumn,
+    this.pieCategoryColumn,
     required this.geometries,
     this.xScale,
     this.yScale,
@@ -981,8 +993,14 @@ class _AnimatedChartPainter extends CustomPainter {
     final colorScale = _setupColorScale();
     final sizeScale = _setupSizeScale();
 
+    final hasPieChart = geometries.any((g) => g is PieGeometry);
+
     _drawBackground(canvas, plotArea);
-    _drawGrid(canvas, plotArea, xScale, yScale, y2Scale);
+
+    // Skip grid and axes for pie charts
+    if (!hasPieChart) {
+      _drawGrid(canvas, plotArea, xScale, yScale, y2Scale);
+    }
 
     // Clip rendering to plot area to prevent drawing over axis labels
     canvas.save();
@@ -1007,7 +1025,10 @@ class _AnimatedChartPainter extends CustomPainter {
     // Restore canvas state to draw axes outside clipped area
     canvas.restore();
 
-    _drawAxes(canvas, size, plotArea, xScale, yScale, y2Scale);
+    // Skip axes for pie charts
+    if (!hasPieChart) {
+      _drawAxes(canvas, size, plotArea, xScale, yScale, y2Scale);
+    }
   }
 
   bool _hasSecondaryYAxis() {
@@ -1269,8 +1290,14 @@ class _AnimatedChartPainter extends CustomPainter {
   }
 
   ColorScale _setupColorScale() {
-    if (colorColumn == null) return ColorScale();
-    final values = data.map((d) => d[colorColumn]).toSet().toList();
+    // For pie charts, use category column; otherwise use color column
+    final hasPieChart = geometries.any((g) => g is PieGeometry);
+    final columnToUse = hasPieChart && pieCategoryColumn != null
+        ? pieCategoryColumn
+        : colorColumn;
+
+    if (columnToUse == null) return ColorScale();
+    final values = data.map((d) => d[columnToUse]).toSet().toList();
     return ColorScale(values: values, colors: theme.colorPalette);
   }
 
@@ -1411,6 +1438,13 @@ class _AnimatedChartPainter extends CustomPainter {
         yScale,
         colorScale,
         isSecondaryY,
+      );
+    } else if (geometry is PieGeometry) {
+      _drawPieAnimated(
+        canvas,
+        plotArea,
+        geometry,
+        colorScale,
       );
     }
   }
@@ -2309,6 +2343,216 @@ class _AnimatedChartPainter extends CustomPainter {
     }
   }
 
+  void _drawPieAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    PieGeometry geometry,
+    ColorScale colorScale,
+  ) {
+    // Use pie-specific columns or fall back to regular columns
+    final valueColumn = pieValueColumn ?? yColumn;
+    final categoryColumn = pieCategoryColumn ?? colorColumn ?? xColumn;
+
+    if (valueColumn == null || categoryColumn == null || data.isEmpty) {
+      return;
+    }
+
+    // Calculate center point of the plot area
+    final center = Offset(
+      plotArea.left + plotArea.width / 2,
+      plotArea.top + plotArea.height / 2,
+    );
+
+    // Calculate radius based on plot area (leave margin for labels)
+    final maxRadius = math.min(plotArea.width, plotArea.height) / 2 - 50;
+    final outerRadius = math.min(geometry.outerRadius, maxRadius);
+    final innerRadius = math.min(geometry.innerRadius,
+        outerRadius * 0.8); // Ensure inner radius isn't too close to outer
+
+    // Extract and calculate values
+    final values =
+        data.map((d) => _getNumericValue(d[valueColumn]) ?? 0).toList();
+    final total = values.fold<double>(0, (sum, val) => sum + val);
+
+    if (total <= 0) return;
+
+    // Animation progress for pie chart
+    final pieProgress = math.max(0.0, math.min(1.0, animationProgress));
+    if (pieProgress <= 0.001) return;
+
+    // Draw pie slices
+    double currentAngle = geometry.startAngle;
+
+    for (int i = 0; i < data.length; i++) {
+      final value = values[i];
+      if (value <= 0) continue;
+
+      final sweepAngle = (value / total) * 2 * math.pi;
+      final category = data[i][categoryColumn];
+      final sliceColor = colorScale.scale(category);
+
+      // Animation: each slice grows with a slight delay
+      final sliceDelay =
+          i / data.length * 0.3; // 30% of animation for staggering
+      final sliceProgress = math.max(
+        0.0,
+        math.min(
+          1.0,
+          (pieProgress - sliceDelay) / math.max(0.001, 1.0 - sliceDelay),
+        ),
+      );
+
+      if (sliceProgress <= 0) {
+        currentAngle += sweepAngle;
+        continue;
+      }
+
+      final animatedSweepAngle = sweepAngle * sliceProgress;
+
+      // Calculate slice center for explosion effect
+      Offset sliceCenter = center;
+      if (geometry.explodeSlices) {
+        final midAngle = currentAngle + animatedSweepAngle / 2;
+        sliceCenter = Offset(
+          center.dx + math.cos(midAngle) * geometry.explodeDistance,
+          center.dy + math.sin(midAngle) * geometry.explodeDistance,
+        );
+      }
+
+      // Create slice path
+      final path = Path();
+      if (innerRadius > 0) {
+        // Donut chart - create proper donut slice path
+        final outerStartX =
+            sliceCenter.dx + math.cos(currentAngle) * outerRadius;
+        final outerStartY =
+            sliceCenter.dy + math.sin(currentAngle) * outerRadius;
+        final innerEndX = sliceCenter.dx +
+            math.cos(currentAngle + animatedSweepAngle) * innerRadius;
+        final innerEndY = sliceCenter.dy +
+            math.sin(currentAngle + animatedSweepAngle) * innerRadius;
+
+        // Start at outer edge
+        path.moveTo(outerStartX, outerStartY);
+
+        // Draw outer arc
+        path.arcTo(
+          Rect.fromCircle(center: sliceCenter, radius: outerRadius),
+          currentAngle,
+          animatedSweepAngle,
+          false,
+        );
+
+        // Draw line to inner edge
+        path.lineTo(innerEndX, innerEndY);
+
+        // Draw inner arc (in reverse)
+        path.arcTo(
+          Rect.fromCircle(center: sliceCenter, radius: innerRadius),
+          currentAngle + animatedSweepAngle,
+          -animatedSweepAngle,
+          false,
+        );
+
+        // Close the path
+        path.close();
+      } else {
+        // Full pie chart
+        path.moveTo(sliceCenter.dx, sliceCenter.dy);
+        path.arcTo(
+          Rect.fromCircle(center: sliceCenter, radius: outerRadius),
+          currentAngle,
+          animatedSweepAngle,
+          false,
+        );
+        path.close();
+      }
+
+      // Draw slice
+      final fillPaint = Paint()
+        ..color = sliceColor
+        ..style = PaintingStyle.fill;
+      canvas.drawPath(path, fillPaint);
+
+      // Draw stroke if specified
+      if (geometry.strokeWidth > 0) {
+        final strokePaint = Paint()
+          ..color = geometry.strokeColor ?? Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = geometry.strokeWidth;
+        canvas.drawPath(path, strokePaint);
+      }
+
+      // Draw labels if enabled and slice is mostly visible
+      if (geometry.showLabels && sliceProgress > 0.5) {
+        _drawPieSliceLabel(
+          canvas,
+          sliceCenter,
+          currentAngle + animatedSweepAngle / 2,
+          geometry.labelRadius,
+          value,
+          total,
+          category.toString(),
+          geometry.labelStyle ?? theme.axisTextStyle,
+          geometry.showPercentages,
+        );
+      }
+
+      currentAngle += sweepAngle;
+    }
+  }
+
+  void _drawPieSliceLabel(
+    Canvas canvas,
+    Offset center,
+    double angle,
+    double radius,
+    double value,
+    double total,
+    String category,
+    TextStyle style,
+    bool showPercentages,
+  ) {
+    String labelText;
+    if (showPercentages) {
+      final percentage = (value / total * 100).toStringAsFixed(1);
+      labelText = '$category\n$percentage%';
+    } else {
+      labelText = '$category\n${_formatAxisLabel(value)}';
+    }
+
+    final textPainter = TextPainter(
+      text: TextSpan(text: labelText, style: style),
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+
+    final labelOffset = Offset(
+      center.dx + math.cos(angle) * radius - textPainter.width / 2,
+      center.dy + math.sin(angle) * radius - textPainter.height / 2,
+    );
+
+    // Draw label background for better readability
+    final labelRect = Rect.fromLTWH(
+      labelOffset.dx - 4,
+      labelOffset.dy - 2,
+      textPainter.width + 8,
+      textPainter.height + 4,
+    );
+
+    final backgroundPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.8)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(labelRect, const Radius.circular(4)),
+      backgroundPaint,
+    );
+
+    textPainter.paint(canvas, labelOffset);
+  }
+
   String _formatAxisLabel(dynamic value) {
     if (value is num) {
       if (value == value.roundToDouble()) {
@@ -2328,6 +2572,8 @@ class _AnimatedChartPainter extends CustomPainter {
         oldDelegate.geometries != geometries ||
         oldDelegate.animationProgress != animationProgress ||
         oldDelegate.coordFlipped != coordFlipped ||
-        oldDelegate.y2Column != y2Column;
+        oldDelegate.y2Column != y2Column ||
+        oldDelegate.pieValueColumn != pieValueColumn ||
+        oldDelegate.pieCategoryColumn != pieCategoryColumn;
   }
 }

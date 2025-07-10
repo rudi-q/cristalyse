@@ -1,0 +1,407 @@
+---
+title: "Pie Charts"
+description: "Visualize proportions and percentages with animated pie and donut charts"
+---
+
+## Overview
+
+Pie charts are perfect for displaying proportional data and percentages. Cristalyse supports both traditional pie charts and donut charts with smooth animations, customizable styling, and interactive features.
+
+<div align="center">
+  <em>Pie and donut charts with slice-by-slice progressive animation</em>
+</div>
+
+## Basic Pie Chart
+
+Create a simple pie chart to show proportions:
+
+```dart
+final marketData = [
+  {'company': 'Apple', 'marketShare': 28.5},
+  {'company': 'Samsung', 'marketShare': 22.1},
+  {'company': 'Google', 'marketShare': 15.8},
+  {'company': 'Xiaomi', 'marketShare': 12.3},
+  {'company': 'Others', 'marketShare': 21.3},
+];
+
+CristalyseChart()
+  .data(marketData)
+  .mapping(
+    pieValue: 'marketShare',
+    pieCategory: 'company',
+  )
+  .geomPie(
+    outerRadius: 150,
+    showLabels: true,
+    showPercentages: true,
+  )
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Donut Chart
+
+Create a donut chart with a hollow center:
+
+```dart
+final salesData = [
+  {'region': 'North America', 'sales': 450000},
+  {'region': 'Europe', 'sales': 320000},
+  {'region': 'Asia Pacific', 'sales': 280000},
+  {'region': 'Latin America', 'sales': 150000},
+  {'region': 'Middle East', 'sales': 100000},
+];
+
+CristalyseChart()
+  .data(salesData)
+  .mapping(
+    pieValue: 'sales',
+    pieCategory: 'region',
+  )
+  .geomPie(
+    outerRadius: 180,
+    innerRadius: 80,  // Creates donut effect
+    showLabels: true,
+    showPercentages: false,
+  )
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Exploded Pie Chart
+
+Create separation between slices for emphasis:
+
+```dart
+final budgetData = [
+  {'category': 'Development', 'amount': 450000},
+  {'category': 'Marketing', 'amount': 280000},
+  {'category': 'Operations', 'amount': 320000},
+  {'category': 'Sales', 'amount': 180000},
+];
+
+CristalyseChart()
+  .data(budgetData)
+  .mapping(
+    pieValue: 'amount',
+    pieCategory: 'category',
+  )
+  .geomPie(
+    outerRadius: 160,
+    explodeSlices: true,
+    explodeDistance: 15,
+    showLabels: true,
+    showPercentages: true,
+  )
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Styling Options
+
+### Custom Colors
+
+Override default color mapping:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(
+    pieValue: 'value',
+    pieCategory: 'category',
+  )
+  .geomPie(
+    outerRadius: 150,
+    colors: [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.red,
+      Colors.purple,
+    ],
+  )
+  .build()
+```
+
+### Stroke Styling
+
+Add borders to pie slices:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(
+    pieValue: 'value',
+    pieCategory: 'category',
+  )
+  .geomPie(
+    outerRadius: 150,
+    strokeWidth: 2.0,
+    strokeColor: Colors.white,
+    showLabels: true,
+  )
+  .build()
+```
+
+### Custom Label Styling
+
+Customize label appearance:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(
+    pieValue: 'value',
+    pieCategory: 'category',
+  )
+  .geomPie(
+    outerRadius: 150,
+    showLabels: true,
+    showPercentages: true,
+    labelRadius: 180,
+    labelStyle: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      color: Colors.black87,
+    ),
+  )
+  .build()
+```
+
+## Animation Options
+
+### Progressive Slice Animation
+
+Slices animate in sequence:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(
+    pieValue: 'value',
+    pieCategory: 'category',
+  )
+  .geomPie(
+    outerRadius: 150,
+    animationDuration: Duration(milliseconds: 1500),
+  )
+  .animate(
+    duration: Duration(milliseconds: 1500),
+    curve: Curves.easeInOutCubic,
+  )
+  .build()
+```
+
+### Custom Start Angle
+
+Control where the pie starts:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(
+    pieValue: 'value',
+    pieCategory: 'category',
+  )
+  .geomPie(
+    outerRadius: 150,
+    startAngle: -pi / 2,  // Start at top (12 o'clock)
+  )
+  .build()
+```
+
+## Real-World Examples
+
+### E-commerce Sales by Category
+
+```dart
+final ecommerceData = [
+  {'category': 'Electronics', 'sales': 2850000, 'color': Colors.blue},
+  {'category': 'Clothing', 'sales': 1920000, 'color': Colors.green},
+  {'category': 'Home & Garden', 'sales': 1450000, 'color': Colors.orange},
+  {'category': 'Books', 'sales': 890000, 'color': Colors.red},
+  {'category': 'Sports', 'sales': 720000, 'color': Colors.purple},
+];
+
+CristalyseChart()
+  .data(ecommerceData)
+  .mapping(
+    pieValue: 'sales',
+    pieCategory: 'category',
+  )
+  .geomPie(
+    outerRadius: 180,
+    innerRadius: 60,
+    showLabels: true,
+    showPercentages: true,
+    labelRadius: 220,
+    strokeWidth: 3,
+    strokeColor: Colors.white,
+    explodeSlices: true,
+    explodeDistance: 8,
+  )
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+### Project Time Allocation
+
+```dart
+final projectData = [
+  {'phase': 'Planning', 'hours': 120},
+  {'phase': 'Development', 'hours': 480},
+  {'phase': 'Testing', 'hours': 160},
+  {'phase': 'Deployment', 'hours': 80},
+  {'phase': 'Documentation', 'hours': 60},
+];
+
+CristalyseChart()
+  .data(projectData)
+  .mapping(
+    pieValue: 'hours',
+    pieCategory: 'phase',
+  )
+  .geomPie(
+    outerRadius: 160,
+    showLabels: true,
+    showPercentages: true,
+    labelStyle: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+    ),
+  )
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Advanced Features
+
+### Interactive Pie Charts
+
+Add hover effects and click handling:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(
+    pieValue: 'value',
+    pieCategory: 'category',
+  )
+  .geomPie(
+    outerRadius: 150,
+    showLabels: true,
+    onSliceClick: (data, index) {
+      print('Clicked slice: ${data['category']}');
+    },
+  )
+  .interactions(
+    enableHover: true,
+    enableClick: true,
+  )
+  .build()
+```
+
+### Responsive Sizing
+
+Automatically adjust based on container size:
+
+```dart
+LayoutBuilder(
+  builder: (context, constraints) {
+    final radius = math.min(constraints.maxWidth, constraints.maxHeight) / 3;
+    
+    return CristalyseChart()
+      .data(data)
+      .mapping(
+        pieValue: 'value',
+        pieCategory: 'category',
+      )
+      .geomPie(
+        outerRadius: radius,
+        innerRadius: radius * 0.4,
+        showLabels: constraints.maxWidth > 300,
+      )
+      .build();
+  },
+)
+```
+
+## Best Practices
+
+### When to Use Pie Charts
+
+✅ **Good for:**
+- Showing parts of a whole
+- Displaying percentages
+- Comparing proportions (5-7 categories max)
+- Simple data visualization
+
+❌ **Avoid for:**
+- Too many categories (>7)
+- Comparing exact values
+- Time series data
+- Negative values
+
+### Design Tips
+
+- Limit to 5-7 slices for readability
+- Use contrasting colors
+- Order slices by size (largest first)
+- Consider donut charts for modern look
+- Use exploded slices sparingly for emphasis
+
+### Performance Considerations
+
+- Optimize for large datasets by grouping small values
+- Use appropriate animation durations
+- Consider static rendering for print/export
+- Test on different screen sizes
+
+## Common Patterns
+
+### Market Share Analysis
+
+```dart
+final marketShare = [
+  {'company': 'Leader', 'share': 35.2},
+  {'company': 'Challenger', 'share': 24.8},
+  {'company': 'Follower', 'share': 18.5},
+  {'company': 'Niche', 'share': 12.1},
+  {'company': 'Others', 'share': 9.4},
+];
+
+CristalyseChart()
+  .data(marketShare)
+  .mapping(pieValue: 'share', pieCategory: 'company')
+  .geomPie(
+    outerRadius: 160,
+    showLabels: true,
+    showPercentages: true,
+    explodeSlices: true,
+    explodeDistance: 10,
+  )
+  .build()
+```
+
+### Survey Results
+
+```dart
+final surveyResults = [
+  {'response': 'Very Satisfied', 'count': 45},
+  {'response': 'Satisfied', 'count': 38},
+  {'response': 'Neutral', 'count': 12},
+  {'response': 'Dissatisfied', 'count': 3},
+  {'response': 'Very Dissatisfied', 'count': 2},
+];
+
+CristalyseChart()
+  .data(surveyResults)
+  .mapping(pieValue: 'count', pieCategory: 'response')
+  .geomPie(
+    outerRadius: 150,
+    innerRadius: 50,
+    showLabels: true,
+    showPercentages: true,
+  )
+  .build()
+```

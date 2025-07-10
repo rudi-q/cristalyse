@@ -29,6 +29,7 @@
               "charts/line-charts",
               "charts/bar-charts",
               "charts/area-charts",
+              "charts/pie-charts",
               "charts/dual-axis"
             ]
           },
