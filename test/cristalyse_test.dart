@@ -295,6 +295,85 @@ void main() {
       });
     });
 
+    group('Pie Charts', () {
+      late List<Map<String, dynamic>> pieData;
+
+      setUp(() {
+        pieData = [
+          {'category': 'Mobile', 'revenue': 45.2, 'users': 1200},
+          {'category': 'Desktop', 'revenue': 32.8, 'users': 800},
+          {'category': 'Tablet', 'revenue': 22.0, 'users': 600},
+        ];
+      });
+
+      test('should create basic pie chart', () {
+        final chart = CristalyseChart()
+            .data(pieData)
+            .mappingPie(value: 'revenue', category: 'category')
+            .geomPie();
+
+        expect(chart, isNotNull);
+        final widget = chart.build();
+        expect(widget, isA<Widget>());
+      });
+
+      test('should create donut chart', () {
+        final chart = CristalyseChart()
+            .data(pieData)
+            .mappingPie(value: 'users', category: 'category')
+            .geomPie(
+              innerRadius: 40.0,
+              outerRadius: 120.0,
+              strokeWidth: 2.0,
+            );
+
+        expect(chart, isNotNull);
+        final widget = chart.build();
+        expect(widget, isA<Widget>());
+      });
+
+      test('should create pie chart with custom styling', () {
+        final chart = CristalyseChart()
+            .data(pieData)
+            .mappingPie(value: 'revenue', category: 'category')
+            .geomPie(
+              outerRadius: 150.0,
+              strokeWidth: 3.0,
+              strokeColor: Colors.white,
+              showLabels: true,
+              showPercentages: true,
+              explodeSlices: true,
+              explodeDistance: 15.0,
+            );
+
+        expect(chart, isNotNull);
+        final widget = chart.build();
+        expect(widget, isA<Widget>());
+      });
+
+      test('should handle empty pie data', () {
+        final chart = CristalyseChart()
+            .data([])
+            .mappingPie(value: 'revenue', category: 'category')
+            .geomPie();
+
+        expect(chart, isNotNull);
+        final widget = chart.build();
+        expect(widget, isA<Widget>());
+      });
+
+      test('should handle missing pie mapping columns', () {
+        final chart = CristalyseChart()
+            .data(pieData)
+            .mappingPie(value: 'nonexistent', category: 'category')
+            .geomPie();
+
+        expect(chart, isNotNull);
+        final widget = chart.build();
+        expect(widget, isA<Widget>());
+      });
+    });
+
     group('Combined Visualizations', () {
       test('should combine multiple geometries', () {
         final chart = CristalyseChart()

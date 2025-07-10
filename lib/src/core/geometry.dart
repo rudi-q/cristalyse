@@ -103,3 +103,33 @@ class AreaGeometry extends Geometry {
     super.interactive,
   });
 }
+
+/// Pie geometry for pie and donut charts
+class PieGeometry extends Geometry {
+  final double innerRadius; // For donut charts (0.0 for full pie)
+  final double outerRadius;
+  final Color? strokeColor;
+  final double strokeWidth;
+  final bool showLabels;
+  final TextStyle? labelStyle;
+  final double labelRadius; // Distance from center for labels
+  final double startAngle; // Starting angle in radians
+  final bool showPercentages;
+  final bool explodeSlices;
+  final double explodeDistance;
+
+  PieGeometry({
+    this.innerRadius = 0.0,
+    this.outerRadius = 100.0,
+    this.strokeColor,
+    this.strokeWidth = 1.0,
+    this.showLabels = true,
+    this.labelStyle,
+    this.labelRadius = 120.0,
+    this.startAngle = -1.5707963267948966, // -π/2 (start at top)
+    this.showPercentages = true,
+    this.explodeSlices = false,
+    this.explodeDistance = 10.0,
+    super.interactive = true,
+  }) : super(yAxis: YAxis.primary); // Pie charts don't use Y-axis
+}

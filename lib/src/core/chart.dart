@@ -18,6 +18,10 @@ class CristalyseChart {
   String? _colorColumn;
   String? _sizeColumn;
 
+  /// Pie chart specific mappings
+  String? _pieValueColumn;
+  String? _pieCategoryColumn;
+
   final List<Geometry> _geometries = [];
   Scale? _xScale;
   Scale? _yScale;
@@ -73,6 +77,18 @@ class CristalyseChart {
   /// ```
   CristalyseChart mappingY2(String column) {
     _y2Column = column;
+    return this;
+  }
+
+  /// Map data for pie charts
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.mappingPie(value: 'revenue', category: 'department')
+  /// ```
+  CristalyseChart mappingPie({String? value, String? category}) {
+    _pieValueColumn = value;
+    _pieCategoryColumn = category;
     return this;
   }
 
@@ -182,6 +198,48 @@ class CristalyseChart {
       yAxis: yAxis ?? YAxis.primary,
     );
     _geometries.add(barGeom);
+    return this;
+  }
+
+  /// Add pie chart
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.geomPie(
+  ///   outerRadius: 120.0,
+  ///   innerRadius: 40.0, // For donut chart
+  ///   showLabels: true,
+  ///   strokeWidth: 2.0,
+  /// )
+  /// ```
+  CristalyseChart geomPie({
+    double? innerRadius,
+    double? outerRadius,
+    Color? strokeColor,
+    double? strokeWidth,
+    bool? showLabels,
+    TextStyle? labelStyle,
+    double? labelRadius,
+    double? startAngle,
+    bool? showPercentages,
+    bool? explodeSlices,
+    double? explodeDistance,
+  }) {
+    _geometries.add(
+      PieGeometry(
+        innerRadius: innerRadius ?? 0.0,
+        outerRadius: outerRadius ?? 100.0,
+        strokeColor: strokeColor,
+        strokeWidth: strokeWidth ?? 1.0,
+        showLabels: showLabels ?? true,
+        labelStyle: labelStyle,
+        labelRadius: labelRadius ?? 120.0,
+        startAngle: startAngle ?? -1.5707963267948966, // -π/2
+        showPercentages: showPercentages ?? true,
+        explodeSlices: explodeSlices ?? false,
+        explodeDistance: explodeDistance ?? 10.0,
+      ),
+    );
     return this;
   }
 
@@ -429,6 +487,8 @@ class CristalyseChart {
       y2Column: _y2Column,
       colorColumn: _colorColumn,
       sizeColumn: _sizeColumn,
+      pieValueColumn: _pieValueColumn,
+      pieCategoryColumn: _pieCategoryColumn,
       geometries: _geometries,
       xScale: _xScale,
       yScale: _yScale,
