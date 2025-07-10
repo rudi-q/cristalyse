@@ -6,13 +6,13 @@
 
 **The grammar of graphics visualization library that Flutter developers have been waiting for.**
 
-[![pub package](https://img.shields.io/pub/v/cristalyse.svg)](https://pub.dev/packages/cristalyse)
-[![pub points](https://img.shields.io/pub/points/cristalyse)](https://pub.dev/packages/cristalyse/score)
-[![likes](https://img.shields.io/pub/likes/cristalyse)](https://pub.dev/packages/cristalyse/score)
-[![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-blue)](https://flutter.dev/)
-[![Flutter support](https://img.shields.io/badge/Flutter-1.17%2B-blue)](https://flutter.dev/)
-[![Dart support](https://img.shields.io/badge/Dart-3.0%2B-blue)](https://dart.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![pub package](https://img.shields.io/pub/v/cristalyse.svg?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse)
+[![pub points](https://img.shields.io/pub/points/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
+[![likes](https://img.shields.io/pub/likes/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
+[![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-2cacbf?labelColor=145261)](https://flutter.dev/)
+[![Flutter support](https://img.shields.io/badge/Flutter-1.17%2B-2cacbf?labelColor=145261)](https://flutter.dev/)
+[![Dart support](https://img.shields.io/badge/Dart-2.19.2%2B-2cacbf?labelColor=145261)](https://dart.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-2cacbf.svg?labelColor=145261)](https://opensource.org/licenses/MIT)
 
 > Finally, create beautiful data visualizations in Flutter without fighting against chart widgets or settling for web-based solutions.
 
