@@ -1,5 +1,6 @@
 library;
 
+export 'src/core/axis_formatter.dart';
 export 'src/core/chart.dart';
 export 'src/core/geometry.dart';
 export 'src/core/scale.dart';

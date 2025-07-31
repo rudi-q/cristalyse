@@ -4,6 +4,7 @@ import 'package:cristalyse/cristalyse.dart';
 import 'package:cristalyse_example/chart_theme.dart';
 import 'package:flutter/material.dart';
 
+import 'axis_formatting_demo.dart';
 import 'graphs/area_chart.dart';
 import 'graphs/bar_chart.dart';
 import 'graphs/dual_axis_chart.dart';
@@ -114,7 +115,7 @@ class _ExampleHomeState extends State<ExampleHome>
   void initState() {
     super.initState();
     _tabController =
-        TabController(length: 12, vsync: this); // Updated to 12 tabs
+        TabController(length: 13, vsync: this); // Updated to 13 tabs
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -571,6 +572,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Pie Chart'), // New pie chart tab
             Tab(text: 'Dual Y-Axis'),
             Tab(text: 'Export'), // New export tab
+            Tab(text: 'Axis Format'), // New axis formatting tab
           ],
         ),
       ),
@@ -745,6 +747,19 @@ class _ExampleHomeState extends State<ExampleHome>
                         'Scalability', '∞', 'Infinite Zoom', Colors.green),
                     _buildStatsCard(
                         'File Size', 'Small', 'Compact', Colors.purple),
+                  ],
+                ),
+                _buildChartPage(
+                  'Axis Label Formatting',
+                  'Format axis labels with prefix, suffix, and decimal places • Currency, percentage, and custom formatting',
+                  const AxisFormattingDemo(),
+                  [
+                    _buildStatsCard(
+                        'Currency', '\$1,234', 'Dollar Prefix', Colors.green),
+                    _buildStatsCard(
+                        'Percentage', '15.2%', 'Percent Suffix', Colors.blue),
+                    _buildStatsCard(
+                        'Custom', 'JPY 1500', 'No Decimals', Colors.orange),
                   ],
                 ),
               ],
@@ -1014,6 +1029,13 @@ class _ExampleHomeState extends State<ExampleHome>
           'Infinite zoom and professional quality output',
           'Small file sizes perfect for web and print',
           'Editable in design software and ideal for presentations'
+        ];
+      case 12: // Axis formatting demo
+        return [
+          'Currency formatting with prefix support (\$, JPY, EUR)',
+          'Percentage formatting with suffix and custom decimal places',
+          'Independent formatting for X, Y, and Y2 axes in dual-axis charts',
+          'Predefined formatters and custom formatting options'
         ];
       default:
         return [];

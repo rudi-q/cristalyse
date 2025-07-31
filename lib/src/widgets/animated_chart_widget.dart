@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+import '../core/axis_formatter.dart';
 import '../core/geometry.dart';
 import '../core/scale.dart';
 import '../interaction/chart_interactions.dart';
@@ -31,6 +32,9 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
   final Curve animationCurve;
   final bool coordFlipped;
   final ChartInteraction interaction;
+  final AxisFormatter xAxisFormatter;
+  final AxisFormatter yAxisFormatter;
+  final AxisFormatter y2AxisFormatter;
 
   const AnimatedCristalyseChartWidget({
     super.key,
@@ -53,6 +57,9 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
     this.animationCurve = Curves.easeInOut,
     this.coordFlipped = false,
     this.interaction = ChartInteraction.none,
+    this.xAxisFormatter = AxisFormatter.defaultFormatter,
+    this.yAxisFormatter = AxisFormatter.defaultFormatter,
+    this.y2AxisFormatter = AxisFormatter.defaultFormatter,
   });
 
   @override
@@ -446,6 +453,9 @@ class _AnimatedCristalyseChartWidgetState
             theme: widget.theme,
             animationProgress: 1.0,
             coordFlipped: widget.coordFlipped,
+            xAxisFormatter: widget.xAxisFormatter,
+            yAxisFormatter: widget.yAxisFormatter,
+            y2AxisFormatter: widget.y2AxisFormatter,
           ),
           child: Container(),
         ),
@@ -482,6 +492,9 @@ class _AnimatedCristalyseChartWidgetState
       coordFlipped: widget.coordFlipped,
       panXDomain: _panXDomain,
       panYDomain: _panYDomain,
+      xAxisFormatter: widget.xAxisFormatter,
+      yAxisFormatter: widget.yAxisFormatter,
+      y2AxisFormatter: widget.y2AxisFormatter,
     );
 
     Widget chart = CustomPaint(painter: chartPainter, child: Container());
@@ -932,6 +945,9 @@ class _AnimatedChartPainter extends CustomPainter {
   final bool coordFlipped;
   final List<double>? panXDomain;
   final List<double>? panYDomain;
+  final AxisFormatter xAxisFormatter;
+  final AxisFormatter yAxisFormatter;
+  final AxisFormatter y2AxisFormatter;
 
   _AnimatedChartPainter({
     required this.data,
@@ -953,6 +969,9 @@ class _AnimatedChartPainter extends CustomPainter {
     this.coordFlipped = false,
     this.panXDomain,
     this.panYDomain,
+    required this.xAxisFormatter,
+    required this.yAxisFormatter,
+    required this.y2AxisFormatter,
   });
 
   @override
@@ -2265,7 +2284,7 @@ class _AnimatedChartPainter extends CustomPainter {
         paint,
       );
 
-      final label = _formatAxisLabel(tick);
+      final label = _formatAxisLabel(tick, AxisType.x);
       final textPainter = TextPainter(
         text: TextSpan(text: label, style: axisLabelStyle),
         textDirection: TextDirection.ltr,
@@ -2291,7 +2310,7 @@ class _AnimatedChartPainter extends CustomPainter {
         paint,
       );
 
-      final label = _formatAxisLabel(tick);
+      final label = _formatAxisLabel(tick, AxisType.y);
       final textPainter = TextPainter(
         text: TextSpan(text: label, style: axisLabelStyle),
         textDirection: TextDirection.ltr,
@@ -2318,7 +2337,7 @@ class _AnimatedChartPainter extends CustomPainter {
           paint,
         );
 
-        final label = _formatAxisLabel(tick);
+        final label = _formatAxisLabel(tick, AxisType.y2);
         final textPainter = TextPainter(
           text: TextSpan(
             text: label,
@@ -2518,7 +2537,7 @@ class _AnimatedChartPainter extends CustomPainter {
       final percentage = (value / total * 100).toStringAsFixed(1);
       labelText = '$category\n$percentage%';
     } else {
-      labelText = '$category\n${_formatAxisLabel(value)}';
+      labelText = '$category\n${_formatAxisLabel(value, AxisType.y)}';
     }
 
     final textPainter = TextPainter(
@@ -2553,16 +2572,21 @@ class _AnimatedChartPainter extends CustomPainter {
     textPainter.paint(canvas, labelOffset);
   }
 
-  String _formatAxisLabel(dynamic value) {
-    if (value is num) {
-      if (value == value.roundToDouble()) {
-        return value.round().toString();
-      } else {
-        return value.toStringAsFixed(1);
-      }
-    } else {
-      return value.toString();
+  String _formatAxisLabel(dynamic value, AxisType axisType) {
+    final AxisFormatter formatter;
+    switch (axisType) {
+      case AxisType.x:
+        formatter = xAxisFormatter;
+        break;
+      case AxisType.y:
+        formatter = yAxisFormatter;
+        break;
+      case AxisType.y2:
+        formatter = y2AxisFormatter;
+        break;
     }
+    
+    return formatter.format(value);
   }
 
   @override
@@ -2574,6 +2598,9 @@ class _AnimatedChartPainter extends CustomPainter {
         oldDelegate.coordFlipped != coordFlipped ||
         oldDelegate.y2Column != y2Column ||
         oldDelegate.pieValueColumn != pieValueColumn ||
-        oldDelegate.pieCategoryColumn != pieCategoryColumn;
+        oldDelegate.pieCategoryColumn != pieCategoryColumn ||
+        oldDelegate.xAxisFormatter != xAxisFormatter ||
+        oldDelegate.yAxisFormatter != yAxisFormatter ||
+        oldDelegate.y2AxisFormatter != y2AxisFormatter;
   }
 }

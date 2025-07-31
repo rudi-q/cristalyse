@@ -4,6 +4,7 @@ import '../export/chart_export.dart';
 import '../interaction/chart_interactions.dart';
 import '../themes/chart_theme.dart';
 import '../widgets/animated_chart_widget.dart';
+import 'axis_formatter.dart';
 import 'geometry.dart';
 import 'scale.dart';
 
@@ -37,6 +38,11 @@ class CristalyseChart {
   Curve _animationCurve = Curves.easeInOut;
 
   bool _coordFlipped = false;
+
+  // Axis formatters
+  AxisFormatter _xAxisFormatter = AxisFormatter.defaultFormatter;
+  AxisFormatter _yAxisFormatter = AxisFormatter.defaultFormatter;
+  AxisFormatter _y2AxisFormatter = AxisFormatter.defaultFormatter;
 
   /// Interaction configuration
   ChartInteraction _interaction = ChartInteraction.none;
@@ -429,6 +435,81 @@ class CristalyseChart {
     return this;
   }
 
+  /// Format X-axis labels
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.formatXAxis(prefix: '\$', suffix: '', decimals: 2)
+  /// chart.formatXAxis(formatter: AxisFormatter.currency)
+  /// ```
+  CristalyseChart formatXAxis({
+    String? prefix,
+    String? suffix,
+    int? decimals,
+    AxisFormatter? formatter,
+  }) {
+    if (formatter != null) {
+      _xAxisFormatter = formatter;
+    } else {
+      _xAxisFormatter = AxisFormatter(
+        prefix: prefix ?? '',
+        suffix: suffix ?? '',
+        decimals: decimals,
+      );
+    }
+    return this;
+  }
+
+  /// Format Y-axis labels (primary/left axis)
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.formatYAxis(prefix: '', suffix: '%', decimals: 1)
+  /// chart.formatYAxis(formatter: AxisFormatter.percentage)
+  /// ```
+  CristalyseChart formatYAxis({
+    String? prefix,
+    String? suffix,
+    int? decimals,
+    AxisFormatter? formatter,
+  }) {
+    if (formatter != null) {
+      _yAxisFormatter = formatter;
+    } else {
+      _yAxisFormatter = AxisFormatter(
+        prefix: prefix ?? '',
+        suffix: suffix ?? '',
+        decimals: decimals,
+      );
+    }
+    return this;
+  }
+
+  /// Format secondary Y-axis labels (right axis)
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.formatY2Axis(prefix: 'JPY ', suffix: '', decimals: 0)
+  /// chart.formatY2Axis(formatter: AxisFormatter.currencyWithSymbol('€'))
+  /// ```
+  CristalyseChart formatY2Axis({
+    String? prefix,
+    String? suffix,
+    int? decimals,
+    AxisFormatter? formatter,
+  }) {
+    if (formatter != null) {
+      _y2AxisFormatter = formatter;
+    } else {
+      _y2AxisFormatter = AxisFormatter(
+        prefix: prefix ?? '',
+        suffix: suffix ?? '',
+        decimals: decimals,
+      );
+    }
+    return this;
+  }
+
   /// Export the chart as SVG image
   ///
   /// Example:
@@ -500,6 +581,9 @@ class CristalyseChart {
       animationCurve: _animationCurve,
       coordFlipped: _coordFlipped,
       interaction: _interaction,
+      xAxisFormatter: _xAxisFormatter,
+      yAxisFormatter: _yAxisFormatter,
+      y2AxisFormatter: _y2AxisFormatter,
     );
   }
 }

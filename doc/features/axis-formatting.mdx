@@ -1,0 +1,211 @@
+---
+title: "Axis Formatting"
+description: "Format axis labels with prefix, suffix, and decimal places for professional charts"
+---
+
+## Overview
+
+Cristalyse's axis formatting system provides precise control over how axis labels are displayed. Add currency symbols, percentage signs, custom prefixes, and control decimal places to create professional, readable charts.
+
+## Basic Usage
+
+### Currency Formatting
+
+Add dollar signs or other currency symbols to your Y-axis:
+
+```dart
+CristalyseChart()
+  .data(revenueData)
+  .mapping(x: 'month', y: 'revenue')
+  .geomBar()
+  .formatYAxis(prefix: '\$', decimals: 0)  // $1234
+  .build()
+```
+
+### Percentage Formatting
+
+Perfect for conversion rates and growth metrics:
+
+```dart
+CristalyseChart()
+  .data(conversionData)
+  .mapping(x: 'month', y: 'rate')
+  .geomLine()
+  .formatYAxis(suffix: '%', decimals: 1)  // 15.2%
+  .build()
+```
+
+### Custom Decimal Places
+
+Control precision for different data types:
+
+```dart
+CristalyseChart()
+  .data(precisionData)
+  .mapping(x: 'category', y: 'value')
+  .geomBar()
+  .formatYAxis(decimals: 3)  // 3.142
+  .build()
+```
+
+## Predefined Formatters
+
+Use built-in formatters for common cases:
+
+```dart
+// Currency with $ prefix
+.formatYAxis(formatter: AxisFormatter.currency)
+
+// Percentage with % suffix  
+.formatYAxis(formatter: AxisFormatter.percentage)
+
+// Custom currency symbol
+.formatYAxis(formatter: AxisFormatter.currencyWithSymbol('€'))
+```
+
+## Dual-Axis Formatting
+
+Format each axis independently in dual-axis charts:
+
+```dart
+CristalyseChart()
+  .data(businessData)
+  .mapping(x: 'month', y: 'revenue')
+  .mappingY2('conversion_rate')
+  .geomBar()                                    // Revenue bars
+  .geomLine(yAxis: YAxis.secondary)            // Conversion line
+  .formatYAxis(prefix: '\$', decimals: 0)       // Left: $1234
+  .formatY2Axis(suffix: '%', decimals: 1)      // Right: 15.2%
+  .build()
+```
+
+## Custom Formatters
+
+Create your own formatters for specialized needs:
+
+```dart
+// Custom three-letter currency code
+final jpyFormatter = AxisFormatter.custom(
+  prefix: 'JPY ',
+  suffix: '',
+  decimals: 0,
+);
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'revenue_jpy')
+  .geomBar()
+  .formatYAxis(formatter: jpyFormatter)  // JPY 1500
+  .build()
+```
+
+## Advanced Examples
+
+### Regional Growth Rates Dashboard
+
+```dart
+CristalyseChart()
+  .data(internationalData)
+  .mapping(x: 'region', y: 'revenue_usd')
+  .mappingY2('growth_rate')
+  .geomBar(color: Colors.blue)
+  .geomLine(
+    yAxis: YAxis.secondary,
+    color: Colors.red,
+    strokeWidth: 3.0,
+  )
+  .formatXAxis()  // No formatting for region names
+  .formatYAxis(prefix: '\$', suffix: 'M', decimals: 1)  // $2.5M
+  .formatY2Axis(suffix: '%', decimals: 0)               // 23%
+  .build()
+```
+
+### Financial Performance Metrics
+
+```dart
+CristalyseChart()
+  .data(financialMetrics)
+  .mapping(x: 'quarter', y: 'profit_margin')
+  .geomArea(alpha: 0.3)
+  .geomLine(strokeWidth: 2.0)
+  .formatYAxis(
+    prefix: '',
+    suffix: '%',
+    decimals: 2,  // 18.75%
+  )
+  .build()
+```
+
+## API Reference
+
+### Format Methods
+
+```dart
+// Format X-axis labels
+.formatXAxis({String? prefix, String? suffix, int? decimals, AxisFormatter? formatter})
+
+// Format Y-axis labels (primary/left)
+.formatYAxis({String? prefix, String? suffix, int? decimals, AxisFormatter? formatter})
+
+// Format secondary Y-axis labels (right)
+.formatY2Axis({String? prefix, String? suffix, int? decimals, AxisFormatter? formatter})
+```
+
+### AxisFormatter Class
+
+```dart
+// Constructor
+AxisFormatter({String prefix = '', String suffix = '', int? decimals})
+
+// Predefined formatters
+AxisFormatter.currency         // $ prefix
+AxisFormatter.percentage       // % suffix
+
+// Factory methods
+AxisFormatter.currencyWithSymbol(String symbol)
+AxisFormatter.custom({String prefix, String suffix, int? decimals})
+```
+
+## Best Practices
+
+### 1. Consistent Formatting
+Use the same formatter throughout related charts:
+
+```dart
+final currencyFormatter = AxisFormatter.currency;
+
+// Apply to multiple charts
+chart1.formatYAxis(formatter: currencyFormatter);
+chart2.formatYAxis(formatter: currencyFormatter);
+```
+
+### 2. Appropriate Decimal Places
+- **Currency**: 0-2 decimals (`$1,234` or `$1,234.50`)
+- **Percentages**: 0-1 decimals (`15%` or `15.2%`)
+- **Precise metrics**: 2-3 decimals (`3.142`)
+
+### 3. Clear Axis Labels
+Combine formatting with clear data:
+
+```dart
+// Revenue in thousands
+.formatYAxis(prefix: '\$', suffix: 'K', decimals: 0)  // $125K
+
+// Convert data first
+final revenueInThousands = data.map((d) => {
+  ...d,
+  'revenue': d['revenue'] / 1000,
+}).toList();
+```
+
+## Tooltip Integration
+
+Tooltips automatically respect your axis formatting. When you format your Y-axis with currency, for example, tooltips will display `$1,234` instead of raw `1234.0` values - no additional configuration needed.
+
+## Performance Notes
+
+- Formatters are lightweight and efficient
+- String formatting occurs during rendering
+- Works seamlessly with animations and interactions
+
+Axis formatting enhances chart readability and provides professional, context-appropriate displays for any data visualization need.

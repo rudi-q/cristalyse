@@ -39,7 +39,8 @@
               "features/animations",
               "features/theming",
               "features/interactions",
-              "features/export"
+              "features/export",
+              "features/axis-formatting"
             ]
           },
           {
