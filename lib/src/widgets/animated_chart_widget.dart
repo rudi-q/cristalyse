@@ -2259,8 +2259,8 @@ class _AnimatedChartPainter extends CustomPainter {
     final xTicks = xScale.getTicks(5);
     for (final tick in xTicks) {
       // Use bandCenter for OrdinalScale to center ticks on bars
-      final pos = plotArea.left + 
-          (xScale is OrdinalScale 
+      final pos = plotArea.left +
+          (xScale is OrdinalScale
               // ignore: unnecessary_cast
               ? (xScale as OrdinalScale).bandCenter(tick)
               : xScale.scale(tick));
@@ -2290,8 +2290,8 @@ class _AnimatedChartPainter extends CustomPainter {
     final yTicks = yScale.getTicks(5);
     for (final tick in yTicks) {
       // Use bandCenter for OrdinalScale to center ticks on bars (for horizontal bar charts)
-      final pos = plotArea.top + 
-          (yScale is OrdinalScale 
+      final pos = plotArea.top +
+          (yScale is OrdinalScale
               // ignore: unnecessary_cast
               ? (yScale as OrdinalScale).bandCenter(tick)
               : yScale.scale(tick));
