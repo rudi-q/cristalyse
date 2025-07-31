@@ -20,7 +20,7 @@ class AxisFormatter {
   String format(dynamic value) {
     if (value is num) {
       final String numericString;
-      
+
       // Handle special double values
       if (value.isInfinite || value.isNaN) {
         numericString = value.toString();
@@ -35,7 +35,7 @@ class AxisFormatter {
           numericString = value.toStringAsFixed(1);
         }
       }
-      
+
       return '$prefix$numericString$suffix';
     } else if (value is String) {
       // For string values, add prefix/suffix
@@ -60,27 +60,28 @@ class AxisFormatter {
   }
 
   /// Common formatters for convenience
-  
+
   /// Currency formatter with $ prefix
   static const AxisFormatter currency = AxisFormatter(prefix: '\$');
-  
+
   /// Percentage formatter with % suffix
   static const AxisFormatter percentage = AxisFormatter(suffix: '%');
-  
+
   /// Currency formatter with custom prefix
-  static AxisFormatter currencyWithSymbol(String symbol) => 
+  static AxisFormatter currencyWithSymbol(String symbol) =>
       AxisFormatter(prefix: symbol);
-  
+
   /// Formatter with custom prefix and suffix
   static AxisFormatter custom({
     String prefix = '',
     String suffix = '',
     int? decimals,
-  }) => AxisFormatter(
-    prefix: prefix,
-    suffix: suffix,
-    decimals: decimals,
-  );
+  }) =>
+      AxisFormatter(
+        prefix: prefix,
+        suffix: suffix,
+        decimals: decimals,
+      );
 
   @override
   bool operator ==(Object other) {

@@ -2585,7 +2585,7 @@ class _AnimatedChartPainter extends CustomPainter {
         formatter = y2AxisFormatter;
         break;
     }
-    
+
     return formatter.format(value);
   }
 

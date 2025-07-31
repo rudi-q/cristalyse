@@ -45,10 +45,10 @@ class AxisFormattingDemo extends StatelessWidget {
                   .theme(ChartTheme.defaultTheme())
                   .build(),
             ),
-            
+
             const SizedBox(height: 30),
-            
-            // Percentage formatting example  
+
+            // Percentage formatting example
             const Text(
               'Conversion Rate with Percentage Formatting',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -64,13 +64,14 @@ class AxisFormattingDemo extends StatelessWidget {
                   .geomLine(strokeWidth: 3.0)
                   .geomPoint(size: 6.0)
                   .formatXAxis() // No formatting for X-axis
-                  .formatYAxis(suffix: '%', decimals: 1) // Percentage formatting
+                  .formatYAxis(
+                      suffix: '%', decimals: 1) // Percentage formatting
                   .theme(ChartTheme.defaultTheme())
                   .build(),
             ),
-            
+
             const SizedBox(height: 30),
-            
+
             // Dual-axis chart with different formatting
             const Text(
               'Dual-Axis Chart with Different Formatting',
@@ -87,16 +88,23 @@ class AxisFormattingDemo extends StatelessWidget {
                   .scaleYContinuous()
                   .scaleY2Continuous(min: 0, max: 25)
                   .geomBar() // Revenue bars (primary Y-axis)
-                  .geomLine(strokeWidth: 3.0, color: Colors.red, yAxis: YAxis.secondary) // Conversion line (secondary Y-axis)
+                  .geomLine(
+                      strokeWidth: 3.0,
+                      color: Colors.red,
+                      yAxis:
+                          YAxis.secondary) // Conversion line (secondary Y-axis)
                   .formatXAxis() // No formatting for X-axis
-                  .formatYAxis(prefix: '\$', decimals: 0) // Currency for primary Y-axis
-                  .formatY2Axis(suffix: '%', decimals: 1) // Percentage for secondary Y-axis
+                  .formatYAxis(
+                      prefix: '\$', decimals: 0) // Currency for primary Y-axis
+                  .formatY2Axis(
+                      suffix: '%',
+                      decimals: 1) // Percentage for secondary Y-axis
                   .theme(ChartTheme.defaultTheme())
                   .build(),
             ),
-            
+
             const SizedBox(height: 30),
-            
+
             // Custom formatting example
             const Text(
               'Custom Formatting with Japanese Yen',
@@ -106,22 +114,26 @@ class AxisFormattingDemo extends StatelessWidget {
             SizedBox(
               height: 300,
               child: CristalyseChart()
-                  .data(revenueData.map((d) => {
-                    'month': d['month'],
-                    'revenue_jpy': (d['revenue']! as double) * 150, // Convert to JPY
-                  }).toList())
+                  .data(revenueData
+                      .map((d) => {
+                            'month': d['month'],
+                            'revenue_jpy': (d['revenue']! as double) *
+                                150, // Convert to JPY
+                          })
+                      .toList())
                   .mapping(x: 'month', y: 'revenue_jpy')
                   .scaleXOrdinal()
                   .scaleYContinuous()
                   .geomBar()
                   .formatXAxis() // No formatting for X-axis
-                  .formatYAxis(prefix: 'JPY ', decimals: 0) // Japanese Yen (no decimals)
+                  .formatYAxis(
+                      prefix: 'JPY ', decimals: 0) // Japanese Yen (no decimals)
                   .theme(ChartTheme.defaultTheme())
                   .build(),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Information card
             Card(
               child: Padding(
@@ -131,14 +143,17 @@ class AxisFormattingDemo extends StatelessWidget {
                   children: [
                     const Text(
                       'Axis Formatting Features:',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     const Text('• Prefix support (e.g., \$, JPY, EUR)'),
                     const Text('• Suffix support (e.g., %, units, per item)'),
                     const Text('• Custom decimal places'),
-                    const Text('• Predefined formatters (currency, percentage)'),
-                    const Text('• Independent formatting for X, Y, and Y2 axes'),
+                    const Text(
+                        '• Predefined formatters (currency, percentage)'),
+                    const Text(
+                        '• Independent formatting for X, Y, and Y2 axes'),
                     const Text('• Works with all chart types'),
                     const SizedBox(height: 12),
                     const Text(
@@ -157,15 +172,18 @@ class AxisFormattingDemo extends StatelessWidget {
                         children: [
                           Text(
                             'chart.formatYAxis(prefix: "\$", decimals: 2)',
-                            style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                            style: TextStyle(
+                                fontFamily: 'monospace', fontSize: 12),
                           ),
                           Text(
                             'chart.formatYAxis(suffix: "%", decimals: 1)',
-                            style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                            style: TextStyle(
+                                fontFamily: 'monospace', fontSize: 12),
                           ),
                           Text(
                             'chart.formatYAxis(formatter: AxisFormatter.currency)',
-                            style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                            style: TextStyle(
+                                fontFamily: 'monospace', fontSize: 12),
                           ),
                         ],
                       ),
