@@ -2258,7 +2258,12 @@ class _AnimatedChartPainter extends CustomPainter {
     // X-axis labels
     final xTicks = xScale.getTicks(5);
     for (final tick in xTicks) {
-      final pos = plotArea.left + xScale.scale(tick);
+      // Use bandCenter for OrdinalScale to center ticks on bars
+      final pos = plotArea.left + 
+          (xScale is OrdinalScale 
+              // ignore: unnecessary_cast
+              ? (xScale as OrdinalScale).bandCenter(tick)
+              : xScale.scale(tick));
       canvas.drawLine(
         Offset(pos, plotArea.bottom),
         Offset(pos, plotArea.bottom + theme.axisWidth * 2),
@@ -2284,7 +2289,12 @@ class _AnimatedChartPainter extends CustomPainter {
     // Primary Y-axis labels (left)
     final yTicks = yScale.getTicks(5);
     for (final tick in yTicks) {
-      final pos = plotArea.top + yScale.scale(tick);
+      // Use bandCenter for OrdinalScale to center ticks on bars (for horizontal bar charts)
+      final pos = plotArea.top + 
+          (yScale is OrdinalScale 
+              // ignore: unnecessary_cast
+              ? (yScale as OrdinalScale).bandCenter(tick)
+              : yScale.scale(tick));
       canvas.drawLine(
         Offset(plotArea.left - theme.axisWidth * 2, pos),
         Offset(plotArea.left, pos),
