@@ -1582,8 +1582,10 @@ class _AnimatedChartPainter extends CustomPainter {
       double totalGroupWidth;
 
       if (xScale is OrdinalScale) {
-        basePosition = plotArea.left + xScale.scale(x);
+        // Use bandCenter to center the bars, then adjust for group width
+        final centerPos = plotArea.left + xScale.bandCenter(x);
         totalGroupWidth = xScale.bandWidth * geometry.width;
+        basePosition = centerPos - (totalGroupWidth / 2);
       } else {
         basePosition = plotArea.left + xScale.scale(x) - 20;
         totalGroupWidth = 40 * geometry.width;
