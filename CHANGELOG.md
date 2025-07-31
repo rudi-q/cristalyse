@@ -1,3 +1,18 @@
+# 1.0.1 - 2025-07-31
+
+## Fixed
+
+* **Grouped Bar Chart Alignment**: Fixed positioning of grouped bars on ordinal scales to center properly on tick marks instead of aligning to the left edge of category bands (thanks @davidlrichmond)
+ - Updated `_drawGroupedBars()` to use `bandCenter()` method for accurate positioning
+  - Affects charts with `color` mapping and `scaleXOrdinal()` configuration
+  - Grouped bars now visually align with their corresponding axis tick marks for professional appearance
+
+## Technical
+
+* Added comprehensive test coverage for `OrdinalScale.bandCenter()` method
+* Enhanced edge case handling for empty domains and single categories
+* Improved visual consistency between axis ticks and bar positioning
+
 ## 1.0.0 - 2025-07-10
 
 - **🥧 Major Feature: Comprehensive Pie Chart and Donut Chart Support**
