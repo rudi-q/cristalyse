@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 import 'package:cristalyse/src/core/scale.dart';
-import 'package:cristalyse/src/core/label_formatter.dart';
 
 void main() {
   group('LabelFormatter Core Functionality', () {
@@ -125,7 +124,7 @@ void main() {
         return (num value) {
           final abs = value.abs();
           final formatted = NumberFormat.compact().format(abs);
-          return value >= 0 ? '$formatted' : '($formatted)';
+          return value >= 0 ? formatted : '($formatted)';
         };
       }
 

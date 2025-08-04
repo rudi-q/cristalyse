@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../core/geometry.dart';
 import '../core/scale.dart';
-import '../core/label_formatter.dart';
 import '../interaction/chart_interactions.dart';
 import '../interaction/interaction_detector.dart';
 import '../interaction/tooltip_widget.dart';
