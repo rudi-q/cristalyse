@@ -976,6 +976,7 @@ class _ExampleHomeState extends State<ExampleHome>
       case 6: // Grouped bars
         return [
           'Side-by-side comparison of multiple data series',
+          'Clean currency formatting for financial comparisons',
           'Coordinated group animations with smooth timing',
           'Automatic legend generation from color mappings',
           'Perfect for product or regional comparisons'
@@ -998,7 +999,7 @@ class _ExampleHomeState extends State<ExampleHome>
         return [
           'Smooth slice animations with staggered timing',
           'Donut chart support with configurable inner radius',
-          'Smart label positioning with percentage display',
+          'Smart label positioning with formatting',
           'Exploded slices for emphasis and visual impact'
         ];
       case 10: // Dual Y-axis

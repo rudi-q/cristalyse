@@ -75,6 +75,150 @@ CristalyseChart()
   .build()
 ```
 
+## Label Formatting
+
+Transform axis labels by passing a callback to the `labels` parameter on any axis scale that takes any number and returns a string.
+
+### Direct NumberFormat Usage
+
+For simple cases, you can use `NumberFormat` from Dart's `intl` package:
+
+```dart
+import 'package:intl/intl.dart';
+
+// Revenue chart with currency formatting
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .scaleYContinuous(labels: NumberFormat.simpleCurrency().format) // $1,234.56
+  .build()
+
+// Conversion rate chart with percentage formatting
+CristalyseChart()
+  .data(conversionData)
+  .mapping(x: 'month', y: 'rate')
+  .scaleYContinuous(labels: NumberFormat.percentPattern().format) // 23%
+  .build()
+
+// User growth chart with compact formatting
+CristalyseChart()
+  .data(userGrowthData)
+  .mapping(x: 'date', y: 'users')
+  .scaleYContinuous(labels: NumberFormat.compact().format) // 1.2K, 1.5M
+  .build()
+```
+
+### Custom Callbacks for Advanced Cases
+
+When you need custom logic beyond NumberFormat, use a factory pattern to create a callback based on that logic.
+
+```dart
+// Create formatter once based on passed locale, reuse callback
+static String Function(num) createCurrencyFormatter({String locale = 'en_US'}) {
+  final formatter = NumberFormat.simpleCurrency(locale: locale); // Created once
+  return (num value) => formatter.format(value); // Reused callback
+}
+
+// Usage
+final currencyLabels = createCurrencyFormatter();
+// uses default here, but could internationalize
+
+// Revenue chart with currency formatting
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .scaleYContinuous(labels: currencyLabels) // pass callback
+  .build()
+```
+
+#### Conditional Formatting (Value-Based Logic)
+
+```dart
+// Time duration formatting (seconds to human readable)
+static String Function(num) createDurationFormatter() {
+  return (num seconds) {
+    final roundedSeconds = seconds.round(); // Round to nearest second first
+    
+    if (roundedSeconds >= 3600) {
+      final hours = roundedSeconds / 3600;
+      if (hours == hours.round()) {
+        return '${hours.round()}h';  // Clean: "1h", "2h", "24h"
+      }
+      return '${hours.toStringAsFixed(1)}h';  // Decimal: "1.5h", "2.3h"
+    } else if (roundedSeconds >= 60) {
+      final minutes = (roundedSeconds / 60).round();
+      return '${minutes}m';  // "1m", "30m", "59m"
+    }
+    return '${roundedSeconds}s';  // "5s", "30s", "59s"
+  };
+}
+
+final usageLabels = createDurationFormatter();
+
+CristalyseChart()
+  .data(usageData)
+  .mapping(x: 'day', y: 'usage')
+  .scaleYContinuous(labels: usageLabels) // pass callback
+  .build()
+```
+
+#### Chart-Optimized Formatting (Clean Integers)
+
+```dart
+// Implement chart-friendly integer/decimal distinction w/ NumberFormat
+static String Function(num) createChartCurrencyFormatter() {
+  final formatter = NumberFormat.simpleCurrency(locale: 'en_US');
+  return (num value) {
+    if (value == value.roundToDouble()) {
+      return formatter.format(value).replaceAll('.00', ''); // $42
+    }
+    return formatter.format(value); // $42.50
+  };
+}
+
+final currencyLabels = createChartCurrencyFormatter();
+
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .scaleYContinuous(labels: currencyLabels)
+  .build()
+```
+
+#### Business Logic Formatting
+
+```dart
+// Handle negative values differently (P&L charts)
+static String Function(num) createProfitLossFormatter() {
+  return (num value) {
+    final abs = value.abs();
+    final formatted = NumberFormat.compact().format(abs);
+    return value >= 0 ? '$formatted' : '($formatted)';
+  };
+}
+
+final currencyLabels = createProfitLossFormatter();
+
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .scaleYContinuous(labels: currencyLabels)
+  .build()
+
+// Custom units (basis points for finance - converts decimal rates to bp)
+static String Function(num) createBasisPointFormatter() {
+  return (num value) => '${(value * 10000).toStringAsFixed(0)}bp';
+}
+
+final bpLabels = createBasisPointFormatter();
+
+CristalyseChart()
+  .data(yieldData) // Data has decimal rates like 0.0025, 0.0150
+  .mapping(x: 'maturity', y: 'yield_rate') // yield_rate is decimal (0.0025 = 25bp)
+  .scaleYContinuous(labels: bpLabels) // Converts 0.0025 → "25bp"
+  .build()
+```
+
 ## Scale Customization
 
 Customize scales to fit your data representation needs:
@@ -84,7 +228,7 @@ CristalyseChart()
   .data(data)
   .mapping(x: 'day', y: 'hours')
   .scaleXOrdinal()
-  .scaleYContinuous(min: 0, max: 24) // Range of working hours per day
+  .scaleYContinuous(min: 0, max: 24, labels: (v) => '${v}h') // Custom hour labels
   .build()
 ```
 

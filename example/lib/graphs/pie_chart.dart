@@ -1,13 +1,14 @@
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 Widget buildPieChartTab(ChartTheme currentTheme,
     List<Map<String, dynamic>> data, double sliderValue) {
-  // Create pie chart specific data
+  // Create pie chart specific data with realistic revenue numbers
   final pieData = [
-    {'category': 'Mobile', 'revenue': 45.2, 'users': 1200},
-    {'category': 'Desktop', 'revenue': 32.8, 'users': 800},
-    {'category': 'Tablet', 'revenue': 22.0, 'users': 600},
+    {'category': 'Mobile', 'revenue': 450000, 'users': 1200},
+    {'category': 'Desktop', 'revenue': 328000, 'users': 800},
+    {'category': 'Tablet', 'revenue': 220000, 'users': 600},
   ];
 
   return SingleChildScrollView(
@@ -15,7 +16,7 @@ Widget buildPieChartTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Animated Pie Chart'),
+        const Text('Revenue Distribution - Percentage Display'),
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
@@ -28,7 +29,7 @@ Widget buildPieChartTab(ChartTheme currentTheme,
                 strokeWidth: 2.0,
                 strokeColor: Colors.white,
                 showLabels: true,
-                showPercentages: true,
+                showPercentages: true, // Show default percentage formatting
               )
               .theme(currentTheme)
               .animate(
@@ -40,7 +41,8 @@ Widget buildPieChartTab(ChartTheme currentTheme,
         const Text(
             '• Slices animate in with staggered timing\n• Percentages shown on labels\n• Smooth elastic animation curve'),
         const SizedBox(height: 32),
-        const Text('Donut Chart Example'),
+        const Text(
+            'User Distribution - Donut Chart with Compact Number Formatting'),
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
@@ -53,7 +55,9 @@ Widget buildPieChartTab(ChartTheme currentTheme,
                 strokeWidth: 3.0,
                 strokeColor: Colors.white,
                 showLabels: true,
-                showPercentages: false, // Show actual values instead
+                showPercentages: false, // Show formatted user counts instead
+                labels:
+                    NumberFormat.compact().format, // Direct NumberFormat usage
               )
               .theme(currentTheme)
               .animate(
@@ -63,7 +67,7 @@ Widget buildPieChartTab(ChartTheme currentTheme,
         ),
         const SizedBox(height: 16),
         const Text(
-            '• Donut chart with inner radius\n• Shows actual values instead of percentages\n• Different animation curve'),
+            '• Donut chart with inner radius\n• Shows actual values instead of percentages\n• Different animation curve\n• Uses NumberFormat.compact() formatting'),
       ],
     ),
   );
