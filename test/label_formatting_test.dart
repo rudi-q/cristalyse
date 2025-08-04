@@ -121,9 +121,10 @@ void main() {
     test('createProfitLossFormatter example from docs works', () {
       // Test the createProfitLossFormatter pattern - profit/loss with +/- signs
       String Function(num) createProfitLossFormatter() {
+        final formatter = NumberFormat.compact(); // Created once
         return (num value) {
           final abs = value.abs();
-          final formatted = NumberFormat.compact().format(abs);
+          final formatted = formatter.format(abs); // Reuse formatter
           return value >= 0 ? formatted : '($formatted)';
         };
       }
