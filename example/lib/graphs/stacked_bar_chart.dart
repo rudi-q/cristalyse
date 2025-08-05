@@ -1,5 +1,6 @@
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 Widget buildStackedBarTab(ChartTheme currentTheme,
     List<Map<String, dynamic>> data, double sliderValue) {
@@ -8,7 +9,12 @@ Widget buildStackedBarTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Stacked Bar Chart'),
+        const Text('Revenue Breakdown by Category'),
+        const SizedBox(height: 8),
+        const Text(
+          'Stacked segments showing part-to-whole relationships with currency formatting',
+          style: TextStyle(fontSize: 12, color: Colors.grey),
+        ),
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
@@ -20,7 +26,11 @@ Widget buildStackedBarTab(ChartTheme currentTheme,
                   style: BarStyle.stacked, // This is the key!
                   alpha: 0.9)
               .scaleXOrdinal()
-              .scaleYContinuous(min: 0)
+              .scaleYContinuous(
+                min: 0,
+                labels: NumberFormat.simpleCurrency()
+                    .format, // Direct NumberFormat usage
+              )
               .theme(currentTheme)
               .animate(
                   duration: const Duration(milliseconds: 1400),
@@ -29,7 +39,7 @@ Widget buildStackedBarTab(ChartTheme currentTheme,
         ),
         const SizedBox(height: 16),
         const Text(
-            '• Segments stack on top of each other\n• Each color represents a different category\n• Great for showing part-to-whole relationships\n• Animated segment-by-segment building'),
+            '• Segments stack on top of each other\n• Each color represents a different category\n• Direct NumberFormat.simpleCurrency() usage\n• Great for showing part-to-whole relationships\n• Animated segment-by-segment building'),
       ],
     ),
   );

@@ -2272,7 +2272,7 @@ class _AnimatedChartPainter extends CustomPainter {
         paint,
       );
 
-      final label = _formatAxisLabel(tick);
+      final label = xScale.formatLabel(tick);
       final textPainter = TextPainter(
         text: TextSpan(text: label, style: axisLabelStyle),
         textDirection: TextDirection.ltr,
@@ -2303,7 +2303,7 @@ class _AnimatedChartPainter extends CustomPainter {
         paint,
       );
 
-      final label = _formatAxisLabel(tick);
+      final label = yScale.formatLabel(tick);
       final textPainter = TextPainter(
         text: TextSpan(text: label, style: axisLabelStyle),
         textDirection: TextDirection.ltr,
@@ -2330,7 +2330,7 @@ class _AnimatedChartPainter extends CustomPainter {
           paint,
         );
 
-        final label = _formatAxisLabel(tick);
+        final label = y2Scale.formatLabel(tick);
         final textPainter = TextPainter(
           text: TextSpan(
             text: label,
@@ -2501,12 +2501,11 @@ class _AnimatedChartPainter extends CustomPainter {
           canvas,
           sliceCenter,
           currentAngle + animatedSweepAngle / 2,
-          geometry.labelRadius,
           value,
           total,
           category.toString(),
           geometry.labelStyle ?? theme.axisTextStyle,
-          geometry.showPercentages,
+          geometry,
         );
       }
 
@@ -2518,19 +2517,23 @@ class _AnimatedChartPainter extends CustomPainter {
     Canvas canvas,
     Offset center,
     double angle,
-    double radius,
     double value,
     double total,
     String category,
     TextStyle style,
-    bool showPercentages,
+    PieGeometry geometry,
   ) {
+    final radius = geometry.labelRadius;
+    final showPercentages = geometry.showPercentages;
+
     String labelText;
     if (showPercentages) {
-      final percentage = (value / total * 100).toStringAsFixed(1);
-      labelText = '$category\n$percentage%';
+      final percentageRatio = value /
+          total; // 0.0-1.0 range, as NumberFormat expects for percentages
+      final percentageText = geometry.labelFormatter(percentageRatio);
+      labelText = '$category\n$percentageText';
     } else {
-      labelText = '$category\n${_formatAxisLabel(value)}';
+      labelText = '$category\n${geometry.labelFormatter(value)}';
     }
 
     final textPainter = TextPainter(
@@ -2563,18 +2566,6 @@ class _AnimatedChartPainter extends CustomPainter {
     );
 
     textPainter.paint(canvas, labelOffset);
-  }
-
-  String _formatAxisLabel(dynamic value) {
-    if (value is num) {
-      if (value == value.roundToDouble()) {
-        return value.round().toString();
-      } else {
-        return value.toStringAsFixed(1);
-      }
-    } else {
-      return value.toString();
-    }
   }
 
   @override

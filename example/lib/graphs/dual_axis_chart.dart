@@ -41,9 +41,15 @@ Widget buildDualAxisTab(ChartTheme currentTheme,
                       : Colors.orange,
                   yAxis: YAxis.secondary) // Uses right Y-axis
               .scaleXOrdinal()
-              .scaleYContinuous(min: 0) // Left Y-axis (revenue)
+              .scaleYContinuous(
+                  min: 0,
+                  labels: (value) =>
+                      '\$${value.toStringAsFixed(0)}K') // Revenue in $K format
               .scaleY2Continuous(
-                  min: 0, max: 30) // Right Y-axis (percentage, adjusted range)
+                  min: 0,
+                  max: 30,
+                  labels: (value) =>
+                      '${value.toStringAsFixed(1)}%') // Conversion rates as %, adjusted range
               .theme(currentTheme)
               .animate(
                   duration: const Duration(milliseconds: 1500),
@@ -52,7 +58,7 @@ Widget buildDualAxisTab(ChartTheme currentTheme,
         ),
         const SizedBox(height: 16),
         const Text(
-            '• Bars show revenue (left Y-axis in \$k)\n• Line shows conversion rate (right Y-axis in %)\n• Two independent scales for different data ranges\n• Perfect for correlating volume vs efficiency metrics'),
+            '• Bars show revenue (left Y-axis in \$K format)\n• Line shows conversion rate (right Y-axis in %)\n• Two independent scales for different data ranges\n• Perfect for correlating volume vs efficiency metrics'),
       ],
     ),
   );

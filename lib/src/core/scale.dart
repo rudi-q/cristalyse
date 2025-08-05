@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'label_formatter.dart';
 
 /// Base class for all scales
 abstract class Scale {
+  final LabelFormatter _formatter;
+
+  Scale({LabelCallback? labelFormatter})
+      : _formatter = LabelFormatter(labelFormatter);
+
   double scale(dynamic value);
   List<dynamic> getTicks(int count);
   List<dynamic> get domain;
@@ -9,6 +15,9 @@ abstract class Scale {
 
   /// Inverse transformation: convert screen coordinate back to data value
   dynamic invert(double screenValue);
+
+  /// Format a value for display using this Scale instance's label formatter
+  String formatLabel(dynamic value) => _formatter.format(value);
 }
 
 /// Linear scale for continuous data
@@ -18,7 +27,7 @@ class LinearScale extends Scale {
   final double? min;
   final double? max;
 
-  LinearScale({this.min, this.max});
+  LinearScale({this.min, this.max, super.labelFormatter});
 
   @override
   List<double> get domain => _domain;
@@ -62,7 +71,8 @@ class OrdinalScale extends Scale {
   final double _padding; // 10% padding between bands
   double _bandWidth = 0;
 
-  OrdinalScale({double padding = 0.1}) : _padding = padding;
+  OrdinalScale({double padding = 0.1, super.labelFormatter})
+      : _padding = padding;
 
   @override
   List<dynamic> get domain => _domain;

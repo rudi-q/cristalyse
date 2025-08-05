@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' as intl;
+import 'label_formatter.dart';
 
 /// Enum for specifying which Y-axis to use
 enum YAxis { primary, secondary }
@@ -106,6 +108,9 @@ class AreaGeometry extends Geometry {
 
 /// Pie geometry for pie and donut charts
 class PieGeometry extends Geometry {
+  /// Static formatter as a default; don't create NumberFormat on every label render
+  static final _defaultPercentageFormatter = intl.NumberFormat.percentPattern();
+
   final double innerRadius; // For donut charts (0.0 for full pie)
   final double outerRadius;
   final Color? strokeColor;
@@ -117,6 +122,7 @@ class PieGeometry extends Geometry {
   final bool showPercentages;
   final bool explodeSlices;
   final double explodeDistance;
+  final LabelCallback labelFormatter;
 
   PieGeometry({
     this.innerRadius = 0.0,
@@ -130,6 +136,8 @@ class PieGeometry extends Geometry {
     this.showPercentages = true,
     this.explodeSlices = false,
     this.explodeDistance = 10.0,
+    LabelCallback? labelFormatter,
     super.interactive = true,
-  }) : super(yAxis: YAxis.primary); // Pie charts don't use Y-axis
+  })  : labelFormatter = labelFormatter ?? _defaultPercentageFormatter.format,
+        super(yAxis: YAxis.primary); // Pie charts don't use Y-axis
 }

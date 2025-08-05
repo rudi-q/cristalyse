@@ -6,6 +6,7 @@ import '../themes/chart_theme.dart';
 import '../widgets/animated_chart_widget.dart';
 import 'geometry.dart';
 import 'scale.dart';
+import 'label_formatter.dart';
 
 /// Main chart class implementing grammar of graphics API
 class CristalyseChart {
@@ -210,6 +211,7 @@ class CristalyseChart {
   ///   innerRadius: 40.0, // For donut chart
   ///   showLabels: true,
   ///   strokeWidth: 2.0,
+  ///   labels: (value) => NumberFormat.currency(symbol: '$').format(value),
   /// )
   /// ```
   CristalyseChart geomPie({
@@ -224,6 +226,7 @@ class CristalyseChart {
     bool? showPercentages,
     bool? explodeSlices,
     double? explodeDistance,
+    LabelCallback? labels,
   }) {
     _geometries.add(
       PieGeometry(
@@ -238,20 +241,23 @@ class CristalyseChart {
         showPercentages: showPercentages ?? true,
         explodeSlices: explodeSlices ?? false,
         explodeDistance: explodeDistance ?? 10.0,
+        labelFormatter: labels,
       ),
     );
     return this;
   }
 
   /// Configure continuous X scale
-  CristalyseChart scaleXContinuous({double? min, double? max}) {
-    _xScale = LinearScale(min: min, max: max);
+  CristalyseChart scaleXContinuous(
+      {double? min, double? max, LabelCallback? labels}) {
+    _xScale = LinearScale(min: min, max: max, labelFormatter: labels);
     return this;
   }
 
   /// Configure continuous Y scale (primary/left axis)
-  CristalyseChart scaleYContinuous({double? min, double? max}) {
-    _yScale = LinearScale(min: min, max: max);
+  CristalyseChart scaleYContinuous(
+      {double? min, double? max, LabelCallback? labels}) {
+    _yScale = LinearScale(min: min, max: max, labelFormatter: labels);
     return this;
   }
 
@@ -261,20 +267,21 @@ class CristalyseChart {
   /// ```dart
   /// chart.scaleY2Continuous(min: 0, max: 100) // For percentage data
   /// ```
-  CristalyseChart scaleY2Continuous({double? min, double? max}) {
-    _y2Scale = LinearScale(min: min, max: max);
+  CristalyseChart scaleY2Continuous(
+      {double? min, double? max, LabelCallback? labels}) {
+    _y2Scale = LinearScale(min: min, max: max, labelFormatter: labels);
     return this;
   }
 
   /// Configure categorical X scale (useful for bar charts)
-  CristalyseChart scaleXOrdinal() {
-    _xScale = OrdinalScale();
+  CristalyseChart scaleXOrdinal({LabelCallback? labels}) {
+    _xScale = OrdinalScale(labelFormatter: labels);
     return this;
   }
 
   /// Configure categorical Y scale
-  CristalyseChart scaleYOrdinal() {
-    _yScale = OrdinalScale();
+  CristalyseChart scaleYOrdinal({LabelCallback? labels}) {
+    _yScale = OrdinalScale(labelFormatter: labels);
     return this;
   }
 

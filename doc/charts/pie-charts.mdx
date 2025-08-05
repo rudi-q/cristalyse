@@ -210,6 +210,88 @@ CristalyseChart()
   .build()
 ```
 
+## Label Formatting
+
+Transform pie chart labels by passing a callback to the `labels` parameter.
+
+### Simple Custom Labels
+
+For basic formatting, you can use a simple callback:
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mappingPie(value: 'revenue', category: 'region')
+  .geomPie(
+    outerRadius: 150,
+    showLabels: true,
+    showPercentages: false,
+    labels: (value) => '\$${value}K', // $450K
+  )
+  .build()
+```
+
+### Using NumberFormat
+
+For robust, locale-aware formatting, use NumberFormat:
+
+```dart
+import 'package:intl/intl.dart';
+
+// Currency formatting
+CristalyseChart()
+  .data(revenueData)
+  .mappingPie(value: 'revenue', category: 'department')
+  .geomPie(
+    outerRadius: 150,
+    showLabels: true,
+    showPercentages: false,
+    labels: NumberFormat.simpleCurrency().format, // $1,234.56
+  )
+  .build()
+
+// Compact user counts
+CristalyseChart()
+  .data(userData)
+  .mappingPie(value: 'users', category: 'platform')
+  .geomPie(
+    outerRadius: 150,
+    showLabels: true,
+    showPercentages: false,
+    labels: NumberFormat.compact().format, // 1.2K
+  )
+  .build()
+```
+
+### Percentage Formatting
+
+When `showPercentages: true`, your callback receives ratio values (0.0-1.0):
+
+```dart
+// Default percentage formatting
+CristalyseChart()
+  .data(surveyData)
+  .mappingPie(value: 'responses', category: 'rating')
+  .geomPie(
+    outerRadius: 150,
+    showLabels: true,
+    showPercentages: true, // Uses NumberFormat.percentPattern()
+  )
+  .build()
+
+// Custom percentage with NumberFormat
+CristalyseChart()
+  .data(surveyData)
+  .mappingPie(value: 'responses', category: 'rating')
+  .geomPie(
+    outerRadius: 150,
+    showLabels: true,
+    showPercentages: true,
+    labels: NumberFormat.percentPattern().format, // 23%
+  )
+  .build()
+```
+
 ## Real-World Examples
 
 ### E-commerce Sales by Category

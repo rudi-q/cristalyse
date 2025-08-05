@@ -97,6 +97,36 @@ class MyFirstChart extends StatelessWidget {
   <em>Your first chart - clean, responsive, and cross-platform</em>
 </div>
 
+## Formatting Axis Labels
+
+You'll often want formatted axis labels.
+
+The `labels` parameter takes any function that converts a number to a string:
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .geomBar()
+  .scaleYContinuous(labels: (value) => '\$${value}') // $150
+  .scaleXOrdinal()
+  .build()
+```
+
+For robust, locale-aware formatting, use NumberFormat:
+
+```dart
+import 'package:intl/intl.dart';
+
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .geomBar()
+  .scaleYContinuous(labels: NumberFormat.simpleCurrency().format) // $1,234.56
+  .scaleXOrdinal()
+  .build()
+```
+
 ## Understanding the Grammar
 
 Cristalyse follows the **Grammar of Graphics** pattern:

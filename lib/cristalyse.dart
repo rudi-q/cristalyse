@@ -3,6 +3,7 @@ library;
 export 'src/core/chart.dart';
 export 'src/core/geometry.dart';
 export 'src/core/scale.dart';
+export 'src/core/label_formatter.dart';
 export 'src/export/chart_export.dart';
 export 'src/interaction/chart_interactions.dart';
 export 'src/interaction/interaction_detector.dart';

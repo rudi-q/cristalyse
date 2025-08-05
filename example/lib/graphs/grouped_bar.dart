@@ -1,5 +1,6 @@
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 Widget buildGroupedBarTab(ChartTheme currentTheme,
     List<Map<String, dynamic>> data, double sliderValue) {
@@ -8,7 +9,12 @@ Widget buildGroupedBarTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Grouped Bar Chart'),
+        const Text('Product Performance by Quarter'),
+        const SizedBox(height: 8),
+        const Text(
+          'Multiple product lines compared side-by-side with currency formatting',
+          style: TextStyle(fontSize: 12, color: Colors.grey),
+        ),
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
@@ -20,7 +26,11 @@ Widget buildGroupedBarTab(ChartTheme currentTheme,
                   style: BarStyle.grouped,
                   alpha: 0.9)
               .scaleXOrdinal()
-              .scaleYContinuous(min: 0)
+              .scaleYContinuous(
+                min: 0,
+                labels: NumberFormat.simpleCurrency()
+                    .format, // Direct NumberFormat usage
+              )
               .theme(currentTheme)
               .animate(
                   duration: const Duration(milliseconds: 1200),
@@ -29,7 +39,7 @@ Widget buildGroupedBarTab(ChartTheme currentTheme,
         ),
         const SizedBox(height: 16),
         const Text(
-            '• Multiple series grouped side-by-side\n• Color mapping for different products\n• Coordinated group animation'),
+            '• Multiple series grouped side-by-side\n• Uses direct NumberFormat.simpleCurrency()\n• Color mapping for different products\n• Coordinated group animation'),
       ],
     ),
   );

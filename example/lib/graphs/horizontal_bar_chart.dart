@@ -9,6 +9,11 @@ Widget buildHorizontalBarTab(ChartTheme currentTheme,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Horizontal Bar Chart'),
+        const SizedBox(height: 8),
+        const Text(
+          'Team headcount by department',
+          style: TextStyle(fontSize: 12, color: Colors.grey),
+        ),
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
@@ -18,7 +23,11 @@ Widget buildHorizontalBarTab(ChartTheme currentTheme,
               .geomBar(width: sliderValue.clamp(0.1, 1.0))
               .coordFlip()
               .scaleXOrdinal()
-              .scaleYContinuous(min: 0)
+              .scaleYContinuous(
+                min: 0,
+                labels: (value) =>
+                    '${value.round()}', // Clean whole numbers for headcount
+              )
               .theme(currentTheme)
               .animate(
                   duration: const Duration(milliseconds: 1000),
@@ -27,7 +36,7 @@ Widget buildHorizontalBarTab(ChartTheme currentTheme,
         ),
         const SizedBox(height: 16),
         const Text(
-            '• Bars grow from left to right\n• Categorical Y-axis for departments\n• Great for ranking data'),
+            '• Bars grow from left to right\n• Categorical Y-axis for departments\n• Clean whole number formatting for headcount\n• Great for ranking data'),
       ],
     ),
   );
