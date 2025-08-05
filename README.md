@@ -710,7 +710,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.0.1** - Production ready with enhanced dual Y-axis SVG export and comprehensive interactive capabilities
+**Current Version: 1.1.0** - Production ready with enhanced dual Y-axis SVG export and comprehensive interactive capabilities
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 

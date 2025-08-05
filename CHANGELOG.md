@@ -1,4 +1,69 @@
-# 1.0.1 - 2025-07-31
+## 1.1.0 - 2025-08-05
+
+#### 🎯 Major Feature: Advanced Label Formatting System
+
+- **Grammar of Graphics Label Control**: Full callback-based label formatting system brings professional data visualization to Cristalyse
+- **NumberFormat Integration**: Seamless integration with Flutter's `intl` package for currency, percentages, compact notation, and locale-aware formatting
+- **Smart Fallback Chain**: Custom callback → default formatting → toString() ensures bulletproof label rendering
+- **Zero Breaking Changes**: All existing charts continue working unchanged while new functionality is opt-in
+
+#### 🚀 New API Capabilities
+
+- **Scale-Level Formatting**: `LinearScale(labelFormatter: NumberFormat.currency().format)` for axis labels
+- **Chart-Level Integration**: Direct formatter support in all chart geometries
+- **Flexible Callback Pattern**: Compatible with any `String Function(num)` signature
+- **Factory Pattern Support**: Create reusable formatter factories for consistent styling across charts
+
+#### 💼 Professional Use Cases Unlocked
+
+- **Financial Dashboards**: Currency formatting, basis points, profit/loss indicators
+- **Analytics Platforms**: Compact notation (1.2K, 1.5M), percentage displays, duration formatting
+- **Scientific Visualization**: Scientific notation, custom units, precision control
+- **International Applications**: Locale-aware number formatting for global deployment
+
+#### 📖 Examples Added
+
+```dart
+// Business Dashboard: Professional currency formatting
+CristalyseChart()
+  .data(revenueData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .geomBar()
+  .scaleYContinuous(labels: NumberFormat.simpleCurrency().format) // $1,234.56
+  .build();
+
+// Analytics: Compact notation for large numbers  
+CristalyseChart()
+  .data(userMetrics)
+  .mapping(x: 'date', y: 'active_users')
+  .geomLine()
+  .scaleYContinuous(labels: NumberFormat.compact().format) // 1.2K, 1.5M
+  .build();
+
+// Custom Business Logic: Conditional formatting
+CristalyseChart()
+  .data(performanceData)
+  .mapping(x: 'metric', y: 'value')
+  .geomBar()  
+  .scaleYContinuous(labels: (value) => value > 100 ? '${value.toInt()}%' : '${value}pts')
+  .build();
+```
+
+#### 🧪 Quality Assurance
+
+- **Comprehensive Test Coverage**: 15+ test cases covering all formatting scenarios including NumberFormat integration
+- **Documentation Accuracy**: All code examples in documentation are tested and verified
+- **Backwards Compatibility**: 100% existing chart compatibility maintained
+- **Edge Case Handling**: Robust null safety and graceful fallbacks for invalid data
+
+**This release brings Cristalyse label formatting up to professional visualization library standards, enabling publication-ready charts with locale-aware formatting and business-grade customization.** 🎯
+
+#### 🙏 Contributors
+
+**Feature authored by [@davidlrichmond](https://github.com/davidlrichmond) and reviewed by [@rudi-q](https://github.com/rudi-q).** Thank you for this excellent contribution that significantly enhances Cristalyse's professional visualization capabilities!
+
+
+## 1.0.1 - 2025-07-31
 
 ## Fixed
 
@@ -665,9 +730,9 @@ CristalyseChart()
 
 **This release positions Cristalyse as a serious competitor to Tableau, Power BI, and other professional visualization tools. Dual Y-axis support is a fundamental requirement for business dashboards - now we have it! 🎯**
 
-# 0.4.4 - 2025-06-12
+## 0.4.4 - 2025-06-12
 
-## Added
+### Added
 
 * Stacked Bar Charts: Full support for stacked bars with `BarStyle.stacked`
 	+ Segment-by-segment progressive animation with staggered timing
@@ -675,17 +740,17 @@ CristalyseChart()
 	+ Consistent color ordering across all stacked groups
 	+ Smart Y-scale domain calculation based on total stack heights (not individual segments)
 
-## Fixed
+### Fixed
 
 * Stacked Bar Scale Domain: Y-axis now correctly calculates domain based on cumulative stacked totals instead of individual segment values, preventing bars from rendering outside chart bounds
 * Stacked Bar Animation: Improved animation timing with proper segment delays for smooth visual building effect
 
-## Improved
+### Improved
 
 * Example App: Added new "Stacked Bars" tab showcasing revenue breakdown by category with realistic business data
 * Chart Features Documentation: Updated feature descriptions to include stacked bar capabilities
 
-## Technical
+### Technical
 
 * Enhanced `_setupYScale` method to detect stacked bar geometries and calculate proper domain bounds
 * Added 10% padding to stacked bar charts for better visual spacing
