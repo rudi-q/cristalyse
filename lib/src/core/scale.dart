@@ -177,3 +177,99 @@ class SizeScale {
     return range[0] + (value - domain[0]) / domainSpan * rangeSpan;
   }
 }
+
+/// Gradient color scale for continuous color mapping (e.g., heat maps)
+class GradientColorScale {
+  final List<double> domain;
+  final List<Color> colors;
+  final bool interpolate;
+  
+  GradientColorScale({
+    this.domain = const [0, 1],
+    this.colors = const [Colors.blue, Colors.red],
+    this.interpolate = true,
+  });
+  
+  Color scale(double value) {
+    if (colors.isEmpty) return Colors.grey;
+    if (colors.length == 1) return colors[0];
+    
+    // Normalize value to 0-1 range
+    final minDomain = domain.isNotEmpty ? domain.first : 0;
+    final maxDomain = domain.length > 1 ? domain.last : 1;
+    final normalizedValue = maxDomain > minDomain 
+        ? ((value - minDomain) / (maxDomain - minDomain)).clamp(0.0, 1.0)
+        : 0.0;
+    
+    if (!interpolate) {
+      // Discrete colors based on segments
+      final colorIndex = (normalizedValue * (colors.length - 1)).round();
+      return colors[colorIndex.clamp(0, colors.length - 1)];
+    }
+    
+    // Interpolate between colors
+    final scaledValue = normalizedValue * (colors.length - 1);
+    final lowerIndex = scaledValue.floor();
+    final upperIndex = scaledValue.ceil();
+    
+    if (lowerIndex == upperIndex) {
+      return colors[lowerIndex];
+    }
+    
+    final t = scaledValue - lowerIndex;
+    return Color.lerp(colors[lowerIndex], colors[upperIndex], t)!;
+  }
+  
+  /// Predefined gradient themes
+  static GradientColorScale viridis() {
+    return GradientColorScale(
+      colors: [
+        const Color(0xFF440154), // Dark purple
+        const Color(0xFF3B528B), // Blue
+        const Color(0xFF21908C), // Teal
+        const Color(0xFF5DC863), // Green
+        const Color(0xFFFDE725), // Yellow
+      ],
+    );
+  }
+  
+  static GradientColorScale coolWarm() {
+    return GradientColorScale(
+      colors: [
+        const Color(0xFF3B4CC0), // Cool blue
+        const Color(0xFF7396F5), // Light blue
+        const Color(0xFFDDDDDD), // Neutral gray
+        const Color(0xFFF7AA8F), // Light red
+        const Color(0xFFB40426), // Warm red
+      ],
+    );
+  }
+  
+  static GradientColorScale heatMap() {
+    return GradientColorScale(
+      colors: [
+        const Color(0xFF000033), // Dark blue
+        const Color(0xFF000099), // Blue
+        const Color(0xFF0000FF), // Bright blue
+        const Color(0xFF00FFFF), // Cyan
+        const Color(0xFF00FF00), // Green
+        const Color(0xFFFFFF00), // Yellow
+        const Color(0xFFFF8800), // Orange
+        const Color(0xFFFF0000), // Red
+        const Color(0xFF880000), // Dark red
+      ],
+    );
+  }
+  
+  static GradientColorScale greenRed() {
+    return GradientColorScale(
+      colors: [
+        const Color(0xFF00CC00), // Green
+        const Color(0xFF99FF99), // Light green
+        const Color(0xFFFFFFFF), // White
+        const Color(0xFFFF9999), // Light red
+        const Color(0xFFCC0000), // Red
+      ],
+    );
+  }
+}

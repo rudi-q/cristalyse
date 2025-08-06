@@ -141,3 +141,33 @@ class PieGeometry extends Geometry {
   })  : labelFormatter = labelFormatter ?? _defaultPercentageFormatter.format,
         super(yAxis: YAxis.primary); // Pie charts don't use Y-axis
 }
+
+/// Heat map geometry for 2D matrix visualization
+class HeatMapGeometry extends Geometry {
+  final double cellSpacing;
+  final BorderRadius? cellBorderRadius;
+  final bool showValues;
+  final TextStyle? valueTextStyle;
+  final LabelCallback? valueFormatter;
+  final double? minValue;
+  final double? maxValue;
+  final List<Color>? colorGradient;
+  final bool interpolateColors;
+  final Color? nullValueColor;
+  final double? cellAspectRatio; // width/height ratio, null = square cells
+  
+  HeatMapGeometry({
+    this.cellSpacing = 1.0,
+    this.cellBorderRadius,
+    this.showValues = false,
+    this.valueTextStyle,
+    this.valueFormatter,
+    this.minValue,
+    this.maxValue,
+    this.colorGradient,
+    this.interpolateColors = true,
+    this.nullValueColor,
+    this.cellAspectRatio,
+    super.interactive = true,
+  }) : super(yAxis: YAxis.primary);
+}

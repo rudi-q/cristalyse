@@ -9,6 +9,7 @@ import 'graphs/bar_chart.dart';
 import 'graphs/dual_axis_chart.dart';
 import 'graphs/export_demo.dart';
 import 'graphs/grouped_bar.dart';
+import 'graphs/heatmap_chart.dart';
 import 'graphs/horizontal_bar_chart.dart';
 import 'graphs/interactive_scatter.dart';
 import 'graphs/line_chart.dart';
@@ -114,7 +115,7 @@ class _ExampleHomeState extends State<ExampleHome>
   void initState() {
     super.initState();
     _tabController =
-        TabController(length: 12, vsync: this); // Updated to 12 tabs
+        TabController(length: 14, vsync: this); // Updated to 14 tabs (added 2 heatmaps)
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -331,6 +332,8 @@ class _ExampleHomeState extends State<ExampleHome>
       'Revenue Breakdown by Category',
       'Platform Revenue Distribution',
       'Revenue vs Conversion Performance',
+      'Weekly Activity Heatmap',
+      'Developer Contributions',
     ];
   }
 
@@ -347,6 +350,8 @@ class _ExampleHomeState extends State<ExampleHome>
       'Product sales continue to drive growth, with subscriptions showing strong momentum',
       'Mobile dominates with 45% share, desktop and tablet showing steady growth',
       'Revenue growth correlates with improved conversion optimization',
+      'Visualize user engagement patterns throughout the week with color-coded intensity',
+      'GitHub-style contribution graph showing code activity over the last 12 weeks',
     ];
   }
 
@@ -570,6 +575,8 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Stacked Bars'),
             Tab(text: 'Pie Chart'), // New pie chart tab
             Tab(text: 'Dual Y-Axis'),
+            Tab(text: 'Heatmap'), // New heatmap tab
+            Tab(text: 'Contributions'), // New contributions heatmap tab
             Tab(text: 'Export'), // New export tab
           ],
         ),
@@ -729,6 +736,33 @@ class _ExampleHomeState extends State<ExampleHome>
                         'Avg Conversion', '19.2%', '+2.4%', Colors.green),
                     _buildStatsCard(
                         'Correlation', '0.73', '+0.12', Colors.purple),
+                  ],
+                ),
+                _buildChartPage(
+                  chartTitles[11],
+                  chartDescriptions[11],
+                  buildHeatMapTab(
+                      currentTheme, _colorPalettes[_currentPaletteIndex]),
+                  [
+                    _buildStatsCard(
+                        'Peak Hours', '8am-6pm', 'Weekdays', Colors.orange),
+                    _buildStatsCard(
+                        'Activity Rate', '68%', '+5.2%', Colors.red),
+                    _buildStatsCard(
+                        'Data Points', '84', '7x12 Grid', Colors.blue),
+                  ],
+                ),
+                _buildChartPage(
+                  chartTitles[12],
+                  chartDescriptions[12],
+                  buildContributionHeatMapTab(currentTheme),
+                  [
+                    _buildStatsCard(
+                        'Total Commits', '523', '+89', Colors.green),
+                    _buildStatsCard(
+                        'Streak Days', '47', 'Current', Colors.blue),
+                    _buildStatsCard(
+                        'Active Days', '73%', '+8%', Colors.purple),
                   ],
                 ),
                 _buildChartPage(
@@ -1009,7 +1043,23 @@ class _ExampleHomeState extends State<ExampleHome>
           'Combined bar and line visualizations',
           'Perfect for correlating volume vs efficiency metrics'
         ];
-      case 11: // Export demo
+      case 11: // Heatmap
+        return [
+          'Color-coded intensity visualization for multi-dimensional data',
+          'Animated cell appearance with wave effect',
+          'Customizable color gradients with interpolation support',
+          'Value labels with automatic contrast for readability',
+          'Null value support with customizable styling'
+        ];
+      case 12: // Contributions heatmap
+        return [
+          'GitHub-style contribution graph visualization',
+          'Discrete color levels for activity intensity',
+          'Weekly grid layout with day-based organization',
+          'Animated cell scaling with elastic curves',
+          'Perfect for activity tracking and habit visualization'
+        ];
+      case 13: // Export demo
         return [
           'Export charts as scalable SVG vector graphics',
           'Infinite zoom and professional quality output',

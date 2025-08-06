@@ -22,6 +22,11 @@ class CristalyseChart {
   /// Pie chart specific mappings
   String? _pieValueColumn;
   String? _pieCategoryColumn;
+  
+  /// Heat map specific mappings
+  String? _heatMapXColumn;
+  String? _heatMapYColumn;
+  String? _heatMapValueColumn;
 
   final List<Geometry> _geometries = [];
   Scale? _xScale;
@@ -90,6 +95,19 @@ class CristalyseChart {
   CristalyseChart mappingPie({String? value, String? category}) {
     _pieValueColumn = value;
     _pieCategoryColumn = category;
+    return this;
+  }
+
+  /// Map data for heat maps
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.mappingHeatMap(x: 'day', y: 'hour', value: 'temperature')
+  /// ```
+  CristalyseChart mappingHeatMap({String? x, String? y, String? value}) {
+    _heatMapXColumn = x;
+    _heatMapYColumn = y;
+    _heatMapValueColumn = value;
     return this;
   }
 
@@ -242,6 +260,48 @@ class CristalyseChart {
         explodeSlices: explodeSlices ?? false,
         explodeDistance: explodeDistance ?? 10.0,
         labelFormatter: labels,
+      ),
+    );
+    return this;
+  }
+
+  /// Add heat map
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.geomHeatMap(
+  ///   showValues: true,
+  ///   colorGradient: [Colors.blue, Colors.yellow, Colors.red],
+  ///   cellSpacing: 2.0,
+  ///   valueFormatter: (value) => value.toStringAsFixed(1),
+  /// )
+  /// ```
+  CristalyseChart geomHeatMap({
+    double? cellSpacing,
+    BorderRadius? cellBorderRadius,
+    bool? showValues,
+    TextStyle? valueTextStyle,
+    LabelCallback? valueFormatter,
+    double? minValue,
+    double? maxValue,
+    List<Color>? colorGradient,
+    bool? interpolateColors,
+    Color? nullValueColor,
+    double? cellAspectRatio,
+  }) {
+    _geometries.add(
+      HeatMapGeometry(
+        cellSpacing: cellSpacing ?? 1.0,
+        cellBorderRadius: cellBorderRadius,
+        showValues: showValues ?? false,
+        valueTextStyle: valueTextStyle,
+        valueFormatter: valueFormatter,
+        minValue: minValue,
+        maxValue: maxValue,
+        colorGradient: colorGradient,
+        interpolateColors: interpolateColors ?? true,
+        nullValueColor: nullValueColor,
+        cellAspectRatio: cellAspectRatio,
       ),
     );
     return this;
@@ -496,6 +556,9 @@ class CristalyseChart {
       sizeColumn: _sizeColumn,
       pieValueColumn: _pieValueColumn,
       pieCategoryColumn: _pieCategoryColumn,
+      heatMapXColumn: _heatMapXColumn,
+      heatMapYColumn: _heatMapYColumn,
+      heatMapValueColumn: _heatMapValueColumn,
       geometries: _geometries,
       xScale: _xScale,
       yScale: _yScale,
