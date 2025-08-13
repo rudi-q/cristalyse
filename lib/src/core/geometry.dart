@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
+
 import 'label_formatter.dart';
 
 /// Enum for specifying which Y-axis to use
@@ -155,7 +156,7 @@ class HeatMapGeometry extends Geometry {
   final bool interpolateColors;
   final Color? nullValueColor;
   final double? cellAspectRatio; // width/height ratio, null = square cells
-  
+
   HeatMapGeometry({
     this.cellSpacing = 1.0,
     this.cellBorderRadius,

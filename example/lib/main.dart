@@ -114,8 +114,8 @@ class _ExampleHomeState extends State<ExampleHome>
   @override
   void initState() {
     super.initState();
-    _tabController =
-        TabController(length: 14, vsync: this); // Updated to 14 tabs (added 2 heatmaps)
+    _tabController = TabController(
+        length: 14, vsync: this); // Updated to 14 tabs (added 2 heatmaps)
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -761,8 +761,7 @@ class _ExampleHomeState extends State<ExampleHome>
                         'Total Commits', '523', '+89', Colors.green),
                     _buildStatsCard(
                         'Streak Days', '47', 'Current', Colors.blue),
-                    _buildStatsCard(
-                        'Active Days', '73%', '+8%', Colors.purple),
+                    _buildStatsCard('Active Days', '73%', '+8%', Colors.purple),
                   ],
                 ),
                 _buildChartPage(

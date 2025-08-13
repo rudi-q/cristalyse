@@ -21,7 +21,7 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
   final String? pieValueColumn; // Pie chart value column
   final String? pieCategoryColumn; // Pie chart category column
   final String? heatMapXColumn; // Heat map X column
-  final String? heatMapYColumn; // Heat map Y column  
+  final String? heatMapYColumn; // Heat map Y column
   final String? heatMapValueColumn; // Heat map value column
   final List<Geometry> geometries;
   final Scale? xScale;
@@ -2604,8 +2604,10 @@ class _AnimatedChartPainter extends CustomPainter {
     }
 
     // Get unique X and Y values to determine grid
-    final xValues = data.map((d) => d[xCol]).where((v) => v != null).toSet().toList();
-    final yValues = data.map((d) => d[yCol]).where((v) => v != null).toSet().toList();
+    final xValues =
+        data.map((d) => d[xCol]).where((v) => v != null).toSet().toList();
+    final yValues =
+        data.map((d) => d[yCol]).where((v) => v != null).toSet().toList();
 
     if (xValues.isEmpty || yValues.isEmpty) {
       return;
@@ -2618,21 +2620,22 @@ class _AnimatedChartPainter extends CustomPainter {
     // Calculate cell dimensions considering aspect ratio
     double cellWidth = plotArea.width / xValues.length;
     double cellHeight = plotArea.height / yValues.length;
-    
+
     // Ensure minimum cell sizes for visibility
     const double minCellWidth = 20.0;
     const double minCellHeight = 15.0;
-    
+
     cellWidth = math.max(cellWidth, minCellWidth);
     cellHeight = math.max(cellHeight, minCellHeight);
-    
+
     if (geometry.cellAspectRatio != null) {
       // Adjust cell dimensions to maintain aspect ratio
       final targetHeight = cellWidth / geometry.cellAspectRatio!;
       if (targetHeight < cellHeight) {
         cellHeight = math.max(targetHeight, minCellHeight);
       } else {
-        cellWidth = math.max(cellHeight * geometry.cellAspectRatio!, minCellWidth);
+        cellWidth =
+            math.max(cellHeight * geometry.cellAspectRatio!, minCellWidth);
       }
     }
 
@@ -2679,8 +2682,12 @@ class _AnimatedChartPainter extends CustomPainter {
 
         // Calculate cell position with spacing
         final cellRect = Rect.fromLTWH(
-          plotArea.left + xi * (cellWidth + geometry.cellSpacing) + geometry.cellSpacing / 2,
-          plotArea.top + yi * (cellHeight + geometry.cellSpacing) + geometry.cellSpacing / 2,
+          plotArea.left +
+              xi * (cellWidth + geometry.cellSpacing) +
+              geometry.cellSpacing / 2,
+          plotArea.top +
+              yi * (cellHeight + geometry.cellSpacing) +
+              geometry.cellSpacing / 2,
           cellWidth - geometry.cellSpacing,
           cellHeight - geometry.cellSpacing,
         );
@@ -2720,17 +2727,21 @@ class _AnimatedChartPainter extends CustomPainter {
 
         // Calculate color based on value
         Color cellColor;
-        if (geometry.colorGradient != null && geometry.colorGradient!.isNotEmpty) {
+        if (geometry.colorGradient != null &&
+            geometry.colorGradient!.isNotEmpty) {
           // Use provided color gradient
           final normalizedValue = valueRange > 0
               ? ((value - minValue) / valueRange).clamp(0.0, 1.0)
               : 0.5;
-          
+
           if (geometry.interpolateColors) {
-            cellColor = _interpolateGradientColor(normalizedValue, geometry.colorGradient!);
+            cellColor = _interpolateGradientColor(
+                normalizedValue, geometry.colorGradient!);
           } else {
             // Use discrete colors
-            final index = (normalizedValue * (geometry.colorGradient!.length - 1)).round();
+            final index =
+                (normalizedValue * (geometry.colorGradient!.length - 1))
+                    .round();
             cellColor = geometry.colorGradient![index];
           }
         } else {
@@ -2740,7 +2751,7 @@ class _AnimatedChartPainter extends CustomPainter {
               : 0.5;
           cellColor = _defaultHeatMapColor(normalizedValue);
         }
-        
+
         // Animate cell
         Rect animatedRect = cellRect;
         final centerX = cellRect.center.dx;
@@ -2778,15 +2789,17 @@ class _AnimatedChartPainter extends CustomPainter {
 
         // Draw value label if configured
         if (geometry.showValues && cellProgress > 0.5) {
-          final labelText = geometry.valueFormatter?.call(value) ?? value.toStringAsFixed(1);
-          final textStyle = geometry.valueTextStyle ?? 
+          final labelText =
+              geometry.valueFormatter?.call(value) ?? value.toStringAsFixed(1);
+          final textStyle = geometry.valueTextStyle ??
               TextStyle(
-                color: ThemeData.estimateBrightnessForColor(cellColor) == Brightness.dark
+                color: ThemeData.estimateBrightnessForColor(cellColor) ==
+                        Brightness.dark
                     ? Colors.white
                     : Colors.black,
                 fontSize: 10,
               );
-          
+
           final textPainter = TextPainter(
             text: TextSpan(
               text: labelText,
@@ -2809,36 +2822,35 @@ class _AnimatedChartPainter extends CustomPainter {
         }
       }
     }
-    
   }
 
   Color _interpolateGradientColor(double value, List<Color> gradient) {
     // Ensure value is in [0, 1]
     value = value.clamp(0.0, 1.0);
-    
+
     if (gradient.isEmpty) return Colors.grey;
     if (gradient.length == 1) return gradient.first;
-    
+
     // Calculate position in gradient
     final scaledValue = value * (gradient.length - 1);
     final index = scaledValue.floor();
     final t = scaledValue - index;
-    
+
     if (index >= gradient.length - 1) {
       return gradient.last;
     }
-    
+
     return Color.lerp(gradient[index], gradient[index + 1], t)!;
   }
 
   Color _defaultHeatMapColor(double value) {
     // Enhanced default gradient with higher intensity
     value = value.clamp(0.0, 1.0);
-    
+
     // Make colors more vibrant and increase the minimum intensity
-    final minIntensity = 0.4;  // Ensure cells are never too faint
+    final minIntensity = 0.4; // Ensure cells are never too faint
     final adjustedValue = minIntensity + (value * (1.0 - minIntensity));
-    
+
     if (adjustedValue < 0.5) {
       // Dark blue to bright cyan (more intense)
       return Color.lerp(
@@ -2862,7 +2874,6 @@ class _AnimatedChartPainter extends CustomPainter {
       )!;
     }
   }
-
 
   @override
   bool shouldRepaint(covariant _AnimatedChartPainter oldDelegate) {

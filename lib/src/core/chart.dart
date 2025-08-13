@@ -5,8 +5,8 @@ import '../interaction/chart_interactions.dart';
 import '../themes/chart_theme.dart';
 import '../widgets/animated_chart_widget.dart';
 import 'geometry.dart';
-import 'scale.dart';
 import 'label_formatter.dart';
+import 'scale.dart';
 
 /// Main chart class implementing grammar of graphics API
 class CristalyseChart {
@@ -22,7 +22,7 @@ class CristalyseChart {
   /// Pie chart specific mappings
   String? _pieValueColumn;
   String? _pieCategoryColumn;
-  
+
   /// Heat map specific mappings
   String? _heatMapXColumn;
   String? _heatMapYColumn;

@@ -1,6 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 class HeatMapExample extends StatelessWidget {
   final ChartTheme theme;
@@ -16,39 +17,52 @@ class HeatMapExample extends StatelessWidget {
     // Generate data for a weekly activity heatmap
     final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final hours = [
-      '12am', '2am', '4am', '6am', '8am', '10am',
-      '12pm', '2pm', '4pm', '6pm', '8pm', '10pm'
+      '12am',
+      '2am',
+      '4am',
+      '6am',
+      '8am',
+      '10am',
+      '12pm',
+      '2pm',
+      '4pm',
+      '6pm',
+      '8pm',
+      '10pm'
     ];
-    
+
     final random = math.Random(42); // Fixed seed for consistency
     final data = <Map<String, dynamic>>[];
-    
+
     for (final day in days) {
       for (int i = 0; i < hours.length; i++) {
         final hour = hours[i];
-        
+
         // Create realistic patterns
         double baseValue = 0.3;
-        
+
         // Higher activity during work hours on weekdays
         if (['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].contains(day)) {
-          if (i >= 4 && i <= 9) { // 8am to 6pm
+          if (i >= 4 && i <= 9) {
+            // 8am to 6pm
             baseValue = 0.7;
           }
         }
-        
+
         // Lower activity on weekends
         if (['Sat', 'Sun'].contains(day)) {
           baseValue = 0.2;
-          if (i >= 5 && i <= 8) { // Late morning on weekends
+          if (i >= 5 && i <= 8) {
+            // Late morning on weekends
             baseValue = 0.5;
           }
         }
-        
+
         // Add some randomness
-        final value = (baseValue + (random.nextDouble() - 0.5) * 0.3)
-            .clamp(0.0, 1.0) * 100; // Convert to percentage
-        
+        final value =
+            (baseValue + (random.nextDouble() - 0.5) * 0.3).clamp(0.0, 1.0) *
+                100; // Convert to percentage
+
         // Occasionally add null values to show gaps
         if (random.nextDouble() < 0.05) {
           data.add({
@@ -65,14 +79,14 @@ class HeatMapExample extends StatelessWidget {
         }
       }
     }
-    
+
     return data;
   }
 
   @override
   Widget build(BuildContext context) {
     final heatMapData = _generateHeatMapData();
-    
+
     // Create a custom color gradient from blue to red
     final heatMapColors = [
       Colors.blue.shade50,
@@ -196,20 +210,20 @@ class ContributionHeatMap extends StatelessWidget {
   List<Map<String, dynamic>> _generateContributionData() {
     final weeks = List.generate(12, (i) => 'W${i + 1}');
     final days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
+
     final random = math.Random(42);
     final data = <Map<String, dynamic>>[];
-    
+
     for (final week in weeks) {
       for (final day in days) {
         // Simulate contribution counts with realistic patterns
         double probability = 0.7; // 70% chance of having contributions
-        
+
         // Lower on weekends
         if (day == 'Sun' || day == 'Sat') {
           probability = 0.3;
         }
-        
+
         if (random.nextDouble() < probability) {
           // Generate contribution count (0-10)
           final contributions = (random.nextDouble() * 10).round();
@@ -227,14 +241,14 @@ class ContributionHeatMap extends StatelessWidget {
         }
       }
     }
-    
+
     return data;
   }
 
   @override
   Widget build(BuildContext context) {
     final contributionData = _generateContributionData();
-    
+
     // GitHub-style color scheme
     final contributionColors = [
       const Color(0xFFEBEDF0), // No contributions

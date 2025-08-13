@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'label_formatter.dart';
 
 /// Base class for all scales
@@ -183,43 +184,43 @@ class GradientColorScale {
   final List<double> domain;
   final List<Color> colors;
   final bool interpolate;
-  
+
   GradientColorScale({
     this.domain = const [0, 1],
     this.colors = const [Colors.blue, Colors.red],
     this.interpolate = true,
   });
-  
+
   Color scale(double value) {
     if (colors.isEmpty) return Colors.grey;
     if (colors.length == 1) return colors[0];
-    
+
     // Normalize value to 0-1 range
     final minDomain = domain.isNotEmpty ? domain.first : 0;
     final maxDomain = domain.length > 1 ? domain.last : 1;
-    final normalizedValue = maxDomain > minDomain 
+    final normalizedValue = maxDomain > minDomain
         ? ((value - minDomain) / (maxDomain - minDomain)).clamp(0.0, 1.0)
         : 0.0;
-    
+
     if (!interpolate) {
       // Discrete colors based on segments
       final colorIndex = (normalizedValue * (colors.length - 1)).round();
       return colors[colorIndex.clamp(0, colors.length - 1)];
     }
-    
+
     // Interpolate between colors
     final scaledValue = normalizedValue * (colors.length - 1);
     final lowerIndex = scaledValue.floor();
     final upperIndex = scaledValue.ceil();
-    
+
     if (lowerIndex == upperIndex) {
       return colors[lowerIndex];
     }
-    
+
     final t = scaledValue - lowerIndex;
     return Color.lerp(colors[lowerIndex], colors[upperIndex], t)!;
   }
-  
+
   /// Predefined gradient themes
   static GradientColorScale viridis() {
     return GradientColorScale(
@@ -232,7 +233,7 @@ class GradientColorScale {
       ],
     );
   }
-  
+
   static GradientColorScale coolWarm() {
     return GradientColorScale(
       colors: [
@@ -244,7 +245,7 @@ class GradientColorScale {
       ],
     );
   }
-  
+
   static GradientColorScale heatMap() {
     return GradientColorScale(
       colors: [
@@ -260,7 +261,7 @@ class GradientColorScale {
       ],
     );
   }
-  
+
   static GradientColorScale greenRed() {
     return GradientColorScale(
       colors: [
