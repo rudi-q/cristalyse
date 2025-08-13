@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:cristalyse/src/core/chart.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Pie Chart Label Formatting - Integration Tests', () {
