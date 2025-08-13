@@ -1,10 +1,11 @@
+import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cristalyse/cristalyse.dart';
 
 void main() {
   group('HeatMap Widget Tests', () {
-    testWidgets('HeatMapExample renders without errors', (WidgetTester tester) async {
+    testWidgets('HeatMapExample renders without errors',
+        (WidgetTester tester) async {
       // Create a test app with HeatMapExample
       await tester.pumpWidget(
         MaterialApp(
@@ -17,17 +18,20 @@ void main() {
           ),
         ),
       );
-      
+
       // Wait for animations to complete
       await tester.pumpAndSettle();
-      
+
       // Verify the widget tree contains expected elements
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
       expect(find.text('Weekly Activity Heatmap'), findsOneWidget);
-      expect(find.text('Hours spent on different activities throughout the week'), findsOneWidget);
+      expect(
+          find.text('Hours spent on different activities throughout the week'),
+          findsOneWidget);
     });
 
-    testWidgets('HeatMap renders with data points', (WidgetTester tester) async {
+    testWidgets('HeatMap renders with data points',
+        (WidgetTester tester) async {
       // Create test data
       final testData = [
         {'day': 'Mon', 'hour': '9AM', 'value': 5},
@@ -35,7 +39,7 @@ void main() {
         {'day': 'Tue', 'hour': '9AM', 'value': 3},
         {'day': 'Tue', 'hour': '10AM', 'value': 6},
       ];
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -59,17 +63,18 @@ void main() {
           ),
         ),
       );
-      
+
       await tester.pumpAndSettle();
-      
+
       // Check that the chart widget is rendered
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
-      
+
       // Verify paint is called (indicates drawing is happening)
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('ContributionHeatMap renders without errors', (WidgetTester tester) async {
+    testWidgets('ContributionHeatMap renders without errors',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -81,22 +86,25 @@ void main() {
           ),
         ),
       );
-      
+
       await tester.pumpAndSettle();
-      
+
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
       expect(find.text('Developer Contributions'), findsOneWidget);
-      expect(find.text('GitHub-style contribution graph showing daily activity'), findsOneWidget);
+      expect(
+          find.text('GitHub-style contribution graph showing daily activity'),
+          findsOneWidget);
     });
 
-    testWidgets('HeatMap with null values renders correctly', (WidgetTester tester) async {
+    testWidgets('HeatMap with null values renders correctly',
+        (WidgetTester tester) async {
       final testData = [
         {'x': 'A', 'y': '1', 'value': 5},
         {'x': 'A', 'y': '2', 'value': null}, // Null value
         {'x': 'B', 'y': '1', 'value': 3},
         {'x': 'B', 'y': '2', 'value': 7},
       ];
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -119,20 +127,23 @@ void main() {
           ),
         ),
       );
-      
+
       await tester.pumpAndSettle();
-      
+
       // Should render without throwing errors
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('HeatMap with custom color gradient', (WidgetTester tester) async {
-      final testData = List.generate(16, (i) => {
-        'x': (i % 4).toString(),
-        'y': (i ~/ 4).toString(),
-        'value': i.toDouble(),
-      });
-      
+    testWidgets('HeatMap with custom color gradient',
+        (WidgetTester tester) async {
+      final testData = List.generate(
+          16,
+          (i) => {
+                'x': (i % 4).toString(),
+                'y': (i ~/ 4).toString(),
+                'value': i.toDouble(),
+              });
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -161,19 +172,21 @@ void main() {
           ),
         ),
       );
-      
+
       await tester.pumpAndSettle();
-      
+
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
     testWidgets('HeatMap with discrete colors', (WidgetTester tester) async {
-      final testData = List.generate(9, (i) => {
-        'x': (i % 3).toString(),
-        'y': (i ~/ 3).toString(),
-        'value': i * 10.0,
-      });
-      
+      final testData = List.generate(
+          9,
+          (i) => {
+                'x': (i % 3).toString(),
+                'y': (i ~/ 3).toString(),
+                'value': i * 10.0,
+              });
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -203,13 +216,14 @@ void main() {
           ),
         ),
       );
-      
+
       await tester.pumpAndSettle();
-      
+
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('HeatMap handles empty data gracefully', (WidgetTester tester) async {
+    testWidgets('HeatMap handles empty data gracefully',
+        (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -230,9 +244,9 @@ void main() {
           ),
         ),
       );
-      
+
       await tester.pumpAndSettle();
-      
+
       // Should render without errors even with empty data
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
@@ -242,7 +256,7 @@ void main() {
         {'x': 'A', 'y': '1', 'value': 5},
         {'x': 'B', 'y': '1', 'value': 10},
       ];
-      
+
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -264,16 +278,16 @@ void main() {
           ),
         ),
       );
-      
+
       // Initial pump
       await tester.pump();
-      
+
       // Pump halfway through animation
       await tester.pump(const Duration(milliseconds: 250));
-      
+
       // Complete animation
       await tester.pump(const Duration(milliseconds: 250));
-      
+
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
   });
@@ -281,7 +295,7 @@ void main() {
   group('HeatMapGeometry Tests', () {
     test('HeatMapGeometry default values', () {
       final geometry = HeatMapGeometry();
-      
+
       expect(geometry.cellSpacing, 1.0);
       expect(geometry.showValues, false);
       expect(geometry.interpolateColors, true);
@@ -304,7 +318,7 @@ void main() {
         valueFormatter: (value) => value.toStringAsFixed(0),
         valueTextStyle: const TextStyle(fontSize: 12),
       );
-      
+
       expect(geometry.cellSpacing, 2.0);
       expect(geometry.showValues, true);
       expect(geometry.interpolateColors, false);
@@ -324,7 +338,7 @@ void main() {
       final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       final hours = List.generate(24, (i) => '${i}h');
       final data = <Map<String, dynamic>>[];
-      
+
       for (final day in days) {
         for (final hour in hours) {
           data.add({
@@ -334,7 +348,7 @@ void main() {
           });
         }
       }
-      
+
       expect(data.length, 7 * 24); // 7 days * 24 hours
       expect(data.first['day'], 'Mon');
       expect(data.first['hour'], '0h');
@@ -345,10 +359,11 @@ void main() {
     test('Generate contribution data', () {
       final data = <Map<String, dynamic>>[];
       final now = DateTime.now();
-      
+
       for (int week = 0; week < 52; week++) {
         for (int day = 0; day < 7; day++) {
-          final date = now.subtract(Duration(days: (51 - week) * 7 + (6 - day)));
+          final date =
+              now.subtract(Duration(days: (51 - week) * 7 + (6 - day)));
           data.add({
             'week': 'W${week + 1}',
             'day': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day],
@@ -357,7 +372,7 @@ void main() {
           });
         }
       }
-      
+
       expect(data.length, 52 * 7); // 52 weeks * 7 days
       expect(data.first['week'], 'W1');
       expect(data.last['week'], 'W52');
@@ -377,7 +392,7 @@ class _TestHeatMapExample extends StatelessWidget {
     final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final hours = List.generate(24, (i) => '${i}h');
     final data = <Map<String, dynamic>>[];
-    
+
     for (int d = 0; d < days.length; d++) {
       for (int h = 0; h < hours.length; h++) {
         double value;
@@ -392,7 +407,7 @@ class _TestHeatMapExample extends StatelessWidget {
             value = h >= 6 && h <= 8 ? 3.0 : 0.5;
           }
         }
-        
+
         data.add({
           'day': days[d],
           'hour': hours[h],
@@ -462,12 +477,12 @@ class _TestContributionHeatMap extends StatelessWidget {
     final data = <Map<String, dynamic>>[];
     final now = DateTime.now();
     final weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
+
     for (int week = 0; week < 52; week++) {
       for (int day = 0; day < 7; day++) {
         final date = now.subtract(Duration(days: (51 - week) * 7 + (6 - day)));
         int contributions;
-        
+
         final random = (week * 7 + day) % 100;
         if (random < 30) {
           contributions = 0;
@@ -480,7 +495,7 @@ class _TestContributionHeatMap extends StatelessWidget {
         } else {
           contributions = 16 + (random % 15);
         }
-        
+
         data.add({
           'week': 'W${week + 1}',
           'day': weekDays[day],
