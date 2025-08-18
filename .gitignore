@@ -30,3 +30,6 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 build/
 .metadata
+
+# Development tools and configurations
+w***.md

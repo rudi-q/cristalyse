@@ -1,0 +1,607 @@
+---
+title: "Heat Map Charts"
+description: "Visualize 2D data patterns with color-coded intensity heat maps"
+---
+
+## Overview
+
+Heat maps are perfect for visualizing 2D data patterns where color intensity represents value magnitude. Cristalyse heat maps support customizable color schemes, interactive tooltips, and responsive layouts for effective data exploration.
+
+<div align="center">
+  <em>Heat maps with customizable color gradients and interactive cell highlighting</em>
+</div>
+
+## Basic Heat Map
+
+Create a simple heat map to show data density:
+
+```dart
+final performanceData = [
+  {'region': 'North', 'month': 'Jan', 'sales': 120},
+  {'region': 'North', 'month': 'Feb', 'sales': 135},
+  {'region': 'North', 'month': 'Mar', 'sales': 98},
+  {'region': 'South', 'month': 'Jan', 'sales': 85},
+  {'region': 'South', 'month': 'Feb', 'sales': 92},
+  {'region': 'South', 'month': 'Mar', 'sales': 110},
+  {'region': 'West', 'month': 'Jan', 'sales': 165},
+  {'region': 'West', 'month': 'Feb', 'sales': 140},
+  {'region': 'West', 'month': 'Mar', 'sales': 180},
+];
+
+CristalyseChart()
+  .data(performanceData)
+  .mapping(
+    x: 'month',
+    y: 'region', 
+    color: 'sales',
+  )
+  .geomHeatMap(
+    cellWidth: 60,
+    cellHeight: 40,
+    showLabels: true,
+    showValues: true,
+  )
+  .scaleXOrdinal()
+  .scaleYOrdinal()
+  .scaleColorContinuous(
+    range: [Colors.lightBlue.shade100, Colors.blue.shade800],
+  )
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Business Performance Heat Map
+
+Monitor regional sales performance across months:
+
+```dart
+final businessData = [
+  {'region': 'North America', 'month': 'Q1', 'sales': 450},
+  {'region': 'North America', 'month': 'Q2', 'sales': 520},
+  {'region': 'North America', 'month': 'Q3', 'sales': 380},
+  {'region': 'North America', 'month': 'Q4', 'sales': 620},
+  {'region': 'Europe', 'month': 'Q1', 'sales': 320},
+  {'region': 'Europe', 'month': 'Q2', 'sales': 290},
+  {'region': 'Europe', 'month': 'Q3', 'sales': 410},
+  {'region': 'Europe', 'month': 'Q4', 'sales': 480},
+  {'region': 'Asia Pacific', 'month': 'Q1', 'sales': 180},
+  {'region': 'Asia Pacific', 'month': 'Q2', 'sales': 220},
+  {'region': 'Asia Pacific', 'month': 'Q3', 'sales': 280},
+  {'region': 'Asia Pacific', 'month': 'Q4', 'sales': 350},
+];
+
+CristalyseChart()
+  .data(businessData)
+  .mapping(
+    x: 'month',
+    y: 'region',
+    color: 'sales',
+  )
+  .geomHeatMap(
+    cellWidth: 80,
+    cellHeight: 50,
+    showLabels: true,
+    showValues: true,
+    borderRadius: BorderRadius.circular(6),
+    borderWidth: 1.0,
+    borderColor: Colors.white,
+  )
+  .scaleXOrdinal()
+  .scaleYOrdinal()
+  .scaleColorContinuous(
+    range: [Colors.red.shade200, Colors.orange, Colors.green.shade600],
+  )
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## System Monitoring Heat Map
+
+Visualize server response times across hours and services:
+
+```dart
+final monitoringData = [
+  {'hour': '00:00', 'service': 'API Gateway', 'responseTime': 45},
+  {'hour': '00:00', 'service': 'Auth Service', 'responseTime': 32},
+  {'hour': '00:00', 'service': 'Database', 'responseTime': 28},
+  {'hour': '06:00', 'service': 'API Gateway', 'responseTime': 120},
+  {'hour': '06:00', 'service': 'Auth Service', 'responseTime': 85},
+  {'hour': '06:00', 'service': 'Database', 'responseTime': 95},
+  {'hour': '12:00', 'service': 'API Gateway', 'responseTime': 200},
+  {'hour': '12:00', 'service': 'Auth Service', 'responseTime': 150},
+  {'hour': '12:00', 'service': 'Database', 'responseTime': 180},
+  {'hour': '18:00', 'service': 'API Gateway', 'responseTime': 180},
+  {'hour': '18:00', 'service': 'Auth Service', 'responseTime': 130},
+  {'hour': '18:00', 'service': 'Database', 'responseTime': 160},
+];
+
+CristalyseChart()
+  .data(monitoringData)
+  .mapping(
+    x: 'hour',
+    y: 'service',
+    color: 'responseTime',
+  )
+  .geomHeatMap(
+    cellWidth: 70,
+    cellHeight: 45,
+    showLabels: true,
+    showValues: true,
+    minValue: 0,
+    maxValue: 250,
+    nullValueColor: Colors.grey.shade300,
+    textStyle: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+      color: Colors.white,
+    ),
+  )
+  .scaleXOrdinal()
+  .scaleYOrdinal()
+  .scaleColorContinuous(
+    range: [Colors.green.shade400, Colors.yellow, Colors.red.shade600],
+  )
+  .theme(ChartTheme.darkTheme())
+  .build()
+```
+
+## Correlation Matrix Heat Map
+
+Display statistical correlations with diverging color scheme:
+
+```dart
+final correlationData = [
+  {'var1': 'Revenue', 'var2': 'Marketing', 'correlation': 0.85},
+  {'var1': 'Revenue', 'var2': 'Sales Team', 'correlation': 0.92},
+  {'var1': 'Revenue', 'var2': 'Customer Sat', 'correlation': 0.74},
+  {'var1': 'Marketing', 'var2': 'Revenue', 'correlation': 0.85},
+  {'var1': 'Marketing', 'var2': 'Sales Team', 'correlation': 0.68},
+  {'var1': 'Marketing', 'var2': 'Customer Sat', 'correlation': 0.45},
+  {'var1': 'Sales Team', 'var2': 'Revenue', 'correlation': 0.92},
+  {'var1': 'Sales Team', 'var2': 'Marketing', 'correlation': 0.68},
+  {'var1': 'Sales Team', 'var2': 'Customer Sat', 'correlation': 0.58},
+  {'var1': 'Customer Sat', 'var2': 'Revenue', 'correlation': 0.74},
+  {'var1': 'Customer Sat', 'var2': 'Marketing', 'correlation': 0.45},
+  {'var1': 'Customer Sat', 'var2': 'Sales Team', 'correlation': 0.58},
+];
+
+CristalyseChart()
+  .data(correlationData)
+  .mapping(
+    x: 'var1',
+    y: 'var2',
+    color: 'correlation',
+  )
+  .geomHeatMap(
+    cellWidth: 80,
+    cellHeight: 80,
+    showLabels: true,
+    showValues: true,
+    minValue: -1.0,
+    maxValue: 1.0,
+    valueFormatter: (value) => value.toStringAsFixed(2),
+  )
+  .scaleXOrdinal()
+  .scaleYOrdinal()
+  .scaleColorContinuous(
+    range: [Colors.blue.shade700, Colors.white, Colors.red.shade700],
+    center: 0.0,
+  )
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Styling Options
+
+### Color Gradients
+
+Define custom color schemes for different data types:
+
+```dart
+// Single color gradient (low to high)
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap()
+  .scaleColorContinuous(
+    range: [Colors.white, Colors.deepPurple],
+  )
+  .build()
+
+// Multi-step gradient
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap()
+  .scaleColorContinuous(
+    range: [
+      Colors.blue.shade900,
+      Colors.blue.shade300,
+      Colors.white,
+      Colors.orange.shade300,
+      Colors.red.shade900,
+    ],
+  )
+  .build()
+
+// Diverging gradient with center
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap()
+  .scaleColorContinuous(
+    range: [Colors.blue, Colors.white, Colors.red],
+    center: 0.0,
+  )
+  .build()
+```
+
+### Cell Styling
+
+Customize cell appearance and borders:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap(
+    cellWidth: 60,
+    cellHeight: 40,
+    borderRadius: BorderRadius.circular(8),
+    borderWidth: 2.0,
+    borderColor: Colors.grey.shade300,
+    showLabels: true,
+    showValues: true,
+  )
+  .build()
+```
+
+### Text Styling
+
+Control label and value text appearance:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap(
+    showLabels: true,
+    showValues: true,
+    textStyle: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      color: Colors.black87,
+    ),
+    labelStyle: TextStyle(
+      fontSize: 12,
+      color: Colors.grey.shade600,
+    ),
+  )
+  .build()
+```
+
+## Data Handling
+
+### Missing Values
+
+Handle null or missing data points:
+
+```dart
+CristalyseChart()
+  .data(dataWithNulls)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap(
+    nullValueColor: Colors.grey.shade200,
+    showNullValues: true,
+    nullValueText: 'N/A',
+  )
+  .build()
+```
+
+### Value Ranges
+
+Set explicit minimum and maximum values:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap(
+    minValue: 0,
+    maxValue: 100,
+    clampValues: true, // Values outside range are clamped
+  )
+  .scaleColorContinuous(
+    domain: [0, 100],
+    range: [Colors.white, Colors.red],
+  )
+  .build()
+```
+
+### Value Formatting
+
+Customize how values are displayed:
+
+```dart
+import 'package:intl/intl.dart';
+
+// Currency formatting
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'month', y: 'region', color: 'revenue')
+  .geomHeatMap(
+    showValues: true,
+    valueFormatter: (value) => NumberFormat.simpleCurrency().format(value),
+  )
+  .build()
+
+// Percentage formatting
+CristalyseChart()
+  .data(percentageData)
+  .mapping(x: 'category', y: 'segment', color: 'percentage')
+  .geomHeatMap(
+    showValues: true,
+    valueFormatter: (value) => '${(value * 100).toStringAsFixed(1)}%',
+  )
+  .build()
+
+// Custom formatting
+CristalyseChart()
+  .data(temperatureData)
+  .mapping(x: 'hour', y: 'day', color: 'temperature')
+  .geomHeatMap(
+    showValues: true,
+    valueFormatter: (value) => '${value.toStringAsFixed(1)}°C',
+  )
+  .build()
+```
+
+## Interactive Features
+
+### Hover Effects
+
+Add rich tooltips on cell hover:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap()
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) {
+        return Container(
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.8),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${point.getDisplayValue('x')} - ${point.getDisplayValue('y')}',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                'Value: ${point.getDisplayValue('value')}',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  )
+  .build()
+```
+
+### Click Handlers
+
+React to cell selection:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap()
+  .interaction(
+    click: ClickConfig(
+      onTap: (point) {
+        print('Clicked cell: ${point.data}');
+        // Show detailed view
+        showCellDetails(point.data);
+      },
+    ),
+  )
+  .build()
+```
+
+## Animation Options
+
+### Fade In Animation
+
+Cells appear with smooth fade transition:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap()
+  .animate(
+    duration: Duration(milliseconds: 1000),
+    curve: Curves.easeInOut,
+  )
+  .build()
+```
+
+### Staggered Animation
+
+Each cell animates with a slight delay:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap()
+  .animate(
+    duration: Duration(milliseconds: 1500),
+    curve: Curves.elasticOut,
+    stagger: Duration(milliseconds: 50),
+  )
+  .build()
+```
+
+## Advanced Features
+
+### Responsive Layout
+
+Automatically adjust cell sizes based on available space:
+
+```dart
+LayoutBuilder(
+  builder: (context, constraints) {
+    final cellSize = (constraints.maxWidth / dataColumns).clamp(30.0, 80.0);
+    
+    return CristalyseChart()
+      .data(data)
+      .mapping(x: 'x', y: 'y', color: 'value')
+      .geomHeatMap(
+        cellWidth: cellSize,
+        cellHeight: cellSize,
+        showLabels: constraints.maxWidth > 400,
+        showValues: cellSize > 50,
+      )
+      .build();
+  },
+)
+```
+
+### Dynamic Color Scales
+
+Adjust color mapping based on data distribution:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'value')
+  .geomHeatMap()
+  .scaleColorContinuous(
+    domain: calculateDataRange(data), // Auto-calculate range
+    range: [Colors.white, Colors.red],
+    interpolation: ColorInterpolation.lab, // Better color transitions
+  )
+  .build()
+```
+
+## Best Practices
+
+### When to Use Heat Maps
+
+✅ **Good for:**
+- 2D categorical data visualization
+- Correlation matrices
+- Time-based patterns (hour vs day)
+- Geographic data on grids
+- Performance monitoring dashboards
+
+❌ **Avoid for:**
+- Continuous spatial data
+- Data with more than 20x20 cells
+- Precise value comparison
+- Single-dimension data
+
+### Design Tips
+
+- Use intuitive color schemes (cool to warm for intensity)
+- Ensure sufficient color contrast for accessibility
+- Limit grid size to maintain readability
+- Consider showing values for precise reading
+- Use diverging colors for data with meaningful zero point
+
+### Performance Considerations
+
+- Optimize for datasets with < 400 cells (20x20)
+- Use simpler styling for large grids
+- Consider data aggregation for very large datasets
+- Test color schemes for colorblind accessibility
+
+## Common Patterns
+
+### Website Analytics Heat Map
+
+```dart
+final analyticsData = [
+  {'page': 'Home', 'hour': '9 AM', 'visitors': 245},
+  {'page': 'Home', 'hour': '12 PM', 'visitors': 380},
+  {'page': 'Home', 'hour': '6 PM', 'visitors': 520},
+  {'page': 'Products', 'hour': '9 AM', 'visitors': 180},
+  {'page': 'Products', 'hour': '12 PM', 'visitors': 290},
+  {'page': 'Products', 'hour': '6 PM', 'visitors': 350},
+];
+
+CristalyseChart()
+  .data(analyticsData)
+  .mapping(x: 'hour', y: 'page', color: 'visitors')
+  .geomHeatMap(
+    cellWidth: 70,
+    cellHeight: 50,
+    showLabels: true,
+    showValues: true,
+  )
+  .scaleColorContinuous(
+    range: [Colors.blue.shade100, Colors.blue.shade800],
+  )
+  .build()
+```
+
+### Financial Risk Matrix
+
+```dart
+final riskData = [
+  {'probability': 'Low', 'impact': 'Low', 'risk': 1},
+  {'probability': 'Low', 'impact': 'Medium', 'risk': 2},
+  {'probability': 'Low', 'impact': 'High', 'risk': 3},
+  {'probability': 'Medium', 'impact': 'Low', 'risk': 2},
+  {'probability': 'Medium', 'impact': 'Medium', 'risk': 4},
+  {'probability': 'Medium', 'impact': 'High', 'risk': 6},
+  {'probability': 'High', 'impact': 'Low', 'risk': 3},
+  {'probability': 'High', 'impact': 'Medium', 'risk': 6},
+  {'probability': 'High', 'impact': 'High', 'risk': 9},
+];
+
+CristalyseChart()
+  .data(riskData)
+  .mapping(x: 'probability', y: 'impact', color: 'risk')
+  .geomHeatMap(
+    cellWidth: 100,
+    cellHeight: 80,
+    showLabels: true,
+    showValues: true,
+  )
+  .scaleColorContinuous(
+    range: [Colors.green, Colors.yellow, Colors.red],
+  )
+  .build()
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Scatter Plots" icon="chart-scatter" href="/charts/scatter-plots">
+    Explore relationships between continuous variables
+  </Card>
+  <Card title="Interactions" icon="hand-pointer" href="/features/interactions">
+    Add advanced interactive features to charts
+  </Card>
+  <Card title="Theming" icon="palette" href="/features/theming">
+    Customize colors and styling themes
+  </Card>
+  <Card title="Export" icon="download" href="/features/export">
+    Save heat maps as images or data files
+  </Card>
+</CardGroup>

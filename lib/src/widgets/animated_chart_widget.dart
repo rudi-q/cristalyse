@@ -20,6 +20,9 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
   final String? sizeColumn;
   final String? pieValueColumn; // Pie chart value column
   final String? pieCategoryColumn; // Pie chart category column
+  final String? heatMapXColumn; // Heat map X column
+  final String? heatMapYColumn; // Heat map Y column
+  final String? heatMapValueColumn; // Heat map value column
   final List<Geometry> geometries;
   final Scale? xScale;
   final Scale? yScale;
@@ -42,6 +45,9 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
     this.sizeColumn,
     this.pieValueColumn,
     this.pieCategoryColumn,
+    this.heatMapXColumn,
+    this.heatMapYColumn,
+    this.heatMapValueColumn,
     required this.geometries,
     this.xScale,
     this.yScale,
@@ -345,7 +351,6 @@ class _AnimatedCristalyseChartWidgetState
     widget.interaction.hover?.onExit?.call(null);
 
     if (widget.interaction.tooltip?.builder != null) {
-      debugPrint("[_handlePanEnd] Pan ended, calling hideTooltip.");
       hideTooltip(panEndContext);
     }
   }
@@ -373,9 +378,6 @@ class _AnimatedCristalyseChartWidgetState
     final RenderBox renderBox = tapContext.findRenderObject() as RenderBox;
     final Offset globalPosition = renderBox.localToGlobal(
       details.localPosition,
-    );
-    debugPrint(
-      "[_handleTap] localPosition: ${details.localPosition}, globalPosition: $globalPosition",
     );
 
     if (point != null) {
@@ -437,6 +439,9 @@ class _AnimatedCristalyseChartWidgetState
             sizeColumn: widget.sizeColumn,
             pieValueColumn: widget.pieValueColumn,
             pieCategoryColumn: widget.pieCategoryColumn,
+            heatMapXColumn: widget.heatMapXColumn,
+            heatMapYColumn: widget.heatMapYColumn,
+            heatMapValueColumn: widget.heatMapValueColumn,
             geometries: widget.geometries,
             xScale: widget.xScale,
             yScale: widget.yScale,
@@ -471,6 +476,9 @@ class _AnimatedCristalyseChartWidgetState
       sizeColumn: widget.sizeColumn,
       pieValueColumn: widget.pieValueColumn,
       pieCategoryColumn: widget.pieCategoryColumn,
+      heatMapXColumn: widget.heatMapXColumn,
+      heatMapYColumn: widget.heatMapYColumn,
+      heatMapValueColumn: widget.heatMapValueColumn,
       geometries: widget.geometries,
       xScale: widget.xScale,
       yScale: widget.yScale,
@@ -892,7 +900,6 @@ class _AnimatedCristalyseChartWidgetState
       } catch (e) {
         // If scales don't support invert (like OrdinalScale in some cases),
         // provide null values
-        debugPrint('Could not calculate pan range: $e');
       }
     }
 
@@ -921,6 +928,9 @@ class _AnimatedChartPainter extends CustomPainter {
   final String? sizeColumn;
   final String? pieValueColumn;
   final String? pieCategoryColumn;
+  final String? heatMapXColumn;
+  final String? heatMapYColumn;
+  final String? heatMapValueColumn;
   final List<Geometry> geometries;
   final Scale? xScale;
   final Scale? yScale;
@@ -942,6 +952,9 @@ class _AnimatedChartPainter extends CustomPainter {
     this.sizeColumn,
     this.pieValueColumn,
     this.pieCategoryColumn,
+    this.heatMapXColumn,
+    this.heatMapYColumn,
+    this.heatMapValueColumn,
     required this.geometries,
     this.xScale,
     this.yScale,
@@ -1441,6 +1454,13 @@ class _AnimatedChartPainter extends CustomPainter {
       );
     } else if (geometry is PieGeometry) {
       _drawPieAnimated(
+        canvas,
+        plotArea,
+        geometry,
+        colorScale,
+      );
+    } else if (geometry is HeatMapGeometry) {
+      _drawHeatMapAnimated(
         canvas,
         plotArea,
         geometry,
@@ -2566,6 +2586,292 @@ class _AnimatedChartPainter extends CustomPainter {
     );
 
     textPainter.paint(canvas, labelOffset);
+  }
+
+  void _drawHeatMapAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    HeatMapGeometry geometry,
+    ColorScale colorScale,
+  ) {
+    // Use heat map specific columns
+    final xCol = heatMapXColumn ?? xColumn;
+    final yCol = heatMapYColumn ?? yColumn;
+    final valueCol = heatMapValueColumn ?? colorColumn;
+
+    if (xCol == null || yCol == null || valueCol == null || data.isEmpty) {
+      return;
+    }
+
+    // Get unique X and Y values to determine grid
+    final xValues =
+        data.map((d) => d[xCol]).where((v) => v != null).toSet().toList();
+    final yValues =
+        data.map((d) => d[yCol]).where((v) => v != null).toSet().toList();
+
+    if (xValues.isEmpty || yValues.isEmpty) {
+      return;
+    }
+
+    // Sort values for consistent ordering
+    xValues.sort((a, b) => a.toString().compareTo(b.toString()));
+    yValues.sort((a, b) => a.toString().compareTo(b.toString()));
+
+    // Calculate cell dimensions considering spacing
+    final totalSpacingX = geometry.cellSpacing * (xValues.length + 1);
+    final totalSpacingY = geometry.cellSpacing * (yValues.length + 1);
+    double cellWidth = (plotArea.width - totalSpacingX) / xValues.length;
+    double cellHeight = (plotArea.height - totalSpacingY) / yValues.length;
+
+    if (geometry.cellAspectRatio != null) {
+      // Adjust cell dimensions to maintain aspect ratio
+      final targetHeight = cellWidth / geometry.cellAspectRatio!;
+      if (targetHeight < cellHeight) {
+        cellHeight = targetHeight;
+      } else {
+        cellWidth = cellHeight * geometry.cellAspectRatio!;
+      }
+    }
+
+    // Get value range for color mapping
+    final values = data
+        .map((d) => _getNumericValue(d[valueCol]))
+        .where((v) => v != null && v.isFinite)
+        .cast<double>()
+        .toList();
+
+    if (values.isEmpty) {
+      return;
+    }
+
+    final minValue = geometry.minValue ?? values.reduce(math.min);
+    final maxValue = geometry.maxValue ?? values.reduce(math.max);
+    final valueRange = maxValue - minValue;
+
+    // Create a map for quick lookup
+    final dataMap = <String, double>{};
+    for (final point in data) {
+      final x = point[xCol];
+      final y = point[yCol];
+      final value = _getNumericValue(point[valueCol]);
+      if (x != null && y != null && value != null) {
+        final key = '${x}_$y';
+        dataMap[key] = value;
+      }
+    }
+
+    // Animation progress
+    final heatMapProgress = math.max(0.0, math.min(1.0, animationProgress));
+    if (heatMapProgress <= 0.001) {
+      return;
+    }
+
+    // Draw cells
+    for (int xi = 0; xi < xValues.length; xi++) {
+      for (int yi = 0; yi < yValues.length; yi++) {
+        final xVal = xValues[xi];
+        final yVal = yValues[yi];
+        final key = '${xVal}_$yVal';
+        final value = dataMap[key];
+
+        // Calculate cell position with spacing
+        final cellRect = Rect.fromLTWH(
+          plotArea.left +
+              geometry.cellSpacing +
+              xi * (cellWidth + geometry.cellSpacing),
+          plotArea.top +
+              geometry.cellSpacing +
+              yi * (cellHeight + geometry.cellSpacing),
+          cellWidth,
+          cellHeight,
+        );
+
+        if (value == null) {
+          // Draw null value cell if color is configured
+          if (geometry.nullValueColor != null) {
+            final nullPaint = Paint()
+              ..color = geometry.nullValueColor!.withAlpha(
+                ((geometry.nullValueColor!.a * 255.0) * heatMapProgress)
+                        .round() &
+                    0xff,
+              )
+              ..style = PaintingStyle.fill;
+
+            if (geometry.cellBorderRadius != null) {
+              canvas.drawRRect(
+                geometry.cellBorderRadius!.toRRect(cellRect),
+                nullPaint,
+              );
+            } else {
+              canvas.drawRect(cellRect, nullPaint);
+            }
+          }
+          continue;
+        }
+
+        // Calculate cell animation with wave effect
+        final cellDelay = (xi + yi) / (xValues.length + yValues.length) * 0.3;
+        final cellProgress = math.max(
+          0.0,
+          math.min(
+            1.0,
+            (heatMapProgress - cellDelay) / math.max(0.001, 1.0 - cellDelay),
+          ),
+        );
+
+        if (cellProgress <= 0) continue;
+
+        // Calculate color based on value
+        Color cellColor;
+        if (geometry.colorGradient != null &&
+            geometry.colorGradient!.isNotEmpty) {
+          // Use provided color gradient
+          final normalizedValue = valueRange > 0
+              ? ((value - minValue) / valueRange).clamp(0.0, 1.0)
+              : 0.5;
+
+          if (geometry.interpolateColors) {
+            cellColor = _interpolateGradientColor(
+                normalizedValue, geometry.colorGradient!);
+          } else {
+            // Use discrete colors
+            final index =
+                (normalizedValue * (geometry.colorGradient!.length - 1))
+                    .round();
+            cellColor = geometry.colorGradient![index];
+          }
+        } else {
+          // Use default gradient with enhanced visibility
+          final normalizedValue = valueRange > 0
+              ? ((value - minValue) / valueRange).clamp(0.0, 1.0)
+              : 0.5;
+          cellColor = _defaultHeatMapColor(normalizedValue);
+        }
+
+        // Animate cell
+        Rect animatedRect = cellRect;
+        final centerX = cellRect.center.dx;
+        final centerY = cellRect.center.dy;
+        final scaledWidth = cellRect.width * cellProgress;
+        final scaledHeight = cellRect.height * cellProgress;
+        animatedRect = Rect.fromCenter(
+          center: Offset(centerX, centerY),
+          width: scaledWidth,
+          height: scaledHeight,
+        );
+
+        // Draw cell
+        final cellPaint = Paint()
+          ..color = cellColor.withAlpha(
+            math.max(
+                200,
+                ((cellColor.a * 255.0) * cellProgress).round() &
+                    0xff), // Ensure minimum visibility
+          )
+          ..style = PaintingStyle.fill;
+
+        if (geometry.cellBorderRadius != null) {
+          // Scale border radius with animation
+          final animatedBorderRadius = BorderRadius.only(
+            topLeft: geometry.cellBorderRadius!.topLeft * cellProgress,
+            topRight: geometry.cellBorderRadius!.topRight * cellProgress,
+            bottomLeft: geometry.cellBorderRadius!.bottomLeft * cellProgress,
+            bottomRight: geometry.cellBorderRadius!.bottomRight * cellProgress,
+          );
+          canvas.drawRRect(
+            animatedBorderRadius.toRRect(animatedRect),
+            cellPaint,
+          );
+        } else {
+          canvas.drawRect(animatedRect, cellPaint);
+        }
+
+        // Draw value label if configured
+        if (geometry.showValues && cellProgress > 0.5) {
+          final labelText =
+              geometry.valueFormatter?.call(value) ?? value.toStringAsFixed(1);
+          final textStyle = geometry.valueTextStyle ??
+              TextStyle(
+                color: ThemeData.estimateBrightnessForColor(cellColor) ==
+                        Brightness.dark
+                    ? Colors.white
+                    : Colors.black,
+                fontSize: 10,
+              );
+
+          final textPainter = TextPainter(
+            text: TextSpan(
+              text: labelText,
+              style: textStyle.copyWith(
+                color: textStyle.color?.withAlpha((255 * cellProgress).round()),
+              ),
+            ),
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+
+          // Calculate text position (center of cell)
+          final textOffset = Offset(
+            animatedRect.center.dx - textPainter.width / 2,
+            animatedRect.center.dy - textPainter.height / 2,
+          );
+
+          textPainter.paint(canvas, textOffset);
+        }
+      }
+    }
+  }
+
+  Color _interpolateGradientColor(double value, List<Color> gradient) {
+    // Ensure value is in [0, 1]
+    value = value.clamp(0.0, 1.0);
+
+    if (gradient.isEmpty) return Colors.grey;
+    if (gradient.length == 1) return gradient.first;
+
+    // Calculate position in gradient
+    final scaledValue = value * (gradient.length - 1);
+    final index = scaledValue.floor();
+    final t = scaledValue - index;
+
+    if (index >= gradient.length - 1) {
+      return gradient.last;
+    }
+
+    return Color.lerp(gradient[index], gradient[index + 1], t)!;
+  }
+
+  Color _defaultHeatMapColor(double value) {
+    // Enhanced default gradient with higher intensity
+    value = value.clamp(0.0, 1.0);
+
+    // Make colors more vibrant and increase the minimum intensity
+    final minIntensity = 0.4; // Ensure cells are never too faint
+    final adjustedValue = minIntensity + (value * (1.0 - minIntensity));
+
+    if (adjustedValue < 0.5) {
+      // Dark blue to bright cyan (more intense)
+      return Color.lerp(
+        const Color(0xFF000080), // Dark blue
+        const Color(0xFF00FFFF), // Bright cyan
+        adjustedValue * 2,
+      )!;
+    } else if (adjustedValue < 0.75) {
+      // Bright cyan to lime green
+      return Color.lerp(
+        const Color(0xFF00FFFF), // Bright cyan
+        const Color(0xFF32FF32), // Lime green
+        (adjustedValue - 0.5) * 4,
+      )!;
+    } else {
+      // Lime green to bright red
+      return Color.lerp(
+        const Color(0xFF32FF32), // Lime green
+        const Color(0xFFFF0000), // Bright red
+        (adjustedValue - 0.75) * 4,
+      )!;
+    }
   }
 
   @override
