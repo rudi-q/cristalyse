@@ -424,10 +424,82 @@ CristalyseChart()
   )
   .theme(ChartTheme.solarizedLightTheme())
   .build()
+}
+```
+
+## 🔥 Heat Map Charts
+
+**Perfect for 2D data visualization** - visualize correlations, performance matrices, time-based patterns, and any data with two categorical dimensions and a continuous value.
+
+### Business Performance Heat Map
+```dart
+// Sales Performance by Region and Month
+CristalyseChart()
+  .data([
+    {'month': 'Jan', 'region': 'North', 'sales': 85},
+    {'month': 'Jan', 'region': 'South', 'sales': 62},
+    {'month': 'Feb', 'region': 'North', 'sales': 93},
+    {'month': 'Feb', 'region': 'South', 'sales': 78},
+    // ... more data
+  ])
+  .mappingHeatMap(x: 'month', y: 'region', value: 'sales')
+  .geomHeatMap(
+    cellSpacing: 2.0,
+    cellBorderRadius: BorderRadius.circular(4),
+    colorGradient: [Colors.red, Colors.yellow, Colors.green],
+    interpolateColors: true,
+    showValues: true,
+    valueFormatter: (value) => '${value.toInt()}%',
+  )
+  .theme(ChartTheme.defaultTheme())
+  .animate(duration: Duration(milliseconds: 1500))
+  .build()
+```
+
+### System Monitoring Heat Map
+```dart
+// Server Response Times by Hour and Service
+CristalyseChart()
+  .data(metricsData)
+  .mappingHeatMap(x: 'hour', y: 'service', value: 'response_time')
+  .geomHeatMap(
+    minValue: 0,
+    maxValue: 100,
+    nullValueColor: Colors.grey.shade200,
+    cellAspectRatio: 1.0,
+    showValues: true,
+    valueTextStyle: TextStyle(
+      fontSize: 10, 
+      fontWeight: FontWeight.bold,
+    ),
+  )
+  .theme(ChartTheme.darkTheme())
+  .build()
+```
+
+### Correlation Matrix
+```dart
+// Feature Correlation Analysis
+CristalyseChart()
+  .data(correlationData)
+  .mappingHeatMap(x: 'variable1', y: 'variable2', value: 'correlation')
+  .geomHeatMap(
+    minValue: -1.0,
+    maxValue: 1.0,
+    colorGradient: [
+      Colors.blue.shade800,   // Strong negative correlation
+      Colors.white,           // No correlation  
+      Colors.red.shade800,    // Strong positive correlation
+    ],
+    interpolateColors: true,
+    cellSpacing: 1.0,
+    showValues: true,
+    valueFormatter: (value) => value.toStringAsFixed(2),
+  )
+  .build()
 ```
 
 ## 🎯 Dual Y-Axis Charts
-
 **Perfect for business dashboards** - correlate volume metrics with efficiency metrics on independent scales.
 
 ```dart
@@ -495,6 +567,7 @@ CristalyseChart()
 - **Area charts** with smooth fills and multi-series transparency
 - **Bar charts** (vertical, horizontal, grouped, stacked) with smooth animations
 - **Pie charts and donut charts** with exploded slices and smart label positioning
+- **Heat map charts** with customizable color gradients and 2D data visualization
 - **Dual Y-axis charts** for professional business dashboards
 - **Combined visualizations** (bars + lines, points + lines, etc.)
 
@@ -710,7 +783,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.1.0** - Production ready with enhanced dual Y-axis SVG export and comprehensive interactive capabilities
+**Current Version: 1.2.0** - Production ready with heat map charts, enhanced dual Y-axis SVG export and comprehensive interactive capabilities
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -723,6 +796,41 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v0.7.0** - Interactive panning
 - ✅ **v0.8.0** - **Area chart support** with animations and multi-series capabilities
 - ✅ **v0.9.0** - **Enhanced dual Y-axis SVG export** with comprehensive scale support
+- ✅ **v1.0.0** - **Pie charts and donut charts** with exploded slices and smart label positioning
+- ✅ **v1.1.0** - **Advanced label formatting system** with NumberFormat integration
+- ✅ **v1.2.0** - **Heat map charts** with 2D data visualization and customizable color gradients
+
+## Support This Project
+
+**Love Cristalyse?** Your support helps me dedicate more time to building the Flutter charting library you deserve!
+
+<p align="center">
+  <a href="https://github.com/sponsors/rudi-q">
+    <img src="https://img.shields.io/badge/Sponsor_on-GitHub-EA4AAA?style=for-the-badge&logo=github&logoColor=white" alt="Sponsor on GitHub"/>
+  </a>
+</p>
+
+### Why Sponsor?
+
+- **Faster Development** - More features, bug fixes, and improvements
+- **Better Documentation** - Comprehensive guides and examples
+- **Priority Support** - Get your issues and feature requests prioritized
+- **New Chart Types** - Help fund development of advanced visualizations
+- **Platform Support** - Ensure continued cross-platform compatibility
+
+### What Your Support Enables
+
+**Active Development** - Cristalyse is passion project that requires significant time investment  
+**Advanced Features** - Complex chart types like treemaps, sankey diagrams, and statistical overlays  
+**Bug Fixes & Performance** - Rapid responses to issues and continuous optimization  
+**Documentation & Examples** - Real-world examples and comprehensive tutorials  
+**Community Building** - Discord server, workshops, and educational content  
+
+<p align="center">
+  <strong>Every contribution, no matter the size, makes a real difference!</strong>
+</p>
+
+---
 
 ## 🤝 Contributing
 

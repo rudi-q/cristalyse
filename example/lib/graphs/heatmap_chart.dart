@@ -180,8 +180,10 @@ class HeatMapExample extends StatelessWidget {
                     fontSize: 8,
                     fontWeight: FontWeight.w500,
                   ),
+                  // Ensure min/max values cover the full range of your data (0-100 for percentages)
                   minValue: 0,
                   maxValue: 100,
+                  // Ensure a valid color gradient is provided
                   colorGradient: heatMapColors,
                   interpolateColors: true,
                   nullValueColor: Colors.grey.shade200,

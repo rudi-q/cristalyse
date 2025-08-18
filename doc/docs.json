@@ -30,6 +30,7 @@
               "charts/bar-charts",
               "charts/area-charts",
               "charts/pie-charts",
+              "charts/heat-map-charts",
               "charts/dual-axis"
             ]
           },

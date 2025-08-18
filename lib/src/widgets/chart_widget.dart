@@ -443,14 +443,14 @@ class _ChartPainter extends CustomPainter {
   void _drawText(Canvas canvas, String text, Offset position, TextStyle style) {
     final textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
-      textDirection: TextDirection.ltr, // This was the missing piece!
+      textDirection: TextDirection.ltr,
     );
     textPainter.layout();
     textPainter.paint(canvas, position);
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+  bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
   }
 }

@@ -2617,25 +2617,19 @@ class _AnimatedChartPainter extends CustomPainter {
     xValues.sort((a, b) => a.toString().compareTo(b.toString()));
     yValues.sort((a, b) => a.toString().compareTo(b.toString()));
 
-    // Calculate cell dimensions considering aspect ratio
-    double cellWidth = plotArea.width / xValues.length;
-    double cellHeight = plotArea.height / yValues.length;
-
-    // Ensure minimum cell sizes for visibility
-    const double minCellWidth = 20.0;
-    const double minCellHeight = 15.0;
-
-    cellWidth = math.max(cellWidth, minCellWidth);
-    cellHeight = math.max(cellHeight, minCellHeight);
+    // Calculate cell dimensions considering spacing
+    final totalSpacingX = geometry.cellSpacing * (xValues.length + 1);
+    final totalSpacingY = geometry.cellSpacing * (yValues.length + 1);
+    double cellWidth = (plotArea.width - totalSpacingX) / xValues.length;
+    double cellHeight = (plotArea.height - totalSpacingY) / yValues.length;
 
     if (geometry.cellAspectRatio != null) {
       // Adjust cell dimensions to maintain aspect ratio
       final targetHeight = cellWidth / geometry.cellAspectRatio!;
       if (targetHeight < cellHeight) {
-        cellHeight = math.max(targetHeight, minCellHeight);
+        cellHeight = targetHeight;
       } else {
-        cellWidth =
-            math.max(cellHeight * geometry.cellAspectRatio!, minCellWidth);
+        cellWidth = cellHeight * geometry.cellAspectRatio!;
       }
     }
 
@@ -2683,13 +2677,13 @@ class _AnimatedChartPainter extends CustomPainter {
         // Calculate cell position with spacing
         final cellRect = Rect.fromLTWH(
           plotArea.left +
-              xi * (cellWidth + geometry.cellSpacing) +
-              geometry.cellSpacing / 2,
+              geometry.cellSpacing +
+              xi * (cellWidth + geometry.cellSpacing),
           plotArea.top +
-              yi * (cellHeight + geometry.cellSpacing) +
-              geometry.cellSpacing / 2,
-          cellWidth - geometry.cellSpacing,
-          cellHeight - geometry.cellSpacing,
+              geometry.cellSpacing +
+              yi * (cellHeight + geometry.cellSpacing),
+          cellWidth,
+          cellHeight,
         );
 
         if (value == null) {
@@ -2697,7 +2691,9 @@ class _AnimatedChartPainter extends CustomPainter {
           if (geometry.nullValueColor != null) {
             final nullPaint = Paint()
               ..color = geometry.nullValueColor!.withAlpha(
-                (geometry.nullValueColor!.a * heatMapProgress).round(),
+                ((geometry.nullValueColor!.a * 255.0) * heatMapProgress)
+                        .round() &
+                    0xff,
               )
               ..style = PaintingStyle.fill;
 
@@ -2767,7 +2763,10 @@ class _AnimatedChartPainter extends CustomPainter {
         // Draw cell
         final cellPaint = Paint()
           ..color = cellColor.withAlpha(
-            (cellColor.a * cellProgress).round(),
+            math.max(
+                200,
+                ((cellColor.a * 255.0) * cellProgress).round() &
+                    0xff), // Ensure minimum visibility
           )
           ..style = PaintingStyle.fill;
 
