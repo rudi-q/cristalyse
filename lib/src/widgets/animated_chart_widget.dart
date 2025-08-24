@@ -1007,11 +1007,12 @@ class _AnimatedChartPainter extends CustomPainter {
     final sizeScale = _setupSizeScale();
 
     final hasPieChart = geometries.any((g) => g is PieGeometry);
+    final hasHeatMapChart = geometries.any((g) => g is HeatMapGeometry);
 
     _drawBackground(canvas, plotArea);
 
-    // Skip grid and axes for pie charts
-    if (!hasPieChart) {
+    // Skip grid and axes for pie charts and heatmaps
+    if (!hasPieChart && !hasHeatMapChart) {
       _drawGrid(canvas, plotArea, xScale, yScale, y2Scale);
     }
 
@@ -1038,9 +1039,11 @@ class _AnimatedChartPainter extends CustomPainter {
     // Restore canvas state to draw axes outside clipped area
     canvas.restore();
 
-    // Skip axes for pie charts
-    if (!hasPieChart) {
+    // Skip axes for pie charts, draw special axes for heatmaps
+    if (!hasPieChart && !hasHeatMapChart) {
       _drawAxes(canvas, size, plotArea, xScale, yScale, y2Scale);
+    } else if (hasHeatMapChart) {
+      _drawHeatMapAxes(canvas, size, plotArea);
     }
   }
 
@@ -2790,12 +2793,18 @@ class _AnimatedChartPainter extends CustomPainter {
         if (geometry.showValues && cellProgress > 0.5) {
           final labelText =
               geometry.valueFormatter?.call(value) ?? value.toStringAsFixed(1);
+
+          // Use black text for values < 15%, otherwise use brightness-based logic
+          final textColor = value < 0.15
+              ? Colors.black
+              : (ThemeData.estimateBrightnessForColor(cellColor) ==
+                      Brightness.dark
+                  ? Colors.white
+                  : Colors.black);
+
           final textStyle = geometry.valueTextStyle ??
               TextStyle(
-                color: ThemeData.estimateBrightnessForColor(cellColor) ==
-                        Brightness.dark
-                    ? Colors.white
-                    : Colors.black,
+                color: textColor,
                 fontSize: 10,
               );
 
@@ -2872,6 +2881,226 @@ class _AnimatedChartPainter extends CustomPainter {
         (adjustedValue - 0.75) * 4,
       )!;
     }
+  }
+
+  void _drawHeatMapAxes(Canvas canvas, Size size, Rect plotArea) {
+    // Use heat map specific columns
+    final xCol = heatMapXColumn ?? xColumn;
+    final yCol = heatMapYColumn ?? yColumn;
+    final valueCol = heatMapValueColumn ?? colorColumn;
+
+    if (xCol == null || yCol == null || valueCol == null || data.isEmpty) {
+      return;
+    }
+
+    // Get unique X and Y values to determine grid
+    final xValues =
+        data.map((d) => d[xCol]).where((v) => v != null).toSet().toList();
+    final yValues =
+        data.map((d) => d[yCol]).where((v) => v != null).toSet().toList();
+
+    if (xValues.isEmpty || yValues.isEmpty) {
+      return;
+    }
+
+    // Sort values for consistent ordering with proper day/time logic
+    _sortHeatMapValues(xValues);
+    _sortHeatMapValues(yValues);
+
+    // Find the heat map geometry for styling
+    final heatMapGeom = geometries.firstWhere(
+      (g) => g is HeatMapGeometry,
+      orElse: () => HeatMapGeometry(),
+    ) as HeatMapGeometry;
+
+    // Calculate cell dimensions considering spacing
+    final totalSpacingX = heatMapGeom.cellSpacing * (xValues.length + 1);
+    final totalSpacingY = heatMapGeom.cellSpacing * (yValues.length + 1);
+    double cellWidth = (plotArea.width - totalSpacingX) / xValues.length;
+    double cellHeight = (plotArea.height - totalSpacingY) / yValues.length;
+
+    if (heatMapGeom.cellAspectRatio != null) {
+      // Adjust cell dimensions to maintain aspect ratio
+      final targetHeight = cellWidth / heatMapGeom.cellAspectRatio!;
+      if (targetHeight < cellHeight) {
+        cellHeight = targetHeight;
+      } else {
+        cellWidth = cellHeight * heatMapGeom.cellAspectRatio!;
+      }
+    }
+
+    final axisLabelStyle = theme.axisLabelStyle ??
+        const TextStyle(color: Colors.black, fontSize: 12);
+
+    // Draw X-axis labels (bottom)
+    for (int xi = 0; xi < xValues.length; xi++) {
+      final xVal = xValues[xi];
+      final centerX = plotArea.left +
+          heatMapGeom.cellSpacing +
+          xi * (cellWidth + heatMapGeom.cellSpacing) +
+          cellWidth / 2;
+
+      final label = xVal.toString();
+      final textPainter = TextPainter(
+        text: TextSpan(text: label, style: axisLabelStyle),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      );
+      textPainter.layout();
+      textPainter.paint(
+        canvas,
+        Offset(
+          centerX - textPainter.width / 2,
+          plotArea.bottom + 8,
+        ),
+      );
+    }
+
+    // Draw Y-axis labels (left)
+    for (int yi = 0; yi < yValues.length; yi++) {
+      final yVal = yValues[yi];
+      final centerY = plotArea.top +
+          heatMapGeom.cellSpacing +
+          yi * (cellHeight + heatMapGeom.cellSpacing) +
+          cellHeight / 2;
+
+      final label = yVal.toString();
+      final textPainter = TextPainter(
+        text: TextSpan(text: label, style: axisLabelStyle),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.right,
+      );
+      textPainter.layout(minWidth: 0, maxWidth: plotArea.left - 16);
+      textPainter.paint(
+        canvas,
+        Offset(
+          plotArea.left - textPainter.width - 8,
+          centerY - textPainter.height / 2,
+        ),
+      );
+    }
+  }
+
+  /// Smart sorting for heatmap values that handles days of the week and time properly
+  void _sortHeatMapValues(List<dynamic> values) {
+    // Define ordered lists for common patterns
+    final dayOrder = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sun',
+      'mon',
+      'tue',
+      'wed',
+      'thu',
+      'fri',
+      'sat'
+    ];
+
+    final monthOrder = [
+      'january',
+      'february',
+      'march',
+      'april',
+      'may',
+      'june',
+      'july',
+      'august',
+      'september',
+      'october',
+      'november',
+      'december',
+      'jan',
+      'feb',
+      'mar',
+      'apr',
+      'may',
+      'jun',
+      'jul',
+      'aug',
+      'sep',
+      'oct',
+      'nov',
+      'dec'
+    ];
+
+    values.sort((a, b) {
+      final aStr = a.toString().toLowerCase();
+      final bStr = b.toString().toLowerCase();
+
+      // Check if both are days of the week
+      final aDay = dayOrder.indexOf(aStr);
+      final bDay = dayOrder.indexOf(bStr);
+      if (aDay != -1 && bDay != -1) {
+        // Both are days - use day order, but normalize Sunday=0 to Sunday=7 for weekly view
+        final normalizedA =
+            aDay < 7 ? (aDay == 0 ? 7 : aDay) : (aDay - 7 == 0 ? 7 : aDay - 7);
+        final normalizedB =
+            bDay < 7 ? (bDay == 0 ? 7 : bDay) : (bDay - 7 == 0 ? 7 : bDay - 7);
+        return normalizedA.compareTo(normalizedB);
+      }
+
+      // Check if both are months
+      final aMonth = monthOrder.indexOf(aStr);
+      final bMonth = monthOrder.indexOf(bStr);
+      if (aMonth != -1 && bMonth != -1) {
+        final normalizedA = aMonth < 12 ? aMonth : aMonth - 12;
+        final normalizedB = bMonth < 12 ? bMonth : bMonth - 12;
+        return normalizedA.compareTo(normalizedB);
+      }
+
+      // Check if both are time values (like 8am, 2pm, 14:30, etc.)
+      final aTime = _parseTimeValue(aStr);
+      final bTime = _parseTimeValue(bStr);
+      if (aTime != null && bTime != null) {
+        return aTime.compareTo(bTime);
+      }
+
+      // Check if both are numeric
+      final aNum = double.tryParse(aStr);
+      final bNum = double.tryParse(bStr);
+      if (aNum != null && bNum != null) {
+        return aNum.compareTo(bNum);
+      }
+
+      // Fall back to alphabetical sorting
+      return aStr.compareTo(bStr);
+    });
+  }
+
+  /// Parse time values like "8am", "2pm", "14:30", "9:15am" into comparable integers (minutes since midnight)
+  int? _parseTimeValue(String timeStr) {
+    // Remove common time separators and normalize
+    final normalized = timeStr.replaceAll(RegExp(r'[:\s]'), '').toLowerCase();
+
+    // Match patterns like 8am, 2pm, 14h, 830am, 915pm, etc.
+    final timeRegex = RegExp(r'^(\d{1,2})(\d{2})?(am|pm|h)?$');
+    final match = timeRegex.firstMatch(normalized);
+
+    if (match == null) return null;
+
+    final hour = int.tryParse(match.group(1) ?? '');
+    final minute = int.tryParse(match.group(2) ?? '0') ?? 0;
+    final meridiem = match.group(3);
+
+    if (hour == null || hour < 0 || hour > 23) return null;
+    if (minute < 0 || minute > 59) return null;
+
+    int finalHour = hour;
+
+    // Handle AM/PM
+    if (meridiem == 'am') {
+      if (hour == 12) finalHour = 0; // 12am = midnight
+    } else if (meridiem == 'pm') {
+      if (hour != 12) finalHour = hour + 12; // Convert to 24-hour format
+    }
+    // For 'h' suffix or no suffix, assume 24-hour format already
+
+    return finalHour * 60 + minute; // Convert to minutes since midnight
   }
 
   @override
