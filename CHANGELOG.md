@@ -1,3 +1,9 @@
+## 1.2.3 - 2025-08-24
+
+- Updated correct references in documentation
+
+---
+
 ## 1.2.2 - 2025-08-24
 
 #### 🎨 Visual Improvements

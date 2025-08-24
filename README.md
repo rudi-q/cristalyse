@@ -47,7 +47,7 @@
     <img src="https://img.shields.io/badge/🎨_Examples-718096?style=for-the-badge&logoColor=white&labelColor=718096" alt="View Examples"/>
   </a>
   &nbsp;&nbsp;
-  <a href="https://github.com/rudrankriyam/cristalyse">
+  <a href="https://github.com/rudi-q/cristalyse">
     <img src="https://img.shields.io/badge/📦_View_Source-8B9DC3?style=for-the-badge&logoColor=white&labelColor=8B9DC3" alt="View Source Code"/>
   </a>
 </p>
@@ -783,7 +783,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.2.2** - Production ready with heat map charts, enhanced dual Y-axis SVG export and comprehensive interactive capabilities
+**Current Version: 1.2.3** - Production ready with heat map charts, enhanced dual Y-axis SVG export and comprehensive interactive capabilities
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
