@@ -1,3 +1,23 @@
+## 1.2.2 - 2025-08-24
+
+#### 🎨 Visual Improvements
+
+- **Enhanced HeatMap Text Readability**: Improved text visibility for low-value cells in heat maps
+  - Values < 15%: Now display with black text for guaranteed readability
+  - Values ≥ 15%: Continue using smart brightness-based contrast (white on dark, black on light)
+  - **Zero Breaking Changes**: Fully backward compatible - existing code works unchanged
+  - **Quality Enhancement**: Small percentage values are now consistently readable across all color backgrounds
+
+#### 🔧 Technical Details
+
+- Refined text color logic in `HeatMapGeometry` rendering for optimal contrast
+- Maintains all existing API compatibility and default behaviors
+- No performance impact - purely visual enhancement
+
+**This patch release improves the user experience for heat map visualizations with better text contrast for low-value cells while maintaining 100% backward compatibility.** ✨
+
+---
+
 ## 1.2.1 - 2025-08-24
 
 #### 📦 Dependencies
