@@ -2726,13 +2726,14 @@ class _AnimatedChartPainter extends CustomPainter {
 
         // Calculate color based on value
         Color cellColor;
+        // Calculate normalized value once for both color and text logic
+        final normalizedValue = valueRange > 0
+            ? ((value - minValue) / valueRange).clamp(0.0, 1.0)
+            : 0.5;
+
         if (geometry.colorGradient != null &&
             geometry.colorGradient!.isNotEmpty) {
           // Use provided color gradient
-          final normalizedValue = valueRange > 0
-              ? ((value - minValue) / valueRange).clamp(0.0, 1.0)
-              : 0.5;
-
           if (geometry.interpolateColors) {
             cellColor = _interpolateGradientColor(
                 normalizedValue, geometry.colorGradient!);
@@ -2745,9 +2746,6 @@ class _AnimatedChartPainter extends CustomPainter {
           }
         } else {
           // Use default gradient with enhanced visibility
-          final normalizedValue = valueRange > 0
-              ? ((value - minValue) / valueRange).clamp(0.0, 1.0)
-              : 0.5;
           cellColor = _defaultHeatMapColor(normalizedValue);
         }
 
@@ -2794,8 +2792,8 @@ class _AnimatedChartPainter extends CustomPainter {
           final labelText =
               geometry.valueFormatter?.call(value) ?? value.toStringAsFixed(1);
 
-          // Use black text for values < 15%, otherwise use brightness-based logic
-          final textColor = value < 0.15
+          // Use black text for normalized values < 15%, otherwise use brightness-based logic
+          final textColor = normalizedValue < 0.15
               ? Colors.black
               : (ThemeData.estimateBrightnessForColor(cellColor) ==
                       Brightness.dark
