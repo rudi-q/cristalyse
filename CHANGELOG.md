@@ -1,3 +1,13 @@
+## 1.2.1 - 2025-08-24
+
+#### 📦 Dependencies
+- Updated project dependencies to the latest compatible versions for improved stability and security.
+
+#### 📖 Documentation
+- Added a pie chart screenshot to the examples/documentation to better showcase the chart appearance.
+
+---
+
 ## 1.2.0 - 2025-08-18
 
 #### 🔥 Major Feature: Heat Map Chart Support
