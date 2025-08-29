@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import '../core/geometry.dart';
 import '../core/scale.dart';
 import '../core/util/helper.dart';
+import '../core/util/painter.dart';
 import '../interaction/chart_interactions.dart';
 import '../interaction/interaction_detector.dart';
 import '../interaction/tooltip_widget.dart';
 import '../themes/chart_theme.dart';
-import 'animated_chart_painter.dart' show AnimatedChartPainter;
 
 /// Animated wrapper for the chart widget
 class AnimatedCristalyseChartWidget extends StatefulWidget {
@@ -433,28 +433,13 @@ class _AnimatedCristalyseChartWidgetState
           border: Border.all(color: widget.theme.borderColor),
         ),
         child: CustomPaint(
-          painter: AnimatedChartPainter(
-            data: widget.data,
-            xColumn: widget.xColumn,
-            yColumn: widget.yColumn,
-            y2Column: widget.y2Column,
-            colorColumn: widget.colorColumn,
-            sizeColumn: widget.sizeColumn,
-            pieValueColumn: widget.pieValueColumn,
-            pieCategoryColumn: widget.pieCategoryColumn,
-            heatMapXColumn: widget.heatMapXColumn,
-            heatMapYColumn: widget.heatMapYColumn,
-            heatMapValueColumn: widget.heatMapValueColumn,
-            geometries: widget.geometries,
-            xScale: widget.xScale,
-            yScale: widget.yScale,
-            y2Scale: widget.y2Scale,
-            colorScale: widget.colorScale,
-            sizeScale: widget.sizeScale,
-            theme: widget.theme,
-            animationProgress: 1.0,
-            coordFlipped: widget.coordFlipped,
-          ),
+          painter: chartPainterAnimated(
+              widget: widget,
+              context: context,
+              size: size,
+              animationProgress: 1.0,
+              panXDomain: _panXDomain,
+              panYDomain: _panYDomain),
           child: Container(),
         ),
       );
@@ -471,30 +456,13 @@ class _AnimatedCristalyseChartWidgetState
       size.height - widget.theme.padding.vertical,
     );
 
-    final chartPainter = AnimatedChartPainter(
-      data: widget.data,
-      xColumn: widget.xColumn,
-      yColumn: widget.yColumn,
-      y2Column: widget.y2Column,
-      colorColumn: widget.colorColumn,
-      sizeColumn: widget.sizeColumn,
-      pieValueColumn: widget.pieValueColumn,
-      pieCategoryColumn: widget.pieCategoryColumn,
-      heatMapXColumn: widget.heatMapXColumn,
-      heatMapYColumn: widget.heatMapYColumn,
-      heatMapValueColumn: widget.heatMapValueColumn,
-      geometries: widget.geometries,
-      xScale: widget.xScale,
-      yScale: widget.yScale,
-      y2Scale: widget.y2Scale,
-      colorScale: widget.colorScale,
-      sizeScale: widget.sizeScale,
-      theme: widget.theme,
-      animationProgress: math.max(0.0, math.min(1.0, animationValue)),
-      coordFlipped: widget.coordFlipped,
-      panXDomain: _panXDomain,
-      panYDomain: _panYDomain,
-    );
+    final chartPainter = chartPainterAnimated(
+        widget: widget,
+        context: context,
+        size: size,
+        animationProgress: math.max(0.0, math.min(1.0, animationValue)),
+        panXDomain: _panXDomain,
+        panYDomain: _panYDomain);
 
     Widget chart = CustomPaint(painter: chartPainter, child: Container());
 
