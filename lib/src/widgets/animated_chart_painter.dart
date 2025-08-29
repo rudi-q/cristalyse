@@ -33,6 +33,35 @@ class AnimatedChartPainter extends CustomPainter {
   final List<double>? panXDomain;
   final List<double>? panYDomain;
 
+  /// Creates an [AnimatedChartPainter] with comprehensive chart rendering capabilities.
+  ///
+  /// This constructor initializes a painter that can handle multiple chart types
+  /// including line charts, bar charts, scatter plots, area charts, pie charts,
+  /// and heat maps with full animation support.
+  ///
+  /// Parameters:
+  /// - [data]: The dataset to visualize as a list of key-value maps.
+  /// - [xColumn]: Column name for X-axis values. Can be null for certain chart types.
+  /// - [yColumn]: Column name for primary Y-axis values.
+  /// - [y2Column]: Column name for secondary Y-axis values (dual-axis charts).
+  /// - [colorColumn]: Column name for color mapping in categorical visualizations.
+  /// - [sizeColumn]: Column name for size mapping in scatter plots.
+  /// - [pieValueColumn]: Column name for pie chart values.
+  /// - [pieCategoryColumn]: Column name for pie chart categories.
+  /// - [heatMapXColumn]: Column name for heat map X-axis categories.
+  /// - [heatMapYColumn]: Column name for heat map Y-axis categories.
+  /// - [heatMapValueColumn]: Column name for heat map cell values.
+  /// - [geometries]: List of visual geometries that define how data is rendered.
+  /// - [xScale]: Scale transformation for X-axis positioning.
+  /// - [yScale]: Scale transformation for primary Y-axis positioning.
+  /// - [y2Scale]: Scale transformation for secondary Y-axis positioning.
+  /// - [colorScale]: Scale transformation for color mapping.
+  /// - [sizeScale]: Scale transformation for size mapping.
+  /// - [theme]: Visual theme containing colors, fonts, and styling options.
+  /// - [animationProgress]: Current animation progress from 0.0 to 1.0.
+  /// - [coordFlipped]: Whether to flip X and Y coordinates (horizontal charts).
+  /// - [panXDomain]: Custom X-axis domain for panning functionality.
+  /// - [panYDomain]: Custom Y-axis domain for panning functionality.
   AnimatedChartPainter({
     required this.data,
     this.xColumn,
@@ -58,6 +87,25 @@ class AnimatedChartPainter extends CustomPainter {
     this.panYDomain,
   });
 
+  /// Renders the complete chart visualization on the provided canvas.
+  ///
+  /// This method orchestrates the entire chart drawing process including:
+  /// - Setting up scales and transformations for data-to-pixel mapping
+  /// - Drawing background, grid, and axes
+  /// - Rendering all specified geometries (points, lines, bars, areas, pies, heatmaps)
+  /// - Applying animations based on the current animation progress
+  /// - Handling coordinate flipping and dual Y-axis configurations
+  /// - Clipping content to plot boundaries
+  ///
+  /// The method automatically adapts to different chart types and configurations:
+  /// - Skips grid and axes for pie charts and heat maps
+  /// - Applies special axis handling for heat map categorical data
+  /// - Adjusts padding for dual Y-axis layouts
+  /// - Uses pan domains when available for interactive charts
+  ///
+  /// Parameters:
+  /// - [canvas]: The Flutter canvas to draw on
+  /// - [size]: Available drawing area dimensions
   @override
   void paint(Canvas canvas, Size size) {
     if (data.isEmpty || geometries.isEmpty) return;

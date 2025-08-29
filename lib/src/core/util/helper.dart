@@ -2,7 +2,29 @@ import 'package:cristalyse/cristalyse.dart' show Geometry;
 
 import '../geometry.dart' show YAxis;
 
-/// Smart sorting for heatmap values that handles days of the week and time properly
+/// Intelligently sorts heatmap values with special handling for dates, times, and common patterns.
+///
+/// This function provides context-aware sorting that recognizes and properly orders:
+/// - Days of the week (both full names and abbreviations)
+/// - Months (both full names and abbreviations)  
+/// - Time values (12-hour and 24-hour formats)
+/// - Numeric values
+/// - Alphabetical fallback for other strings
+///
+/// The sorting normalizes Sunday to position 7 for a Monday-first weekly view.
+/// Time values are converted to minutes since midnight for proper chronological ordering.
+///
+/// Parameters:
+/// - [values]: The list of dynamic values to sort in-place.
+///
+/// Examples:
+/// ```dart
+/// final days = ['wed', 'mon', 'fri', 'tue'];
+/// sortHeatMapValues(days); // Result: ['mon', 'tue', 'wed', 'fri']
+///
+/// final times = ['2pm', '8am', '10:30am', '14:45'];
+/// sortHeatMapValues(times); // Result: ['8am', '10:30am', '2pm', '14:45']
+/// ```
 void sortHeatMapValues(List<dynamic> values) {
   // Define ordered lists for common patterns
   final dayOrder = [
@@ -93,7 +115,29 @@ void sortHeatMapValues(List<dynamic> values) {
   });
 }
 
-/// Parse time values like "8am", "2pm", "14:30", "9:15am" into comparable integers (minutes since midnight)
+/// Parses various time format strings into minutes since midnight for comparison.
+///
+/// Supports multiple time formats including:
+/// - 12-hour format: "8am", "2pm", "11:30pm", "12:15am"
+/// - 24-hour format: "14:30", "09:15", "23:45"
+/// - Hour-only formats: "8h", "14h"
+/// - Compact formats: "830am", "1430", "915pm"
+///
+/// The function normalizes all formats to minutes since midnight (0-1439)
+/// for consistent chronological comparison.
+///
+/// Parameters:
+/// - [timeStr]: The time string to parse.
+///
+/// Returns the time as minutes since midnight, or null if parsing fails.
+///
+/// Examples:
+/// ```dart
+/// parseTimeValue('8am') => 480      // 8 * 60 = 480 minutes
+/// parseTimeValue('2:30pm') => 870   // 14 * 60 + 30 = 870 minutes
+/// parseTimeValue('14:30') => 870    // Same as 2:30pm
+/// parseTimeValue('midnight') => null // Invalid format
+/// ```
 int? parseTimeValue(String timeStr) {
   // Remove common time separators and normalize
   final normalized = timeStr.replaceAll(RegExp(r'[:\s]'), '').toLowerCase();
@@ -124,12 +168,40 @@ int? parseTimeValue(String timeStr) {
   return finalHour * 60 + minute; // Convert to minutes since midnight
 }
 
+/// Converts dynamic values to double, handling both numeric and string inputs.
+///
+/// Returns the numeric value as a double if the input is a number or a valid
+/// numeric string. Returns null for non-numeric values.
+///
+/// Examples:
+/// ```dart
+/// getNumericValue(42) => 42.0
+/// getNumericValue('3.14') => 3.14
+/// getNumericValue('hello') => null
+/// ```
 double? getNumericValue(dynamic value) {
   if (value is num) return value.toDouble();
   if (value is String) return double.tryParse(value);
   return null;
 }
 
+/// Determines if a data column contains categorical (string or boolean) values.
+///
+/// Examines the first non-null value in the specified column to determine
+/// if the data type is categorical (String or bool) rather than numeric.
+///
+/// Parameters:
+/// - [column]: The column name to check. Returns false if null.
+/// - [data]: The dataset to examine. Returns false if empty.
+///
+/// Returns true if the column contains categorical data, false otherwise.
+///
+/// Example:
+/// ```dart
+/// final data = [{'category': 'A', 'value': 10}, {'category': 'B', 'value': 20}];
+/// isColumnCategorical('category', data) => true
+/// isColumnCategorical('value', data) => false
+/// ```
 bool isColumnCategorical(String? column, List<Map<String, dynamic>> data) {
   if (column == null || data.isEmpty) return false;
   for (final row in data) {
@@ -141,6 +213,24 @@ bool isColumnCategorical(String? column, List<Map<String, dynamic>> data) {
   return false;
 }
 
+/// Determines if the chart configuration includes a secondary Y-axis.
+///
+/// A secondary Y-axis is present when both conditions are met:
+/// 1. A secondary Y column is specified ([y2Column] is not null)
+/// 2. At least one geometry is configured to use [YAxis.secondary]
+///
+/// Parameters:
+/// - [y2Column]: The name of the secondary Y column. Can be null.
+/// - [geometries]: The list of chart geometries to examine.
+///
+/// Returns true if a secondary Y-axis should be displayed, false otherwise.
+///
+/// Example:
+/// ```dart
+/// final geometries = [LineGeometry(yAxis: YAxis.secondary)];
+/// hasSecondaryYAxis(y2Column: 'price2', geometries: geometries) => true
+/// hasSecondaryYAxis(y2Column: null, geometries: geometries) => false
+/// ```
 bool hasSecondaryYAxis({String? y2Column, required List<Geometry> geometries}) {
   return y2Column != null && geometries.any((g) => g.yAxis == YAxis.secondary);
 }
