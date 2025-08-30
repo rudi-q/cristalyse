@@ -9,7 +9,14 @@ Widget buildScatterPlotTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Animated Scatter Plot'),
+        Text(
+          'Animated Scatter Plot',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: currentTheme.axisColor,
+          ),
+        ),
         const SizedBox(height: 16),
         SizedBox(
           height: 400,

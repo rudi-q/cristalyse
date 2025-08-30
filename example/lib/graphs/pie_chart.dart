@@ -16,7 +16,14 @@ Widget buildPieChartTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Revenue Distribution - Percentage Display'),
+        Text(
+          'Revenue Distribution - Percentage Display',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: currentTheme.axisColor,
+          ),
+        ),
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
@@ -41,8 +48,14 @@ Widget buildPieChartTab(ChartTheme currentTheme,
         const Text(
             '• Slices animate in with staggered timing\n• Percentages shown on labels\n• Smooth elastic animation curve'),
         const SizedBox(height: 32),
-        const Text(
-            'User Distribution - Donut Chart with Compact Number Formatting'),
+        Text(
+          'User Distribution - Donut Chart with Compact Number Formatting',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: currentTheme.axisColor,
+          ),
+        ),
         const SizedBox(height: 16),
         SizedBox(
           height: 400,

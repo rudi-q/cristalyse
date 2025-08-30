@@ -8,7 +8,14 @@ Widget buildHorizontalBarTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Horizontal Bar Chart'),
+        Text(
+          'Horizontal Bar Chart',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: currentTheme.axisColor,
+          ),
+        ),
         const SizedBox(height: 8),
         const Text(
           'Team headcount by department',

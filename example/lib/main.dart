@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:cristalyse/cristalyse.dart';
 import 'package:cristalyse_example/chart_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'graphs/area_chart.dart';
 import 'graphs/bar_chart.dart';
@@ -531,23 +532,12 @@ class _ExampleHomeState extends State<ExampleHome>
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
           children: [
-            const Text(
-              '🔮 Cristalyse',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              'Grammar of Graphics for Flutter',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.normal,
-              ),
+            SvgPicture.asset(
+              'assets/images/logo.svg',
+              height: 32,
+              width: 160,
             ),
           ],
         ),

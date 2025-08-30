@@ -9,7 +9,14 @@ Widget buildGroupedBarTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Product Performance by Quarter'),
+        Text(
+          'Product Performance by Quarter',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: currentTheme.axisColor,
+          ),
+        ),
         const SizedBox(height: 8),
         const Text(
           'Multiple product lines compared side-by-side with currency formatting',

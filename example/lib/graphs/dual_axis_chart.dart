@@ -8,7 +8,14 @@ Widget buildDualAxisTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Dual Y-Axis Chart'),
+        Text(
+          'Dual Y-Axis Chart',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: currentTheme.axisColor,
+          ),
+        ),
         const SizedBox(height: 8),
         const Text(
           'Revenue (bars, left axis) vs Conversion Rate (line, right axis)',

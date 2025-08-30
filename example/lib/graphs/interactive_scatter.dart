@@ -12,9 +12,13 @@ Widget buildInteractiveScatterTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Interactive Scatter Plot',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: currentTheme.axisColor,
+          ),
         ),
         const SizedBox(height: 8),
         const Text(
