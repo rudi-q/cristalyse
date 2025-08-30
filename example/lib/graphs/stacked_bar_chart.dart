@@ -9,7 +9,14 @@ Widget buildStackedBarTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Revenue Breakdown by Category'),
+        Text(
+          'Revenue Breakdown by Category',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: currentTheme.axisColor,
+          ),
+        ),
         const SizedBox(height: 8),
         const Text(
           'Stacked segments showing part-to-whole relationships with currency formatting',

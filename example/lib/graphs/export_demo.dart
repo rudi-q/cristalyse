@@ -175,9 +175,13 @@ class _ExportDemoState extends State<ExportDemo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Chart Export Demo',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: widget.theme.axisColor,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(

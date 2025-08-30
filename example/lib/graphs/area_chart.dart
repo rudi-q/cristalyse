@@ -65,9 +65,13 @@ class _AreaChartExampleState extends State<AreaChartExample> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Area Chart - Website Traffic',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: widget.theme.axisColor,
+            ),
           ),
           const SizedBox(height: 8),
           const Text(
@@ -141,9 +145,13 @@ class _AreaChartExampleState extends State<AreaChartExample> {
           const SizedBox(height: 24),
 
           // Multi-Series Stacked Areas
-          const Text(
+          Text(
             'Multi-Series Area Chart - Mobile vs Desktop',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: widget.theme.axisColor,
+            ),
           ),
           const SizedBox(height: 8),
 

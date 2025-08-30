@@ -8,7 +8,14 @@ Widget buildBarChartTab(ChartTheme currentTheme,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Animated Bar Chart'),
+        Text(
+          'Animated Bar Chart',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: currentTheme.axisColor,
+          ),
+        ),
         const SizedBox(height: 16),
         SizedBox(
           height: 400,

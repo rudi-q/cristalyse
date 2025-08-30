@@ -783,7 +783,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.2.3** - Production ready with heat map charts, enhanced dual Y-axis SVG export and comprehensive interactive capabilities
+**Current Version: 1.2.4** - Production ready with heat map charts, enhanced dual Y-axis SVG export and comprehensive interactive capabilities
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
