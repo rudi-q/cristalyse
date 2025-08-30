@@ -172,3 +172,38 @@ class HeatMapGeometry extends Geometry {
     super.interactive = true,
   }) : super(yAxis: YAxis.primary);
 }
+
+/// Bubble geometry for bubble charts
+/// 
+/// Bubble charts are scatter plots where the size of each point (bubble)
+/// represents a third dimension of data. Perfect for visualizing relationships
+/// between three continuous variables.
+class BubbleGeometry extends Geometry {
+  final double? minSize;
+  final double? maxSize;
+  final Color? color;
+  final double alpha;
+  final PointShape shape;
+  final double borderWidth;
+  final Color? borderColor;
+  final bool showLabels;
+  final TextStyle? labelStyle;
+  final LabelCallback? labelFormatter;
+  final double labelOffset; // Distance from bubble center to label
+
+  BubbleGeometry({
+    this.minSize = 5.0,
+    this.maxSize = 30.0,
+    this.color,
+    this.alpha = 0.7,
+    this.shape = PointShape.circle,
+    this.borderWidth = 1.0,
+    this.borderColor,
+    this.showLabels = false,
+    this.labelStyle,
+    this.labelFormatter,
+    this.labelOffset = 5.0,
+    super.yAxis,
+    super.interactive,
+  });
+}
