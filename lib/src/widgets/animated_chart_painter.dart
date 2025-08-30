@@ -2018,9 +2018,9 @@ class AnimatedChartPainter extends CustomPainter {
         if (value == null) {
           // Draw null value cell if color is configured
           if (geometry.nullValueColor != null) {
-            final baseAlpha = (geometry.nullValueColor!.a * 255.0).toDouble();
+            final baseAlpha = (geometry.nullValueColor!.a * 255.0).round() & 0xff;
             final animatedAlpha = (baseAlpha * heatMapProgress).round();
-            final clampedAlpha = animatedAlpha.clamp(0, 255);
+            final clampedAlpha = animatedAlpha.clamp(0, 255).toInt();
 
             final nullPaint = Paint()
               ..color = geometry.nullValueColor!.withAlpha(clampedAlpha)
@@ -2088,10 +2088,10 @@ class AnimatedChartPainter extends CustomPainter {
         );
 
         // Draw cell
-        final baseAlpha = (cellColor.a * 255.0).toDouble();
+        final baseAlpha = (cellColor.a * 255.0).round() & 0xff;
         final animatedAlpha = (baseAlpha * cellProgress).round();
         final minVisibleAlpha = math.max(200, animatedAlpha);
-        final clampedAlpha = minVisibleAlpha.clamp(0, 255);
+        final clampedAlpha = minVisibleAlpha.clamp(0, 255).toInt();
 
         final cellPaint = Paint()
           ..color = cellColor.withAlpha(clampedAlpha)

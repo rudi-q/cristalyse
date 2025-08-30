@@ -29,7 +29,7 @@ import 'package:flutter/material.dart' show Colors, Color;
 /// ```
 Color defaultHeatMapColor(double value) {
   // Enhanced default gradient with higher intensity
-  value = value.clamp(0.0, 1.0);
+  value = value.clamp(0.0, 1.0).toDouble();
 
   // Make colors more vibrant and increase the minimum intensity
   final minIntensity = 0.4; // Ensure cells are never too faint
@@ -87,7 +87,7 @@ Color defaultHeatMapColor(double value) {
 /// ```
 Color interpolateGradientColor(double value, List<Color> gradient) {
   // Ensure value is in [0, 1]
-  value = value.clamp(0.0, 1.0);
+  value = value.clamp(0.0, 1.0).toDouble();
 
   if (gradient.isEmpty) return Colors.grey;
   if (gradient.length == 1) return gradient.first;

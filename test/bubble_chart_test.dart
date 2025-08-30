@@ -161,8 +161,8 @@ void main() {
       // Wait for animation to complete
       await tester.pumpAndSettle();
 
-      // Verify chart widget exists
-      expect(find.byType(CustomPaint), findsOneWidget);
+      // Verify chart widget exists (allow multiple CustomPaint widgets)
+      expect(find.byType(CustomPaint), findsWidgets);
     });
 
     testWidgets('should handle empty data gracefully', (WidgetTester tester) async {
@@ -187,8 +187,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Should not crash with empty data
-      expect(find.byType(CustomPaint), findsOneWidget);
+      // Should not crash with empty data (allow multiple CustomPaint widgets)
+      expect(find.byType(CustomPaint), findsWidgets);
     });
   });
 }

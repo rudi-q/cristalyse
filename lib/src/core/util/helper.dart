@@ -189,6 +189,8 @@ double? getNumericValue(dynamic value) {
 ///
 /// Examines the first non-null value in the specified column to determine
 /// if the data type is categorical (String or bool) rather than numeric.
+/// For String values, attempts to parse as a number - only treats as categorical
+/// if parsing fails.
 ///
 /// Parameters:
 /// - [column]: The column name to check. Returns false if null.
@@ -198,16 +200,32 @@ double? getNumericValue(dynamic value) {
 ///
 /// Example:
 /// ```dart
-/// final data = [{'category': 'A', 'value': 10}, {'category': 'B', 'value': 20}];
-/// isColumnCategorical('category', data) => true
-/// isColumnCategorical('value', data) => false
+/// final data = [{'category': 'A', 'value': 10}, {'category': 'B', 'value': '200'}];
+/// isColumnCategorical('category', data) => true  // String that's not numeric
+/// isColumnCategorical('value', data) => false    // Numeric value
+/// isColumnCategorical('value', [{'value': '200'}]) => false // Numeric string
 /// ```
 bool isColumnCategorical(String? column, List<Map<String, dynamic>> data) {
   if (column == null || data.isEmpty) return false;
   for (final row in data) {
     final value = row[column];
     if (value != null) {
-      return value is String || value is bool;
+      // Treat bool as categorical
+      if (value is bool) return true;
+      
+      // Treat numeric types as non-categorical
+      if (value is num) return false;
+      
+      // For strings, attempt to parse as number
+      if (value is String) {
+        // If we can parse it as a number, it's not categorical
+        if (num.tryParse(value) != null) return false;
+        // If parsing fails, it's categorical
+        return true;
+      }
+      
+      // For other types, consider non-categorical
+      return false;
     }
   }
   return false;
