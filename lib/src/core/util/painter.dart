@@ -36,7 +36,7 @@ import '../../widgets/animated_chart_painter.dart' show AnimatedChartPainter;
 ///   panXDomain: [0.0, 100.0],
 ///   panYDomain: [0.0, 50.0],
 /// );
-/// 
+///
 /// CustomPaint(painter: painter, child: Container())
 /// ```
 AnimatedChartPainter chartPainterAnimated(

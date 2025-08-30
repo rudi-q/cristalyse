@@ -18,7 +18,7 @@ import 'package:flutter/material.dart' show Colors, Color;
 ///
 /// Color mapping:
 /// - 0.0-0.5: Dark blue → Bright cyan
-/// - 0.5-0.75: Bright cyan → Lime green  
+/// - 0.5-0.75: Bright cyan → Lime green
 /// - 0.75-1.0: Lime green → Bright red
 ///
 /// Examples:

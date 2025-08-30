@@ -6,7 +6,7 @@ import '../geometry.dart' show YAxis;
 ///
 /// This function provides context-aware sorting that recognizes and properly orders:
 /// - Days of the week (both full names and abbreviations)
-/// - Months (both full names and abbreviations)  
+/// - Months (both full names and abbreviations)
 /// - Time values (12-hour and 24-hour formats)
 /// - Numeric values
 /// - Alphabetical fallback for other strings
