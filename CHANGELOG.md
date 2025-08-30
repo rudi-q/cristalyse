@@ -1,3 +1,23 @@
+## 1.2.4 - 2025-08-30
+
+#### Bug Fixes
+
+- Fix heatmap cell ordering to match axis labels using `sortHeatMapValues` helper
+- Fix `shouldRepaint` method to compare all relevant properties for proper UI updates
+- Fix horizontal grouped bar charts crash when `coordFlipped=true`
+- Fix heatmap alpha calculation overflow bugs with proper clamping
+
+#### Documentation
+
+- Add comprehensive docstrings for `AnimatedChartPainter` and core utilities
+
+#### Code Quality
+
+- Add `chartPainterAnimated` utility function to reduce code duplication
+- Code formatting improvements
+
+---
+
 ## 1.2.3 - 2025-08-24
 
 - Updated correct references in documentation
