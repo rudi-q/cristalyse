@@ -747,7 +747,7 @@ class AnimatedChartPainter extends CustomPainter {
           canvas,
           plotArea,
           geometry,
-          null,
+          x,
           value,
           xScale,
           yScale,
