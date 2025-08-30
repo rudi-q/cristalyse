@@ -1733,9 +1733,9 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     }
 
-    // Sort values for consistent ordering
-    xValues.sort((a, b) => a.toString().compareTo(b.toString()));
-    yValues.sort((a, b) => a.toString().compareTo(b.toString()));
+    // Sort values for consistent ordering using existing helper
+    sortHeatMapValues(xValues);
+    sortHeatMapValues(yValues);
 
     // Calculate cell dimensions considering spacing
     final totalSpacingX = geometry.cellSpacing * (xValues.length + 1);
