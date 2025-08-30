@@ -2048,12 +2048,37 @@ class AnimatedChartPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant AnimatedChartPainter oldDelegate) {
     return oldDelegate.data != data ||
-        oldDelegate.theme != theme ||
+        oldDelegate.xColumn != xColumn ||
+        oldDelegate.yColumn != yColumn ||
+        oldDelegate.y2Column != y2Column ||
+        oldDelegate.colorColumn != colorColumn ||
+        oldDelegate.sizeColumn != sizeColumn ||
+        oldDelegate.pieValueColumn != pieValueColumn ||
+        oldDelegate.pieCategoryColumn != pieCategoryColumn ||
+        oldDelegate.heatMapXColumn != heatMapXColumn ||
+        oldDelegate.heatMapYColumn != heatMapYColumn ||
+        oldDelegate.heatMapValueColumn != heatMapValueColumn ||
         oldDelegate.geometries != geometries ||
+        oldDelegate.xScale != xScale ||
+        oldDelegate.yScale != yScale ||
+        oldDelegate.y2Scale != y2Scale ||
+        oldDelegate.colorScale != colorScale ||
+        oldDelegate.sizeScale != sizeScale ||
+        oldDelegate.theme != theme ||
         oldDelegate.animationProgress != animationProgress ||
         oldDelegate.coordFlipped != coordFlipped ||
-        oldDelegate.y2Column != y2Column ||
-        oldDelegate.pieValueColumn != pieValueColumn ||
-        oldDelegate.pieCategoryColumn != pieCategoryColumn;
+        !_listEquals(oldDelegate.panXDomain, panXDomain) ||
+        !_listEquals(oldDelegate.panYDomain, panYDomain);
+  }
+
+  /// Helper method to compare two nullable lists for equality
+  bool _listEquals<T>(List<T>? a, List<T>? b) {
+    if (a == null && b == null) return true;
+    if (a == null || b == null) return false;
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) return false;
+    }
+    return true;
   }
 }
