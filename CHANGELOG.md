@@ -1,4 +1,4 @@
-## 1.3.0 - 2025-08-31
+## 1.3.0 - 2025-09-02
 
 #### 🔥 Major Feature: Comprehensive Bubble Chart Support
 
