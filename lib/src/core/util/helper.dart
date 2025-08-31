@@ -212,10 +212,10 @@ bool isColumnCategorical(String? column, List<Map<String, dynamic>> data) {
     if (value != null) {
       // Treat bool as categorical
       if (value is bool) return true;
-      
+
       // Treat numeric types as non-categorical
       if (value is num) return false;
-      
+
       // For strings, attempt to parse as number
       if (value is String) {
         // If we can parse it as a number, it's not categorical
@@ -223,7 +223,7 @@ bool isColumnCategorical(String? column, List<Map<String, dynamic>> data) {
         // If parsing fails, it's categorical
         return true;
       }
-      
+
       // For other types, consider non-categorical
       return false;
     }

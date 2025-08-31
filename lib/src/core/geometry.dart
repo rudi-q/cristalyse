@@ -174,7 +174,7 @@ class HeatMapGeometry extends Geometry {
 }
 
 /// Bubble geometry for bubble charts
-/// 
+///
 /// Bubble charts are scatter plots where the size of each point (bubble)
 /// represents a third dimension of data. Perfect for visualizing relationships
 /// between three continuous variables.

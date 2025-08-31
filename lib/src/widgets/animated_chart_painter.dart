@@ -448,9 +448,16 @@ class AnimatedChartPainter extends CustomPainter {
         .cast<double>()
         .toList();
     if (values.isNotEmpty) {
+      // Check if we have a bubble geometry to use its size range
+      final bubbleGeometries = geometries.whereType<BubbleGeometry>().toList();
+      final bubbleGeometry =
+          bubbleGeometries.isNotEmpty ? bubbleGeometries.first : null;
+      final minSize = bubbleGeometry?.minSize ?? theme.pointSizeMin;
+      final maxSize = bubbleGeometry?.maxSize ?? theme.pointSizeMax;
+
       return SizeScale(
         domain: [values.reduce(math.min), values.reduce(math.max)],
-        range: [theme.pointSizeMin, theme.pointSizeMax],
+        range: [minSize, maxSize],
       );
     }
     return SizeScale();
@@ -1110,7 +1117,8 @@ class AnimatedChartPainter extends CustomPainter {
         0.0,
         math.min(
           1.0,
-          (animationProgress - bubbleDelay) / math.max(0.001, 1.0 - bubbleDelay),
+          (animationProgress - bubbleDelay) /
+              math.max(0.001, 1.0 - bubbleDelay),
         ),
       );
 
@@ -1124,12 +1132,8 @@ class AnimatedChartPainter extends CustomPainter {
                   ? theme.colorPalette.first
                   : theme.primaryColor));
 
-      // Calculate bubble size using size scale and geometry constraints
-      final scaledSize = sizeScale.scale(sizeValue);
-      final bubbleSize = math.max(
-        geometry.minSize ?? 5.0,
-        math.min(geometry.maxSize ?? 30.0, scaledSize),
-      );
+      // Calculate bubble size using size scale
+      final bubbleSize = sizeScale.scale(sizeValue);
 
       // Calculate screen coordinates
       final pointX = plotArea.left + xScale.scale(x);
@@ -2018,7 +2022,8 @@ class AnimatedChartPainter extends CustomPainter {
         if (value == null) {
           // Draw null value cell if color is configured
           if (geometry.nullValueColor != null) {
-            final baseAlpha = (geometry.nullValueColor!.a * 255.0).round() & 0xff;
+            final baseAlpha =
+                (geometry.nullValueColor!.a * 255.0).round() & 0xff;
             final animatedAlpha = (baseAlpha * heatMapProgress).round();
             final clampedAlpha = animatedAlpha.clamp(0, 255).toInt();
 

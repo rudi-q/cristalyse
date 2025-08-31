@@ -600,7 +600,8 @@ class _ExampleHomeState extends State<ExampleHome>
                 child: ListTile(
                   leading: Icon(Icons.bubble_chart, size: 20),
                   title: Text('Bubble Chart'),
-                  subtitle: Text('New!', style: TextStyle(color: Colors.green, fontSize: 10)),
+                  subtitle: Text('New!',
+                      style: TextStyle(color: Colors.green, fontSize: 10)),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -978,6 +979,15 @@ class _ExampleHomeState extends State<ExampleHome>
 
   Widget _buildChartPage(
       String title, String description, Widget chart, List<Widget> stats) {
+    // Determine chart height based on chart type
+    double chartHeight = 380; // Default height
+    if (title.contains('Market Performance Analysis') ||
+        title.contains('Bubble')) {
+      chartHeight = 500; // Larger height for bubble charts to prevent cutoff
+    } else if (title.contains('Heatmap') || title.contains('Contributions')) {
+      chartHeight = 450; // Slightly larger for heatmaps
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -1017,7 +1027,7 @@ class _ExampleHomeState extends State<ExampleHome>
 
           // Chart Container
           Container(
-            height: 380,
+            height: chartHeight,
             width: double.infinity,
             decoration: BoxDecoration(
               color: currentTheme.backgroundColor,
