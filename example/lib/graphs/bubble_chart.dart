@@ -269,7 +269,7 @@ Widget buildBubbleChartTab(
                               _buildMetricRow(
                                 Icons.pie_chart,
                                 'Market Share',
-                                '${marketShare}%',
+                                '$marketShare%',
                                 Colors.orange[400]!,
                               ),
                             ],

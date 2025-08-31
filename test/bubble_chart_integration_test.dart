@@ -54,8 +54,6 @@ void main() {
       final minMarketShare = marketShares.reduce(math.min);
       final maxMarketShare = marketShares.reduce(math.max);
 
-      print('Market share range: $minMarketShare to $maxMarketShare');
-
       // Test with slider at 0.0 (minimum sizes)
       final minBubbleSize = 5.0; // 5px radius minimum
       final maxBubbleSize = 15.0; // 15px radius maximum
@@ -76,10 +74,6 @@ void main() {
             reason: '$name bubble should be at least min size');
         expect(bubbleSize, lessThanOrEqualTo(maxBubbleSize),
             reason: '$name bubble should not exceed max size');
-
-        // Print for verification
-        print(
-            '$name: ${marketShare}% market share -> ${bubbleSize.toStringAsFixed(1)}px radius');
       }
 
       // Verify relative sizing is correct
