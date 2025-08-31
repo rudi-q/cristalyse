@@ -7,7 +7,7 @@
 - **Interactive Tooltips**: Rich hover tooltips with company details, metrics, and category-based styling
 - **Grammar of Graphics Integration**: New `geomBubble()` API method following established patterns
 - **Theme Integration**: Full integration with theme system - bubble colors dynamically change with theme/palette selection
-- **Responsive Layout**: Dynamic chart height allocation (500px for bubble charts) to prevent cutoff
+- **Responsive Layout**: Dynamic chart height allocation with default bubble-chart height of 500 px (configurable) to prevent cutoff
 - **Professional Styling**: Category-based color mapping, legend system, and visual enhancements
 
 #### 🚀 New API Capabilities

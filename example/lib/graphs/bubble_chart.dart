@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 Widget buildBubbleChartTab(
   ChartTheme theme,
-  List<Map<String, dynamic>> data,
   double sliderValue,
 ) {
   // Use proper bubble data generation without random values on each render

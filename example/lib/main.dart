@@ -799,8 +799,7 @@ class _ExampleHomeState extends State<ExampleHome>
                 _buildChartPage(
                   'Market Performance Analysis',
                   'Three-dimensional visualization showing revenue, customer count, and market share',
-                  buildBubbleChartTab(
-                      currentTheme, _scatterPlotData, _sliderValue),
+                  buildBubbleChartTab(currentTheme, _sliderValue),
                   [
                     _buildStatsCard(
                         'Market Leaders', '4', 'Enterprise', Colors.blue),
