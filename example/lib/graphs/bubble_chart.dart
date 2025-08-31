@@ -16,14 +16,15 @@ Widget buildBubbleChartTab(
   final maxSize =
       15.0 + sliderValue * 10.0; // 15-25 px radius (30-50 px diameter)
 
-  // Define category colors for better visual distinction
-  final categoryColors = {
-    'Enterprise': const Color(0xFF2E7D32), // Deep green
-    'SMB': const Color(0xFF1565C0), // Deep blue
-    'Startup': const Color(0xFFE65100), // Deep orange
-  };
+  // Use theme's color palette for categories
+  final categories = ['Enterprise', 'SMB', 'Startup'];
+  final categoryColors = <String, Color>{};
+  for (int i = 0; i < categories.length; i++) {
+    categoryColors[categories[i]] =
+        theme.colorPalette[i % theme.colorPalette.length];
+  }
 
-  // Use theme directly and update color palette
+  // Use theme directly with its color palette
   final enhancedTheme = ChartTheme(
     backgroundColor: theme.backgroundColor,
     plotBackgroundColor: theme.plotBackgroundColor,
@@ -36,7 +37,7 @@ Widget buildBubbleChartTab(
     pointSizeDefault: theme.pointSizeDefault,
     pointSizeMin: theme.pointSizeMin,
     pointSizeMax: theme.pointSizeMax,
-    colorPalette: categoryColors.values.toList(),
+    colorPalette: theme.colorPalette, // Use theme's actual color palette
     padding: theme.padding,
     axisTextStyle: theme.axisTextStyle,
     axisLabelStyle: const TextStyle(
