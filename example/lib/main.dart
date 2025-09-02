@@ -15,6 +15,7 @@ import 'graphs/heatmap_chart.dart';
 import 'graphs/horizontal_bar_chart.dart';
 import 'graphs/interactive_scatter.dart';
 import 'graphs/line_chart.dart';
+import 'graphs/multi_series_line_chart.dart';
 import 'graphs/pan_example.dart';
 import 'graphs/pie_chart.dart';
 import 'graphs/scatter_plot.dart';
@@ -117,7 +118,8 @@ class _ExampleHomeState extends State<ExampleHome>
   void initState() {
     super.initState();
     _tabController = TabController(
-        length: 15, vsync: this); // Updated to 15 tabs (added bubble chart)
+        length: 16,
+        vsync: this); // Updated to 16 tabs (added multi-series line chart)
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -681,6 +683,17 @@ class _ExampleHomeState extends State<ExampleHome>
               const PopupMenuItem(
                 value: 14,
                 child: ListTile(
+                  leading: Icon(Icons.timeline, size: 20),
+                  title: Text('Multi-Series Lines'),
+                  subtitle: Text('Fixed!',
+                      style: TextStyle(color: Colors.green, fontSize: 10)),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 15,
+                child: ListTile(
                   leading: Icon(Icons.file_download, size: 20),
                   title: Text('Export'),
                   dense: true,
@@ -715,6 +728,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Dual Y-Axis'),
             Tab(text: 'Heatmap'), // New heatmap tab
             Tab(text: 'Contributions'), // New contributions heatmap tab
+            Tab(text: 'Multi-Series'), // New multi-series line chart tab
             Tab(text: 'Export'), // New export tab
           ],
         ),
@@ -913,6 +927,19 @@ class _ExampleHomeState extends State<ExampleHome>
                     _buildStatsCard(
                         'Streak Days', '47', 'Current', Colors.blue),
                     _buildStatsCard('Active Days', '73%', '+8%', Colors.purple),
+                  ],
+                ),
+                _buildChartPage(
+                  'Multi-Series Line Chart Demo',
+                  'Demonstrates the fixed multi-series line chart functionality • Previously broken, now fully working',
+                  buildMultiSeriesLineChartTab(currentTheme, _sliderValue),
+                  [
+                    _buildStatsCard(
+                        'Bug Status', 'Fixed!', '100% Working', Colors.green),
+                    _buildStatsCard(
+                        'Series Count', '3 Max', 'Unlimited', Colors.blue),
+                    _buildStatsCard(
+                        'Line Quality', 'Perfect', 'Separated', Colors.purple),
                   ],
                 ),
                 _buildChartPage(
@@ -1224,6 +1251,13 @@ class _ExampleHomeState extends State<ExampleHome>
           'Infinite zoom and professional quality output',
           'Small file sizes perfect for web and print',
           'Editable in design software and ideal for presentations'
+        ];
+      case 14: // Multi-series line chart
+        return [
+          'Fixed multi-series line rendering with proper separation',
+          'Each series gets its own line with distinct colors',
+          'Points and lines work together seamlessly',
+          'Fully backward compatible with single-series charts'
         ];
       default:
         return [];
