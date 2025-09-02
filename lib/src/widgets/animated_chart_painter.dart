@@ -980,10 +980,23 @@ class AnimatedChartPainter extends CustomPainter {
 
     for (int i = 0; i < data.length; i++) {
       final point = data[i];
-      final x = getNumericValue(point[xColumn]);
+      final xRawValue = point[xColumn];
       final y = getNumericValue(point[yCol]);
 
-      if (x == null || y == null) continue;
+      if (xRawValue == null || y == null) continue;
+
+      // Handle both ordinal and continuous X-scales
+      double pointX;
+      if (xScale is OrdinalScale) {
+        // For ordinal scales, use the raw string value with bandCenter
+        final ordinalScale = xScale;
+        pointX = plotArea.left + ordinalScale.bandCenter(xRawValue);
+      } else {
+        // For continuous scales, convert to number first
+        final x = getNumericValue(xRawValue);
+        if (x == null) continue;
+        pointX = plotArea.left + xScale.scale(x);
+      }
 
       final pointDelay = data.isNotEmpty ? i / data.length * 0.2 : 0.0;
       final pointProgress = math.max(
@@ -1012,7 +1025,6 @@ class AnimatedChartPainter extends CustomPainter {
         )
         ..style = PaintingStyle.fill;
 
-      final pointX = plotArea.left + xScale.scale(x);
       final pointY = plotArea.top + yScale.scale(y);
 
       if (!pointX.isFinite || !pointY.isFinite) {
@@ -1296,17 +1308,90 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     }
 
-    final color = geometry.color ??
-        (colorColumn != null
-            ? colorScale.scale(data.first[colorColumn])
-            : (theme.colorPalette.isNotEmpty
-                ? theme.colorPalette.first
-                : theme.primaryColor));
+    if (colorColumn != null) {
+      // Group by color and draw separate lines
+      final groupedData = <dynamic, List<Map<String, dynamic>>>{};
+      for (final point in data) {
+        final colorValue = point[colorColumn];
+        groupedData.putIfAbsent(colorValue, () => []).add(point);
+      }
+
+      for (final entry in groupedData.entries) {
+        final colorValue = entry.key;
+        final groupData = entry.value;
+        final lineColor = geometry.color ?? colorScale.scale(colorValue);
+        _drawSingleLineAnimated(
+          canvas,
+          plotArea,
+          groupData,
+          xScale,
+          yScale,
+          lineColor,
+          geometry,
+          yCol,
+        );
+      }
+    } else {
+      // Draw single line for all data
+      final lineColor = geometry.color ??
+          (theme.colorPalette.isNotEmpty
+              ? theme.colorPalette.first
+              : theme.primaryColor);
+      _drawSingleLineAnimated(
+        canvas,
+        plotArea,
+        data,
+        xScale,
+        yScale,
+        lineColor,
+        geometry,
+        yCol,
+      );
+    }
+  }
+
+  void _drawSingleLineAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    List<Map<String, dynamic>> lineData,
+    Scale xScale,
+    Scale yScale,
+    Color color,
+    LineGeometry geometry,
+    String yCol,
+  ) {
+    // Sort data by x value for proper line connection
+    final sortedData = List<Map<String, dynamic>>.from(lineData);
+    sortedData.sort((a, b) {
+      final aXValue = a[xColumn];
+      final bXValue = b[xColumn];
+
+      if (aXValue == null && bXValue == null) return 0;
+      if (aXValue == null) return -1;
+      if (bXValue == null) return 1;
+
+      // Get the actual plotted X position for proper ordering
+      double aXPosition, bXPosition;
+
+      if (xScale is OrdinalScale) {
+        // For ordinal scales, use domain index as fallback to scale position
+        aXPosition = xScale.bandCenter(aXValue);
+        bXPosition = xScale.bandCenter(bXValue);
+      } else {
+        // For continuous scales, convert to numeric and scale
+        final aXNum = getNumericValue(aXValue) ?? 0;
+        final bXNum = getNumericValue(bXValue) ?? 0;
+        aXPosition = xScale.scale(aXNum);
+        bXPosition = xScale.scale(bXNum);
+      }
+
+      return aXPosition.compareTo(bXPosition);
+    });
 
     final points = <Offset>[];
 
-    for (int i = 0; i < data.length; i++) {
-      final point = data[i];
+    for (int i = 0; i < sortedData.length; i++) {
+      final point = sortedData[i];
       final xRawValue = point[xColumn];
       final yVal = getNumericValue(point[yCol]);
 
@@ -1348,7 +1433,9 @@ class AnimatedChartPainter extends CustomPainter {
     final paint = Paint()
       ..color = color.withAlpha((geometry.alpha * 255).round())
       ..strokeWidth = geometry.strokeWidth
-      ..style = PaintingStyle.stroke;
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
     final int numSegments = points.length - 1;

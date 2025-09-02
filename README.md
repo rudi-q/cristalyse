@@ -10,8 +10,8 @@
 [![pub points](https://img.shields.io/pub/points/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
 [![likes](https://img.shields.io/pub/likes/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
 [![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-2cacbf?labelColor=145261)](https://flutter.dev/)
-[![Flutter support](https://img.shields.io/badge/Flutter-1.17%2B-2cacbf?labelColor=145261)](https://flutter.dev/)
-[![Dart support](https://img.shields.io/badge/Dart-2.19.2%2B-2cacbf?labelColor=145261)](https://dart.dev/)
+[![Flutter support](https://img.shields.io/badge/Flutter-3.13%2B-2cacbf?labelColor=145261)](https://flutter.dev/)
+[![Dart support](https://img.shields.io/badge/Dart-3.3.0%2B-2cacbf?labelColor=145261)](https://dart.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2cacbf.svg?labelColor=145261)](https://opensource.org/licenses/MIT)
 
 > Finally, create beautiful data visualizations in Flutter without fighting against chart widgets or settling for web-based solutions.
@@ -783,7 +783,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.3.0** - Production ready with heat map charts, enhanced dual Y-axis SVG export and comprehensive interactive capabilities
+**Current Version: 1.3.1** - Production ready with heat map charts, enhanced dual Y-axis SVG export and comprehensive interactive capabilities
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 

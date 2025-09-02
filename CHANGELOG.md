@@ -1,3 +1,22 @@
+## 1.3.1 - 2025-09-03
+
+#### 🐛 Bug Fixes
+
+- **Multi-Series Line Chart Rendering**: Fixed critical rendering issues with multi-series line charts
+  - Resolved missing data points on multi-series line charts
+  - Fixed overlapping series lines - each series now maintains distinct visual separation
+  - Ensured all data points are visible and properly positioned across multiple series
+
+#### 📖 Documentation
+
+- **Multi-Series Example**: Added comprehensive multi-series line chart example demonstrating the fixes
+  - Professional business analytics use case with quarterly revenue data
+  - Clean layout with focused chart presentation
+
+**This patch release resolves critical multi-series line chart rendering issues, ensuring all data points are visible and series lines are properly separated.** 🔧
+
+---
+
 ## 1.3.0 - 2025-09-02
 
 #### 🔥 Major Feature: Comprehensive Bubble Chart Support

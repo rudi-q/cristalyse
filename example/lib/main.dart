@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:cristalyse/cristalyse.dart';
 import 'package:cristalyse_example/chart_theme.dart';
+import 'package:cristalyse_example/utils/chart_feature_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -15,6 +16,7 @@ import 'graphs/heatmap_chart.dart';
 import 'graphs/horizontal_bar_chart.dart';
 import 'graphs/interactive_scatter.dart';
 import 'graphs/line_chart.dart';
+import 'graphs/multi_series_line_chart.dart';
 import 'graphs/pan_example.dart';
 import 'graphs/pie_chart.dart';
 import 'graphs/scatter_plot.dart';
@@ -116,8 +118,7 @@ class _ExampleHomeState extends State<ExampleHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-        length: 15, vsync: this); // Updated to 15 tabs (added bubble chart)
+    _tabController = TabController(length: 16, vsync: this);
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -681,6 +682,17 @@ class _ExampleHomeState extends State<ExampleHome>
               const PopupMenuItem(
                 value: 14,
                 child: ListTile(
+                  leading: Icon(Icons.timeline, size: 20),
+                  title: Text('Multi-Series Lines'),
+                  subtitle: Text('Fixed!',
+                      style: TextStyle(color: Colors.green, fontSize: 10)),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 15,
+                child: ListTile(
                   leading: Icon(Icons.file_download, size: 20),
                   title: Text('Export'),
                   dense: true,
@@ -715,6 +727,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Dual Y-Axis'),
             Tab(text: 'Heatmap'), // New heatmap tab
             Tab(text: 'Contributions'), // New contributions heatmap tab
+            Tab(text: 'Multi-Series'), // New multi-series line chart tab
             Tab(text: 'Export'), // New export tab
           ],
         ),
@@ -916,6 +929,19 @@ class _ExampleHomeState extends State<ExampleHome>
                   ],
                 ),
                 _buildChartPage(
+                  'Multi-Series Line Chart Demo',
+                  'Demonstrates the fixed multi-series line chart functionality • Previously broken, now fully working',
+                  buildMultiSeriesLineChartTab(currentTheme, _sliderValue),
+                  [
+                    _buildStatsCard(
+                        'Bug Status', 'Fixed!', '100% Working', Colors.green),
+                    _buildStatsCard(
+                        'Series Count', '3 Max', 'Unlimited', Colors.blue),
+                    _buildStatsCard(
+                        'Line Quality', 'Perfect', 'Separated', Colors.purple),
+                  ],
+                ),
+                _buildChartPage(
                   'Chart Export Demo',
                   'Export your charts as scalable SVG vector graphics for reports and presentations',
                   ExportDemo(
@@ -1089,7 +1115,7 @@ class _ExampleHomeState extends State<ExampleHome>
   }
 
   Widget _buildFeatureList() {
-    final features = _getChartFeatures();
+    final features = getChartFeatures(_tabController.index);
     return Column(
       children: features
           .map((feature) => Padding(
@@ -1120,113 +1146,5 @@ class _ExampleHomeState extends State<ExampleHome>
               ))
           .toList(),
     );
-  }
-
-  List<String> _getChartFeatures() {
-    switch (_tabController.index) {
-      case 0:
-        return [
-          'Grammar of graphics API with intuitive data mapping',
-          'Smooth 60fps animations with elastic curves',
-          'Size and color encoding for multi-dimensional data',
-          'Responsive scaling and high-DPI support'
-        ];
-      case 1: // Interactive scatter plot
-        return [
-          'Rich tooltip system with customizable content and styling',
-          'Hover detection with spatial indexing for smooth performance',
-          'Click interactions for navigation and custom actions',
-          'Mobile-optimized touch handling and gesture recognition'
-        ];
-      case 2: // Panning demo
-        return [
-          'Real-time pan detection with visible range callbacks',
-          'Perfect for large datasets with efficient data loading',
-          'Throttled updates to prevent overwhelming the database',
-          'Coordinate transformation from screen pixels to data values'
-        ];
-      case 3: // Line chart
-        return [
-          'Progressive line drawing with smooth transitions',
-          'Multi-series support with automatic color mapping',
-          'Customizable stroke width and transparency',
-          'Optimized for time-series and continuous data'
-        ];
-      case 4: // Area chart
-        return [
-          'Smooth area fills with customizable transparency',
-          'Progressive animation revealing data over time',
-          'Multi-series support with overlapping transparency',
-          'Combined area + line + point visualizations'
-        ];
-      case 5: // Bar chart
-        return [
-          'Categorical data visualization with ordinal scales',
-          'Staggered bar animations for visual impact',
-          'Automatic baseline detection and scaling',
-          'Customizable bar width and styling options'
-        ];
-      case 6: // Grouped bars
-        return [
-          'Side-by-side comparison of multiple data series',
-          'Clean currency formatting for financial comparisons',
-          'Coordinated group animations with smooth timing',
-          'Automatic legend generation from color mappings',
-          'Perfect for product or regional comparisons'
-        ];
-      case 7: // Horizontal bars
-        return [
-          'Coordinate system flipping for horizontal layouts',
-          'Ideal for ranking and categorical comparisons',
-          'Space-efficient labeling for long category names',
-          'Consistent animation system across orientations'
-        ];
-      case 8: // Stacked bars
-        return [
-          'Segment-by-segment progressive stacking animation',
-          'Automatic part-to-whole relationship visualization',
-          'Consistent color mapping across all segments',
-          'Perfect for budget breakdowns and composition analysis'
-        ];
-      case 9: // Pie charts
-        return [
-          'Smooth slice animations with staggered timing',
-          'Donut chart support with configurable inner radius',
-          'Smart label positioning with formatting',
-          'Exploded slices for emphasis and visual impact'
-        ];
-      case 10: // Dual Y-axis
-        return [
-          'Dual Y-axis support for different data scales',
-          'Independent left and right axis scaling',
-          'Combined bar and line visualizations',
-          'Perfect for correlating volume vs efficiency metrics'
-        ];
-      case 11: // Heatmap
-        return [
-          'Color-coded intensity visualization for multi-dimensional data',
-          'Animated cell appearance with wave effect',
-          'Customizable color gradients with interpolation support',
-          'Value labels with automatic contrast for readability',
-          'Null value support with customizable styling'
-        ];
-      case 12: // Contributions heatmap
-        return [
-          'GitHub-style contribution graph visualization',
-          'Discrete color levels for activity intensity',
-          'Weekly grid layout with day-based organization',
-          'Animated cell scaling with elastic curves',
-          'Perfect for activity tracking and habit visualization'
-        ];
-      case 13: // Export demo
-        return [
-          'Export charts as scalable SVG vector graphics',
-          'Infinite zoom and professional quality output',
-          'Small file sizes perfect for web and print',
-          'Editable in design software and ideal for presentations'
-        ];
-      default:
-        return [];
-    }
   }
 }

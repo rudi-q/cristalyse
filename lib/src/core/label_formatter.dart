@@ -52,8 +52,9 @@ class LabelFormatter {
   /// custom callback → default formatter → toString()
   String format(dynamic value) {
     if (value is num) {
-      if (_customCallback != null) {
-        return _customCallback!(value);
+      final cb = _customCallback;
+      if (cb != null) {
+        return cb(value);
       }
       return _formatDefault(value);
     }

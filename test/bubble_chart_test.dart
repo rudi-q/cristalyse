@@ -1,6 +1,6 @@
+import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cristalyse/cristalyse.dart';
 
 void main() {
   group('Bubble Size Scaling - Critical Tests', () {
