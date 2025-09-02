@@ -120,7 +120,7 @@ class _ExampleHomeState extends State<ExampleHome>
     super.initState();
     _tabController = TabController(
         length: 16,
-        vsync: this); // Updated to 16 tabs (added multi-series line chart)
+        vsync: this); 
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
