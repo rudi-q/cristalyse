@@ -1363,9 +1363,29 @@ class AnimatedChartPainter extends CustomPainter {
     // Sort data by x value for proper line connection
     final sortedData = List<Map<String, dynamic>>.from(lineData);
     sortedData.sort((a, b) {
-      final aX = getNumericValue(a[xColumn]) ?? 0;
-      final bX = getNumericValue(b[xColumn]) ?? 0;
-      return aX.compareTo(bX);
+      final aXValue = a[xColumn];
+      final bXValue = b[xColumn];
+
+      if (aXValue == null && bXValue == null) return 0;
+      if (aXValue == null) return -1;
+      if (bXValue == null) return 1;
+
+      // Get the actual plotted X position for proper ordering
+      double aXPosition, bXPosition;
+
+      if (xScale is OrdinalScale) {
+        // For ordinal scales, use domain index as fallback to scale position
+        aXPosition = xScale.bandCenter(aXValue);
+        bXPosition = xScale.bandCenter(bXValue);
+      } else {
+        // For continuous scales, convert to numeric and scale
+        final aXNum = getNumericValue(aXValue) ?? 0;
+        final bXNum = getNumericValue(bXValue) ?? 0;
+        aXPosition = xScale.scale(aXNum);
+        bXPosition = xScale.scale(bXNum);
+      }
+
+      return aXPosition.compareTo(bXPosition);
     });
 
     final points = <Offset>[];
