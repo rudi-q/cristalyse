@@ -19,10 +19,10 @@ Create a simple bubble chart with three data dimensions:
 
 ```dart
 final marketData = [
-  {'revenue': 120.0, 'customers': 150.0, 'marketShare': 15.0, 'company': 'TechCorp'},
-  {'revenue': 200.0, 'customers': 120.0, 'marketShare': 25.0, 'company': 'FinanceInc'},
-  {'revenue': 80.0, 'customers': 200.0, 'marketShare': 10.0, 'company': 'HealthPlus'},
-  {'revenue': 150.0, 'customers': 220.0, 'marketShare': 30.0, 'company': 'RetailMax'},
+  {'revenue': 120.0, 'customers': 150.0, 'marketShare': 15.0, 'name': 'TechCorp'},
+  {'revenue': 200.0, 'customers': 120.0, 'marketShare': 25.0, 'name': 'FinanceInc'},
+  {'revenue': 80.0, 'customers': 200.0, 'marketShare': 10.0, 'name': 'HealthPlus'},
+  {'revenue': 150.0, 'customers': 220.0, 'marketShare': 30.0, 'name': 'RetailMax'},
 ];
 
 CristalyseChart()
@@ -109,6 +109,8 @@ class _BubbleChartWidgetState extends State<BubbleChartWidget> {
       children: [
         Slider(
           value: _sizeMultiplier,
+          min: 0.0,
+          max: 1.0,
           onChanged: (value) => setState(() => _sizeMultiplier = value),
           label: 'Bubble Size',
         ),
@@ -422,7 +424,7 @@ class MarketAnalysisDashboard extends StatefulWidget {
 }
 
 class _MarketAnalysisDashboardState extends State<MarketAnalysisDashboard> {
-  double _bubbleScale = 0.5;
+  double _bubbleScale = 1.0;
   
   final _marketData = [
     {
@@ -480,6 +482,10 @@ class _MarketAnalysisDashboardState extends State<MarketAnalysisDashboard> {
                     Text('Bubble Size'),
                     Slider(
                       value: _bubbleScale,
+                      min: 0.1,
+                      max: 2.0,
+                      divisions: 19,
+                      label: '${(_bubbleScale * 100).round()}%',
                       onChanged: (value) => setState(() => _bubbleScale = value),
                     ),
                   ],
