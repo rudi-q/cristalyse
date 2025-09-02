@@ -118,9 +118,7 @@ class _ExampleHomeState extends State<ExampleHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-        length: 16,
-        vsync: this); 
+    _tabController = TabController(length: 16, vsync: this);
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
