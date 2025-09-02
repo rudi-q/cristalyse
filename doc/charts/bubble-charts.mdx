@@ -268,7 +268,7 @@ CristalyseChart()
           padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.grey[900]!, Colors.grey[850]!],
+              colors: [Colors.grey[900]!, Colors.grey[800]!],
             ),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
@@ -395,7 +395,7 @@ final performanceData = [
 
 CristalyseChart()
   .data(performanceData)
-  .mapping(x: 'quarter', y: 'revenue')
+  .mapping(x: 'quarter', y: 'revenue', size: 'efficiency')
   .mappingY2('satisfaction')
   .geomBar(yAxis: YAxis.primary)      // Revenue bars on primary axis
   .geomBubble(                        // Satisfaction bubbles on secondary axis
