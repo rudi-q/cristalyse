@@ -1,0 +1,724 @@
+---
+title: "Bubble Charts"
+description: "Three-dimensional data visualization with position and size encoding"
+---
+
+## Overview
+
+Bubble charts are powerful scatter plots where the size of each point (bubble) represents a third dimension of data. They excel at visualizing relationships between three continuous variables simultaneously, making them perfect for market analysis, performance dashboards, and multi-dimensional data exploration.
+
+<div align="center">
+  <img src="/images/cristalyse_bubble_chart.gif" alt="Interactive Bubble Chart Animation" width="600"/>
+  <br/>
+  <em>Interactive bubble charts with size scaling, tooltips, and smooth animations</em>
+</div>
+
+## Basic Bubble Chart
+
+Create a simple bubble chart with three data dimensions:
+
+```dart
+final marketData = [
+  {'revenue': 120.0, 'customers': 150.0, 'marketShare': 15.0, 'name': 'TechCorp'},
+  {'revenue': 200.0, 'customers': 120.0, 'marketShare': 25.0, 'name': 'FinanceInc'},
+  {'revenue': 80.0, 'customers': 200.0, 'marketShare': 10.0, 'name': 'HealthPlus'},
+  {'revenue': 150.0, 'customers': 220.0, 'marketShare': 30.0, 'name': 'RetailMax'},
+];
+
+CristalyseChart()
+  .data(marketData)
+  .mapping(
+    x: 'revenue',      // X position
+    y: 'customers',    // Y position  
+    size: 'marketShare' // Bubble size
+  )
+  .geomBubble()
+  .scaleXContinuous()
+  .scaleYContinuous()
+  .build()
+```
+
+## Color Mapping
+
+Add categorical grouping with color encoding:
+
+```dart
+final companyData = [
+  {'revenue': 120.0, 'customers': 150.0, 'marketShare': 15.0, 'category': 'Enterprise', 'name': 'TechFlow Solutions'},
+  {'revenue': 80.0, 'customers': 200.0, 'marketShare': 10.0, 'category': 'SMB', 'name': 'DataSync Pro'},
+  {'revenue': 60.0, 'customers': 180.0, 'marketShare': 8.0, 'category': 'Startup', 'name': 'InnovateLab'},
+  {'revenue': 200.0, 'customers': 120.0, 'marketShare': 25.0, 'category': 'Enterprise', 'name': 'GlobalTech Industries'},
+];
+
+CristalyseChart()
+  .data(companyData)
+  .mapping(
+    x: 'revenue',
+    y: 'customers', 
+    size: 'marketShare',
+    color: 'category'  // Color by category
+  )
+  .geomBubble(
+    alpha: 0.7,        // Semi-transparent for overlaps
+    borderWidth: 2.0,  // Border for better definition
+  )
+  .scaleXContinuous(min: 0)
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.defaultTheme())
+  .build()
+```
+
+## Bubble Sizing
+
+### Size Range Control
+
+Control the minimum and maximum bubble sizes:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare')
+  .geomBubble(
+    minSize: 8.0,   // Minimum radius in pixels
+    maxSize: 25.0,  // Maximum radius in pixels
+    alpha: 0.75,
+  )
+  .build()
+```
+
+### Dynamic Size Scaling
+
+Use a slider or control to adjust bubble sizes dynamically:
+
+```dart
+class BubbleChartWidget extends StatefulWidget {
+  @override
+  _BubbleChartWidgetState createState() => _BubbleChartWidgetState();
+}
+
+class _BubbleChartWidgetState extends State<BubbleChartWidget> {
+  double _sizeMultiplier = 0.5;
+
+  @override
+  Widget build(BuildContext context) {
+    // Calculate sizes based on multiplier
+    final minSize = 5.0 + _sizeMultiplier * 3.0;  // 5-8px
+    final maxSize = 15.0 + _sizeMultiplier * 10.0; // 15-25px
+    
+    return Column(
+      children: [
+        Slider(
+          value: _sizeMultiplier,
+          min: 0.0,
+          max: 1.0,
+          onChanged: (value) => setState(() => _sizeMultiplier = value),
+          label: 'Bubble Size',
+        ),
+        Expanded(
+          child: CristalyseChart()
+            .data(data)
+            .mapping(x: 'revenue', y: 'customers', size: 'marketShare')
+            .geomBubble(minSize: minSize, maxSize: maxSize)
+            .build(),
+        ),
+      ],
+    );
+  }
+}
+```
+
+## Bubble Styling
+
+### Shape Options
+
+Customize bubble shapes:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', size: 'size')
+  .geomBubble(
+    shape: PointShape.circle,    // circle, square, triangle
+    borderWidth: 2.0,
+    borderColor: Colors.white,
+    alpha: 0.8,
+  )
+  .build()
+```
+
+Available shapes:
+- `PointShape.circle` (default)
+- `PointShape.square`
+- `PointShape.triangle`
+
+### Advanced Styling
+
+```dart
+CristalyseChart()
+  .data(marketData)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare', color: 'category')
+  .geomBubble(
+    minSize: 10.0,
+    maxSize: 30.0,
+    alpha: 0.75,                 // Transparency for overlapping
+    borderWidth: 2.0,            // Border thickness
+    borderColor: Colors.white,   // Border color
+    shape: PointShape.circle,    // Bubble shape
+  )
+  .build()
+```
+
+## Labels and Text
+
+### Bubble Labels
+
+Add labels to bubbles:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare')
+  .geomBubble(
+    showLabels: true,
+    labelFormatter: (value) => '${value.toStringAsFixed(1)}%',
+    labelStyle: const TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    labelOffset: 0.0,  // Center labels on bubbles
+  )
+  .build()
+```
+
+### Custom Label Positioning
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare')
+  .geomBubble(
+    showLabels: true,
+    labelOffset: 15.0,  // Offset labels from bubble center
+    labelFormatter: (value) => 'Share: ${value}%',
+    labelStyle: TextStyle(
+      fontSize: 10,
+      color: Colors.black87,
+      backgroundColor: Colors.white.withOpacity(0.8),
+    ),
+  )
+  .build()
+```
+
+## Scale Customization
+
+### Axis Formatting
+
+Format axis labels for better readability:
+
+```dart
+CristalyseChart()
+  .data(marketData)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare')
+  .geomBubble()
+  .scaleXContinuous(
+    min: 0,
+    labels: (value) => '\$${value.toStringAsFixed(0)}M',  // Revenue in millions
+  )
+  .scaleYContinuous(
+    min: 0, 
+    labels: (value) => '${value.toStringAsFixed(0)}K',    // Customers in thousands
+  )
+  .build()
+```
+
+### Size Scale Optimization
+
+Ensure meaningful size differences:
+
+```dart
+// Good: Clear size hierarchy
+.geomBubble(minSize: 8.0, maxSize: 24.0)  // 3:1 ratio
+
+// Avoid: Too extreme ratios
+.geomBubble(minSize: 2.0, maxSize: 50.0)  // 25:1 ratio - hard to perceive
+```
+
+## Interactive Features
+
+### Rich Tooltips
+
+Create informative hover tooltips:
+
+```dart
+CristalyseChart()
+  .data(companyData)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare', color: 'category')
+  .geomBubble()
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) {
+        final name = point.getDisplayValue('name');
+        final revenue = point.getDisplayValue('revenue');
+        final customers = point.getDisplayValue('customers');
+        final marketShare = point.getDisplayValue('marketShare');
+        final category = point.getDisplayValue('category');
+        
+        return Container(
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.grey[900]!, Colors.grey[800]!],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 12,
+                offset: Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                name,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8),
+              _buildTooltipRow(Icons.attach_money, 'Revenue', '\$${revenue}M'),
+              _buildTooltipRow(Icons.people, 'Customers', '${customers}K'),
+              _buildTooltipRow(Icons.pie_chart, 'Market Share', '${marketShare}%'),
+              _buildTooltipRow(Icons.category, 'Category', category),
+            ],
+          ),
+        );
+      },
+    ),
+  )
+  .build()
+
+Widget _buildTooltipRow(IconData icon, String label, String value) {
+  return Padding(
+    padding: EdgeInsets.symmetric(vertical: 2),
+    child: Row(
+      children: [
+        Icon(icon, size: 14, color: Colors.grey[400]),
+        SizedBox(width: 6),
+        Text(label, style: TextStyle(color: Colors.grey[400], fontSize: 11)),
+        Spacer(),
+        Text(value, style: TextStyle(color: Colors.white, fontSize: 12)),
+      ],
+    ),
+  );
+}
+```
+
+### Click Interactions
+
+Handle bubble selection:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare', color: 'category')
+  .geomBubble()
+  .interaction(
+    click: ClickConfig(
+      onTap: (point) {
+        final companyName = point.getDisplayValue('name');
+        print('Selected company: $companyName');
+        
+        // Navigate to company details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CompanyDetailScreen(company: companyName),
+          ),
+        );
+      },
+    ),
+  )
+  .build()
+```
+
+## Animation
+
+### Entrance Animation
+
+Animate bubbles appearing:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare', color: 'category')
+  .geomBubble(alpha: 0.75)
+  .animate(
+    duration: Duration(milliseconds: 1200),
+    curve: Curves.easeOutCubic,
+  )
+  .build()
+```
+
+### Smooth Animation
+
+Customize animation timing and curves:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare')
+  .geomBubble()
+  .animate(
+    duration: Duration(milliseconds: 1500),
+    curve: Curves.elasticOut,
+  )
+  .build()
+```
+
+## Dual Y-Axis Support
+
+Use bubble charts with secondary Y-axis:
+
+```dart
+final performanceData = [
+  {'quarter': 'Q1', 'revenue': 120, 'efficiency': 85, 'satisfaction': 4.2},
+  {'quarter': 'Q2', 'revenue': 150, 'efficiency': 92, 'satisfaction': 4.5},
+  {'quarter': 'Q3', 'revenue': 110, 'efficiency': 78, 'satisfaction': 3.9},
+];
+
+CristalyseChart()
+  .data(performanceData)
+  .mapping(x: 'quarter', y: 'revenue', size: 'efficiency')
+  .mappingY2('satisfaction')
+  .geomBar(yAxis: YAxis.primary)      // Revenue bars on primary axis
+  .geomBubble(                        // Satisfaction bubbles on secondary axis
+    yAxis: YAxis.secondary,
+    minSize: 8.0,
+    maxSize: 20.0,
+    color: Colors.orange,
+    alpha: 0.8,
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .scaleY2Continuous(min: 1, max: 5)
+  .build()
+```
+
+## Market Analysis Example
+
+### Complete Dashboard
+
+A comprehensive market analysis bubble chart:
+
+```dart
+class MarketAnalysisDashboard extends StatefulWidget {
+  @override
+  _MarketAnalysisDashboardState createState() => _MarketAnalysisDashboardState();
+}
+
+class _MarketAnalysisDashboardState extends State<MarketAnalysisDashboard> {
+  double _bubbleScale = 1.0;
+  
+  final _marketData = [
+    {
+      'name': 'TechCorp Solutions',
+      'revenue': 250.0,
+      'customers': 180.0,
+      'marketShare': 28.0,
+      'category': 'Enterprise',
+    },
+    {
+      'name': 'StartupX Labs', 
+      'revenue': 85.0,
+      'customers': 120.0,
+      'marketShare': 12.0,
+      'category': 'Startup',
+    },
+    {
+      'name': 'MidSize Systems',
+      'revenue': 150.0,
+      'customers': 160.0,
+      'marketShare': 18.0,
+      'category': 'SMB', 
+    },
+    // ... more data
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final minSize = 8.0 + _bubbleScale * 5.0;
+    final maxSize = 15.0 + _bubbleScale * 15.0;
+    
+    return Scaffold(
+      body: Column(
+        children: [
+          // Header with controls
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Market Performance Analysis',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      Text('Revenue vs Customer Base'),
+                    ],
+                  ),
+                ),
+                // Bubble size control
+                Column(
+                  children: [
+                    Text('Bubble Size'),
+                    Slider(
+                      value: _bubbleScale,
+                      min: 0.1,
+                      max: 2.0,
+                      divisions: 19,
+                      label: '${(_bubbleScale * 100).round()}%',
+                      onChanged: (value) => setState(() => _bubbleScale = value),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          // Chart
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: CristalyseChart()
+                .data(_marketData)
+                .mapping(
+                  x: 'revenue',
+                  y: 'customers', 
+                  size: 'marketShare',
+                  color: 'category',
+                )
+                .geomBubble(
+                  minSize: minSize,
+                  maxSize: maxSize,
+                  alpha: 0.75,
+                  borderWidth: 2.0,
+                  borderColor: Colors.white,
+                )
+                .scaleXContinuous(
+                  labels: (value) => '\$${value.toStringAsFixed(0)}M',
+                )
+                .scaleYContinuous(
+                  labels: (value) => '${value.toStringAsFixed(0)}K',
+                )
+                .theme(ChartTheme.defaultTheme())
+                .animate(
+                  duration: Duration(milliseconds: 1000),
+                  curve: Curves.easeOutCubic,
+                )
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: _buildRichTooltip,
+                  ),
+                )
+                .build(),
+            ),
+          ),
+          
+          // Legend and insights
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              children: [
+                // Category legend
+                _buildLegend(),
+                SizedBox(height: 16),
+                // Key insights
+                _buildInsightsPanel(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRichTooltip(DataPointInfo point) {
+    final name = point.getDisplayValue('name');
+    final revenue = point.getDisplayValue('revenue');
+    final customers = point.getDisplayValue('customers');
+    final marketShare = point.getDisplayValue('marketShare');
+    final category = point.getDisplayValue('category');
+    
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.black87,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(name, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          SizedBox(height: 4),
+          Text('Revenue: \$${revenue}M', style: TextStyle(color: Colors.white)),
+          Text('Customers: ${customers}K', style: TextStyle(color: Colors.white)),
+          Text('Market Share: ${marketShare}%', style: TextStyle(color: Colors.white)),
+          Text('Category: ${category}', style: TextStyle(color: Colors.white)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegend() {
+    final categories = ['Enterprise', 'SMB', 'Startup'];
+    final colors = [Colors.blue, Colors.green, Colors.orange];
+    
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: categories.asMap().entries.map((entry) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12),
+          child: Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: colors[entry.key],
+                  shape: BoxShape.circle,
+                ),
+              ),
+              SizedBox(width: 6),
+              Text(entry.value),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildInsightsPanel() {
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.blue[200]!),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(Icons.insights, color: Colors.blue[700]),
+              SizedBox(width: 8),
+              Text(
+                'Key Insights',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue[900],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            '• Bubble size represents market share percentage\n'
+            '• Hover over bubbles for detailed company metrics\n'
+            '• Colors indicate company categories',
+            style: TextStyle(fontSize: 12, color: Colors.blue[700]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Size Encoding">
+    - Use bubble size for positive, quantitative variables
+    - Keep size ratios between 2:1 and 5:1 for optimal perception
+    - Ensure smallest bubbles are clearly visible (minimum 5-8px radius)
+    - Consider area vs radius scaling based on your data distribution
+  </Accordion>
+  
+  <Accordion title="Color and Transparency">
+    - Use alpha (transparency) for overlapping bubbles
+    - Limit color categories to 6-8 for clarity
+    - Add white borders to improve bubble separation
+    - Consider colorblind-friendly palettes
+  </Accordion>
+  
+  <Accordion title="Data Density">
+    - For dense data, increase transparency and reduce size
+    - Use tooltips instead of labels for cluttered charts
+    - Consider data aggregation or filtering for very large datasets
+    - Provide zoom/pan functionality for detailed exploration
+  </Accordion>
+  
+  <Accordion title="Interactive Design">
+    - Always include informative tooltips
+    - Use consistent hover states
+    - Consider click-through navigation to detail views
+    - Provide size controls for user customization
+  </Accordion>
+  
+  <Accordion title="Performance">
+    - For 500+ bubbles, reduce border width or disable borders
+    - Use lower alpha values for better performance
+    - Consider data virtualization for very large datasets
+    - Test on different device sizes and performance levels
+  </Accordion>
+</AccordionGroup>
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Market Analysis" icon="chart-bubble">
+    Revenue vs customers with market share sizing
+  </Card>
+  <Card title="Portfolio Visualization" icon="briefcase">
+    Risk vs return with position size bubbles
+  </Card>
+  <Card title="Performance Metrics" icon="gauge">
+    Multi-dimensional KPI dashboards
+  </Card>
+  <Card title="Scientific Data" icon="flask">
+    Three-variable correlation analysis
+  </Card>
+  <Card title="Geographic Analysis" icon="globe">
+    Population vs GDP with area sizing
+  </Card>
+  <Card title="Product Comparison" icon="comparison">
+    Price vs quality with popularity sizing
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Scatter Plots" icon="chart-scatter" href="/charts/scatter-plots">
+    Basic two-dimensional point charts
+  </Card>
+  <Card title="Heat Maps" icon="grid" href="/charts/heat-map-charts">
+    Matrix-based data visualization
+  </Card>
+  <Card title="Interactions" icon="hand-pointer" href="/features/interactions">
+    Add tooltips and click handlers
+  </Card>
+  <Card title="Animations" icon="play" href="/features/animations">
+    Smooth entrance and transition effects
+  </Card>
+</CardGroup>

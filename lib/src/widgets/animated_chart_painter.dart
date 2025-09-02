@@ -448,9 +448,16 @@ class AnimatedChartPainter extends CustomPainter {
         .cast<double>()
         .toList();
     if (values.isNotEmpty) {
+      // Check if we have a bubble geometry to use its size range
+      final bubbleGeometries = geometries.whereType<BubbleGeometry>().toList();
+      final bubbleGeometry =
+          bubbleGeometries.isNotEmpty ? bubbleGeometries.first : null;
+      final minSize = bubbleGeometry?.minSize ?? theme.pointSizeMin;
+      final maxSize = bubbleGeometry?.maxSize ?? theme.pointSizeMax;
+
       return SizeScale(
         domain: [values.reduce(math.min), values.reduce(math.max)],
-        range: [theme.pointSizeMin, theme.pointSizeMax],
+        range: [minSize, maxSize],
       );
     }
     return SizeScale();
@@ -585,6 +592,17 @@ class AnimatedChartPainter extends CustomPainter {
         plotArea,
         geometry,
         colorScale,
+      );
+    } else if (geometry is BubbleGeometry) {
+      _drawBubblesAnimated(
+        canvas,
+        plotArea,
+        geometry,
+        xScale,
+        yScale,
+        colorScale,
+        sizeScale,
+        isSecondaryY,
       );
     }
   }
@@ -1064,6 +1082,201 @@ class AnimatedChartPainter extends CustomPainter {
           path.close();
           canvas.drawPath(path, borderPaint);
         }
+      }
+    }
+  }
+
+  void _drawBubblesAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    BubbleGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+    SizeScale sizeScale,
+    bool isSecondaryY,
+  ) {
+    final yCol = isSecondaryY ? y2Column : yColumn;
+
+    if (sizeColumn == null) {
+      // If no size column is specified, treat as regular points
+      return;
+    }
+
+    for (int i = 0; i < data.length; i++) {
+      final point = data[i];
+      final x = getNumericValue(point[xColumn]);
+      final y = getNumericValue(point[yCol]);
+      final sizeValue = getNumericValue(point[sizeColumn]);
+
+      if (x == null || y == null || sizeValue == null) continue;
+
+      // Calculate bubble animation delay
+      final bubbleDelay = data.isNotEmpty ? i / data.length * 0.2 : 0.0;
+      final bubbleProgress = math.max(
+        0.0,
+        math.min(
+          1.0,
+          (animationProgress - bubbleDelay) /
+              math.max(0.001, 1.0 - bubbleDelay),
+        ),
+      );
+
+      if (bubbleProgress <= 0) continue;
+
+      // Get bubble color
+      final color = geometry.color ??
+          (colorColumn != null
+              ? colorScale.scale(point[colorColumn])
+              : (theme.colorPalette.isNotEmpty
+                  ? theme.colorPalette.first
+                  : theme.primaryColor));
+
+      // Calculate bubble size using size scale
+      final bubbleSize = sizeScale.scale(sizeValue);
+
+      // Calculate screen coordinates
+      final pointX = plotArea.left + xScale.scale(x);
+      final pointY = plotArea.top + yScale.scale(y);
+
+      if (!pointX.isFinite || !pointY.isFinite) {
+        continue;
+      }
+
+      // Create bubble paint with animation
+      final paint = Paint()
+        ..color = color.withAlpha(
+          (geometry.alpha * bubbleProgress * 255).round(),
+        )
+        ..style = PaintingStyle.fill;
+
+      final animatedSize = bubbleSize * bubbleProgress;
+
+      // Draw bubble based on shape
+      if (geometry.shape == PointShape.circle) {
+        canvas.drawCircle(
+          Offset(pointX, pointY),
+          animatedSize,
+          paint,
+        );
+      } else if (geometry.shape == PointShape.square) {
+        canvas.drawRect(
+          Rect.fromCenter(
+            center: Offset(pointX, pointY),
+            width: animatedSize * 2,
+            height: animatedSize * 2,
+          ),
+          paint,
+        );
+      } else if (geometry.shape == PointShape.triangle) {
+        final path = Path();
+        path.moveTo(pointX, pointY - animatedSize);
+        path.lineTo(
+          pointX - animatedSize,
+          pointY + animatedSize,
+        );
+        path.lineTo(
+          pointX + animatedSize,
+          pointY + animatedSize,
+        );
+        path.close();
+        canvas.drawPath(path, paint);
+      }
+
+      // Draw border if specified
+      if (geometry.borderWidth > 0) {
+        final borderColor = geometry.borderColor ?? theme.borderColor;
+        final borderPaint = Paint()
+          ..color = borderColor.withAlpha(
+            (geometry.alpha * bubbleProgress * 255).round(),
+          )
+          ..strokeWidth = geometry.borderWidth
+          ..style = PaintingStyle.stroke;
+
+        if (geometry.shape == PointShape.circle) {
+          canvas.drawCircle(
+            Offset(pointX, pointY),
+            animatedSize,
+            borderPaint,
+          );
+        } else if (geometry.shape == PointShape.square) {
+          canvas.drawRect(
+            Rect.fromCenter(
+              center: Offset(pointX, pointY),
+              width: animatedSize * 2,
+              height: animatedSize * 2,
+            ),
+            borderPaint,
+          );
+        } else if (geometry.shape == PointShape.triangle) {
+          final path = Path();
+          path.moveTo(pointX, pointY - animatedSize);
+          path.lineTo(
+            pointX - animatedSize,
+            pointY + animatedSize,
+          );
+          path.lineTo(
+            pointX + animatedSize,
+            pointY + animatedSize,
+          );
+          path.close();
+          canvas.drawPath(path, borderPaint);
+        }
+      }
+
+      // Draw label if enabled
+      if (geometry.showLabels && bubbleProgress > 0.7) {
+        final labelText = geometry.labelFormatter != null
+            ? geometry.labelFormatter!(sizeValue)
+            : sizeValue.toStringAsFixed(1);
+
+        final textStyle = geometry.labelStyle ??
+            TextStyle(
+              color: Colors.black,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            );
+
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: labelText,
+            style: textStyle.copyWith(
+              color: textStyle.color?.withAlpha(
+                (255 * bubbleProgress).round(),
+              ),
+            ),
+          ),
+          textAlign: TextAlign.center,
+          textDirection: TextDirection.ltr,
+        );
+        textPainter.layout();
+
+        // Position label offset from bubble center
+        final labelOffset = Offset(
+          pointX - textPainter.width / 2,
+          pointY - animatedSize - geometry.labelOffset - textPainter.height / 2,
+        );
+
+        // Draw text background for better readability
+        final backgroundRect = Rect.fromLTWH(
+          labelOffset.dx - 2,
+          labelOffset.dy - 1,
+          textPainter.width + 4,
+          textPainter.height + 2,
+        );
+
+        final backgroundPaint = Paint()
+          ..color = Colors.white.withValues(
+            alpha: 0.8 * bubbleProgress,
+          )
+          ..style = PaintingStyle.fill;
+
+        canvas.drawRRect(
+          RRect.fromRectAndRadius(backgroundRect, const Radius.circular(2)),
+          backgroundPaint,
+        );
+
+        textPainter.paint(canvas, labelOffset);
       }
     }
   }
@@ -1809,9 +2022,10 @@ class AnimatedChartPainter extends CustomPainter {
         if (value == null) {
           // Draw null value cell if color is configured
           if (geometry.nullValueColor != null) {
-            final baseAlpha = (geometry.nullValueColor!.a * 255.0).toDouble();
+            final baseAlpha =
+                (geometry.nullValueColor!.a * 255.0).round() & 0xff;
             final animatedAlpha = (baseAlpha * heatMapProgress).round();
-            final clampedAlpha = animatedAlpha.clamp(0, 255);
+            final clampedAlpha = animatedAlpha.clamp(0, 255).toInt();
 
             final nullPaint = Paint()
               ..color = geometry.nullValueColor!.withAlpha(clampedAlpha)
@@ -1879,10 +2093,10 @@ class AnimatedChartPainter extends CustomPainter {
         );
 
         // Draw cell
-        final baseAlpha = (cellColor.a * 255.0).toDouble();
+        final baseAlpha = (cellColor.a * 255.0).round() & 0xff;
         final animatedAlpha = (baseAlpha * cellProgress).round();
         final minVisibleAlpha = math.max(200, animatedAlpha);
-        final clampedAlpha = minVisibleAlpha.clamp(0, 255);
+        final clampedAlpha = minVisibleAlpha.clamp(0, 255).toInt();
 
         final cellPaint = Paint()
           ..color = cellColor.withAlpha(clampedAlpha)

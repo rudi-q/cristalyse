@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import 'graphs/area_chart.dart';
 import 'graphs/bar_chart.dart';
+import 'graphs/bubble_chart.dart';
 import 'graphs/dual_axis_chart.dart';
 import 'graphs/export_demo.dart';
 import 'graphs/grouped_bar.dart';
@@ -116,7 +117,7 @@ class _ExampleHomeState extends State<ExampleHome>
   void initState() {
     super.initState();
     _tabController = TabController(
-        length: 14, vsync: this); // Updated to 14 tabs (added 2 heatmaps)
+        length: 15, vsync: this); // Updated to 15 tabs (added bubble chart)
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -542,6 +543,152 @@ class _ExampleHomeState extends State<ExampleHome>
           ],
         ),
         actions: [
+          PopupMenuButton<int>(
+            icon: const Icon(Icons.list_alt),
+            tooltip: 'Jump to Chart',
+            onSelected: (index) {
+              _tabController.animateTo(index);
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 0,
+                child: ListTile(
+                  leading: Icon(Icons.scatter_plot, size: 20),
+                  title: Text('Scatter Plot'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 1,
+                child: ListTile(
+                  leading: Icon(Icons.touch_app, size: 20),
+                  title: Text('Interactive'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 2,
+                child: ListTile(
+                  leading: Icon(Icons.pan_tool, size: 20),
+                  title: Text('Panning'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 3,
+                child: ListTile(
+                  leading: Icon(Icons.show_chart, size: 20),
+                  title: Text('Line Chart'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 4,
+                child: ListTile(
+                  leading: Icon(Icons.area_chart, size: 20),
+                  title: Text('Area Chart'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 5,
+                child: ListTile(
+                  leading: Icon(Icons.bubble_chart, size: 20),
+                  title: Text('Bubble Chart'),
+                  subtitle: Text('New!',
+                      style: TextStyle(color: Colors.green, fontSize: 10)),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 6,
+                child: ListTile(
+                  leading: Icon(Icons.bar_chart, size: 20),
+                  title: Text('Bar Chart'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 7,
+                child: ListTile(
+                  leading: Icon(Icons.stacked_bar_chart, size: 20),
+                  title: Text('Grouped Bars'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 8,
+                child: ListTile(
+                  leading: Icon(Icons.horizontal_rule, size: 20),
+                  title: Text('Horizontal Bars'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 9,
+                child: ListTile(
+                  leading: Icon(Icons.stacked_line_chart, size: 20),
+                  title: Text('Stacked Bars'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 10,
+                child: ListTile(
+                  leading: Icon(Icons.pie_chart, size: 20),
+                  title: Text('Pie Chart'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 11,
+                child: ListTile(
+                  leading: Icon(Icons.analytics, size: 20),
+                  title: Text('Dual Y-Axis'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 12,
+                child: ListTile(
+                  leading: Icon(Icons.grid_on, size: 20),
+                  title: Text('Heatmap'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 13,
+                child: ListTile(
+                  leading: Icon(Icons.calendar_view_day, size: 20),
+                  title: Text('Contributions'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 14,
+                child: ListTile(
+                  leading: Icon(Icons.file_download, size: 20),
+                  title: Text('Export'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
           IconButton(
             onPressed: () => setState(() => _showControls = !_showControls),
             icon: Icon(_showControls ? Icons.visibility_off : Icons.visibility),
@@ -559,6 +706,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Panning'), // New panning tab
             Tab(text: 'Line Chart'),
             Tab(text: 'Area Chart'), // New area chart tab
+            Tab(text: 'Bubble Chart'), // New bubble chart tab
             Tab(text: 'Bar Chart'),
             Tab(text: 'Grouped Bars'),
             Tab(text: 'Horizontal Bars'),
@@ -646,6 +794,19 @@ class _ExampleHomeState extends State<ExampleHome>
                         'Mobile Share', '62%', '+4.1%', Colors.green),
                     _buildStatsCard(
                         'Avg Session', '4:32', '+12s', Colors.orange),
+                  ],
+                ),
+                _buildChartPage(
+                  'Market Performance Analysis',
+                  'Three-dimensional visualization showing revenue, customer count, and market share',
+                  buildBubbleChartTab(currentTheme, _sliderValue),
+                  [
+                    _buildStatsCard(
+                        'Market Leaders', '4', 'Enterprise', Colors.blue),
+                    _buildStatsCard(
+                        'Growth Rate', '23.5%', '+5.2%', Colors.green),
+                    _buildStatsCard(
+                        'Market Cap', '\$2.1B', '+12%', Colors.purple),
                   ],
                 ),
                 _buildChartPage(
@@ -817,6 +978,15 @@ class _ExampleHomeState extends State<ExampleHome>
 
   Widget _buildChartPage(
       String title, String description, Widget chart, List<Widget> stats) {
+    // Determine chart height based on chart type
+    double chartHeight = 380; // Default height
+    if (title.contains('Market Performance Analysis') ||
+        title.contains('Bubble')) {
+      chartHeight = 500; // Larger height for bubble charts to prevent cutoff
+    } else if (title.contains('Heatmap') || title.contains('Contributions')) {
+      chartHeight = 450; // Slightly larger for heatmaps
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -856,7 +1026,7 @@ class _ExampleHomeState extends State<ExampleHome>
 
           // Chart Container
           Container(
-            height: 380,
+            height: chartHeight,
             width: double.infinity,
             decoration: BoxDecoration(
               color: currentTheme.backgroundColor,

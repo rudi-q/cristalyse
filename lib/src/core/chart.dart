@@ -307,6 +307,66 @@ class CristalyseChart {
     return this;
   }
 
+  /// Add bubble chart
+  ///
+  /// Bubble charts visualize three-dimensional data where X and Y position
+  /// represent two dimensions, and the bubble size represents the third dimension.
+  /// Perfect for showing relationships between multiple continuous variables.
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.geomBubble(
+  ///   minSize: 10.0,
+  ///   maxSize: 50.0,
+  ///   alpha: 0.7,
+  ///   borderWidth: 2.0,
+  ///   showLabels: true,
+  ///   labelFormatter: (value) => value.toStringAsFixed(1),
+  /// )
+  /// ```
+  CristalyseChart geomBubble({
+    double? minSize,
+    double? maxSize,
+    Color? color,
+    double? alpha,
+    PointShape? shape,
+    double? borderWidth,
+    Color? borderColor,
+    bool? showLabels,
+    TextStyle? labelStyle,
+    LabelCallback? labelFormatter,
+    double? labelOffset,
+    YAxis? yAxis,
+  }) {
+    // Validate and normalize size parameters
+    double normalizedMinSize = (minSize != null && minSize > 0) ? minSize : 5.0;
+    double normalizedMaxSize =
+        (maxSize != null && maxSize > 0) ? maxSize : 30.0;
+
+    // Ensure minSize <= maxSize; if not, swap or set equal
+    if (normalizedMinSize > normalizedMaxSize) {
+      normalizedMinSize = normalizedMaxSize;
+    }
+
+    _geometries.add(
+      BubbleGeometry(
+        minSize: normalizedMinSize,
+        maxSize: normalizedMaxSize,
+        color: color,
+        alpha: alpha ?? 0.7,
+        shape: shape ?? PointShape.circle,
+        borderWidth: borderWidth ?? 1.0,
+        borderColor: borderColor,
+        showLabels: showLabels ?? false,
+        labelStyle: labelStyle,
+        labelFormatter: labelFormatter,
+        labelOffset: labelOffset ?? 5.0,
+        yAxis: yAxis ?? YAxis.primary,
+      ),
+    );
+    return this;
+  }
+
   /// Configure continuous X scale
   CristalyseChart scaleXContinuous(
       {double? min, double? max, LabelCallback? labels}) {
