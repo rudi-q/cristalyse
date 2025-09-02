@@ -47,8 +47,8 @@ topics:
   - graph
 
 environment:
-  sdk: '>=2.19.2 <4.0.0'
-  flutter: ">=1.17.0"
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.13.0"
 
 dependencies:
   flutter:

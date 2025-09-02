@@ -53,7 +53,7 @@ class LabelFormatter {
   String format(dynamic value) {
     if (value is num) {
       if (_customCallback != null) {
-        return _customCallback!(value);
+        return _customCallback(value);
       }
       return _formatDefault(value);
     }
