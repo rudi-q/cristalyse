@@ -190,6 +190,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
                   gridWidth: widget.theme.gridWidth,
                   axisWidth: widget.theme.axisWidth,
                 ))
+                .legend(position: LegendPosition.topRight)
                 .animate(
                   duration: const Duration(milliseconds: 1400),
                   curve: Curves.easeInOutCubic,

@@ -39,6 +39,9 @@ Widget buildStackedBarTab(ChartTheme currentTheme,
                     .format, // Direct NumberFormat usage
               )
               .theme(currentTheme)
+              .legend(
+                  position: LegendPosition.topRight,
+                  orientation: LegendOrientation.horizontal)
               .animate(
                   duration: const Duration(milliseconds: 1400),
                   curve: Curves.easeOutQuart)
@@ -46,7 +49,7 @@ Widget buildStackedBarTab(ChartTheme currentTheme,
         ),
         const SizedBox(height: 16),
         const Text(
-            '• Segments stack on top of each other\n• Each color represents a different category\n• Direct NumberFormat.simpleCurrency() usage\n• Great for showing part-to-whole relationships\n• Animated segment-by-segment building'),
+            '• Segments stack on top of each other\n• Each color represents a different category\n• Right-side legend shows revenue categories\n• Direct NumberFormat.simpleCurrency() usage\n• Great for showing part-to-whole relationships\n• Animated segment-by-segment building'),
       ],
     ),
   );
