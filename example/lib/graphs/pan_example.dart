@@ -180,6 +180,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                     ),
                   )
                   .theme(widget.theme)
+                  .animate(duration: const Duration(milliseconds: 0))
                   .build(),
             ),
           ),
