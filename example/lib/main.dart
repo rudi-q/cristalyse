@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:cristalyse/cristalyse.dart';
-import 'package:cristalyse_example/chart_theme.dart';
 import 'package:cristalyse_example/utils/chart_feature_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -929,16 +928,16 @@ class _ExampleHomeState extends State<ExampleHome>
                   ],
                 ),
                 _buildChartPage(
-                  'Multi-Series Line Chart Demo',
-                  'Demonstrates the fixed multi-series line chart functionality • Previously broken, now fully working',
+                  'Multi Series Line Chart with Custom Category Colors Demo',
+                  'Platform analytics with brand-specific colors • iOS Blue, Android Green, Web Orange • NEW in v1.4.0',
                   buildMultiSeriesLineChartTab(currentTheme, _sliderValue),
                   [
-                    _buildStatsCard(
-                        'Bug Status', 'Fixed!', '100% Working', Colors.green),
-                    _buildStatsCard(
-                        'Series Count', '3 Max', 'Unlimited', Colors.blue),
-                    _buildStatsCard(
-                        'Line Quality', 'Perfect', 'Separated', Colors.purple),
+                    _buildStatsCard('iOS Growth', '1,890', '+19.2%',
+                        const Color(0xFF007ACC)),
+                    _buildStatsCard('Android Users', '1,580', '+15.8%',
+                        const Color(0xFF3DDC84)),
+                    _buildStatsCard('Web Platform', '1,280', '+25.6%',
+                        const Color(0xFFFF6B35)),
                   ],
                 ),
                 _buildChartPage(

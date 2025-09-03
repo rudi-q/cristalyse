@@ -99,6 +99,49 @@ CristalyseChart()
   .build();
 ```
 
+## Custom Category Colors
+
+Assign specific colors to line series for brand consistency or semantic meaning:
+
+```dart
+// Product launch performance tracking
+final productColors = {
+  'Premium Edition': const Color(0xFFAB47BC),    // Purple - luxury
+  'Standard Edition': const Color(0xFF42A5F5),   // Blue - reliable
+  'Lite Edition': const Color(0xFF66BB6A),       // Green - accessible
+  'Beta Version': const Color(0xFFFF7043),       // Orange - experimental
+};
+
+CristalyseChart()
+  .data(launchMetrics)
+  .mapping(x: 'week', y: 'downloads', color: 'product')
+  .geomLine(strokeWidth: 2.5)
+  .geomPoint(size: 4.0)
+  .customPalette(categoryColors: productColors)
+  .build();
+```
+
+### Performance Status Lines
+
+Use semantic colors for status or performance indicators:
+
+```dart
+// Network latency by data center
+final dcColors = {
+  'US-East': const Color(0xFF1E88E5),      // Blue - primary
+  'US-West': const Color(0xFF43A047),      // Green - secondary
+  'EU-Central': const Color(0xFFE53935),   // Red - international
+  'Asia-Pacific': const Color(0xFFFF9800), // Orange - distant
+};
+
+CristalyseChart()
+  .data(latencyData)
+  .mapping(x: 'timestamp', y: 'latency_ms', color: 'datacenter')
+  .geomLine(strokeWidth: 2.0, alpha: 0.8)
+  .customPalette(categoryColors: dcColors)
+  .build();
+```
+
 ## Interactive Features
 
 ### Tooltips

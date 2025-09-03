@@ -140,6 +140,13 @@ Widget buildMultiSeriesLineChartTab(
               {'month': 'Jun', 'platform': 'Web', 'users': 1280},
             ];
 
+            // Define colors for specific categories
+            final Map<String, Color> categoryColors = {
+              'iOS': const Color(0xFF007ACC), // Brand blue
+              'Android': const Color(0xFF3DDC84), // Android green
+              'Web': const Color(0xFFFF6B35), // Web orange
+            };
+
             return CristalyseChart()
                 .data(threeSeriesData)
                 .mapping(x: 'month', y: 'users', color: 'platform')
@@ -148,6 +155,7 @@ Widget buildMultiSeriesLineChartTab(
                 .scaleXOrdinal()
                 .scaleYContinuous(min: 0)
                 .theme(currentTheme)
+                .customPalette(categoryColors: categoryColors)
                 .animate(duration: const Duration(milliseconds: 1800))
                 .build();
           }(),

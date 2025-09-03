@@ -411,6 +411,55 @@ class CristalyseChart {
     return this;
   }
 
+  /// Apply custom colors to specific categories in multi-series charts
+  ///
+  /// Use this method to assign specific colors to categories instead of relying
+  /// on the theme's default color palette. This is particularly useful for:
+  /// - Brand-specific colors (iOS blue, Android green, etc.)
+  /// - Semantic coloring (red for errors, green for success)
+  /// - Consistent visual identity across charts
+  ///
+  /// **Important:** This method requires a `color` mapping to be defined.
+  /// Call `.mapping(x: 'column', y: 'column', color: 'categoryColumn')` first.
+  ///
+  /// Categories not specified in [categoryColors] will fall back to the
+  /// theme's default color palette.
+  ///
+  /// Example:
+  /// ```dart
+  /// final platformColors = {
+  ///   'iOS': const Color(0xFF007ACC),      // Brand blue
+  ///   'Android': const Color(0xFF3DDC84),  // Android green
+  ///   'Web': const Color(0xFFFF6B35),      // Web orange
+  /// };
+  ///
+  /// CristalyseChart()
+  ///   .data(multiSeriesData)
+  ///   .mapping(x: 'month', y: 'users', color: 'platform')
+  ///   .geomLine()
+  ///   .customPalette(categoryColors: platformColors)
+  ///   .build();
+  /// ```
+  ///
+  /// Throws [ArgumentError] if:
+  /// - No color mapping is defined in `.mapping()`
+  /// - [categoryColors] is empty
+  CristalyseChart customPalette({required Map<String, Color> categoryColors}) {
+    if (categoryColors.isEmpty) {
+      throw ArgumentError('categoryColors cannot be empty');
+    }
+    if (_colorColumn != null) {
+      final String colorColumn = _colorColumn ?? '';
+      _theme = _theme.customPalette(
+          data: _data, color: colorColumn, categoryColors: categoryColors);
+    } else {
+      throw ArgumentError("'color' argument is missing from .mapping. \n"
+          "The correct code should look like this .mapping(x:'', y='', color='')\n"
+          "If you don't wish to add a category column, remove customPalette() from your CristalyseChart declaration code.\n\n");
+    }
+    return this;
+  }
+
   /// Configure animations
   ///
   /// Example:
@@ -657,6 +706,112 @@ extension TooltipConfigExtension on TooltipConfig {
       textColor: textColor ?? this.textColor,
       borderRadius: borderRadius ?? this.borderRadius,
       shadow: shadow ?? this.shadow,
+    );
+  }
+}
+
+/// Extension that adds utility methods to [ChartTheme] for enhanced customization
+/// and theme manipulation capabilities.
+extension ChartThemeExtension on ChartTheme {
+  /// Creates a copy of this [ChartTheme] with the given fields replaced with new values
+  ///
+  /// This method allows for easy theme customization by modifying only specific
+  /// properties while preserving all other theme settings.
+  ///
+  /// Example:
+  /// ```dart
+  /// final customTheme = ChartTheme.defaultTheme().copyWith(
+  ///   primaryColor: Colors.deepPurple,
+  ///   colorPalette: [Colors.purple, Colors.amber, Colors.teal],
+  ///   padding: const EdgeInsets.all(20),
+  /// );
+  /// ```
+  ChartTheme copyWith({
+    Color? backgroundColor,
+    Color? plotBackgroundColor,
+    Color? primaryColor,
+    Color? borderColor,
+    Color? gridColor,
+    Color? axisColor,
+    double? gridWidth,
+    double? axisWidth,
+    double? pointSizeDefault,
+    double? pointSizeMin,
+    double? pointSizeMax,
+    List<Color>? colorPalette,
+    EdgeInsets? padding,
+    TextStyle? axisTextStyle,
+    TextStyle? axisLabelStyle,
+  }) {
+    return ChartTheme(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      plotBackgroundColor: plotBackgroundColor ?? this.plotBackgroundColor,
+      primaryColor: primaryColor ?? this.primaryColor,
+      borderColor: borderColor ?? this.borderColor,
+      gridColor: gridColor ?? this.gridColor,
+      axisColor: axisColor ?? this.axisColor,
+      gridWidth: gridWidth ?? this.gridWidth,
+      axisWidth: axisWidth ?? this.axisWidth,
+      pointSizeDefault: pointSizeDefault ?? this.pointSizeDefault,
+      pointSizeMin: pointSizeMin ?? this.pointSizeMin,
+      pointSizeMax: pointSizeMax ?? this.pointSizeMax,
+      colorPalette: colorPalette ?? this.colorPalette,
+      padding: padding ?? this.padding,
+      axisTextStyle: axisTextStyle ?? this.axisTextStyle,
+      axisLabelStyle: axisLabelStyle ?? this.axisLabelStyle,
+    );
+  }
+
+  /// Creates a new [ChartTheme] with a custom color palette based on category mapping
+  ///
+  /// This method analyzes the provided [data] to extract unique categories from the
+  /// specified [color] column, then creates a color palette that maps specific
+  /// colors to categories as defined in [categoryColors].
+  ///
+  /// **Algorithm:**
+  /// 1. Extracts unique categories from `data[color]` column
+  /// 2. Maps each category to a color from [categoryColors]
+  /// 3. Falls back to the current theme's color palette for unmapped categories
+  /// 4. Returns a new theme with the custom color palette
+  ///
+  /// **Fallback behavior:**
+  /// If a category is not found in [categoryColors], the method will use the
+  /// color at the corresponding index from the current theme's `colorPalette`.
+  /// This ensures all categories have colors and prevents visual inconsistencies.
+  ///
+  /// Parameters:
+  /// - [data]: The chart data containing category information
+  /// - [color]: The column name that contains category values
+  /// - [categoryColors]: Map of category names to their desired colors
+  ///
+  /// Example:
+  /// ```dart
+  /// final customTheme = baseTheme.customPalette(
+  ///   data: chartData,
+  ///   color: 'platform',
+  ///   categoryColors: {
+  ///     'iOS': Colors.blue,
+  ///     'Android': Colors.green,
+  ///     'Web': Colors.orange,
+  ///   },
+  /// );
+  /// ```
+  ///
+  /// Returns a new [ChartTheme] with the custom color palette applied.
+  ChartTheme customPalette(
+      {required List<Map<String, dynamic>> data,
+      required String color,
+      required Map<String, Color> categoryColors}) {
+    // Extract unique categories
+    final categories = data.map((d) => d[color] as String).toSet().toList();
+    // Build color palette in the order categories appear
+    final colorPalette = categories
+        .map((category) =>
+            categoryColors[category] ??
+            this.colorPalette[categories.indexOf(category)])
+        .toList();
+    return copyWith(
+      colorPalette: colorPalette,
     );
   }
 }

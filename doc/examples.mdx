@@ -127,6 +127,78 @@ CristalyseChart()
   .build()
 ```
 
+### Custom Category Colors
+
+Assign specific colors to categories for consistent branding and semantic meaning:
+
+```dart
+// E-commerce performance by channel
+final channelColors = {
+  'Organic Search': const Color(0xFF34D399),    // Green - growth
+  'Paid Ads': const Color(0xFF60A5FA),         // Blue - investment
+  'Social Media': const Color(0xFFF59E0B),     // Yellow - engagement
+  'Email': const Color(0xFFEF4444),            // Red - direct
+  'Referrals': const Color(0xFF8B5CF6),        // Purple - partnership
+};
+
+final channelData = [
+  {'quarter': 'Q1', 'revenue': 45000, 'channel': 'Organic Search'},
+  {'quarter': 'Q2', 'revenue': 52000, 'channel': 'Organic Search'},
+  {'quarter': 'Q1', 'revenue': 28000, 'channel': 'Paid Ads'},
+  {'quarter': 'Q2', 'revenue': 35000, 'channel': 'Paid Ads'},
+  {'quarter': 'Q1', 'revenue': 18000, 'channel': 'Social Media'},
+  {'quarter': 'Q2', 'revenue': 22000, 'channel': 'Social Media'},
+  {'quarter': 'Q1', 'revenue': 15000, 'channel': 'Email'},
+  {'quarter': 'Q2', 'revenue': 19000, 'channel': 'Email'},
+];
+
+CristalyseChart()
+  .data(channelData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'channel')
+  .geomLine(strokeWidth: 2.5)
+  .geomPoint(size: 6.0)
+  .customPalette(categoryColors: channelColors)
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0, labels: (value) => '\$${(value/1000).toInt()}K')
+  .build()
+```
+
+### Server Health Monitoring
+
+Semantic colors for system status tracking:
+
+```dart
+// Infrastructure monitoring dashboard
+final healthColors = {
+  'Healthy': const Color(0xFF10B981),      // Green - all good
+  'Warning': const Color(0xFFF59E0B),      // Amber - attention needed
+  'Critical': const Color(0xFFEF4444),     // Red - urgent
+  'Maintenance': const Color(0xFF6B7280),  // Gray - planned downtime
+};
+
+final serverData = [
+  {'hour': '00:00', 'count': 12, 'status': 'Healthy'},
+  {'hour': '06:00', 'count': 15, 'status': 'Healthy'},
+  {'hour': '12:00', 'count': 8, 'status': 'Healthy'},
+  {'hour': '00:00', 'count': 2, 'status': 'Warning'},
+  {'hour': '06:00', 'count': 3, 'status': 'Warning'},
+  {'hour': '12:00', 'count': 1, 'status': 'Warning'},
+  {'hour': '00:00', 'count': 0, 'status': 'Critical'},
+  {'hour': '06:00', 'count': 1, 'status': 'Critical'},
+  {'hour': '12:00', 'count': 2, 'status': 'Critical'},
+];
+
+CristalyseChart()
+  .data(serverData)
+  .mapping(x: 'hour', y: 'count', color: 'status')
+  .geomArea(strokeWidth: 1.5, alpha: 0.6)
+  .customPalette(categoryColors: healthColors)
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .theme(ChartTheme.darkTheme())
+  .build()
+```
+
 ## Bar Charts
 
 ### Vertical Bar Chart

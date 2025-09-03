@@ -1,5 +1,4 @@
 import 'package:cristalyse/cristalyse.dart';
-import 'package:cristalyse_example/chart_theme.dart';
 import 'package:flutter/material.dart';
 
 Widget buildInteractiveScatterTab(

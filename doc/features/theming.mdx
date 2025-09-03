@@ -268,6 +268,102 @@ class ThemeAwareChart extends StatelessWidget {
 }
 ```
 
+## Custom Category Colors
+
+### Using customPalette()
+
+Assign specific colors to chart categories instead of relying on theme defaults. Perfect for brand consistency and semantic coloring:
+
+```dart
+// Financial portfolio by asset class
+final assetColors = {
+  'Stocks': const Color(0xFF2563EB),       // Blue - growth
+  'Bonds': const Color(0xFF059669),        // Green - stability  
+  'Real Estate': const Color(0xFFDC2626),  // Red - tangible
+  'Commodities': const Color(0xFFF59E0B),  // Yellow - resources
+  'Cash': const Color(0xFF6B7280),         // Gray - liquid
+};
+
+CristalyseChart()
+  .data(portfolioData)
+  .mapping(x: 'year', y: 'allocation', color: 'asset_class')
+  .geomArea(strokeWidth: 1.0, alpha: 0.7)
+  .theme(ChartTheme.defaultTheme())
+  .customPalette(categoryColors: assetColors)
+  .build();
+```
+
+### Semantic Color Mapping
+
+Use meaningful colors for status, performance, or categorical data:
+
+```dart
+// Customer satisfaction survey results
+final satisfactionColors = {
+  'Very Satisfied': const Color(0xFF10B981),    // Bright green
+  'Satisfied': const Color(0xFF84CC16),         // Lime green
+  'Neutral': const Color(0xFFFBBF24),           // Amber
+  'Dissatisfied': const Color(0xFFF97316),      // Orange
+  'Very Dissatisfied': const Color(0xFFEF4444), // Red
+};
+
+CristalyseChart()
+  .data(surveyResults)
+  .mapping(x: 'month', y: 'responses', color: 'satisfaction')
+  .geomBar(style: BarStyle.stacked)
+  .customPalette(categoryColors: satisfactionColors)
+  .build();
+```
+
+### Department Analytics
+
+Consistent colors across organizational charts:
+
+```dart
+// Regional sales performance by continent
+final regionColors = {
+  'North America': const Color(0xFF3B82F6),  // Blue - established market
+  'Europe': const Color(0xFF10B981),         // Green - growth market
+  'Asia Pacific': const Color(0xFFF59E0B),   // Yellow - emerging opportunity
+  'Latin America': const Color(0xFFEF4444),  // Red - developing market
+  'Middle East': const Color(0xFF8B5CF6),    // Purple - strategic market
+  'Africa': const Color(0xFF06B6D4),         // Cyan - future potential
+};
+
+CristalyseChart()
+  .data(globalSalesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'region')
+  .geomLine(strokeWidth: 3.0)
+  .geomPoint(size: 5.0)
+  .customPalette(categoryColors: regionColors)
+  .build();
+```
+
+### Smart Fallback Behavior
+
+Categories not specified in your custom palette automatically use theme defaults:
+
+```dart
+// Only specify colors for key categories
+final partialColors = {
+  'Primary': Colors.blue,
+  'Secondary': Colors.orange,
+  // 'Other' categories will use theme.colorPalette colors
+};
+
+CristalyseChart()
+  .data(mixedData)
+  .mapping(x: 'date', y: 'value', color: 'category')
+  .geomArea()
+  .customPalette(categoryColors: partialColors)
+  .build();
+```
+
+<Note>
+  **Important**: The `customPalette()` method requires a `color` mapping in your `.mapping()` call. 
+  Categories not specified in `categoryColors` will automatically use colors from your theme's `colorPalette`.
+</Note>
+
 ## Advanced Theming Patterns
 
 ### Conditional Color Palettes
@@ -343,6 +439,14 @@ ChartTheme responsiveTheme(BuildContext context) {
     - Test themes with various data types and sizes
     - Consider responsive design for different screen sizes
     - Document custom theme usage for team members
+  </Accordion>
+  
+  <Accordion title="Custom Category Colors">
+    - Use `customPalette()` for brand-specific or semantic colors
+    - Maintain consistent color meanings across charts
+    - Leverage fallback behavior for unmapped categories
+    - Combine with themes for complete visual control
+    - Test color accessibility and contrast ratios
   </Accordion>
 </AccordionGroup>
 
