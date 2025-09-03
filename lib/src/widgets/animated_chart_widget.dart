@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../core/geometry.dart';
+import '../core/legend.dart';
 import '../core/scale.dart';
 import '../core/util/helper.dart';
 import '../core/util/painter.dart';
@@ -11,6 +12,7 @@ import '../interaction/chart_interactions.dart';
 import '../interaction/interaction_detector.dart';
 import '../interaction/tooltip_widget.dart';
 import '../themes/chart_theme.dart';
+import 'legend_widget.dart';
 
 /// Animated wrapper for the chart widget
 class AnimatedCristalyseChartWidget extends StatefulWidget {
@@ -36,6 +38,7 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
   final Curve animationCurve;
   final bool coordFlipped;
   final ChartInteraction interaction;
+  final LegendConfig? legendConfig;
 
   const AnimatedCristalyseChartWidget({
     super.key,
@@ -61,6 +64,7 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
     this.animationCurve = Curves.easeInOut,
     this.coordFlipped = false,
     this.interaction = ChartInteraction.none,
+    this.legendConfig,
   });
 
   @override
@@ -513,7 +517,111 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
+    // Add legend if configured
+    if (widget.legendConfig != null) {
+      chart = _buildChartWithLegend(context, chart);
+    }
+
     return chart;
+  }
+
+  /// Build chart with legend positioned according to configuration
+  Widget _buildChartWithLegend(BuildContext context, Widget chart) {
+    final config = widget.legendConfig!;
+
+    // Generate legend items from chart data
+    final legendItems = LegendGenerator.generateFromData(
+      data: widget.data,
+      colorColumn: widget.colorColumn,
+      colorPalette: widget.theme.colorPalette,
+      geometries: widget.geometries,
+    );
+
+    // If no legend items, return chart as-is
+    if (legendItems.isEmpty) return chart;
+
+    final legend = LegendWidget(
+      items: legendItems,
+      config: config,
+      theme: widget.theme,
+    );
+
+    // Position legend based on configuration
+    return _positionLegend(chart, legend, config);
+  }
+
+  /// Position legend relative to chart based on configuration
+  Widget _positionLegend(Widget chart, Widget legend, LegendConfig config) {
+    final spacing = SizedBox(
+      width: config.isRightSide || config.isLeftSide ? config.spacing : 0,
+      height: config.isTopSide || config.isBottomSide ? config.spacing : 0,
+    );
+
+    switch (config.position) {
+      case LegendPosition.top:
+        return Column(
+          children: [legend, spacing, Expanded(child: chart)],
+        );
+
+      case LegendPosition.bottom:
+        return Column(
+          children: [Expanded(child: chart), spacing, legend],
+        );
+
+      case LegendPosition.left:
+        return Row(
+          children: [legend, spacing, Expanded(child: chart)],
+        );
+
+      case LegendPosition.right:
+        return Row(
+          children: [Expanded(child: chart), spacing, legend],
+        );
+
+      case LegendPosition.topLeft:
+        return Column(
+          children: [
+            Row(
+              children: [legend, Expanded(child: Container())],
+            ),
+            spacing,
+            Expanded(child: chart),
+          ],
+        );
+
+      case LegendPosition.topRight:
+        return Column(
+          children: [
+            Row(
+              children: [Expanded(child: Container()), legend],
+            ),
+            spacing,
+            Expanded(child: chart),
+          ],
+        );
+
+      case LegendPosition.bottomLeft:
+        return Column(
+          children: [
+            Expanded(child: chart),
+            spacing,
+            Row(
+              children: [legend, Expanded(child: Container())],
+            ),
+          ],
+        );
+
+      case LegendPosition.bottomRight:
+        return Column(
+          children: [
+            Expanded(child: chart),
+            spacing,
+            Row(
+              children: [Expanded(child: Container()), legend],
+            ),
+          ],
+        );
+    }
   }
 
   Scale _setupXScale(double width, bool hasBarGeometry) {
