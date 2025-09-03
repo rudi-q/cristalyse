@@ -39,7 +39,7 @@ Widget buildGroupedBarTab(ChartTheme currentTheme,
                     .format, // Direct NumberFormat usage
               )
               .theme(currentTheme)
-              .legend(position: LegendPosition.topRight)
+              .legend(position: LegendPosition.top)
               .animate(
                   duration: const Duration(milliseconds: 1200),
                   curve: Curves.easeOutCubic)

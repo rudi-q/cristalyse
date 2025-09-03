@@ -140,7 +140,7 @@ class LegendGenerator {
     required List<Color> colorPalette,
     required List<Geometry> geometries,
   }) {
-    if (colorColumn == null || data.isEmpty) return [];
+    if (colorColumn == null || data.isEmpty || colorPalette.isEmpty) return [];
 
     // Extract unique categories from the color column
     final categories = data

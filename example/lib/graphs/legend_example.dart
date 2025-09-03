@@ -34,7 +34,7 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                 .data(data)
                 .mapping(x: 'quarter', y: 'revenue', color: 'product')
                 .geomBar(
-                    width: sliderValue.clamp(0.1, 1.0),
+                    width: sliderValue.clamp(0.1, 1.0).toDouble(),
                     style: BarStyle.grouped,
                     alpha: 0.9)
                 .scaleXOrdinal()
@@ -63,7 +63,7 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                 .data(data)
                 .mapping(x: 'quarter', y: 'revenue', color: 'product')
                 .geomBar(
-                    width: sliderValue.clamp(0.1, 1.0),
+                    width: sliderValue.clamp(0.1, 1.0).toDouble(),
                     style: BarStyle.grouped,
                     alpha: 0.9)
                 .scaleXOrdinal()
@@ -93,7 +93,7 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                 .data(data)
                 .mapping(x: 'quarter', y: 'revenue', color: 'product')
                 .geomBar(
-                    width: sliderValue.clamp(0.1, 1.0),
+                    width: sliderValue.clamp(0.1, 1.0).toDouble(),
                     style: BarStyle.grouped,
                     alpha: 0.9)
                 .scaleXOrdinal()
@@ -133,7 +133,7 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                 .data(data)
                 .mapping(x: 'quarter', y: 'revenue', color: 'product')
                 .geomBar(
-                    width: sliderValue.clamp(0.1, 1.0),
+                    width: sliderValue.clamp(0.1, 1.0).toDouble(),
                     style: BarStyle.grouped,
                     alpha: 0.9)
                 .scaleXOrdinal()

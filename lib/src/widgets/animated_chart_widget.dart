@@ -552,40 +552,114 @@ class _AnimatedCristalyseChartWidgetState
 
   /// Position legend relative to chart based on configuration
   Widget _positionLegend(Widget chart, Widget legend, LegendConfig config) {
-    final spacing = SizedBox(
-      width: config.isRightSide || config.isLeftSide ? config.spacing : 0,
-      height: config.isTopSide || config.isBottomSide ? config.spacing : 0,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Check if we have bounded constraints
+        final hasFiniteWidth = constraints.maxWidth != double.infinity;
+        final hasFiniteHeight = constraints.maxHeight != double.infinity;
+
+        // If constraints are unbounded, use overlay positioning
+        if (!hasFiniteWidth || !hasFiniteHeight) {
+          return _buildOverlayLegend(chart, legend, config);
+        }
+
+        final spacing = SizedBox(
+          width: config.isRightSide || config.isLeftSide ? config.spacing : 0,
+          height: config.isTopSide || config.isBottomSide ? config.spacing : 0,
+        );
+
+        return _buildFlexLegend(chart, legend, config, spacing);
+      },
     );
+  }
+
+  /// Build legend using overlay positioning for unbounded constraints
+  Widget _buildOverlayLegend(Widget chart, Widget legend, LegendConfig config) {
+    Alignment alignment;
+    EdgeInsets padding;
 
     switch (config.position) {
       case LegendPosition.top:
+        alignment = Alignment.topCenter;
+        padding = EdgeInsets.only(top: config.spacing);
+        break;
+      case LegendPosition.bottom:
+        alignment = Alignment.bottomCenter;
+        padding = EdgeInsets.only(bottom: config.spacing);
+        break;
+      case LegendPosition.left:
+        alignment = Alignment.centerLeft;
+        padding = EdgeInsets.only(left: config.spacing);
+        break;
+      case LegendPosition.right:
+        alignment = Alignment.centerRight;
+        padding = EdgeInsets.only(right: config.spacing);
+        break;
+      case LegendPosition.topLeft:
+        alignment = Alignment.topLeft;
+        padding = EdgeInsets.only(top: config.spacing, left: config.spacing);
+        break;
+      case LegendPosition.topRight:
+        alignment = Alignment.topRight;
+        padding = EdgeInsets.only(top: config.spacing, right: config.spacing);
+        break;
+      case LegendPosition.bottomLeft:
+        alignment = Alignment.bottomLeft;
+        padding = EdgeInsets.only(bottom: config.spacing, left: config.spacing);
+        break;
+      case LegendPosition.bottomRight:
+        alignment = Alignment.bottomRight;
+        padding =
+            EdgeInsets.only(bottom: config.spacing, right: config.spacing);
+        break;
+    }
+
+    return Stack(
+      children: [
+        chart,
+        Align(
+          alignment: alignment,
+          child: Padding(
+            padding: padding,
+            child: legend,
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Build legend using Flex layout for bounded constraints
+  Widget _buildFlexLegend(
+      Widget chart, Widget legend, LegendConfig config, Widget spacing) {
+    switch (config.position) {
+      case LegendPosition.top:
         return Column(
-          children: [legend, spacing, Expanded(child: chart)],
+          children: [legend, spacing, Flexible(child: chart)],
         );
 
       case LegendPosition.bottom:
         return Column(
-          children: [Expanded(child: chart), spacing, legend],
+          children: [Flexible(child: chart), spacing, legend],
         );
 
       case LegendPosition.left:
         return Row(
-          children: [legend, spacing, Expanded(child: chart)],
+          children: [legend, spacing, Flexible(child: chart)],
         );
 
       case LegendPosition.right:
         return Row(
-          children: [Expanded(child: chart), spacing, legend],
+          children: [Flexible(child: chart), spacing, legend],
         );
 
       case LegendPosition.topLeft:
         return Column(
           children: [
             Row(
-              children: [legend, Expanded(child: Container())],
+              children: [legend, Flexible(child: Container())],
             ),
             spacing,
-            Expanded(child: chart),
+            Flexible(child: chart),
           ],
         );
 
@@ -593,20 +667,20 @@ class _AnimatedCristalyseChartWidgetState
         return Column(
           children: [
             Row(
-              children: [Expanded(child: Container()), legend],
+              children: [Flexible(child: Container()), legend],
             ),
             spacing,
-            Expanded(child: chart),
+            Flexible(child: chart),
           ],
         );
 
       case LegendPosition.bottomLeft:
         return Column(
           children: [
-            Expanded(child: chart),
+            Flexible(child: chart),
             spacing,
             Row(
-              children: [legend, Expanded(child: Container())],
+              children: [legend, Flexible(child: Container())],
             ),
           ],
         );
@@ -614,10 +688,10 @@ class _AnimatedCristalyseChartWidgetState
       case LegendPosition.bottomRight:
         return Column(
           children: [
-            Expanded(child: chart),
+            Flexible(child: chart),
             spacing,
             Row(
-              children: [Expanded(child: Container()), legend],
+              children: [Flexible(child: Container()), legend],
             ),
           ],
         );
