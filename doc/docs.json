@@ -38,6 +38,7 @@
           {
             "group": "Features",
             "pages": [
+              "features/legends",
               "features/animations",
               "features/theming",
               "features/interactions",

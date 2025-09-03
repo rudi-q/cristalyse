@@ -82,6 +82,7 @@ class MyFirstChart extends StatelessWidget {
           .scaleXContinuous()
           .scaleYContinuous()
           .theme(ChartTheme.defaultTheme())
+          .legend() // ✨ Add a legend to show categories
           .build(),
       ),
     );
@@ -124,8 +125,58 @@ CristalyseChart()
   .geomBar()
   .scaleYContinuous(labels: NumberFormat.simpleCurrency().format) // $1,234.56
   .scaleXOrdinal()
+  .legend() // Auto-generates legend from color categories
   .build()
 ```
+
+## Adding a Legend
+
+<Tip>
+**New in v1.5.0**: Built-in legend support with zero configuration!
+</Tip>
+
+When your chart has color categories, add a professional legend with one line:
+
+```dart
+final salesData = [
+  {'quarter': 'Q1', 'revenue': 1000, 'product': 'ProductA'},
+  {'quarter': 'Q2', 'revenue': 1200, 'product': 'ProductA'},
+  {'quarter': 'Q1', 'revenue': 800, 'product': 'ProductB'},
+  {'quarter': 'Q2', 'revenue': 950, 'product': 'ProductB'},
+];
+
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product') // Color mapping required
+  .geomBar(style: BarStyle.grouped)
+  .legend() // ✨ Automatically creates legend for each product
+  .build();
+```
+
+**Key Benefits:**
+- 🎯 **Zero Config**: Just add `.legend()` and it works
+- 📱 **Smart Positioning**: Defaults to top-right, 8 position options available
+- 🌙 **Dark Mode Ready**: Text automatically adapts to theme colors
+- 🔄 **Auto-Symbols**: Squares for bars, circles for points, lines for line charts
+
+<Info>
+**Requirement**: Legends need a `color` parameter in your `.mapping()` call to detect categories.
+</Info>
+
+### Quick Legend Positioning
+
+```dart
+// Bottom legend (great for mobile)
+.legend(position: LegendPosition.bottom)
+
+// Right side legend
+.legend(position: LegendPosition.right)
+
+// Top-left corner  
+.legend(position: LegendPosition.topLeft)
+```
+
+Learn more about [legend customization and styling](/features/legends).
 
 ## Understanding the Grammar
 

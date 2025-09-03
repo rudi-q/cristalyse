@@ -1,0 +1,427 @@
+---
+title: 'Built-in Legends'
+description: 'Add professional legends to your charts with automatic positioning and dark mode support'
+---
+
+## Overview
+
+Cristalyse provides built-in legend support that automatically generates beautiful legends from your chart's color mapping data. With just `.legend()`, you get intelligent symbol generation, smart positioning, and full dark mode compatibility.
+
+<Info>
+**New in v1.5.0**: Built-in legend support with zero configuration required!
+</Info>
+
+## Quick Start
+
+Add a legend to any chart with color mapping in just one line:
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .legend() // ✨ That's it! Auto-positioned legend with product categories
+  .build();
+```
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Zero Configuration" icon="magic-wand-sparkles">
+    Works automatically with smart defaults - just add `.legend()`
+  </Card>
+  <Card title="8 Positioning Options" icon="arrows-to-circle">
+    Flexible positioning: corners, edges, with auto-orientation
+  </Card>
+  <Card title="Smart Symbol Detection" icon="eye">
+    Automatically matches your chart type: squares, circles, lines
+  </Card>
+  <Card title="Dark Mode Ready" icon="moon">
+    Legend text adapts automatically to light and dark themes
+  </Card>
+</CardGroup>
+
+## Positioning
+
+### Basic Positioning
+
+Control legend placement with the `position` parameter:
+
+```dart
+// Bottom legend (horizontal layout)
+.legend(position: LegendPosition.bottom)
+
+// Right side legend (vertical layout)  
+.legend(position: LegendPosition.right)
+
+// Top-right corner (default)
+.legend(position: LegendPosition.topRight)
+```
+
+### All Position Options
+
+<CardGroup cols={2}>
+  <Card title="Corner Positions">
+    - `LegendPosition.topLeft`
+    - `LegendPosition.topRight` (default)
+    - `LegendPosition.bottomLeft`
+    - `LegendPosition.bottomRight`
+  </Card>
+  <Card title="Edge Positions">
+    - `LegendPosition.top`
+    - `LegendPosition.bottom`
+    - `LegendPosition.left`
+    - `LegendPosition.right`
+  </Card>
+</CardGroup>
+
+### Visual Examples
+
+<Tabs>
+  <Tab title="Default (Top Right)">
+    ```dart
+    CristalyseChart()
+      .data(data)
+      .mapping(x: 'month', y: 'sales', color: 'region')
+      .geomBar()
+      .legend() // Default: topRight position
+      .build();
+    ```
+    Legend appears in the top-right corner with vertical layout.
+  </Tab>
+  
+  <Tab title="Bottom Legend">
+    ```dart
+    CristalyseChart()
+      .data(data)
+      .mapping(x: 'month', y: 'sales', color: 'region')
+      .geomBar()
+      .legend(position: LegendPosition.bottom)
+      .build();
+    ```
+    Legend appears at bottom with horizontal layout, perfect for mobile.
+  </Tab>
+  
+  <Tab title="Right Side">
+    ```dart
+    CristalyseChart()
+      .data(data)
+      .mapping(x: 'month', y: 'sales', color: 'region')
+      .geomBar()
+      .legend(position: LegendPosition.right)
+      .build();
+    ```
+    Legend appears on the right side with vertical layout.
+  </Tab>
+</Tabs>
+
+## Symbol Generation
+
+Legends automatically choose appropriate symbols based on your chart type:
+
+| Chart Type | Symbol | Description |
+|------------|--------|-------------|
+| **Bar Charts** | 🟦 Square | Solid colored squares for categorical bars |
+| **Line Charts** | ━ Line | Horizontal line segments matching chart lines |
+| **Scatter Plots** | 🔵 Circle | Circular symbols for point data |
+| **Area Charts** | ━ Line | Line symbols representing area boundaries |
+| **Bubble Charts** | 🔵 Circle | Circular symbols for bubble data |
+
+<Note>
+Symbol selection is automatic but can be overridden with custom styling if needed.
+</Note>
+
+## Dark Mode Support
+
+Legend text automatically adapts to your chart theme:
+
+<CodeGroup>
+  ```dart Light Theme
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'month', y: 'sales', color: 'product')
+    .geomBar()
+    .theme(ChartTheme.defaultTheme()) // Light theme
+    .legend() // Dark text on light background
+    .build();
+  ```
+
+  ```dart Dark Theme
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'month', y: 'sales', color: 'product')
+    .geomBar()
+    .theme(ChartTheme.darkTheme()) // Dark theme
+    .legend() // Light text on dark background ✨
+    .build();
+  ```
+</CodeGroup>
+
+<Tip>
+**Theme Inheritance**: Legend text uses `theme.axisColor` for perfect contrast in any theme.
+</Tip>
+
+## Custom Styling
+
+### Background and Appearance
+
+Add custom styling for professional dashboards:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar()
+  .legend(
+    position: LegendPosition.right,
+    backgroundColor: Colors.white.withValues(alpha: 0.95),
+    borderRadius: 8.0,
+    symbolSize: 14.0,
+    itemSpacing: 12.0,
+  )
+  .build();
+```
+
+### Text Styling
+
+Customize legend text while preserving theme colors:
+
+```dart
+.legend(
+  textStyle: TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w600,
+    // Color automatically inherits from theme
+  ),
+  symbolSize: 16.0,
+)
+```
+
+<Warning>
+**Theme Colors**: Avoid hardcoding text colors. Let the legend inherit from your theme for proper dark mode support.
+</Warning>
+
+### All Styling Options
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `position` | `LegendPosition` | `topRight` | Legend placement |
+| `backgroundColor` | `Color?` | `null` | Legend background color |
+| `textStyle` | `TextStyle?` | `null` | Text styling (inherits color from theme) |
+| `symbolSize` | `double` | `12.0` | Size of legend symbols |
+| `itemSpacing` | `double` | `8.0` | Space between legend items |
+| `spacing` | `double` | `12.0` | Space between legend and chart |
+| `borderRadius` | `double` | `4.0` | Background border radius |
+
+## Real-World Examples
+
+### Dashboard Analytics
+
+Perfect for executive dashboards with multiple data series:
+
+```dart
+CristalyseChart()
+  .data(regionalSales)
+  .mapping(x: 'month', y: 'revenue', color: 'region')
+  .geomLine(strokeWidth: 3.0)
+  .geomPoint(size: 6.0)
+  .legend(
+    position: LegendPosition.bottom,
+    backgroundColor: Colors.grey.shade50,
+    borderRadius: 12.0,
+  )
+  .build();
+```
+
+### Mobile-Optimized
+
+Bottom legends work great on mobile devices:
+
+```dart
+CristalyseChart()
+  .data(performanceData)
+  .mapping(x: 'date', y: 'value', color: 'metric')
+  .geomArea(alpha: 0.7)
+  .legend(position: LegendPosition.bottom) // Mobile-friendly
+  .build();
+```
+
+### Dark Theme Dashboard
+
+Professional dark mode with custom styling:
+
+```dart
+CristalyseChart()
+  .data(analyticsData)
+  .mapping(x: 'week', y: 'users', color: 'platform')
+  .geomBar(style: BarStyle.grouped)
+  .theme(ChartTheme.darkTheme())
+  .legend(
+    position: LegendPosition.topRight,
+    backgroundColor: Colors.black.withValues(alpha: 0.7),
+    borderRadius: 8.0,
+    symbolSize: 14.0,
+  )
+  .build();
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="📱 Mobile Optimization">
+    - Use `LegendPosition.bottom` for mobile layouts
+    - Keep symbol sizes readable on small screens
+    - Consider horizontal orientation for many categories
+  </Accordion>
+
+  <Accordion title="🎨 Visual Design">
+    - Let legends inherit theme colors automatically
+    - Use subtle backgrounds with transparency
+    - Maintain consistent spacing across charts
+  </Accordion>
+
+  <Accordion title="📊 Data Clarity">
+    - Ensure category names are descriptive
+    - Limit legend items to 6-8 for readability
+    - Position legends to not obscure important data
+  </Accordion>
+
+  <Accordion title="♿ Accessibility">
+    - Rely on automatic theme colors for contrast
+    - Test legends in both light and dark modes
+    - Ensure sufficient color differentiation
+  </Accordion>
+</AccordionGroup>
+
+## Advanced Usage
+
+### Multi-Series Line Charts
+
+Perfect for time-series data with multiple metrics:
+
+```dart
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'date', y: 'value', color: 'metric')
+  .geomLine(strokeWidth: 2.5)
+  .scaleXContinuous()
+  .scaleYContinuous(
+    labels: (value) => '${value.toStringAsFixed(1)}K',
+  )
+  .legend(position: LegendPosition.topLeft)
+  .build();
+```
+
+### Grouped Bar Charts with Custom Colors
+
+Combine custom palettes with legends:
+
+```dart
+final brandColors = {
+  'iOS': const Color(0xFF007ACC),
+  'Android': const Color(0xFF3DDC84),
+  'Web': const Color(0xFFFF6B35),
+};
+
+CristalyseChart()
+  .data(platformData)
+  .mapping(x: 'quarter', y: 'users', color: 'platform')
+  .geomBar(style: BarStyle.grouped)
+  .customPalette(categoryColors: brandColors)
+  .legend(position: LegendPosition.right)
+  .build();
+```
+
+## Requirements
+
+<Note>
+**Color Mapping Required**: Legends only work when you have a `color` parameter in your `.mapping()` call.
+</Note>
+
+```dart
+// ✅ Works - has color mapping
+.mapping(x: 'month', y: 'sales', color: 'product')
+.legend()
+
+// ❌ Won't show - no color mapping  
+.mapping(x: 'month', y: 'sales')
+.legend() // Legend will be empty
+```
+
+## Migration Guide
+
+### From Manual Legends
+
+If you were manually creating legends, you can now use the built-in functionality:
+
+<CodeGroup>
+  ```dart Before (Manual)
+  // Manual legend creation with custom widgets
+  Column(
+    children: [
+      Row(
+        children: [
+          Container(width: 12, height: 12, color: Colors.blue),
+          SizedBox(width: 8),
+          Text('Product A'),
+        ],
+      ),
+      // ... more manual legend items
+      Expanded(child: CristalyseChart()...),
+    ],
+  )
+  ```
+
+  ```dart After (Built-in)
+  // Automatic legend with one line
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'month', y: 'sales', color: 'product')
+    .geomBar()
+    .legend() // ✨ Automatically creates legend for all products
+    .build();
+  ```
+</CodeGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Legend not appearing">
+    **Solution**: Ensure you have a `color` parameter in your `.mapping()` call:
+    ```dart
+    .mapping(x: 'month', y: 'sales', color: 'category') // Required
+    .legend()
+    ```
+  </Accordion>
+
+  <Accordion title="Legend text too dark in dark theme">
+    **Solution**: Don't override text color - let it inherit from theme:
+    ```dart
+    // ✅ Good - inherits theme color
+    .legend(textStyle: TextStyle(fontSize: 14))
+    
+    // ❌ Bad - hardcoded color
+    .legend(textStyle: TextStyle(fontSize: 14, color: Colors.black))
+    ```
+  </Accordion>
+
+  <Accordion title="Legend overlapping chart content">
+    **Solution**: Choose a different position or add background:
+    ```dart
+    .legend(
+      position: LegendPosition.bottom, // Move to bottom
+      backgroundColor: Colors.white.withValues(alpha: 0.9),
+    )
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## What's Next?
+
+- Learn about [Custom Themes](/advanced/custom-themes) to create branded chart experiences
+- Explore [Interactions](/features/interactions) to add tooltips and hover effects
+- Check out [Export](/features/export) to save charts with legends as SVG files
+
+<Tip>
+**Pro Tip**: Legends work seamlessly with all chart types and export formats. Your exported SVGs will include the positioned legends automatically!
+</Tip>
