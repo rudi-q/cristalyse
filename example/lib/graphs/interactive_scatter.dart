@@ -111,6 +111,7 @@ Widget buildInteractiveScatterTab(
                   hitTestRadius: 35.0, // Even more generous for taps
                 ),
               )
+              .legend(position: LegendPosition.top)
               .animate(
                 duration: const Duration(milliseconds: 800),
                 curve: Curves.elasticOut,

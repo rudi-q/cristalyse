@@ -28,6 +28,9 @@ Widget buildScatterPlotTab(ChartTheme currentTheme,
               .theme(currentTheme.copyWith(
                 pointSizeMax: 2.0 + sliderValue * 20.0,
               ))
+              .legend(
+                  position: LegendPosition.topRight,
+                  orientation: LegendOrientation.horizontal)
               .animate(
                   duration: const Duration(milliseconds: 800),
                   curve: Curves.elasticOut)
@@ -35,7 +38,7 @@ Widget buildScatterPlotTab(ChartTheme currentTheme,
         ),
         const SizedBox(height: 16),
         const Text(
-            '• Points animate in with staggered timing\n• Size and color mapped to data\n• Smooth elastic animation curve'),
+            '• Points animate in with staggered timing\n• Size and color mapped to data\n• Top-right legend shows categories\n• Smooth elastic animation curve'),
       ],
     ),
   );

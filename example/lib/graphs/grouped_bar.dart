@@ -39,6 +39,7 @@ Widget buildGroupedBarTab(ChartTheme currentTheme,
                     .format, // Direct NumberFormat usage
               )
               .theme(currentTheme)
+              .legend(position: LegendPosition.top)
               .animate(
                   duration: const Duration(milliseconds: 1200),
                   curve: Curves.easeOutCubic)
@@ -46,7 +47,7 @@ Widget buildGroupedBarTab(ChartTheme currentTheme,
         ),
         const SizedBox(height: 16),
         const Text(
-            '• Multiple series grouped side-by-side\n• Uses direct NumberFormat.simpleCurrency()\n• Color mapping for different products\n• Coordinated group animation'),
+            '• Multiple series grouped side-by-side\n• Uses direct NumberFormat.simpleCurrency()\n• Color mapping for different products\n• Auto-generated legend shows product categories\n• Coordinated group animation'),
       ],
     ),
   );

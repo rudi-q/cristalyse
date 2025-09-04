@@ -54,6 +54,7 @@ Widget buildMultiSeriesLineChartTab(
               .scaleYContinuous(min: 0)
               .theme(currentTheme)
               .animate(duration: const Duration(milliseconds: 1500))
+              .legend(position: LegendPosition.right)
               .build(),
         ),
 
@@ -91,6 +92,7 @@ Widget buildMultiSeriesLineChartTab(
               .scaleYContinuous(min: 0)
               .theme(currentTheme)
               .animate(duration: const Duration(milliseconds: 1200))
+              .legend(position: LegendPosition.bottom)
               .build(),
         ),
 
@@ -157,6 +159,9 @@ Widget buildMultiSeriesLineChartTab(
                 .theme(currentTheme)
                 .customPalette(categoryColors: categoryColors)
                 .animate(duration: const Duration(milliseconds: 1800))
+                .legend(
+                    position: LegendPosition.topRight,
+                    orientation: LegendOrientation.horizontal)
                 .build();
           }(),
         ),

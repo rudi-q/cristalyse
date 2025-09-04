@@ -6,6 +6,7 @@ import '../themes/chart_theme.dart';
 import '../widgets/animated_chart_widget.dart';
 import 'geometry.dart';
 import 'label_formatter.dart';
+import 'legend.dart';
 import 'scale.dart';
 
 /// Main chart class implementing grammar of graphics API
@@ -46,6 +47,9 @@ class CristalyseChart {
 
   /// Interaction configuration
   ChartInteraction _interaction = ChartInteraction.none;
+
+  /// Legend configuration
+  LegendConfig? _legendConfig;
 
   /// Set the data source for the chart
   ///
@@ -605,6 +609,59 @@ class CristalyseChart {
     return this;
   }
 
+  /// Configure chart legend
+  ///
+  /// Automatically generates a legend based on the color mapping column.
+  /// Only works when a `color` mapping is defined in `.mapping()`.
+  ///
+  /// Basic usage:
+  /// ```dart
+  /// CristalyseChart()
+  ///   .data(salesData)
+  ///   .mapping(x: 'month', y: 'revenue', color: 'product')
+  ///   .geomBar()
+  ///   .legend() // Simple legend with smart defaults
+  ///   .build();
+  /// ```
+  ///
+  /// With positioning:
+  /// ```dart
+  /// chart.legend(position: LegendPosition.bottom)
+  /// ```
+  ///
+  /// With custom styling:
+  /// ```dart
+  /// chart.legend(
+  ///   position: LegendPosition.right,
+  ///   backgroundColor: Colors.white.withOpacity(0.9),
+  ///   textStyle: TextStyle(fontSize: 12),
+  /// )
+  /// ```
+  CristalyseChart legend({
+    LegendPosition? position,
+    LegendOrientation? orientation,
+    double? spacing,
+    double? itemSpacing,
+    double? symbolSize,
+    TextStyle? textStyle,
+    Color? backgroundColor,
+    EdgeInsets? padding,
+    double? borderRadius,
+  }) {
+    _legendConfig = LegendConfig(
+      position: position ?? LegendPosition.topRight,
+      orientation: orientation ?? LegendOrientation.auto,
+      spacing: spacing ?? 12.0,
+      itemSpacing: itemSpacing ?? 8.0,
+      symbolSize: symbolSize ?? 12.0,
+      textStyle: textStyle,
+      backgroundColor: backgroundColor,
+      padding: padding ?? const EdgeInsets.all(8.0),
+      borderRadius: borderRadius ?? 4.0,
+    );
+    return this;
+  }
+
   /// Export the chart as SVG image
   ///
   /// Example:
@@ -679,6 +736,7 @@ class CristalyseChart {
       animationCurve: _animationCurve,
       coordFlipped: _coordFlipped,
       interaction: _interaction,
+      legendConfig: _legendConfig,
     );
   }
 }

@@ -15,13 +15,8 @@ Widget buildBubbleChartTab(
   final maxSize =
       15.0 + sliderValue * 10.0; // 15-25 px radius (30-50 px diameter)
 
-  // Use theme's color palette for categories
+  // Categories for data generation (colors handled automatically by legend)
   final categories = ['Enterprise', 'SMB', 'Startup'];
-  final categoryColors = <String, Color>{};
-  for (int i = 0; i < categories.length; i++) {
-    categoryColors[categories[i]] =
-        theme.colorPalette[i % theme.colorPalette.length];
-  }
 
   // Use theme directly with its color palette
   final enhancedTheme = ChartTheme(
@@ -51,68 +46,23 @@ Widget buildBubbleChartTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Market Analysis Dashboard',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Company performance metrics: Revenue vs Customer base',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+            Text(
+              'Market Analysis Dashboard',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: theme.primaryColor,
               ),
             ),
-            // Legend
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: categoryColors.entries.map((entry) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 12,
-                          height: 12,
-                          decoration: BoxDecoration(
-                            color: entry.value,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          entry.key,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey[
-                                800], // Explicit dark color for visibility
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+            const SizedBox(height: 8),
+            Text(
+              'Company performance metrics: Revenue vs Customer base',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
               ),
             ),
           ],
@@ -156,6 +106,17 @@ Widget buildBubbleChartTab(
                   labels: (value) => '${value.toStringAsFixed(0)}K',
                 )
                 .theme(enhancedTheme)
+                .legend(
+                  position: LegendPosition.top,
+                  backgroundColor: Colors.white.withValues(alpha: 0.95),
+                  borderRadius: 8.0,
+                  symbolSize: 14.0,
+                  itemSpacing: 10.0,
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                )
                 .animate(
                   duration: const Duration(milliseconds: 1000),
                   curve: Curves.easeOutCubic,
@@ -168,7 +129,9 @@ Widget buildBubbleChartTab(
                   final customers = point.getDisplayValue('customers');
                   final marketShare = point.getDisplayValue('marketShare');
                   final category = point.getDisplayValue('category');
-                  final categoryColor = categoryColors[category] ?? Colors.grey;
+                  final categoryColor = enhancedTheme.colorPalette[
+                      categories.indexOf(category) %
+                          enhancedTheme.colorPalette.length];
 
                   return Container(
                     constraints: const BoxConstraints(maxWidth: 280),

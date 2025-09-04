@@ -69,6 +69,7 @@ CristalyseChart()
   .scaleXOrdinal()
   .scaleYContinuous(min: 0)
   .theme(ChartTheme.defaultTheme())
+  .legend() // ✨ Auto-generates legend for each product
   .build()
 ```
 
@@ -102,8 +103,13 @@ CristalyseChart()
   .scaleXOrdinal()
   .scaleYContinuous(min: 0)
   .theme(ChartTheme.defaultTheme())
+  .legend(position: LegendPosition.right) // ✨ Legend showing budget categories
   .build()
 ```
+
+<Info>
+**New in v1.5.0**: Legends automatically generate from your color mapping. Perfect for grouped and stacked bar charts!
+</Info>
 
 ## Horizontal Bar Charts
 

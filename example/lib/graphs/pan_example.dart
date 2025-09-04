@@ -179,6 +179,9 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                       throttle: const Duration(milliseconds: 50),
                     ),
                   )
+                  .legend(
+                      position: LegendPosition.topRight,
+                      orientation: LegendOrientation.horizontal)
                   .theme(widget.theme)
                   .animate(duration: const Duration(milliseconds: 0))
                   .build(),
