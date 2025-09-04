@@ -437,7 +437,24 @@ class AnimatedChartPainter extends CustomPainter {
 
     if (columnToUse == null) return ColorScale();
     final values = data.map((d) => d[columnToUse]).toSet().toList();
-    return ColorScale(values: values, colors: theme.colorPalette);
+
+    // Extract gradients for the values if available
+    Map<dynamic, Gradient>? gradients;
+    if (theme.categoryGradients != null &&
+        theme.categoryGradients!.isNotEmpty) {
+      gradients = {};
+      for (final value in values) {
+        if (theme.categoryGradients!.containsKey(value.toString())) {
+          gradients[value] = theme.categoryGradients![value.toString()]!;
+        }
+      }
+    }
+
+    return ColorScale(
+      values: values,
+      colors: theme.colorPalette,
+      gradients: gradients,
+    );
   }
 
   SizeScale _setupSizeScale() {
@@ -878,15 +895,13 @@ class AnimatedChartPainter extends CustomPainter {
     double? customWidth,
     double yStackOffset = 0,
   }) {
-    final color = colorColumn != null
+    final colorOrGradient = colorColumn != null
         ? colorScale.scale(dataPoint[colorColumn])
         : (theme.colorPalette.isNotEmpty
             ? theme.colorPalette.first
             : theme.primaryColor);
 
-    final paint = Paint()
-      ..color = color.withAlpha((geometry.alpha * 255).round())
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
     Rect barRect;
 
@@ -940,6 +955,14 @@ class AnimatedChartPainter extends CustomPainter {
 
     if (!barRect.isFinite || barRect.isEmpty) {
       return;
+    }
+
+    // Apply gradient or solid color based on what we received
+    if (colorOrGradient is Gradient) {
+      paint.shader = colorOrGradient.createShader(barRect);
+    } else {
+      final color = colorOrGradient as Color;
+      paint.color = color.withAlpha((geometry.alpha * 255).round());
     }
 
     if (geometry.borderRadius != null &&
@@ -1009,7 +1032,7 @@ class AnimatedChartPainter extends CustomPainter {
 
       if (pointProgress <= 0) continue;
 
-      final color = colorColumn != null
+      final colorOrGradient = colorColumn != null
           ? colorScale.scale(point[colorColumn])
           : (theme.colorPalette.isNotEmpty
               ? theme.colorPalette.first
@@ -1019,13 +1042,25 @@ class AnimatedChartPainter extends CustomPainter {
           ? sizeScale.scale(point[sizeColumn])
           : theme.pointSizeDefault;
 
-      final paint = Paint()
-        ..color = color.withAlpha(
-          (geometry.alpha * pointProgress * 255).round(),
-        )
-        ..style = PaintingStyle.fill;
-
       final pointY = plotArea.top + yScale.scale(y);
+
+      final paint = Paint()..style = PaintingStyle.fill;
+
+      // Apply gradient or solid color based on what we received
+      if (colorOrGradient is Gradient) {
+        // For points, create a square shader area around the point
+        final shaderRect = Rect.fromCenter(
+          center: Offset(pointX, pointY),
+          width: size * 2,
+          height: size * 2,
+        );
+        paint.shader = colorOrGradient.createShader(shaderRect);
+      } else {
+        final color = colorOrGradient as Color;
+        paint.color = color.withAlpha(
+          (geometry.alpha * pointProgress * 255).round(),
+        );
+      }
 
       if (!pointX.isFinite || !pointY.isFinite) {
         continue;

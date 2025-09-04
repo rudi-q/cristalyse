@@ -154,13 +154,31 @@ class OrdinalScale extends Scale {
 class ColorScale {
   final List<dynamic> values;
   final List<Color> colors;
+  final Map<dynamic, Gradient>? gradients;
 
-  ColorScale({this.values = const [], this.colors = const []});
+  ColorScale({
+    this.values = const [],
+    this.colors = const [],
+    this.gradients,
+  });
 
-  Color scale(dynamic value) {
+  /// Returns either a Color or Gradient for the given value
+  dynamic scale(dynamic value) {
     if (values.isEmpty || colors.isEmpty) return Colors.blue;
+
+    // Check if we have a gradient for this specific value
+    if (gradients != null && gradients!.containsKey(value)) {
+      return gradients![value]!;
+    }
+
+    // Fall back to solid color
     final index = values.indexOf(value);
     return index >= 0 ? colors[index % colors.length] : colors[0];
+  }
+
+  /// Returns true if this value has a gradient
+  bool hasGradient(dynamic value) {
+    return gradients != null && gradients!.containsKey(value);
   }
 }
 
