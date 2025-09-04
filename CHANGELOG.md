@@ -1,4 +1,4 @@
-## 1.5.0 - 2025-09-03
+## 1.5.0 - 2025-09-05
 
 #### 🔥 Major Feature: Built-In Legend Support
 
