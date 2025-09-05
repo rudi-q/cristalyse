@@ -9,6 +9,8 @@ class DebugGradientExample extends StatelessWidget {
     final data = [
       {'quarter': 'Q1', 'revenue': 120},
       {'quarter': 'Q2', 'revenue': 150},
+      {'quarter': 'Q3', 'revenue': 180},
+      {'quarter': 'Q4', 'revenue': 200},
     ];
 
     final quarterlyGradients = {
@@ -17,6 +19,12 @@ class DebugGradientExample extends StatelessWidget {
       ),
       'Q2': const LinearGradient(
         colors: [Colors.green, Colors.yellow],
+      ),
+      'Q3': const LinearGradient(
+        colors: [Colors.orange, Colors.purple],
+      ),
+      'Q4': const LinearGradient(
+        colors: [Colors.cyan, Colors.pink],
       ),
     };
 

@@ -689,7 +689,7 @@ class _ExampleHomeState extends State<ExampleHome>
                 child: ListTile(
                   leading: Icon(Icons.timeline, size: 20),
                   title: Text('Multi-Series Lines'),
-                  subtitle: Text('Fixed!',
+                  subtitle: Text('New!',
                       style: TextStyle(color: Colors.green, fontSize: 10)),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
