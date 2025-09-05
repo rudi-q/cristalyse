@@ -106,6 +106,49 @@ class AnimatedChartPainter extends CustomPainter {
   /// Parameters:
   /// - [canvas]: The Flutter canvas to draw on
   /// - [size]: Available drawing area dimensions
+  /// Helper method to apply alpha to all colors in a gradient
+  Gradient _applyAlphaToGradient(Gradient gradient, double alpha) {
+    final clampedAlpha = alpha.clamp(0.0, 1.0);
+    final newColors = gradient.colors
+        .map((color) => color.withAlpha((color.alpha * clampedAlpha).round()))
+        .toList();
+
+    if (gradient is LinearGradient) {
+      return LinearGradient(
+        begin: gradient.begin,
+        end: gradient.end,
+        colors: newColors,
+        stops: gradient.stops,
+        tileMode: gradient.tileMode,
+        transform: gradient.transform,
+      );
+    } else if (gradient is RadialGradient) {
+      return RadialGradient(
+        center: gradient.center,
+        radius: gradient.radius,
+        colors: newColors,
+        stops: gradient.stops,
+        tileMode: gradient.tileMode,
+        focal: gradient.focal,
+        focalRadius: gradient.focalRadius,
+        transform: gradient.transform,
+      );
+    } else if (gradient is SweepGradient) {
+      return SweepGradient(
+        center: gradient.center,
+        startAngle: gradient.startAngle,
+        endAngle: gradient.endAngle,
+        colors: newColors,
+        stops: gradient.stops,
+        tileMode: gradient.tileMode,
+        transform: gradient.transform,
+      );
+    }
+    
+    // Fallback: return original gradient if unknown type
+    return gradient;
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     if (data.isEmpty || geometries.isEmpty) return;
@@ -959,7 +1002,8 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Apply gradient or solid color based on what we received
     if (colorOrGradient is Gradient) {
-      paint.shader = colorOrGradient.createShader(barRect);
+      final alphaGradient = _applyAlphaToGradient(colorOrGradient, geometry.alpha);
+      paint.shader = alphaGradient.createShader(barRect);
     } else {
       final color = colorOrGradient as Color;
       paint.color = color.withAlpha((geometry.alpha * 255).round());
@@ -1054,7 +1098,9 @@ class AnimatedChartPainter extends CustomPainter {
           width: size * 2,
           height: size * 2,
         );
-        paint.shader = colorOrGradient.createShader(shaderRect);
+        final combinedAlpha = geometry.alpha * pointProgress;
+        final alphaGradient = _applyAlphaToGradient(colorOrGradient, combinedAlpha);
+        paint.shader = alphaGradient.createShader(shaderRect);
       } else {
         final color = colorOrGradient as Color;
         paint.color = color.withAlpha(

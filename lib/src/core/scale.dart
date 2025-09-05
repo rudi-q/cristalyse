@@ -164,14 +164,14 @@ class ColorScale {
 
   /// Returns either a Color or Gradient for the given value
   dynamic scale(dynamic value) {
-    if (values.isEmpty || colors.isEmpty) return Colors.blue;
-
-    // Check if we have a gradient for this specific value
+    // Check gradients first - this allows gradient-only mappings
     if (gradients != null && gradients!.containsKey(value)) {
       return gradients![value]!;
     }
 
-    // Fall back to solid color
+    // Fall back to solid colors if available
+    if (values.isEmpty || colors.isEmpty) return Colors.blue;
+
     final index = values.indexOf(value);
     return index >= 0 ? colors[index % colors.length] : colors[0];
   }

@@ -15,7 +15,7 @@ class GradientBarExample extends StatelessWidget {
     ];
 
     // Define gradients for each quarter
-    final quarterlyGradients = {
+    final Map<String, Gradient> quarterlyGradients = <String, Gradient>{
       'Q1': const LinearGradient(
         begin: Alignment.bottomCenter,
         end: Alignment.topCenter,

@@ -15,7 +15,7 @@ class AdvancedGradientExample extends StatelessWidget {
     ];
 
     // Mixed gradient types
-    final advancedGradients = {
+    final Map<String, Gradient> advancedGradients = <String, Gradient>{
       'North': const RadialGradient(
         center: Alignment.center,
         radius: 0.8,
