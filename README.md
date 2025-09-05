@@ -2,8 +2,8 @@
   <a href="https://docs.cristalyse.com">
     <img src="doc/logo/logo.svg" alt="Cristalyse" width="400"/>
   </a>
-  <span style="float: right;">
-    <a href="https://github.com/sponsors/rudi-q">
+  <span>
+    <a href="https://github.com/sponsors/rudi-q" style="float:right; margin-right: 300px">
       <img src="https://img.shields.io/badge/Sponsor_on-GitHub-2cacbf?style=for-the-badge&logo=github&logoColor=white&labelColor=145261" alt="Sponsor on GitHub" style="border-radius: 8px;"/>
     </a>
   </span>
@@ -11,7 +11,6 @@
 **The grammar of graphics visualization library that Flutter developers have been waiting for.**
 </p>
 
-<div align="center">
 
 [![Flutter support](https://img.shields.io/badge/Flutter-3.13%2B-2cacbf?logo=flutter&logoColor=white&labelColor=145261)](https://flutter.dev/)
 [![Dart support](https://img.shields.io/badge/Dart-3.3.0%2B-2cacbf?logo=dart&logoColor=white&labelColor=145261)](https://dart.dev/)
@@ -22,7 +21,6 @@
 
 [![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-2cacbf?labelColor=145261)](https://flutter.dev/)
 
-</div>
 
 > Finally, create beautiful data visualizations in Flutter without fighting against chart widgets or settling for web-based solutions.
 
