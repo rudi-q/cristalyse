@@ -1,3 +1,158 @@
+## 1.6.0 - 2025-09-05
+
+#### 🌈 Major Feature: Gradient Color Support
+
+- **Category-Specific Gradients**: New `categoryGradients` property in `ChartTheme` for stunning gradient effects
+  - Support for Linear, Radial, and Sweep gradients with full Flutter Gradient API compatibility
+  - Type-safe `Map<String, Gradient>` implementation for reliability
+- **Advanced Alpha Blending**: Gradients automatically respect animation alpha and geometry transparency
+  - Custom alpha blending algorithm that preserves gradient color relationships
+  - Smooth opacity transitions during chart animations
+- **Multiple Chart Type Support**: Gradient rendering implemented for:
+  - ✅ **Bar Charts** - Full gradient support with shader-based rendering
+  - ✅ **Point/Scatter Charts** - Gradient fills for data points with proper shader regions
+  - 🔄 Line/Area/Bubble charts - Solid colors (gradient support planned for future releases)
+
+#### 🚀 New API Capabilities
+
+- **Intuitive Gradient Definition**: Simple category-based gradient mapping
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
+  .geomBar()
+  .customPalette(categoryGradients: {
+    'Q1': LinearGradient(colors: [Colors.blue, Colors.cyan]),
+    'Q2': RadialGradient(colors: [Colors.red, Colors.orange]),
+    'Q3': SweepGradient(colors: [Colors.purple, Colors.pink]),
+  })
+  .build()
+```
+- **Automatic Color Scale Enhancement**: `ColorScale` intelligently prioritizes gradients over solid colors
+- **Seamless Theme Integration**: Gradients work with existing themes, custom palettes, and color mapping
+
+#### 💎 Gradient Types & Features
+
+- **Linear Gradients**: Smooth directional color transitions with customizable start/end points
+- **Radial Gradients**: Circular gradients expanding from center with configurable radius and focal points
+- **Sweep Gradients**: Angular gradients rotating around center with customizable angle ranges
+- **Advanced Properties**: Full support for color stops, alignment, transforms, and tile modes
+- **Performance Optimized**: Efficient shader caching and GPU-accelerated rendering
+
+#### 🎯 Professional Use Cases Unlocked
+
+- **Modern Data Visualization**: Eye-catching gradient effects for presentations and dashboards
+- **Brand-Aligned Charts**: Custom gradient themes matching corporate visual identity
+- **Enhanced UX**: Visual depth and dimension through gradient shading
+- **Premium Analytics**: Professional-grade chart aesthetics for enterprise applications
+- **Mobile-First Design**: GPU-optimized gradients for smooth mobile performance
+
+#### 📖 Comprehensive Examples Added
+
+```dart
+// Quarterly Revenue with Mixed Gradient Types
+CristalyseChart()
+  .data(quarterlyData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
+  .geomBar(width: 0.8, borderRadius: BorderRadius.circular(8))
+  .customPalette(categoryGradients: {
+    'Q1': LinearGradient(
+      colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    ),
+    'Q3': RadialGradient(
+      colors: [Color(0xFFDC2626), Color(0xFFEF4444)],
+      center: Alignment.center,
+      radius: 0.8,
+    ),
+    'Q4': SweepGradient(
+      colors: [Color(0xFFEAB308), Color(0xFFF59E0B), Color(0xFFEAB308)],
+      center: Alignment.center,
+    ),
+  })
+  .build();
+
+// Regional Sales with Product-Specific Gradients
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'region', y: 'sales', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .customPalette(categoryGradients: {
+    'Premium': LinearGradient(
+      colors: [Color(0xFF8B5CF6), Color(0xFFA78BFA)],
+      stops: [0.0, 1.0],
+    ),
+    'Standard': LinearGradient(
+      colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],
+    ),
+  })
+  .legend()
+  .build();
+```
+
+#### 🔧 Technical Implementation
+
+- **Advanced Alpha Blending**: Custom algorithm for gradient alpha application
+  - `_applyAlphaToGradient()` method supporting all Flutter gradient types
+  - Maintains color relationships while applying animation/geometry alpha
+- **Enhanced ColorScale**: Intelligent gradient detection and prioritization
+  - Gradients checked before solid colors in `scale()` method
+  - Type-safe gradient maps with runtime validation
+- **Shader-Based Rendering**: GPU-accelerated gradient rendering for optimal performance
+  - Proper shader region calculation for bars and points
+  - Efficient paint object reuse and memory management
+
+#### 🐛 Fixes & Improvements
+
+- **API Deprecation Fix**: Replaced deprecated `color.alpha` with proper `(color.a * 255.0).round() & 0xff`
+  - Ensures future compatibility with Flutter updates
+  - Maintains consistent alpha calculation across all color operations
+- **Theme Application Order**: Fixed `.theme()` and `.customPalette()` ordering issue
+  - `.theme()` must be called before `.customPalette()` to preserve gradients
+  - Enhanced documentation with usage guidelines
+
+#### 🧪 Quality Assurance
+
+- **Comprehensive Testing**: New gradient-specific tests added to existing test suite
+  - Gradient theme application and inheritance testing
+  - Alpha blending algorithm validation
+  - ColorScale gradient prioritization tests
+- **Static Analysis Clean**: Zero Flutter analysis issues or warnings
+- **Example Applications**: Two complete example apps demonstrating gradient usage
+  - `gradient_bar_example.dart` - Simple gradient bar charts
+  - `advanced_gradient_example.dart` - Multi-chart gradient showcase
+
+#### ⚡ Performance & Compatibility
+
+- **Zero Breaking Changes**: Completely backward compatible - all existing code works unchanged
+- **Optional Enhancement**: Gradient functionality is purely additive and opt-in
+- **GPU Optimized**: Leverages Flutter's shader system for hardware-accelerated rendering
+- **Memory Efficient**: Gradient objects reused and cached for optimal memory usage
+- **Cross-Platform**: Consistent gradient rendering across iOS, Android, Web, and Desktop
+
+#### 📚 Enhanced Documentation
+
+- **Bar Charts Guide**: Comprehensive gradient section in `/doc/charts/bar-charts.mdx`
+  - Multiple gradient type examples with code snippets
+  - Best practices and usage guidelines
+- **Custom Themes Guide**: New gradient themes section in `/doc/advanced/custom-themes.mdx`
+  - Gradient creation and application patterns
+  - Chart type compatibility matrix
+- **API Documentation**: Enhanced docstrings with gradient examples throughout codebase
+
+#### 📦 Implementation Files
+
+- **Enhanced Core**: Updated `lib/src/widgets/animated_chart_painter.dart` with gradient rendering
+- **ColorScale Enhancement**: Improved `lib/src/core/scale.dart` with gradient prioritization
+- **Theme Extension**: Enhanced `lib/src/themes/chart_theme.dart` with `categoryGradients` property
+- **Utility Functions**: New alpha blending helpers in painter implementation
+- **Example Applications**: Complete gradient demonstration apps in example directory
+
+**This release brings stunning gradient capabilities to cristalyse with professional-grade visual effects, full animation support, and zero breaking changes. Transform your charts with beautiful gradients while maintaining all existing functionality!** 🌈✨
+
+---
+
 ## 1.5.0 - 2025-09-05
 
 #### 🔥 Major Feature: Built-In Legend Support
