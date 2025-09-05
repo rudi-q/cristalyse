@@ -2,17 +2,25 @@
   <a href="https://docs.cristalyse.com">
     <img src="doc/logo/logo.svg" alt="Cristalyse" width="400"/>
   </a>
-</p>
+  <span>
+    <a href="https://github.com/sponsors/rudi-q" style="float:right; margin-right: 300px">
+      <img src="https://img.shields.io/badge/Sponsor_on-GitHub-2cacbf?style=for-the-badge&logo=github&logoColor=white&labelColor=145261" alt="Sponsor on GitHub" style="border-radius: 8px;"/>
+    </a>
+  </span>
 
 **The grammar of graphics visualization library that Flutter developers have been waiting for.**
+</p>
 
+
+[![Flutter support](https://img.shields.io/badge/Flutter-3.13%2B-2cacbf?logo=flutter&logoColor=white&labelColor=145261)](https://flutter.dev/)
+[![Dart support](https://img.shields.io/badge/Dart-3.3.0%2B-2cacbf?logo=dart&logoColor=white&labelColor=145261)](https://dart.dev/)
 [![pub package](https://img.shields.io/pub/v/cristalyse.svg?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse)
 [![pub points](https://img.shields.io/pub/points/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
 [![likes](https://img.shields.io/pub/likes/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
-[![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-2cacbf?labelColor=145261)](https://flutter.dev/)
-[![Flutter support](https://img.shields.io/badge/Flutter-3.13%2B-2cacbf?labelColor=145261)](https://flutter.dev/)
-[![Dart support](https://img.shields.io/badge/Dart-3.3.0%2B-2cacbf?labelColor=145261)](https://dart.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2cacbf.svg?labelColor=145261)](https://opensource.org/licenses/MIT)
+
+[![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-2cacbf?labelColor=145261)](https://flutter.dev/)
+
 
 > Finally, create beautiful data visualizations in Flutter without fighting against chart widgets or settling for web-based solutions.
 
@@ -86,6 +94,7 @@
 - 🎯 **Flutter-First Design** - Seamlessly integrates with your existing Flutter apps
 - 📊 **Dual Y-Axis Support** - Professional business dashboards with independent left/right scales
 - 📈 **Advanced Bar Charts** - Grouped, stacked, and horizontal variations with smooth animations
+- 🫧 **Bubble Charts** - Multi-dimensional data visualization with size, color, and position encoding
 - 👆 **Interactive Charts** - Engage users with tooltips, hover effects, and click events.
 
 ### See What You Can Build
@@ -112,6 +121,7 @@
 - **Data scientists** who want to deploy interactive visualizations to mobile without learning Swift/Kotlin
 - **Enterprise teams** building dashboards that need consistent UX across all platforms
 - **Business analysts** creating professional reports with dual Y-axis charts and advanced visualizations
+- **Product managers** tracking performance metrics across multiple dimensions with bubble charts
 
 </td>
 <td width="50%">
@@ -179,30 +189,84 @@ class MyChart extends StatelessWidget {
 
 ## 💡 Interactive Charts
 
-### New: Enhanced Panning Behavior
+### Enhanced Panning Behavior
 
-Add real-time panning capabilities to your charts with seamless range updates and smooth interaction.
+**Real-time data streaming and interactive exploration** with advanced pan controls and coordinate transformation.
 
 ```dart
+// Basic panning with range callbacks
 CristalyseChart()
-  .data(myData)
-  .mapping(x: 'x', y: 'y')
+  .data(timeSeriesData)
+  .mapping(x: 'timestamp', y: 'value')
   .geomLine()
   .interaction(
     pan: PanConfig(
       enabled: true,
       onPanUpdate: (info) {
         // Handle real-time updates based on visible X range
-        print('Visible X range: \\${info.visibleMinX} - \\${info.visibleMaxX}');
+        print('Visible X range: ${info.visibleMinX} - ${info.visibleMaxX}');
+        
+        // Load more data when approaching boundaries
+        if (info.visibleMaxX! > maxDataTimestamp - bufferTime) {
+          loadMoreRecentData();
+        }
       },
+      throttle: Duration(milliseconds: 100), // Prevent overwhelming callbacks
     ),
   )
   .build();
+
+// Advanced panning with state management
+class PanningChartState extends State<PanningChart> {
+  DateTime? visibleStart;
+  DateTime? visibleEnd;
+  
+  @override
+  Widget build(BuildContext context) {
+    return Column([
+      // Range display header
+      Container(
+        padding: EdgeInsets.all(8),
+        child: Text(
+          visibleStart != null 
+            ? 'Range: ${DateFormat('MMM d').format(visibleStart!)} - ${DateFormat('MMM d').format(visibleEnd!)}'
+            : 'Loading...',
+        ),
+      ),
+      
+      // Interactive chart
+      Expanded(
+        child: CristalyseChart()
+          .data(chartData)
+          .mapping(x: 'date', y: 'revenue')
+          .geomLine()
+          .onPan((info) {
+            setState(() {
+              visibleStart = DateTime.fromMillisecondsSinceEpoch(
+                (info.visibleMinX! * 1000).round()
+              );
+              visibleEnd = DateTime.fromMillisecondsSinceEpoch(
+                (info.visibleMaxX! * 1000).round()
+              );
+            });
+            
+            // Fetch data for new range
+            fetchDataForDateRange(visibleStart!, visibleEnd!);
+          })
+          .build(),
+      ),
+    ]);
+  }
+}
 ```
-**Features:**
-- Maintains pan state across interactions
-- Synchronizes displayed range between header and chart axis
-- Enhanced UI for range display card
+
+**Panning Features:**
+- ✅ **Coordinate Transformation** - Screen pixels to data values automatically
+- ✅ **Throttled Callbacks** - Configurable update frequency for performance
+- ✅ **Range State Persistence** - Maintains pan position across interactions
+- ✅ **Real-time Data Loading** - Perfect for streaming and large datasets
+- ✅ **Multi-axis Support** - Independent X and Y panning controls
+- ✅ **Touch & Mouse Compatible** - Works on all platforms
 
 Bring your data to life with a fully interactive layer. Add rich tooltips, hover effects, and click/tap events to give users a more engaging experience.
 
@@ -333,21 +397,129 @@ CristalyseChart()
   <em>Grouped bar charts for comparing multiple series side-by-side</em>
 </p>
 
-### Horizontal Bar Charts
+### Horizontal Bar Charts & Coordinate Flipping
+**Transform any vertical chart into horizontal** with coordinate system flipping.
+
 ```dart
-// Great for ranking and long category names
+// Horizontal bars - perfect for long category names and rankings
+final departmentData = [
+  {'department': 'Engineering', 'headcount': 45},
+  {'department': 'Product Management', 'headcount': 25},
+  {'department': 'Sales & Marketing', 'headcount': 35},
+  {'department': 'Customer Success', 'headcount': 20},
+  {'department': 'Human Resources', 'headcount': 15},
+];
+
 CristalyseChart()
   .data(departmentData)
   .mapping(x: 'department', y: 'headcount')
   .geomBar(
     borderRadius: BorderRadius.circular(4), // Rounded corners
     borderWidth: 1.0,                       // Add borders
+    alpha: 0.8,
   )
-  .coordFlip()                              // Flip to horizontal
+  .coordFlip()                              // ✨ Flip to horizontal
   .scaleXOrdinal()
   .scaleYContinuous(min: 0)
   .theme(ChartTheme.defaultTheme())
   .build()
+
+// Horizontal grouped bars for comparison
+CristalyseChart()
+  .data(quarterlyData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'region')
+  .geomBar(style: BarStyle.grouped)
+  .coordFlip()  // Makes grouped bars horizontal
+  .legend(position: LegendPosition.bottomRight)
+  .build()
+
+// Horizontal stacked bars for composition
+CristalyseChart()
+  .data(budgetData)
+  .mapping(x: 'category', y: 'amount', color: 'subcategory')
+  .geomBar(style: BarStyle.stacked)
+  .coordFlip()  // Horizontal stacked bars
+  .scaleYContinuous(
+    labels: NumberFormat.simpleCurrency().format,
+  )
+  .build()
+
+// Horizontal scatter plot - useful for rank vs performance
+CristalyseChart()
+  .data(performanceData)
+  .mapping(x: 'employee_name', y: 'performance_score', size: 'years_experience')
+  .geomPoint()
+  .coordFlip()  // Names on Y-axis, scores on X-axis
+  .build()
+```
+
+**Coordinate Flipping Features:**
+- ✅ **Universal Transformation** - Works with all chart types (bars, points, lines)
+- ✅ **Automatic Axis Swapping** - X becomes Y, Y becomes X seamlessly  
+- ✅ **Label Readability** - Perfect for long category names
+- ✅ **Ranking Visualizations** - Natural top-to-bottom ranking display
+- ✅ **Legend Compatibility** - Legends work perfectly with flipped coordinates
+- ✅ **Animation Support** - Smooth animations work in both orientations
+
+## 🏷️ Legends
+**Automatic legend generation** from your color mappings with flexible positioning and styling.
+
+```dart
+// Automatic legend from color mapping
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'month', y: 'revenue', color: 'product') // Color mapping required
+  .geomBar()
+  .legend() // ✨ Auto-generates legend from 'product' categories
+  .build();
+
+// Positioned legend with custom styling
+CristalyseChart()
+  .data(revenueData)
+  .mapping(x: 'quarter', y: 'amount', color: 'category')
+  .geomBar(style: BarStyle.stacked)
+  .legend(
+    position: LegendPosition.right,
+    orientation: LegendOrientation.vertical,
+    backgroundColor: Colors.white.withOpacity(0.9),
+    textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+    padding: EdgeInsets.all(12),
+  )
+  .build();
+
+// Top horizontal legend for grouped bars
+CristalyseChart()
+  .data(productData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .legend(
+    position: LegendPosition.topRight,
+    orientation: LegendOrientation.horizontal,
+    spacing: 16.0,
+    itemSpacing: 8.0,
+  )
+  .build();
+```
+
+**Legend Features:**
+- ✅ **Auto-Generation** - Automatically creates legends from color mappings
+- ✅ **Flexible Positioning** - Top, bottom, left, right, and corner positions
+- ✅ **Custom Styling** - Background, text style, padding, and spacing control
+- ✅ **Smart Layouts** - Automatic horizontal/vertical orientation based on position
+- ✅ **Multi-Chart Support** - Works with all chart types that use color mapping
+- ✅ **Responsive Design** - Adapts to container constraints
+
+### Legend Positions
+```dart
+// Available positions
+LegendPosition.top
+LegendPosition.bottom  
+LegendPosition.left
+LegendPosition.right
+LegendPosition.topLeft
+LegendPosition.topRight
+LegendPosition.bottomLeft
+LegendPosition.bottomRight
 ```
 
 ## 🥧 Pie Charts and Donut Charts
@@ -559,6 +731,51 @@ CristalyseChart()
   .build();
 ```
 
+
+## 🫧 Bubble Charts
+**Perfect for market analysis and multi-dimensional data** - visualize three variables simultaneously with position and size encoding.
+
+```dart
+// Market Performance Analysis
+CristalyseChart()
+  .data([
+    {'company': 'TechCorp', 'revenue': 250, 'customers': 180, 'marketShare': 28},
+    {'company': 'StartupX', 'revenue': 85, 'customers': 120, 'marketShare': 12},
+    {'company': 'MidSize', 'revenue': 150, 'customers': 160, 'marketShare': 18},
+  ])
+  .mapping(
+    x: 'revenue',        // Revenue on X-axis
+    y: 'customers',      // Customer count on Y-axis
+    size: 'marketShare', // Market share determines bubble size
+    color: 'category'    // Color by company category
+  )
+  .geomBubble(
+    minSize: 8.0,        // Minimum bubble radius
+    maxSize: 25.0,       // Maximum bubble radius
+    alpha: 0.7,          // Semi-transparent bubbles
+    borderWidth: 2.0,    // Border for definition
+    showLabels: true,    // Show value labels
+    labelFormatter: (value) => '${value}%', // Custom label format
+  )
+  .scaleXContinuous()
+  .scaleYContinuous()
+  .theme(ChartTheme.defaultTheme())
+  .animate(duration: Duration(milliseconds: 1200))
+  .build()
+```
+
+<p align="center">
+  <em>Perfect for analyzing relationships between three continuous variables</em>
+</p>
+
+### Bubble Chart Features
+- ✅ **Size Encoding** - Third dimension mapped to bubble radius
+- ✅ **Color Grouping** - Categorical data with distinct colors  
+- ✅ **Custom Labels** - Show formatted values on bubbles
+- ✅ **Interactive Tooltips** - Rich hover information
+- ✅ **Dual Y-Axis Support** - Use with secondary scales
+- ✅ **Animation Support** - Smooth entrance effects
+
 ## 🔥 Current Features
 
 ### ✅ Chart Types
@@ -568,6 +785,7 @@ CristalyseChart()
 - **Bar charts** (vertical, horizontal, grouped, stacked) with smooth animations
 - **Pie charts and donut charts** with exploded slices and smart label positioning
 - **Heat map charts** with customizable color gradients and 2D data visualization
+- **Bubble charts** with 3D data visualization and size encoding
 - **Dual Y-axis charts** for professional business dashboards
 - **Combined visualizations** (bars + lines, points + lines, etc.)
 
@@ -575,9 +793,11 @@ CristalyseChart()
 - **Grammar of Graphics API** - Familiar ggplot2-style syntax
 - **Smooth 60fps animations** with customizable timing and curves
 - **Dual Y-axis support** with independent scales and data routing
-- **Coordinate flipping** for horizontal charts
-- **Multiple themes** (Light, Dark, Solarized Light/Dark)
-- **Custom color palettes** and styling options
+- **Multiple built-in themes** (Light, Dark, Solarized Light/Dark)
+- **Custom color palettes** for brand-specific category mapping
+- **Automatic legend generation** with flexible positioning and styling
+- **Advanced label formatting** with NumberFormat integration
+- **Interactive panning** with real-time data streaming support
 - **Responsive scaling** for all screen sizes
 - **High-DPI support** for crisp visuals
 
@@ -587,6 +807,7 @@ CristalyseChart()
 - **Missing value handling** - Graceful degradation for null/invalid data
 - **Large dataset support** - Optimized for 1000+ data points
 - **Real-time updates** - Smooth transitions when data changes
+- **Multi-dimensional mapping** - X, Y, size, color encoding simultaneously
 
 ## 📸 Chart Export
 
@@ -618,12 +839,6 @@ final result = await chart.export(config);
 - ✅ **Design Software Compatible** - Editable in Figma, Adobe Illustrator, etc.
 - ✅ **Cross-Platform Reliable** - Works consistently on all platforms
 - ✅ **Automatic File Management** - Saves to Documents directory with timestamp
-
-### 🚧 Coming Soon (Next Releases)
-- Statistical overlays (regression lines, confidence intervals)
-- Interactive zoom capabilities with scale persistence
-- Faceting for small multiples and grid layouts
-- Enhanced SVG export with full chart rendering
 
 ## 🎯 Real-World Examples
 
@@ -686,27 +901,35 @@ Widget buildMarketSharePie() {
 
 ### Business Intelligence Dashboard
 ```dart
-Widget buildKPIDashboard() {
-  return CristalyseChart()
-      .data(kpiData)
-      .mapping(x: 'quarter', y: 'revenue')
-      .mappingY2('profit_margin')             // Dual Y-axis for percentage
-      .geomBar(
-        yAxis: YAxis.primary,
-        style: BarStyle.stacked,              // Stack revenue components
-        color: 'revenue_source',
-      )
-      .geomLine(
-        yAxis: YAxis.secondary,               // Profit margin trend
-        strokeWidth: 4.0,
-        color: Colors.green,
-      )
-      .scaleXOrdinal()
-      .scaleYContinuous(min: 0)               // Revenue scale
-      .scaleY2Continuous(min: 0, max: 50)     // Percentage scale
-      .theme(ChartTheme.defaultTheme())
-      .build();
-}
+// Revenue bars + profit margin line on dual Y-axis
+CristalyseChart()
+  .data(kpiData)
+  .mapping(x: 'quarter', y: 'revenue')
+  .mappingY2('profit_margin')
+  .geomBar(yAxis: YAxis.primary, style: BarStyle.stacked)
+  .geomLine(yAxis: YAxis.secondary, color: Colors.green)
+  .scaleYContinuous(labels: NumberFormat.simpleCurrency().format)
+  .scaleY2Continuous(labels: (v) => '${v.toStringAsFixed(1)}%')
+  .legend()
+  .build();
+```
+
+### Advanced Multi-Geometry Dashboard
+```dart
+// Combined area + line + bubbles with dual Y-axis
+CristalyseChart()
+  .data(performanceData)
+  .mapping(x: 'month', y: 'revenue', size: 'team_size', color: 'department')
+  .mappingY2('efficiency')
+  .geomArea(yAxis: YAxis.primary, alpha: 0.2)
+  .geomLine(yAxis: YAxis.primary, strokeWidth: 3.0)
+  .geomBubble(yAxis: YAxis.primary, minSize: 5.0, maxSize: 15.0)
+  .geomLine(yAxis: YAxis.secondary, color: Colors.orange)
+  .scaleYContinuous(labels: NumberFormat.compact().format)
+  .scaleY2Continuous(labels: (v) => '${v.round()}%')
+  .legend()
+  .interaction(pan: PanConfig(enabled: true))
+  .build();
 ```
 
 ## 💡 Why Not Just Use...?
@@ -721,19 +944,6 @@ Widget buildKPIDashboard() {
 
 ## 🛠 Advanced Configuration
 
-### Custom Themes
-```dart
-final customTheme = ChartTheme(
-  backgroundColor: Colors.grey[50]!,
-  primaryColor: Colors.deepPurple,
-  colorPalette: [Colors.blue, Colors.red, Colors.green],
-  gridColor: Colors.grey[300]!,
-  axisTextStyle: TextStyle(fontSize: 14, color: Colors.black87),
-  padding: EdgeInsets.all(40),
-);
-
-chart.theme(customTheme)
-```
 
 ### Animation Control
 ```dart
@@ -742,6 +952,91 @@ chart.animate(
   curve: Curves.elasticOut,  // Try different curves!
 )
 ```
+
+### Custom Themes
+
+**Complete visual control** with built-in themes and full customization options.
+
+```dart
+// Built-in themes
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'revenue')
+  .geomLine()
+  .theme(ChartTheme.darkTheme()) // or .defaultTheme(), .solarizedLightTheme()
+  .build();
+
+// Custom branded theme
+final brandedTheme = ChartTheme(
+  primaryColor: const Color(0xFF007BFF), // Brand primary
+  colorPalette: [Colors.blue, Colors.green, Colors.red],
+  axisTextStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+);
+
+CristalyseChart()
+  .theme(brandedTheme)
+  .build();
+```
+
+**Theme Features:**
+- ✅ **Built-in Themes** - Light, dark, and Solarized variants ready to use
+- ✅ **Brand Customization** - Match your organization's visual identity
+- ✅ **Responsive Design** - Adapt themes based on screen size
+- ✅ **Color Palettes** - Comprehensive color schemes for multi-series charts
+- ✅ **Typography Control** - Custom fonts, sizes, and weights
+- ✅ **Layout Options** - Padding, spacing, and dimension control
+
+### Custom Color Palettes
+
+**Brand-specific colors for categories** with semantic meaning and consistent visual identity.
+
+```dart
+// Platform-specific colors
+final platformColors = {
+  'iOS': const Color(0xFF007AFF),
+  'Android': const Color(0xFF3DDC84),
+  'Web': const Color(0xFFFF6B35),
+};
+
+CristalyseChart()
+  .data(appAnalyticsData)
+  .mapping(x: 'month', y: 'users', color: 'platform')
+  .geomLine()
+  .customPalette(categoryColors: platformColors)
+  .build();
+```
+
+**Custom Palette Features:**
+- ✅ **Brand Consistency** - Use your organization's exact brand colors
+- ✅ **Semantic Colors** - Map status, priority, or meaning to colors
+- ✅ **Category Override** - Specific colors for individual categories
+- ✅ **Fallback Support** - Unmapped categories use theme colors
+- ✅ **Legend Integration** - Custom colors appear in auto-generated legends
+
+### Advanced Label Formatting
+
+**Professional number formatting** with NumberFormat integration and custom callbacks.
+
+```dart
+import 'package:intl/intl.dart';
+
+// Currency formatting
+.scaleYContinuous(labels: NumberFormat.simpleCurrency().format) // $1,234.56
+
+// Compact notation
+.scaleYContinuous(labels: NumberFormat.compact().format) // 1.2M, 5.6K
+
+// Custom formatting
+.scaleYContinuous(labels: (value) => '${value.toStringAsFixed(1)}°C') // 23.5°C
+```
+
+**Label Formatting Features:**
+- ✅ **NumberFormat Integration** - Built-in currency, percentage, and compact formatting
+- ✅ **Custom Callbacks** - Full control over label appearance and logic
+- ✅ **Locale Support** - Automatic localization based on device settings
+- ✅ **Multi-Chart Support** - Works with all chart types (axes, pie slices, bubbles)
+- ✅ **Performance Optimized** - Efficient formatting without UI blocking
+- ✅ **Unit Flexibility** - Easy addition of units, symbols, and custom text
 
 ### Advanced Data Mapping
 ```dart
@@ -783,7 +1078,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.5.0** - Production ready with heat map charts, enhanced dual Y-axis SVG export and comprehensive interactive capabilities
+**Current Version: 1.5.0** - Production ready with comprehensive chart library featuring automatic legend generation, flexible positioning, and professional styling
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -799,14 +1094,17 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.0.0** - **Pie charts and donut charts** with exploded slices and smart label positioning
 - ✅ **v1.1.0** - **Advanced label formatting system** with NumberFormat integration
 - ✅ **v1.2.0** - **Heat map charts** with 2D data visualization and customizable color gradients
+- ✅ **v1.3.0** - **Bubble charts** with 3D data visualization and professional size encoding
+- ✅ **v1.4.0** - **Custom color palettes** for brand-specific category mapping
+- ✅ **v1.5.0** - **Automatic legend generation** with flexible positioning and styling
 
 ## Support This Project
 
 **Love Cristalyse?** Your support helps me dedicate more time to building the Flutter charting library you deserve!
 
-<p align="center">
+<p>
   <a href="https://github.com/sponsors/rudi-q">
-    <img src="https://img.shields.io/badge/Sponsor_on-GitHub-EA4AAA?style=for-the-badge&logo=github&logoColor=white" alt="Sponsor on GitHub"/>
+    <img src="https://img.shields.io/badge/Sponsor_on-GitHub-2cacbf?style=for-the-badge&logo=github&logoColor=white&labelColor=145261" alt="Sponsor on GitHub" style="border-radius: 8px;"/>
   </a>
 </p>
 
