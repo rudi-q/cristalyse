@@ -110,7 +110,8 @@ class AnimatedChartPainter extends CustomPainter {
   Gradient _applyAlphaToGradient(Gradient gradient, double alpha) {
     final clampedAlpha = alpha.clamp(0.0, 1.0);
     final newColors = gradient.colors
-        .map((color) => color.withAlpha((((color.a * 255.0).round() & 0xff) * clampedAlpha).round()))
+        .map((color) => color.withAlpha(
+            (((color.a * 255.0).round() & 0xff) * clampedAlpha).round()))
         .toList();
 
     if (gradient is LinearGradient) {
@@ -144,7 +145,7 @@ class AnimatedChartPainter extends CustomPainter {
         transform: gradient.transform,
       );
     }
-    
+
     // Fallback: return original gradient if unknown type
     return gradient;
   }
@@ -1002,7 +1003,8 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Apply gradient or solid color based on what we received
     if (colorOrGradient is Gradient) {
-      final alphaGradient = _applyAlphaToGradient(colorOrGradient, geometry.alpha);
+      final alphaGradient =
+          _applyAlphaToGradient(colorOrGradient, geometry.alpha);
       paint.shader = alphaGradient.createShader(barRect);
     } else {
       final color = colorOrGradient as Color;
@@ -1099,7 +1101,8 @@ class AnimatedChartPainter extends CustomPainter {
           height: size * 2,
         );
         final combinedAlpha = geometry.alpha * pointProgress;
-        final alphaGradient = _applyAlphaToGradient(colorOrGradient, combinedAlpha);
+        final alphaGradient =
+            _applyAlphaToGradient(colorOrGradient, combinedAlpha);
         paint.shader = alphaGradient.createShader(shaderRect);
       } else {
         final color = colorOrGradient as Color;
