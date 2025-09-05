@@ -939,11 +939,17 @@ class AnimatedChartPainter extends CustomPainter {
     double? customWidth,
     double yStackOffset = 0,
   }) {
-    final colorOrGradient = colorColumn != null
-        ? colorScale.scale(dataPoint[colorColumn])
-        : (theme.colorPalette.isNotEmpty
-            ? theme.colorPalette.first
-            : theme.primaryColor);
+    // Priority: geometry.color > colorScale > theme fallback
+    final dynamic colorOrGradient;
+    if (geometry.color != null) {
+      colorOrGradient = geometry.color!;
+    } else if (colorColumn != null) {
+      colorOrGradient = colorScale.scale(dataPoint[colorColumn]);
+    } else {
+      colorOrGradient = theme.colorPalette.isNotEmpty
+          ? theme.colorPalette.first
+          : theme.primaryColor;
+    }
 
     final paint = Paint()..style = PaintingStyle.fill;
 
@@ -1078,11 +1084,17 @@ class AnimatedChartPainter extends CustomPainter {
 
       if (pointProgress <= 0) continue;
 
-      final colorOrGradient = colorColumn != null
-          ? colorScale.scale(point[colorColumn])
-          : (theme.colorPalette.isNotEmpty
-              ? theme.colorPalette.first
-              : theme.primaryColor);
+      // Priority: geometry.color > colorScale > theme fallback
+      final dynamic colorOrGradient;
+      if (geometry.color != null) {
+        colorOrGradient = geometry.color!;
+      } else if (colorColumn != null) {
+        colorOrGradient = colorScale.scale(point[colorColumn]);
+      } else {
+        colorOrGradient = theme.colorPalette.isNotEmpty
+            ? theme.colorPalette.first
+            : theme.primaryColor;
+      }
 
       final size = sizeColumn != null
           ? sizeScale.scale(point[sizeColumn])
