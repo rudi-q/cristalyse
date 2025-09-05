@@ -185,6 +185,104 @@ CristalyseChart()
   .build()
 ```
 
+### Gradient Colors ✨
+
+<Info>
+**New in v1.6.0**: Add stunning gradient effects to your bar charts! Support for linear, radial, and sweep gradients with full alpha blending.
+</Info>
+
+Create beautiful gradient bars using category-specific gradients:
+
+```dart
+final data = [
+  {'quarter': 'Q1', 'revenue': 120},
+  {'quarter': 'Q2', 'revenue': 150},
+  {'quarter': 'Q3', 'revenue': 110},
+  {'quarter': 'Q4', 'revenue': 180},
+];
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
+  .geomBar(
+    width: 0.8,
+    alpha: 0.9,
+    borderRadius: BorderRadius.circular(8),
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .customPalette(categoryGradients: {
+    'Q1': const LinearGradient(
+      colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    ),
+    'Q2': const LinearGradient(
+      colors: [Color(0xFF059669), Color(0xFF10B981)],
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    ),
+    'Q3': const RadialGradient(
+      colors: [Color(0xFFDC2626), Color(0xFFEF4444)],
+      center: Alignment.center,
+      radius: 0.8,
+    ),
+    'Q4': const SweepGradient(
+      colors: [Color(0xFFEAB308), Color(0xFFF59E0B), Color(0xFFEAB308)],
+      center: Alignment.center,
+    ),
+  })
+  .build()
+```
+
+#### Advanced Gradient Examples
+
+Multiple gradient types for regional sales data:
+
+```dart
+final salesData = [
+  {'region': 'North', 'sales': 250, 'product': 'Premium'},
+  {'region': 'South', 'sales': 180, 'product': 'Standard'},
+  {'region': 'East', 'sales': 320, 'product': 'Premium'},
+  {'region': 'West', 'sales': 210, 'product': 'Standard'},
+];
+
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'region', y: 'sales', color: 'product')
+  .geomBar(
+    style: BarStyle.grouped,
+    width: 0.8,
+    borderRadius: BorderRadius.circular(6),
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(min: 0)
+  .customPalette(categoryGradients: {
+    'Premium': const LinearGradient(
+      colors: [Color(0xFF8B5CF6), Color(0xFFA78BFA)],
+      stops: [0.0, 1.0],
+    ),
+    'Standard': const LinearGradient(
+      colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],
+      stops: [0.0, 1.0],
+    ),
+  })
+  .legend()
+  .build()
+```
+
+#### Gradient Features
+
+- **Linear Gradients**: Perfect for vertical or horizontal color transitions
+- **Radial Gradients**: Create circular color effects from center outward
+- **Sweep Gradients**: Circular gradients that sweep around a center point
+- **Alpha Blending**: Gradients automatically respect animation alpha values
+- **Type Safety**: Strongly typed gradient maps for reliability
+
+<Warning>
+**Important**: Gradients are only applied when using color mapping (i.e., when you specify `color: 'columnName'` in your mapping). Without color mapping, bars will use solid colors from the theme's color palette.
+</Warning>
+
 ## Animation Types
 
 ### Progressive Bar Growth

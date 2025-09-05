@@ -106,6 +106,50 @@ class AnimatedChartPainter extends CustomPainter {
   /// Parameters:
   /// - [canvas]: The Flutter canvas to draw on
   /// - [size]: Available drawing area dimensions
+  /// Helper method to apply alpha to all colors in a gradient
+  Gradient _applyAlphaToGradient(Gradient gradient, double alpha) {
+    final clampedAlpha = alpha.clamp(0.0, 1.0);
+    final newColors = gradient.colors
+        .map((color) => color.withAlpha(
+            (((color.a * 255.0).round() & 0xff) * clampedAlpha).round()))
+        .toList();
+
+    if (gradient is LinearGradient) {
+      return LinearGradient(
+        begin: gradient.begin,
+        end: gradient.end,
+        colors: newColors,
+        stops: gradient.stops,
+        tileMode: gradient.tileMode,
+        transform: gradient.transform,
+      );
+    } else if (gradient is RadialGradient) {
+      return RadialGradient(
+        center: gradient.center,
+        radius: gradient.radius,
+        colors: newColors,
+        stops: gradient.stops,
+        tileMode: gradient.tileMode,
+        focal: gradient.focal,
+        focalRadius: gradient.focalRadius,
+        transform: gradient.transform,
+      );
+    } else if (gradient is SweepGradient) {
+      return SweepGradient(
+        center: gradient.center,
+        startAngle: gradient.startAngle,
+        endAngle: gradient.endAngle,
+        colors: newColors,
+        stops: gradient.stops,
+        tileMode: gradient.tileMode,
+        transform: gradient.transform,
+      );
+    }
+
+    // Fallback: return original gradient if unknown type
+    return gradient;
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     if (data.isEmpty || geometries.isEmpty) return;
@@ -437,7 +481,24 @@ class AnimatedChartPainter extends CustomPainter {
 
     if (columnToUse == null) return ColorScale();
     final values = data.map((d) => d[columnToUse]).toSet().toList();
-    return ColorScale(values: values, colors: theme.colorPalette);
+
+    // Extract gradients for the values if available
+    Map<dynamic, Gradient>? gradients;
+    if (theme.categoryGradients != null &&
+        theme.categoryGradients!.isNotEmpty) {
+      gradients = {};
+      for (final value in values) {
+        if (theme.categoryGradients!.containsKey(value.toString())) {
+          gradients[value] = theme.categoryGradients![value.toString()]!;
+        }
+      }
+    }
+
+    return ColorScale(
+      values: values,
+      colors: theme.colorPalette,
+      gradients: gradients,
+    );
   }
 
   SizeScale _setupSizeScale() {
@@ -878,15 +939,19 @@ class AnimatedChartPainter extends CustomPainter {
     double? customWidth,
     double yStackOffset = 0,
   }) {
-    final color = colorColumn != null
-        ? colorScale.scale(dataPoint[colorColumn])
-        : (theme.colorPalette.isNotEmpty
-            ? theme.colorPalette.first
-            : theme.primaryColor);
+    // Priority: geometry.color > colorScale > theme fallback
+    final dynamic colorOrGradient;
+    if (geometry.color != null) {
+      colorOrGradient = geometry.color!;
+    } else if (colorColumn != null) {
+      colorOrGradient = colorScale.scale(dataPoint[colorColumn]);
+    } else {
+      colorOrGradient = theme.colorPalette.isNotEmpty
+          ? theme.colorPalette.first
+          : theme.primaryColor;
+    }
 
-    final paint = Paint()
-      ..color = color.withAlpha((geometry.alpha * 255).round())
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
     Rect barRect;
 
@@ -940,6 +1005,16 @@ class AnimatedChartPainter extends CustomPainter {
 
     if (!barRect.isFinite || barRect.isEmpty) {
       return;
+    }
+
+    // Apply gradient or solid color based on what we received
+    if (colorOrGradient is Gradient) {
+      final alphaGradient =
+          _applyAlphaToGradient(colorOrGradient, geometry.alpha);
+      paint.shader = alphaGradient.createShader(barRect);
+    } else {
+      final color = colorOrGradient as Color;
+      paint.color = color.withAlpha((geometry.alpha * 255).round());
     }
 
     if (geometry.borderRadius != null &&
@@ -1009,23 +1084,44 @@ class AnimatedChartPainter extends CustomPainter {
 
       if (pointProgress <= 0) continue;
 
-      final color = colorColumn != null
-          ? colorScale.scale(point[colorColumn])
-          : (theme.colorPalette.isNotEmpty
-              ? theme.colorPalette.first
-              : theme.primaryColor);
+      // Priority: geometry.color > colorScale > theme fallback
+      final dynamic colorOrGradient;
+      if (geometry.color != null) {
+        colorOrGradient = geometry.color!;
+      } else if (colorColumn != null) {
+        colorOrGradient = colorScale.scale(point[colorColumn]);
+      } else {
+        colorOrGradient = theme.colorPalette.isNotEmpty
+            ? theme.colorPalette.first
+            : theme.primaryColor;
+      }
 
       final size = sizeColumn != null
           ? sizeScale.scale(point[sizeColumn])
           : theme.pointSizeDefault;
 
-      final paint = Paint()
-        ..color = color.withAlpha(
-          (geometry.alpha * pointProgress * 255).round(),
-        )
-        ..style = PaintingStyle.fill;
-
       final pointY = plotArea.top + yScale.scale(y);
+
+      final paint = Paint()..style = PaintingStyle.fill;
+
+      // Apply gradient or solid color based on what we received
+      if (colorOrGradient is Gradient) {
+        // For points, create a square shader area around the point
+        final shaderRect = Rect.fromCenter(
+          center: Offset(pointX, pointY),
+          width: size * 2,
+          height: size * 2,
+        );
+        final combinedAlpha = geometry.alpha * pointProgress;
+        final alphaGradient =
+            _applyAlphaToGradient(colorOrGradient, combinedAlpha);
+        paint.shader = alphaGradient.createShader(shaderRect);
+      } else {
+        final color = colorOrGradient as Color;
+        paint.color = color.withAlpha(
+          (geometry.alpha * pointProgress * 255).round(),
+        );
+      }
 
       if (!pointX.isFinite || !pointY.isFinite) {
         continue;

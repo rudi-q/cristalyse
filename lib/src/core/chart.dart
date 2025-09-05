@@ -415,21 +415,22 @@ class CristalyseChart {
     return this;
   }
 
-  /// Apply custom colors to specific categories in multi-series charts
+  /// Apply custom colors or gradients to specific categories in multi-series charts
   ///
-  /// Use this method to assign specific colors to categories instead of relying
+  /// Use this method to assign specific colors or gradients to categories instead of relying
   /// on the theme's default color palette. This is particularly useful for:
   /// - Brand-specific colors (iOS blue, Android green, etc.)
   /// - Semantic coloring (red for errors, green for success)
+  /// - Gradient effects for enhanced visual appeal
   /// - Consistent visual identity across charts
   ///
   /// **Important:** This method requires a `color` mapping to be defined.
   /// Call `.mapping(x: 'column', y: 'column', color: 'categoryColumn')` first.
   ///
-  /// Categories not specified in [categoryColors] will fall back to the
+  /// Categories not specified in [categoryColors] or [categoryGradients] will fall back to the
   /// theme's default color palette.
   ///
-  /// Example:
+  /// Example with solid colors:
   /// ```dart
   /// final platformColors = {
   ///   'iOS': const Color(0xFF007ACC),      // Brand blue
@@ -445,17 +446,55 @@ class CristalyseChart {
   ///   .build();
   /// ```
   ///
+  /// Example with gradients:
+  /// ```dart
+  /// final quarterlyGradients = {
+  ///   'Q1': LinearGradient(
+  ///     begin: Alignment.bottomCenter,
+  ///     end: Alignment.topCenter,
+  ///     colors: [Colors.blue.shade300, Colors.blue.shade700],
+  ///   ),
+  ///   'Q2': LinearGradient(
+  ///     colors: [Colors.green.shade300, Colors.green.shade700],
+  ///   ),
+  /// };
+  ///
+  /// CristalyseChart()
+  ///   .data(salesData)
+  ///   .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
+  ///   .geomBar()
+  ///   .customPalette(categoryGradients: quarterlyGradients)
+  ///   .build();
+  /// ```
+  ///
   /// Throws [ArgumentError] if:
   /// - No color mapping is defined in `.mapping()`
-  /// - [categoryColors] is empty
-  CristalyseChart customPalette({required Map<String, Color> categoryColors}) {
-    if (categoryColors.isEmpty) {
-      throw ArgumentError('categoryColors cannot be empty');
+  /// - Both [categoryColors] and [categoryGradients] are null or empty
+  CristalyseChart customPalette({
+    Map<String, Color>? categoryColors,
+    Map<String, Gradient>? categoryGradients,
+  }) {
+    if ((categoryColors == null || categoryColors.isEmpty) &&
+        (categoryGradients == null || categoryGradients.isEmpty)) {
+      throw ArgumentError(
+          'Either categoryColors or categoryGradients must be provided and non-empty');
     }
     if (_colorColumn != null) {
       final String colorColumn = _colorColumn ?? '';
-      _theme = _theme.customPalette(
-          data: _data, color: colorColumn, categoryColors: categoryColors);
+
+      // Apply solid colors if provided
+      if (categoryColors != null && categoryColors.isNotEmpty) {
+        _theme = _theme.customPalette(
+            data: _data, color: colorColumn, categoryColors: categoryColors);
+      }
+
+      // Apply gradients if provided
+      if (categoryGradients != null && categoryGradients.isNotEmpty) {
+        _theme = _theme.customGradientPalette(
+            data: _data,
+            color: colorColumn,
+            categoryGradients: categoryGradients);
+      }
     } else {
       throw ArgumentError("'color' argument is missing from .mapping. \n"
           "The correct code should look like this .mapping(x:'', y='', color='')\n"
@@ -800,6 +839,7 @@ extension ChartThemeExtension on ChartTheme {
     EdgeInsets? padding,
     TextStyle? axisTextStyle,
     TextStyle? axisLabelStyle,
+    Map<String, Gradient>? categoryGradients,
   }) {
     return ChartTheme(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -817,6 +857,7 @@ extension ChartThemeExtension on ChartTheme {
       padding: padding ?? this.padding,
       axisTextStyle: axisTextStyle ?? this.axisTextStyle,
       axisLabelStyle: axisLabelStyle ?? this.axisLabelStyle,
+      categoryGradients: categoryGradients ?? this.categoryGradients,
     );
   }
 
@@ -870,6 +911,58 @@ extension ChartThemeExtension on ChartTheme {
         .toList();
     return copyWith(
       colorPalette: colorPalette,
+    );
+  }
+
+  /// Creates a new [ChartTheme] with custom gradients for specific categories
+  ///
+  /// This method allows you to assign gradient fills to specific categories instead of
+  /// solid colors. Perfect for creating visually rich charts with depth and dimension.
+  ///
+  /// **Important:** This method requires a `color` mapping to be defined.
+  /// Call `.mapping(x: 'column', y: 'column', color: 'categoryColumn')` first.
+  ///
+  /// Categories not specified in [categoryGradients] will fall back to solid colors
+  /// from the theme's color palette.
+  ///
+  /// Example:
+  /// ```dart
+  /// final quarterlyGradients = {
+  ///   'Q1': LinearGradient(
+  ///     begin: Alignment.bottomCenter,
+  ///     end: Alignment.topCenter,
+  ///     colors: [Colors.blue.shade300, Colors.blue.shade700],
+  ///   ),
+  ///   'Q2': RadialGradient(
+  ///     colors: [Colors.green.shade200, Colors.green.shade800],
+  ///   ),
+  /// };
+  ///
+  /// CristalyseChart()
+  ///   .data(salesData)
+  ///   .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
+  ///   .geomBar()
+  ///   .theme(ChartTheme.defaultTheme().customGradientPalette(
+  ///     data: salesData,
+  ///     color: 'quarter',
+  ///     categoryGradients: quarterlyGradients,
+  ///   ))
+  ///   .build();
+  /// ```
+  ///
+  /// Parameters:
+  /// - [data]: The chart data containing category information
+  /// - [color]: The column name that contains category values
+  /// - [categoryGradients]: Map of category names to their desired gradients
+  ///
+  /// Returns a new [ChartTheme] with the custom gradient mapping applied.
+  ChartTheme customGradientPalette({
+    required List<Map<String, dynamic>> data,
+    required String color,
+    required Map<String, Gradient> categoryGradients,
+  }) {
+    return copyWith(
+      categoryGradients: categoryGradients,
     );
   }
 }

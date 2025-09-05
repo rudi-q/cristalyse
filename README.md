@@ -1078,7 +1078,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.5.0** - Production ready with comprehensive chart library featuring automatic legend generation, flexible positioning, and professional styling
+**Current Version: 1.6.0** - Production ready with comprehensive chart library featuring automatic legend generation, flexible positioning, and professional styling
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 

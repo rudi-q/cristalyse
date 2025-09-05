@@ -103,6 +103,122 @@ ChartTheme responsiveTheme(BuildContext context) {
 }
 ```
 
+## Gradient Themes ✨
+
+<Info>
+**New in v1.6.0**: Create stunning gradient effects for your charts with category-specific gradient mapping.
+</Info>
+
+### Creating Gradient Themes
+
+Define gradients for specific categories in your data:
+
+```dart
+// Create gradients map for use with .customPalette()
+final productGradients = {
+  // Linear gradients for different product tiers
+  'Enterprise': const LinearGradient(
+    colors: [Color(0xFF8B5CF6), Color(0xFFA78BFA)],
+    begin: Alignment.bottomLeft,
+    end: Alignment.topRight,
+    stops: [0.0, 1.0],
+  ),
+  'Professional': const LinearGradient(
+    colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],
+    begin: Alignment.bottomCenter,
+    end: Alignment.topCenter,
+  ),
+  // Radial gradient for special categories
+  'Premium': const RadialGradient(
+    colors: [Color(0xFFDC2626), Color(0xFFEF4444), Color(0xFFFCA5A5)],
+    center: Alignment.center,
+    radius: 1.2,
+    stops: [0.0, 0.7, 1.0],
+  ),
+  // Sweep gradient for dynamic effects
+  'Special': const SweepGradient(
+    colors: [
+      Color(0xFFEAB308),
+      Color(0xFFF59E0B),
+      Color(0xFFDC2626),
+      Color(0xFFEAB308),
+    ],
+    center: Alignment.center,
+    startAngle: 0.0,
+    endAngle: 2 * math.pi,
+  ),
+};
+```
+
+### Gradient Types
+
+#### Linear Gradients
+
+Smooth color transitions along a line:
+
+```dart
+const LinearGradient(
+  colors: [Color(0xFF4F46E5), Color(0xFF7C3AED)],
+  begin: Alignment.bottomCenter, // Start point
+  end: Alignment.topCenter,      // End point
+  stops: [0.0, 1.0],            // Optional color stops
+)
+```
+
+#### Radial Gradients
+
+Circular color transitions from center outward:
+
+```dart
+const RadialGradient(
+  colors: [Color(0xFF059669), Color(0xFF10B981)],
+  center: Alignment.center,    // Center point
+  radius: 0.8,                // Radius (0.0 to 1.0+)
+  focal: Alignment.center,     // Optional focal point
+  focalRadius: 0.1,           // Optional focal radius
+)
+```
+
+#### Sweep Gradients
+
+Angular color transitions around a center point:
+
+```dart
+const SweepGradient(
+  colors: [Color(0xFFEAB308), Color(0xFFF59E0B), Color(0xFFEAB308)],
+  center: Alignment.center,     // Center point
+  startAngle: 0.0,             // Start angle in radians
+  endAngle: 2 * math.pi,       // End angle in radians
+)
+```
+
+### Applying Gradient Themes
+
+Use gradient themes with color mapping:
+
+```dart
+CristalyseChart()
+  .data(productData)
+  .mapping(x: 'month', y: 'sales', color: 'tier') // Color mapping required
+  .geomBar()
+  .customPalette(categoryGradients: productGradients)
+  .build()
+```
+
+<Warning>
+**Important**: Gradients only work when you specify color mapping in your chart. Without `color: 'columnName'`, charts will use solid colors from the color palette.
+</Warning>
+
+### Supported Chart Types
+
+Gradient themes currently support:
+
+- ✅ **Bar Charts** - Full gradient support with alpha blending
+- ✅ **Point/Scatter Charts** - Gradient fills for data points  
+- ❌ **Line Charts** - Not yet supported (solid colors only)
+- ❌ **Area Charts** - Not yet supported (solid colors only)
+- ❌ **Bubble Charts** - Not yet supported (solid colors only)
+
 ## Advanced Customization
 
 ### Theme Extensions
