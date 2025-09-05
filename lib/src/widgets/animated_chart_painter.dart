@@ -110,7 +110,7 @@ class AnimatedChartPainter extends CustomPainter {
   Gradient _applyAlphaToGradient(Gradient gradient, double alpha) {
     final clampedAlpha = alpha.clamp(0.0, 1.0);
     final newColors = gradient.colors
-        .map((color) => color.withAlpha((color.alpha * clampedAlpha).round()))
+        .map((color) => color.withAlpha((((color.a * 255.0).round() & 0xff) * clampedAlpha).round()))
         .toList();
 
     if (gradient is LinearGradient) {
