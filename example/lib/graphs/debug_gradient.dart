@@ -13,7 +13,7 @@ class DebugGradientExample extends StatelessWidget {
       {'quarter': 'Q4', 'revenue': 200},
     ];
 
-    final quarterlyGradients = {
+    final Map<String, Gradient> quarterlyGradients = {
       'Q1': const LinearGradient(
         colors: [Colors.red, Colors.blue],
       ),
