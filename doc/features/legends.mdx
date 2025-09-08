@@ -121,11 +121,11 @@ Legends automatically choose appropriate symbols based on your chart type:
 
 | Chart Type | Symbol | Description |
 |------------|--------|-------------|
-| **Bar Charts** | 🟦 Square | Solid colored squares for categorical bars |
+|| **Bar Charts** | ◼ Square | Solid colored squares for categorical bars |
 | **Line Charts** | ━ Line | Horizontal line segments matching chart lines |
-| **Scatter Plots** | 🔵 Circle | Circular symbols for point data |
+|| **Scatter Plots** | ● Circle | Circular symbols for point data |
 | **Area Charts** | ━ Line | Line symbols representing area boundaries |
-| **Bubble Charts** | 🔵 Circle | Circular symbols for bubble data |
+|| **Bubble Charts** | ● Circle | Circular symbols for bubble data |
 
 <Note>
 Symbol selection is automatic but can be overridden with custom styling if needed.
@@ -152,7 +152,7 @@ Legend text automatically adapts to your chart theme:
     .mapping(x: 'month', y: 'sales', color: 'product')
     .geomBar()
     .theme(ChartTheme.darkTheme()) // Dark theme
-    .legend() // Light text on dark background ✨
+    .legend() // Light text on dark background
     .build();
   ```
 </CodeGroup>
@@ -268,25 +268,25 @@ CristalyseChart()
 ## Best Practices
 
 <AccordionGroup>
-  <Accordion title="📱 Mobile Optimization">
+  <Accordion title="Mobile Optimization" icon="phone">
     - Use `LegendPosition.bottom` for mobile layouts
     - Keep symbol sizes readable on small screens
     - Consider horizontal orientation for many categories
   </Accordion>
 
-  <Accordion title="🎨 Visual Design">
+  <Accordion title="Visual Design" icon="palette">
     - Let legends inherit theme colors automatically
     - Use subtle backgrounds with transparency
     - Maintain consistent spacing across charts
   </Accordion>
 
-  <Accordion title="📊 Data Clarity">
+  <Accordion title="Data Clarity" icon="bar-chart">
     - Ensure category names are descriptive
     - Limit legend items to 6-8 for readability
     - Position legends to not obscure important data
   </Accordion>
 
-  <Accordion title="♿ Accessibility">
+  <Accordion title="Accessibility" icon="accessibility">
     - Rely on automatic theme colors for contrast
     - Test legends in both light and dark modes
     - Ensure sufficient color differentiation
@@ -339,11 +339,11 @@ CristalyseChart()
 </Note>
 
 ```dart
-// ✅ Works - has color mapping
+// <Icon icon="check" /> Works - has color mapping
 .mapping(x: 'month', y: 'sales', color: 'product')
 .legend()
 
-// ❌ Won't show - no color mapping  
+// <Icon icon="x" /> Won't show - no color mapping
 .mapping(x: 'month', y: 'sales')
 .legend() // Legend will be empty
 ```
@@ -397,10 +397,10 @@ If you were manually creating legends, you can now use the built-in functionalit
   <Accordion title="Legend text too dark in dark theme">
     **Solution**: Don't override text color - let it inherit from theme:
     ```dart
-    // ✅ Good - inherits theme color
+    // <Icon icon="check" /> Good - inherits theme color
     .legend(textStyle: TextStyle(fontSize: 14))
     
-    // ❌ Bad - hardcoded color
+    // <Icon icon="x" /> Bad - hardcoded color
     .legend(textStyle: TextStyle(fontSize: 14, color: Colors.black))
     ```
   </Accordion>

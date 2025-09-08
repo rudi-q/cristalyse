@@ -1,4 +1,18 @@
-## 1.6.0 - 2025-09-05
+## 1.6.1 - 2025-09-08
+
+#### 🤖 MCP Server Integration
+
+- **Cristalyse MCP Server**: New documentation guide for connecting Cristalyse docs to AI coding assistants
+  - Setup instructions for Cursor, Windsurf, and Warp: Add `"cristalyse_docs": {"url": "https://docs.cristalyse.com/mcp"}` to MCP settings
+  - Setup for Claude Code CLI: Run `claude mcp add --transport http cristalyse_docs https://docs.cristalyse.com/mcp`
+  - Setup for Claude Web: Add custom connector with URL `https://docs.cristalyse.com/mcp`
+- **AI-Assisted Development**: Enable your coding assistant to access complete Cristalyse documentation, examples, and best practices directly in your IDE
+- **Comprehensive Guide**: Step-by-step setup instructions with troubleshooting for all major AI coding platforms
+
+**Enhance your development workflow by connecting Cristalyse documentation directly to your AI coding assistant!**
+---
+
+## 1.6.0 - 2025-09-07
 
 #### 🌈 Major Feature: Gradient Color Support (Experimental)
 

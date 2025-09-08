@@ -4,7 +4,7 @@
   </a>
   <span>
     <a href="https://github.com/sponsors/rudi-q" style="float:right; margin-right: 300px">
-      <img src="https://img.shields.io/badge/Sponsor_on-GitHub-2cacbf?style=for-the-badge&logo=github&logoColor=white&labelColor=145261" alt="Sponsor on GitHub" style="border-radius: 8px;"/>
+      <img src="https://img.shields.io/badge/Sponsor_on-GitHub-2cacbf?style=for-the-badge&logo=githubsponsors&logoColor=white&labelColor=145261" alt="Sponsor on GitHub" style="border-radius: 8px;"/>
     </a>
   </span>
 
@@ -19,8 +19,18 @@
 [![likes](https://img.shields.io/pub/likes/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2cacbf.svg?labelColor=145261)](https://opensource.org/licenses/MIT)
 
-[![Platform](https://img.shields.io/badge/platform-android%20%7C%20ios%20%7C%20web%20%7C%20windows%20%7C%20macos%20%7C%20linux-2cacbf?labelColor=145261)](https://flutter.dev/)
+[![Web](https://img.shields.io/badge/Web-145261?logo=google-chrome&logoColor=white)](https://flutter.dev/)
+[![WASM](https://img.shields.io/badge/Web_Assembly_(WASM)-145261?logo=webassembly&logoColor=white)](https://flutter.dev/)
+[![Windows](https://img.shields.io/badge/Windows-145261?logo=Windows&logoColor=white)](https://flutter.dev/)
+[![macOS](https://img.shields.io/badge/macOS-145261?logo=apple&logoColor=white)](https://flutter.dev/)
+[![Linux](https://img.shields.io/badge/Linux-145261?logo=linux&logoColor=white)](https://flutter.dev/)
+[![Android](https://img.shields.io/badge/Android-145261?logo=android&logoColor=white)](https://flutter.dev/)
+[![iOS](https://img.shields.io/badge/iOS-145261?logo=ios&logoStyle=bold&logoColor=white)](https://flutter.dev/)
 
+[![Claude Code support](https://img.shields.io/badge/Claude-MCP_Client-2cacbf?logo=claude&logoColor=white&labelColor=145261)](https://docs.cristalyse.com/cristalyse-mcp-server#claude-code-cli)
+[![Windsurf support](https://img.shields.io/badge/Windsurf-MCP_Client-2cacbf?logo=windsurf&logoColor=white&labelColor=145261)](https://docs.cristalyse.com/cristalyse-mcp-server#ai-code-editor-cursor%2C-windsurf%2C-warp)
+[![CoPilot support](https://img.shields.io/badge/Co_Pilot-MCP_Client-2cacbf?logo=githubcopilot&logoColor=white&labelColor=145261)](https://docs.cristalyse.com/cristalyse-mcp-server#ai-code-editor-cursor%2C-windsurf%2C-warp)
+[![Warp support](https://img.shields.io/badge/Warp-MCP_Client-2cacbf?logo=warp&logoColor=white&labelColor=145261)](https://docs.cristalyse.com/cristalyse-mcp-server#ai-code-editor-cursor%2C-windsurf%2C-warp)
 
 > Finally, create beautiful data visualizations in Flutter without fighting against chart widgets or settling for web-based solutions.
 
@@ -42,27 +52,27 @@
 
 <p align="center">
   <a href="https://docs.cristalyse.com">
-    <img src="https://img.shields.io/badge/📖_Read_Docs-2D3748?style=for-the-badge&logoColor=white&labelColor=2D3748" alt="Read Documentation"/>
+    <img src="https://img.shields.io/badge/Read_Docs-2D3748?style=for-the-badge&logo=mintlify&logoColor=white&labelColor=2D3748" alt="Read Documentation"/>
   </a>
   &nbsp;&nbsp;
   <a href="https://docs.cristalyse.com/quickstart">
-    <img src="https://img.shields.io/badge/⚡_Quick_Start-4A5568?style=for-the-badge&logoColor=white&labelColor=4A5568" alt="Quick Start Guide"/>
+    <img src="https://img.shields.io/badge/Quick_Start-4A5568?style=for-the-badge&logo=gnometerminal&logoColor=white&labelColor=4A5568" alt="Quick Start Guide"/>
   </a>
 </p>
 
 <p align="center">
   <a href="https://docs.cristalyse.com/examples">
-    <img src="https://img.shields.io/badge/🎨_Examples-718096?style=for-the-badge&logoColor=white&labelColor=718096" alt="View Examples"/>
+    <img src="https://img.shields.io/badge/Examples-718096?style=for-the-badge&logo=vercel&logoColor=white&labelColor=718096" alt="View Examples"/>
   </a>
   &nbsp;&nbsp;
   <a href="https://github.com/rudi-q/cristalyse">
-    <img src="https://img.shields.io/badge/📦_View_Source-8B9DC3?style=for-the-badge&logoColor=white&labelColor=8B9DC3" alt="View Source Code"/>
+    <img src="https://img.shields.io/badge/View_Source-8B9DC3?style=for-the-badge&logo=refinedgithub&logoColor=white&labelColor=8B9DC3" alt="View Source Code"/>
   </a>
 </p>
 
 <p align="center">
   <a href="https://cristalyse.com">
-    <img src="https://img.shields.io/badge/🌐_Visit_Website-A0AEC0?style=for-the-badge&logoColor=white&labelColor=A0AEC0" alt="Visit Website"/>
+    <img src="https://img.shields.io/badge/Visit_Website-A0AEC0?style=for-the-badge&logo=astro&logoColor=white&labelColor=A0AEC0" alt="Visit Website"/>
   </a>
 </p>
 
@@ -80,6 +90,18 @@
 </td>
 </tr>
 </table>
+
+---
+
+## 🤖 AI-Powered Development
+
+**Cristalyse Docs now has MCP server** which you can connect to your AI coding assistant (Cursor, Windsurf, Warp, Claude) for instant access to documentation while you code.
+
+<p align="center">
+  <a href="https://docs.cristalyse.com/cristalyse-mcp-server">
+    <img src="https://img.shields.io/badge/Cristalyse_MCP-Setup_Guide-2cacbf?style=for-the-badge&logo=modelcontextprotocol&logoColor=white&labelColor=145261" alt="Cristalyse MCP Setup Guide" style="border-radius: 8px;"/>
+  </a>
+</p>
 
 ---
 
@@ -1078,7 +1100,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.6.0** - Production ready with comprehensive chart library featuring automatic legend generation, flexible positioning, and professional styling
+**Current Version: 1.6.1** - Production ready with comprehensive chart library featuring automatic legend generation, flexible positioning, and professional styling
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1097,6 +1119,7 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.3.0** - **Bubble charts** with 3D data visualization and professional size encoding
 - ✅ **v1.4.0** - **Custom color palettes** for brand-specific category mapping
 - ✅ **v1.5.0** - **Automatic legend generation** with flexible positioning and styling
+- ✅ **v1.6.0** - **Experimental gradient color support** for customPalette with Linear, Radial, and Sweep gradients
 
 ## Support This Project
 
@@ -1104,7 +1127,7 @@ We're shipping progressively! Each release adds new visualization types while ma
 
 <p>
   <a href="https://github.com/sponsors/rudi-q">
-    <img src="https://img.shields.io/badge/Sponsor_on-GitHub-2cacbf?style=for-the-badge&logo=github&logoColor=white&labelColor=145261" alt="Sponsor on GitHub" style="border-radius: 8px;"/>
+    <img src="https://img.shields.io/badge/Sponsor_on-GitHub-2cacbf?style=for-the-badge&logo=githubsponsors&logoColor=white&labelColor=145261" alt="Sponsor on GitHub" style="border-radius: 8px;"/>
   </a>
 </p>
 
