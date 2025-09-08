@@ -5,11 +5,11 @@ import 'package:cristalyse_example/utils/chart_feature_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import 'advanced_gradient_example.dart';
-import 'debug_gradient.dart';
+import 'graphs/advanced_gradient_example.dart';
 import 'graphs/area_chart.dart';
 import 'graphs/bar_chart.dart';
 import 'graphs/bubble_chart.dart';
+import 'graphs/debug_gradient.dart';
 import 'graphs/dual_axis_chart.dart';
 import 'graphs/export_demo.dart';
 import 'graphs/grouped_bar.dart';
@@ -709,7 +709,7 @@ class _ExampleHomeState extends State<ExampleHome>
                 child: ListTile(
                   leading: Icon(Icons.gradient, size: 20),
                   title: Text('Gradient Bars'),
-                  subtitle: Text('New!',
+                  subtitle: Text('Experimental',
                       style: TextStyle(color: Colors.green, fontSize: 10)),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
@@ -720,7 +720,7 @@ class _ExampleHomeState extends State<ExampleHome>
                 child: ListTile(
                   leading: Icon(Icons.auto_awesome, size: 20),
                   title: Text('Advanced Gradients'),
-                  subtitle: Text('New!',
+                  subtitle: Text('Experimental',
                       style: TextStyle(color: Colors.green, fontSize: 10)),
                   dense: true,
                   contentPadding: EdgeInsets.zero,

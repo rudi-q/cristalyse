@@ -1,6 +1,6 @@
 ## 1.6.0 - 2025-09-05
 
-#### 🌈 Major Feature: Gradient Color Support
+#### 🌈 Major Feature: Gradient Color Support (Experimental)
 
 - **Category-Specific Gradients**: New `categoryGradients` property in `ChartTheme` for stunning gradient effects
   - Support for Linear, Radial, and Sweep gradients with full Flutter Gradient API compatibility
@@ -12,8 +12,9 @@
   - ✅ **Bar Charts** - Full gradient support with shader-based rendering
   - ✅ **Point/Scatter Charts** - Gradient fills for data points with proper shader regions
   - 🔄 Line/Area/Bubble charts - Solid colors (gradient support planned for future releases)
+- **Not advisable for Production use as of v1.6.0.**
 
-#### 🚀 New API Capabilities
+#### ✨ New API Capabilities
 
 - **Intuitive Gradient Definition**: Simple category-based gradient mapping
 ```dart
