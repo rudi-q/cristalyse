@@ -1,0 +1,94 @@
+---
+title: "Cristalyse MCP Server"
+description: "Connect Cristalyse documentation to your AI coding assistant using the Model Context Protocol (MCP)"
+---
+
+The Cristalyse MCP Server provides AI coding assistants with direct access to Cristalyse documentation, examples, and best practices through the Model Context Protocol (MCP). This enables your AI assistant to provide accurate, up-to-date information about Cristalyse directly in your coding environment.
+
+## What is MCP?
+
+The Model Context Protocol (MCP) is a standardized way for AI applications to securely connect to external data sources and tools. By adding the Cristalyse MCP server, your AI assistant gains access to:
+
+- Complete Cristalyse documentation
+- Code examples and snippets  
+- Best practices and patterns
+- API reference materials
+- Troubleshooting guides
+
+## Setup Instructions
+
+Choose your AI coding assistant below for specific setup instructions:
+
+<Tabs>
+  <Tab title="Cursor, Windsurf, Warp">
+    Add the following configuration to your MCP settings file:
+
+    ```json
+    {
+      "mcpServers": {
+        "cristalyse_docs": {
+          "url": "https://docs.cristalyse.com/mcp"
+        }
+      }
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Claude Code (CLI)">
+    Run the following command in your terminal:
+
+    ```bash
+    claude mcp add --transport http cristalyse_docs https://docs.cristalyse.com/mcp
+    ```
+  </Tab>
+  
+  <Tab title="Claude (Web & Desktop)">
+    Follow these steps to add the Cristalyse MCP server to Claude:
+
+    ### Step 1: Add the MCP Server
+
+    1. Navigate to the **Connectors** page in the Claude settings
+    2. Select **Add custom connector**
+    3. Add the Cristalyse MCP server with these details:
+       - **Name**: `CristalyseDocs`
+       - **URL**: `https://docs.cristalyse.com/mcp`
+    4. Select **Add**
+
+    ### Step 2: Use the MCP Server in Your Chat
+
+    1. When using Claude, select the **attachments button** (the plus icon)
+    2. Select the **CristalyseDocs** MCP server
+    3. Ask Claude any question about Cristalyse documentation
+  </Tab>
+</Tabs>
+
+## Example Usage
+
+Once connected, you can ask your AI assistant questions like:
+
+- "How do I create a scatter plot with Cristalyse?"
+- "What are the available chart types in Cristalyse?"
+- "Show me an example of custom theming"
+- "How do I add animations to my charts?"
+- "What's the best way to handle large datasets?"
+
+The AI assistant will have access to the complete Cristalyse documentation and can provide accurate, contextual responses with code examples.
+
+## Benefits
+
+<Icon icon="check" /> **Always Up-to-Date**: Access the latest documentation directly from the source  
+<Icon icon="check" /> **Context-Aware**: Get relevant examples based on your current code  
+<Icon icon="check" /> **Faster Development**: No need to switch between your IDE and documentation  
+<Icon icon="check" /> **Better Code Quality**: Follow best practices and patterns recommended in the docs  
+<Icon icon="check" /> **Instant Help**: Get immediate answers to Cristalyse-related questions
+
+## Troubleshooting
+
+If you're having issues connecting to the MCP server:
+
+1. **Check your internet connection** - The MCP server requires internet access
+2. **Verify the URL** - Make sure you're using `https://docs.cristalyse.com/mcp`
+3. **Restart your AI assistant** - Sometimes a restart is needed after adding new MCP servers
+4. **Check your MCP settings** - Ensure the JSON configuration is valid
+
+Need help? Visit our [Questions section](https://github.com/rudi-q/cristalyse/discussions/categories/q-a) for community support.

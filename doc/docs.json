@@ -17,6 +17,7 @@
             "group": "Get Started",
             "pages": [
               "index",
+              "cristalyse-mcp-server",
               "installation",
               "quickstart",
               "examples"
@@ -76,8 +77,18 @@
         },
         {
           "anchor": "Feature Requests",
+          "href": "https://github.com/rudi-q/cristalyse/discussions/categories/ideas",
+          "icon": "lightbulb"
+        },
+        {
+          "anchor": "Questions",
+          "href": "https://github.com/rudi-q/cristalyse/discussions/categories/q-a",
+          "icon": "circle-question"
+        },
+        {
+          "anchor": "Bug Reports",
           "href": "https://github.com/rudi-q/cristalyse/issues",
-          "icon": "hand-point-up"
+          "icon": "bug"
         }
       ]
     }
@@ -92,6 +103,11 @@
         "label": "Star us on GitHub",
         "href": "https://github.com/rudi-q/cristalyse",
         "icon": "star"
+      },
+      {
+        "label": "Sponsor",
+        "href": "https://github.com/sponsors/rudi-q",
+        "icon": "heart"
       },
       {
         "label": "Like us on Pub.dev",
