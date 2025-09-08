@@ -18,6 +18,9 @@ class ChartTheme {
   final TextStyle axisTextStyle;
   final TextStyle? axisLabelStyle;
 
+  /// Category-specific gradients for custom visual mapping
+  final Map<String, Gradient>? categoryGradients;
+
   const ChartTheme({
     required this.backgroundColor,
     required this.plotBackgroundColor,
@@ -34,6 +37,7 @@ class ChartTheme {
     required this.padding,
     required this.axisTextStyle,
     this.axisLabelStyle,
+    this.categoryGradients,
   });
 
   /// Default light theme

@@ -5,9 +5,11 @@ import 'package:cristalyse_example/utils/chart_feature_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'graphs/advanced_gradient_example.dart';
 import 'graphs/area_chart.dart';
 import 'graphs/bar_chart.dart';
 import 'graphs/bubble_chart.dart';
+import 'graphs/debug_gradient.dart';
 import 'graphs/dual_axis_chart.dart';
 import 'graphs/export_demo.dart';
 import 'graphs/grouped_bar.dart';
@@ -117,7 +119,7 @@ class _ExampleHomeState extends State<ExampleHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 16, vsync: this);
+    _tabController = TabController(length: 18, vsync: this);
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -336,6 +338,8 @@ class _ExampleHomeState extends State<ExampleHome>
       'Revenue vs Conversion Performance',
       'Weekly Activity Heatmap',
       'Developer Contributions',
+      'Gradient Bar Charts',
+      'Advanced Gradient Effects',
     ];
   }
 
@@ -354,6 +358,8 @@ class _ExampleHomeState extends State<ExampleHome>
       'Revenue growth correlates with improved conversion optimization',
       'Visualize user engagement patterns throughout the week with color-coded intensity',
       'GitHub-style contribution graph showing code activity over the last 12 weeks',
+      'Beautiful gradient fills for enhanced visual appeal • Linear gradients from light to dark',
+      'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
     ];
   }
 
@@ -683,7 +689,7 @@ class _ExampleHomeState extends State<ExampleHome>
                 child: ListTile(
                   leading: Icon(Icons.timeline, size: 20),
                   title: Text('Multi-Series Lines'),
-                  subtitle: Text('Fixed!',
+                  subtitle: Text('New!',
                       style: TextStyle(color: Colors.green, fontSize: 10)),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
@@ -694,6 +700,28 @@ class _ExampleHomeState extends State<ExampleHome>
                 child: ListTile(
                   leading: Icon(Icons.file_download, size: 20),
                   title: Text('Export'),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 16,
+                child: ListTile(
+                  leading: Icon(Icons.gradient, size: 20),
+                  title: Text('Gradient Bars'),
+                  subtitle: Text('Experimental',
+                      style: TextStyle(color: Colors.green, fontSize: 10)),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 17,
+                child: ListTile(
+                  leading: Icon(Icons.auto_awesome, size: 20),
+                  title: Text('Advanced Gradients'),
+                  subtitle: Text('Experimental',
+                      style: TextStyle(color: Colors.green, fontSize: 10)),
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                 ),
@@ -728,6 +756,8 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Contributions'), // New contributions heatmap tab
             Tab(text: 'Multi-Series'), // New multi-series line chart tab
             Tab(text: 'Export'), // New export tab
+            Tab(text: 'Gradient Bars'), // New gradient bars tab
+            Tab(text: 'Advanced Gradients'), // New advanced gradients tab
           ],
         ),
       ),
@@ -954,6 +984,34 @@ class _ExampleHomeState extends State<ExampleHome>
                         'Scalability', '∞', 'Infinite Zoom', Colors.green),
                     _buildStatsCard(
                         'File Size', 'Small', 'Compact', Colors.purple),
+                  ],
+                ),
+                // Gradient Bar Example
+                _buildChartPage(
+                  'Gradient Bar Charts',
+                  'Beautiful gradient fills for enhanced visual appeal • Linear gradients from light to dark',
+                  const DebugGradientExample(),
+                  [
+                    _buildStatsCard(
+                        'Gradient Types', '4', 'Linear', Colors.blue),
+                    _buildStatsCard(
+                        'Visual Appeal', '100%', 'Enhanced', Colors.green),
+                    _buildStatsCard(
+                        'Animation', 'Smooth', 'Back-ease', Colors.purple),
+                  ],
+                ),
+                // Advanced Gradient Example
+                _buildChartPage(
+                  'Advanced Gradient Effects',
+                  'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
+                  const AdvancedGradientExample(),
+                  [
+                    _buildStatsCard(
+                        'Gradient Types', 'Mixed', 'All Types', Colors.blue),
+                    _buildStatsCard(
+                        'Chart Types', '2', 'Bars + Points', Colors.green),
+                    _buildStatsCard(
+                        'Creativity', '∞', 'Unlimited', Colors.orange),
                   ],
                 ),
               ],
