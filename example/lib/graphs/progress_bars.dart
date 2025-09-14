@@ -36,7 +36,8 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
           height: 300,
           child: CristalyseChart()
               .data(_generateProgressData())
-              .mappingProgress(value: 'completion', label: 'task', category: 'department')
+              .mappingProgress(
+                  value: 'completion', label: 'task', category: 'department')
               .geomProgress(
                 orientation: ProgressOrientation.horizontal,
                 thickness: 20.0 + (sliderValue * 20.0), // 20-40px thickness
@@ -66,7 +67,8 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
           height: 300,
           child: CristalyseChart()
               .data(_generateProgressData())
-              .mappingProgress(value: 'completion', label: 'task', category: 'department')
+              .mappingProgress(
+                  value: 'completion', label: 'task', category: 'department')
               .geomProgress(
                 orientation: ProgressOrientation.vertical,
                 thickness: 15.0 + (sliderValue * 15.0), // 15-30px thickness
@@ -97,7 +99,8 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
           height: 300,
           child: CristalyseChart()
               .data(_generateProgressData())
-              .mappingProgress(value: 'completion', label: 'task', category: 'department')
+              .mappingProgress(
+                  value: 'completion', label: 'task', category: 'department')
               .geomProgress(
                 orientation: ProgressOrientation.circular,
                 thickness: 25.0 + (sliderValue * 25.0), // 25-50px radius
@@ -111,7 +114,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
               .build(),
         ),
         const SizedBox(height: 24),
-        
+
         // Stacked Progress Bars
         Text(
           'Stacked Progress Bars',
@@ -126,7 +129,8 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
           height: 250,
           child: CristalyseChart()
               .data(_generateStackedProgressData())
-              .mappingProgress(value: 'completion', label: 'project', category: 'phase')
+              .mappingProgress(
+                  value: 'completion', label: 'project', category: 'phase')
               .geomProgress(
                 orientation: ProgressOrientation.horizontal,
                 style: ProgressStyle.stacked,
@@ -134,7 +138,11 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
                 cornerRadius: 6.0,
                 showLabel: true,
                 segments: [30.0, 45.0, 25.0], // Three segments
-                segmentColors: [Colors.red.shade400, Colors.orange.shade400, Colors.green.shade400],
+                segmentColors: [
+                  Colors.red.shade400,
+                  Colors.orange.shade400,
+                  Colors.green.shade400
+                ],
               )
               .theme(currentTheme)
               .animate(
@@ -143,7 +151,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
               .build(),
         ),
         const SizedBox(height: 24),
-        
+
         // Grouped Progress Bars
         Text(
           'Grouped Progress Bars',
@@ -158,7 +166,8 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
           height: 280,
           child: CristalyseChart()
               .data(_generateProgressData())
-              .mappingProgress(value: 'completion', label: 'task', category: 'department')
+              .mappingProgress(
+                  value: 'completion', label: 'task', category: 'department')
               .geomProgress(
                 orientation: ProgressOrientation.horizontal,
                 style: ProgressStyle.grouped,
@@ -175,7 +184,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
               .build(),
         ),
         const SizedBox(height: 24),
-        
+
         // Gauge Progress Bars
         Text(
           'Gauge/Speedometer Progress',
@@ -190,7 +199,8 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
           height: 300,
           child: CristalyseChart()
               .data(_generateGaugeData())
-              .mappingProgress(value: 'completion', label: 'metric', category: 'type')
+              .mappingProgress(
+                  value: 'completion', label: 'metric', category: 'type')
               .geomProgress(
                 orientation: ProgressOrientation.circular,
                 style: ProgressStyle.gauge,
@@ -208,7 +218,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
               .build(),
         ),
         const SizedBox(height: 24),
-        
+
         // Concentric Progress Bars
         Text(
           'Concentric Ring Progress',
@@ -223,7 +233,8 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
           height: 320,
           child: CristalyseChart()
               .data(_generateConcentricData())
-              .mappingProgress(value: 'completion', label: 'system', category: 'priority')
+              .mappingProgress(
+                  value: 'completion', label: 'system', category: 'priority')
               .geomProgress(
                 orientation: ProgressOrientation.circular,
                 style: ProgressStyle.concentric,
@@ -239,7 +250,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
               .build(),
         ),
         const SizedBox(height: 16),
-        
+
         const Text(
             '• Horizontal bars grow from left to right with gradient fill\n'
             '• Vertical bars grow from bottom to top with solid colors\n'
@@ -258,26 +269,10 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
 // Generate sample progress data
 List<Map<String, dynamic>> _generateProgressData() {
   return [
-    {
-      'task': 'Backend API',
-      'completion': 85.0,
-      'department': 'Engineering'
-    },
-    {
-      'task': 'Frontend UI',
-      'completion': 70.0,
-      'department': 'Engineering'
-    },
-    {
-      'task': 'User Testing',
-      'completion': 45.0,
-      'department': 'Product'
-    },
-    {
-      'task': 'Documentation',
-      'completion': 30.0,
-      'department': 'Product'
-    },
+    {'task': 'Backend API', 'completion': 85.0, 'department': 'Engineering'},
+    {'task': 'Frontend UI', 'completion': 70.0, 'department': 'Engineering'},
+    {'task': 'User Testing', 'completion': 45.0, 'department': 'Product'},
+    {'task': 'Documentation', 'completion': 30.0, 'department': 'Product'},
     {
       'task': 'Marketing Campaign',
       'completion': 90.0,
@@ -289,67 +284,27 @@ List<Map<String, dynamic>> _generateProgressData() {
 // Generate stacked progress data
 List<Map<String, dynamic>> _generateStackedProgressData() {
   return [
-    {
-      'project': 'Mobile App',
-      'completion': 100.0,
-      'phase': 'Development'
-    },
-    {
-      'project': 'Web Platform',
-      'completion': 75.0,
-      'phase': 'Development'
-    },
-    {
-      'project': 'API Gateway',
-      'completion': 60.0,
-      'phase': 'Development'
-    },
+    {'project': 'Mobile App', 'completion': 100.0, 'phase': 'Development'},
+    {'project': 'Web Platform', 'completion': 75.0, 'phase': 'Development'},
+    {'project': 'API Gateway', 'completion': 60.0, 'phase': 'Development'},
   ];
 }
 
 // Generate gauge data
 List<Map<String, dynamic>> _generateGaugeData() {
   return [
-    {
-      'metric': 'CPU Usage',
-      'completion': 65.0,
-      'type': 'System'
-    },
-    {
-      'metric': 'Memory',
-      'completion': 42.0,
-      'type': 'System'
-    },
-    {
-      'metric': 'Network',
-      'completion': 78.0,
-      'type': 'System'
-    },
-    {
-      'metric': 'Storage',
-      'completion': 35.0,
-      'type': 'System'
-    },
+    {'metric': 'CPU Usage', 'completion': 65.0, 'type': 'System'},
+    {'metric': 'Memory', 'completion': 42.0, 'type': 'System'},
+    {'metric': 'Network', 'completion': 78.0, 'type': 'System'},
+    {'metric': 'Storage', 'completion': 35.0, 'type': 'System'},
   ];
 }
 
 // Generate concentric data
 List<Map<String, dynamic>> _generateConcentricData() {
   return [
-    {
-      'system': 'Database',
-      'completion': 88.0,
-      'priority': 'High'
-    },
-    {
-      'system': 'Cache',
-      'completion': 95.0,
-      'priority': 'High'
-    },
-    {
-      'system': 'Queue',
-      'completion': 73.0,
-      'priority': 'Medium'
-    },
+    {'system': 'Database', 'completion': 88.0, 'priority': 'High'},
+    {'system': 'Cache', 'completion': 95.0, 'priority': 'High'},
+    {'system': 'Queue', 'completion': 73.0, 'priority': 'Medium'},
   ];
 }

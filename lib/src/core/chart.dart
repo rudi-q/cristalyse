@@ -126,7 +126,8 @@ class CristalyseChart {
   /// ```dart
   /// chart.mappingProgress(value: 'completion', label: 'task_name', category: 'department')
   /// ```
-  CristalyseChart mappingProgress({String? value, String? label, String? category}) {
+  CristalyseChart mappingProgress(
+      {String? value, String? label, String? category}) {
     _progressValueColumn = value;
     _progressLabelColumn = label;
     _progressCategoryColumn = category;

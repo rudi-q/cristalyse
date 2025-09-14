@@ -215,13 +215,13 @@ enum ProgressOrientation { horizontal, vertical, circular }
 
 /// Enum for progress bar styles
 enum ProgressStyle {
-  filled,      // Solid fill
-  striped,     // Diagonal stripes
-  gradient,    // Gradient fill
-  stacked,     // Multiple segments in one bar
-  grouped,     // Multiple bars grouped together
-  gauge,       // Speedometer/arc style
-  concentric   // Multiple concentric circles
+  filled, // Solid fill
+  striped, // Diagonal stripes
+  gradient, // Gradient fill
+  stacked, // Multiple segments in one bar
+  grouped, // Multiple bars grouped together
+  gauge, // Speedometer/arc style
+  concentric // Multiple concentric circles
 }
 
 /// Progress bar geometry for progress indicators
@@ -250,22 +250,22 @@ class ProgressGeometry extends Geometry {
   final double strokeWidth;
   final Color? strokeColor;
   final double labelOffset; // Distance from progress bar to label
-  
+
   // Properties for stacked progress bars
   final List<double>? segments; // Values for each segment in stacked bars
   final List<Color>? segmentColors; // Colors for each segment
-  
+
   // Properties for grouped progress bars
   final double? groupSpacing; // Space between grouped bars
   final int? groupCount; // Number of bars in a group
-  
+
   // Properties for gauge/arc progress bars
   final double? startAngle; // Starting angle for gauge (in radians)
   final double? sweepAngle; // Total sweep angle for gauge (in radians)
   final double? gaugeRadius; // Radius for gauge style
   final bool showTicks; // Show tick marks on gauge
   final int? tickCount; // Number of tick marks
-  
+
   // Properties for concentric circular progress
   final List<double>? concentricRadii; // Radii for concentric circles
   final List<double>? concentricThicknesses; // Thickness for each ring
@@ -305,19 +305,26 @@ class ProgressGeometry extends Geometry {
     this.concentricThicknesses,
     super.yAxis,
     super.interactive,
-  }) : assert(minValue != null && maxValue != null && minValue < maxValue,
-           'minValue must be less than maxValue'),
-       assert(animationDuration > Duration.zero,
-           'animationDuration must be positive'),
-       assert(thickness >= 0, 'thickness must be >= 0'),
-       assert(cornerRadius >= 0, 'cornerRadius must be >= 0'),
-       assert(strokeWidth >= 0, 'strokeWidth must be >= 0'),
-       assert(labelOffset >= 0, 'labelOffset must be >= 0'),
-       assert(groupSpacing == null || groupSpacing >= 0, 'groupSpacing must be >= 0'),
-       assert(groupCount == null || groupCount > 0, 'groupCount must be > 0'),
-       assert(tickCount == null || tickCount >= 0, 'tickCount must be >= 0'),
-       assert(gaugeRadius == null || gaugeRadius > 0, 'gaugeRadius must be > 0'),
-       assert(segments == null || segments.every((s) => s >= 0), 'all segments must be >= 0'),
-       assert(concentricRadii == null || concentricRadii.every((r) => r > 0), 'all concentricRadii must be > 0'),
-       assert(concentricThicknesses == null || concentricThicknesses.every((t) => t > 0), 'all concentricThicknesses must be > 0');
+  })  : assert(minValue != null && maxValue != null && minValue < maxValue,
+            'minValue must be less than maxValue'),
+        assert(animationDuration > Duration.zero,
+            'animationDuration must be positive'),
+        assert(thickness >= 0, 'thickness must be >= 0'),
+        assert(cornerRadius >= 0, 'cornerRadius must be >= 0'),
+        assert(strokeWidth >= 0, 'strokeWidth must be >= 0'),
+        assert(labelOffset >= 0, 'labelOffset must be >= 0'),
+        assert(groupSpacing == null || groupSpacing >= 0,
+            'groupSpacing must be >= 0'),
+        assert(groupCount == null || groupCount > 0, 'groupCount must be > 0'),
+        assert(tickCount == null || tickCount >= 0, 'tickCount must be >= 0'),
+        assert(
+            gaugeRadius == null || gaugeRadius > 0, 'gaugeRadius must be > 0'),
+        assert(segments == null || segments.every((s) => s >= 0),
+            'all segments must be >= 0'),
+        assert(concentricRadii == null || concentricRadii.every((r) => r > 0),
+            'all concentricRadii must be > 0'),
+        assert(
+            concentricThicknesses == null ||
+                concentricThicknesses.every((t) => t > 0),
+            'all concentricThicknesses must be > 0');
 }

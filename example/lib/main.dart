@@ -981,12 +981,12 @@ class _ExampleHomeState extends State<ExampleHome>
                   chartDescriptions[13],
                   buildProgressBarsTab(currentTheme, _sliderValue),
                   [
-                    _buildStatsCard(
-                        'Orientations', '3', 'Horizontal, Vertical, Circular', Colors.blue),
-                    _buildStatsCard(
-                        'Styles', '4', 'Filled, Striped, Gradient, Custom', Colors.green),
-                    _buildStatsCard(
-                        'Animations', 'Smooth', 'Customizable Duration', Colors.purple),
+                    _buildStatsCard('Orientations', '3',
+                        'Horizontal, Vertical, Circular', Colors.blue),
+                    _buildStatsCard('Styles', '4',
+                        'Filled, Striped, Gradient, Custom', Colors.green),
+                    _buildStatsCard('Animations', 'Smooth',
+                        'Customizable Duration', Colors.purple),
                   ],
                 ),
                 _buildChartPage(

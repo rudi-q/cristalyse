@@ -2661,11 +2661,14 @@ class AnimatedChartPainter extends CustomPainter {
     final barHeight = geometry.thickness;
     final barSpacing = barHeight + 20.0; // Space between bars
     final barY = plotArea.top + (index * barSpacing) + 20.0;
-    
-    if (barY + barHeight > plotArea.bottom) return; // Don't draw if outside bounds
+
+    if (barY + barHeight > plotArea.bottom) {
+      return; // Don't draw if outside bounds
+    }
 
     final barWidth = plotArea.width * 0.8; // 80% of available width
-    final barX = plotArea.left + (plotArea.width - barWidth) / 2; // Center horizontally
+    final barX =
+        plotArea.left + (plotArea.width - barWidth) / 2; // Center horizontally
 
     final barRect = Rect.fromLTWH(barX, barY, barWidth, barHeight);
 
@@ -2686,12 +2689,15 @@ class AnimatedChartPainter extends CustomPainter {
     final fillPaint = Paint()..style = PaintingStyle.fill;
 
     // Determine fill source (can be Color or Gradient)
-    final fillSource = geometry.fillColor ?? 
-        (categoryColumn != null ? colorScale.scale(point[categoryColumn]) : theme.primaryColor);
+    final fillSource = geometry.fillColor ??
+        (categoryColumn != null
+            ? colorScale.scale(point[categoryColumn])
+            : theme.primaryColor);
 
     if (geometry.fillGradient != null) {
       // Explicit gradient takes precedence
-      final animatedGradient = _applyAlphaToGradient(geometry.fillGradient!, 1.0);
+      final animatedGradient =
+          _applyAlphaToGradient(geometry.fillGradient!, 1.0);
       fillPaint.shader = animatedGradient.createShader(fillRect);
     } else if (fillSource is Gradient) {
       // Handle gradient from color scale
@@ -2727,9 +2733,10 @@ class AnimatedChartPainter extends CustomPainter {
         ..color = geometry.strokeColor ?? theme.borderColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = geometry.strokeWidth;
-      
+
       canvas.drawRRect(
-        RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+        RRect.fromRectAndRadius(
+            barRect, Radius.circular(geometry.cornerRadius)),
         strokePaint,
       );
     }
@@ -2764,7 +2771,7 @@ class AnimatedChartPainter extends CustomPainter {
     final barWidth = geometry.thickness;
     final barSpacing = barWidth + 20.0;
     final barX = plotArea.left + (index * barSpacing) + 20.0;
-    
+
     if (barX + barWidth > plotArea.right) return;
 
     final barHeight = plotArea.height * 0.8;
@@ -2790,12 +2797,15 @@ class AnimatedChartPainter extends CustomPainter {
     final fillPaint = Paint()..style = PaintingStyle.fill;
 
     // Determine fill source (can be Color or Gradient)
-    final fillSource = geometry.fillColor ?? 
-        (categoryColumn != null ? colorScale.scale(point[categoryColumn]) : theme.primaryColor);
+    final fillSource = geometry.fillColor ??
+        (categoryColumn != null
+            ? colorScale.scale(point[categoryColumn])
+            : theme.primaryColor);
 
     if (geometry.fillGradient != null) {
       // Explicit gradient takes precedence
-      final animatedGradient = _applyAlphaToGradient(geometry.fillGradient!, 1.0);
+      final animatedGradient =
+          _applyAlphaToGradient(geometry.fillGradient!, 1.0);
       fillPaint.shader = animatedGradient.createShader(fillRect);
     } else if (fillSource is Gradient) {
       // Handle gradient from color scale
@@ -2830,9 +2840,10 @@ class AnimatedChartPainter extends CustomPainter {
         ..color = geometry.strokeColor ?? theme.borderColor
         ..style = PaintingStyle.stroke
         ..strokeWidth = geometry.strokeWidth;
-      
+
       canvas.drawRRect(
-        RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+        RRect.fromRectAndRadius(
+            barRect, Radius.circular(geometry.cornerRadius)),
         strokePaint,
       );
     }
@@ -2869,7 +2880,7 @@ class AnimatedChartPainter extends CustomPainter {
     final cols = math.max(1, (plotArea.width / centerSpacing).floor());
     final row = index ~/ cols;
     final col = index % cols;
-    
+
     final centerX = plotArea.left + (col * centerSpacing) + centerSpacing / 2;
     final centerY = plotArea.top + (row * centerSpacing) + centerSpacing / 2;
     final center = Offset(centerX, centerY);
@@ -2893,8 +2904,10 @@ class AnimatedChartPainter extends CustomPainter {
       ..strokeWidth = radius * 0.2
       ..strokeCap = StrokeCap.round;
 
-    Color fillColor = geometry.fillColor ?? 
-        (categoryColumn != null ? colorScale.scale(point[categoryColumn]) : theme.primaryColor);
+    Color fillColor = geometry.fillColor ??
+        (categoryColumn != null
+            ? colorScale.scale(point[categoryColumn])
+            : theme.primaryColor);
     progressPaint.color = fillColor;
 
     canvas.drawArc(
@@ -2956,12 +2969,12 @@ class AnimatedChartPainter extends CustomPainter {
   ) {
     final segments = geometry.segments ?? [normalizedValue];
     final segmentColors = geometry.segmentColors ?? [];
-    
+
     // Calculate bar dimensions based on orientation
     final isHorizontal = geometry.orientation == ProgressOrientation.horizontal;
     final barThickness = geometry.thickness;
     final barSpacing = barThickness + 20.0;
-    
+
     late Rect barRect;
     if (isHorizontal) {
       final barY = plotArea.top + (index * barSpacing) + 20.0;
@@ -2976,7 +2989,7 @@ class AnimatedChartPainter extends CustomPainter {
       final barY = plotArea.top + (plotArea.height - barHeight) / 2;
       barRect = Rect.fromLTWH(barX, barY, barThickness, barHeight);
     }
-    
+
     // Draw background
     final backgroundPaint = Paint()
       ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
@@ -2985,16 +2998,16 @@ class AnimatedChartPainter extends CustomPainter {
       RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
       backgroundPaint,
     );
-    
+
     // Draw each segment
     double currentPosition = 0.0;
     final totalValue = segments.fold(0.0, (sum, segment) => sum + segment);
-    
+
     for (int i = 0; i < segments.length; i++) {
       final segmentValue = segments[i];
       final segmentRatio = segmentValue / totalValue;
       final animatedRatio = segmentRatio * animationProgress;
-      
+
       Color segmentColor;
       if (i < segmentColors.length) {
         segmentColor = segmentColors[i];
@@ -3005,7 +3018,7 @@ class AnimatedChartPainter extends CustomPainter {
         final hue = (i * 30.0) % 360.0;
         segmentColor = HSVColor.fromAHSV(1.0, hue, 0.7, 0.8).toColor();
       }
-      
+
       late Rect segmentRect;
       if (isHorizontal) {
         final segmentWidth = barRect.width * animatedRatio;
@@ -3024,19 +3037,20 @@ class AnimatedChartPainter extends CustomPainter {
           segmentHeight,
         );
       }
-      
+
       final segmentPaint = Paint()
         ..color = segmentColor
         ..style = PaintingStyle.fill;
-      
+
       canvas.drawRRect(
-        RRect.fromRectAndRadius(segmentRect, Radius.circular(geometry.cornerRadius)),
+        RRect.fromRectAndRadius(
+            segmentRect, Radius.circular(geometry.cornerRadius)),
         segmentPaint,
       );
-      
+
       currentPosition += segmentRatio;
     }
-    
+
     // Draw stroke
     if (geometry.strokeWidth > 0) {
       final strokePaint = Paint()
@@ -3044,11 +3058,12 @@ class AnimatedChartPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = geometry.strokeWidth;
       canvas.drawRRect(
-        RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+        RRect.fromRectAndRadius(
+            barRect, Radius.circular(geometry.cornerRadius)),
         strokePaint,
       );
     }
-    
+
     // Draw label
     if (geometry.showLabel && labelColumn != null) {
       final labelText = point[labelColumn]?.toString() ?? '';
@@ -3082,54 +3097,65 @@ class AnimatedChartPainter extends CustomPainter {
     final groupCount = geometry.groupCount ?? 3;
     final groupSpacing = geometry.groupSpacing ?? 8.0;
     final isHorizontal = geometry.orientation == ProgressOrientation.horizontal;
-    
+
     // Calculate group layout
     for (int groupIndex = 0; groupIndex < groupCount; groupIndex++) {
-      final groupValue = normalizedValue * (0.6 + (groupIndex * 0.2)); // Vary values
+      final groupValue =
+          normalizedValue * (0.6 + (groupIndex * 0.2)); // Vary values
       final groupColor = HSVColor.fromAHSV(
         1.0,
         (groupIndex * 60.0) % 360.0,
         0.7,
         0.8,
       ).toColor();
-      
+
       late Rect barRect;
       if (isHorizontal) {
         final barHeight = geometry.thickness * 0.8;
-        final totalGroupHeight = (barHeight * groupCount) + (groupSpacing * (groupCount - 1));
-        final groupY = plotArea.top + (index * (totalGroupHeight + 30)) + 20.0 + (groupIndex * (barHeight + groupSpacing));
-        
+        final totalGroupHeight =
+            (barHeight * groupCount) + (groupSpacing * (groupCount - 1));
+        final groupY = plotArea.top +
+            (index * (totalGroupHeight + 30)) +
+            20.0 +
+            (groupIndex * (barHeight + groupSpacing));
+
         if (groupY + barHeight > plotArea.bottom) continue;
-        
+
         final barWidth = plotArea.width * 0.8;
         final barX = plotArea.left + (plotArea.width - barWidth) / 2;
         barRect = Rect.fromLTWH(barX, groupY, barWidth, barHeight);
       } else {
         final barWidth = geometry.thickness * 0.8;
-        final totalGroupWidth = (barWidth * groupCount) + (groupSpacing * (groupCount - 1));
-        final groupX = plotArea.left + (index * (totalGroupWidth + 30)) + 20.0 + (groupIndex * (barWidth + groupSpacing));
-        
+        final totalGroupWidth =
+            (barWidth * groupCount) + (groupSpacing * (groupCount - 1));
+        final groupX = plotArea.left +
+            (index * (totalGroupWidth + 30)) +
+            20.0 +
+            (groupIndex * (barWidth + groupSpacing));
+
         if (groupX + barWidth > plotArea.right) continue;
-        
+
         final barHeight = plotArea.height * 0.8;
         final barY = plotArea.top + (plotArea.height - barHeight) / 2;
         barRect = Rect.fromLTWH(groupX, barY, barWidth, barHeight);
       }
-      
+
       // Draw background
       final backgroundPaint = Paint()
         ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
         ..style = PaintingStyle.fill;
       canvas.drawRRect(
-        RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+        RRect.fromRectAndRadius(
+            barRect, Radius.circular(geometry.cornerRadius)),
         backgroundPaint,
       );
-      
+
       // Draw progress fill
       late Rect fillRect;
       if (isHorizontal) {
         final fillWidth = barRect.width * groupValue * animationProgress;
-        fillRect = Rect.fromLTWH(barRect.left, barRect.top, fillWidth, barRect.height);
+        fillRect =
+            Rect.fromLTWH(barRect.left, barRect.top, fillWidth, barRect.height);
       } else {
         final fillHeight = barRect.height * groupValue * animationProgress;
         fillRect = Rect.fromLTWH(
@@ -3139,12 +3165,13 @@ class AnimatedChartPainter extends CustomPainter {
           fillHeight,
         );
       }
-      
+
       final fillPaint = Paint()
         ..color = groupColor
         ..style = PaintingStyle.fill;
       canvas.drawRRect(
-        RRect.fromRectAndRadius(fillRect, Radius.circular(geometry.cornerRadius)),
+        RRect.fromRectAndRadius(
+            fillRect, Radius.circular(geometry.cornerRadius)),
         fillPaint,
       );
     }
@@ -3163,29 +3190,30 @@ class AnimatedChartPainter extends CustomPainter {
     String? labelColumn,
     int index,
   ) {
-    final radius = geometry.gaugeRadius ?? (math.min(plotArea.width, plotArea.height) * 0.3);
+    final radius = geometry.gaugeRadius ??
+        (math.min(plotArea.width, plotArea.height) * 0.3);
     final centerSpacing = radius * 2.5;
     final cols = math.max(1, (plotArea.width / centerSpacing).floor());
     final row = index ~/ cols;
     final col = index % cols;
-    
+
     final centerX = plotArea.left + (col * centerSpacing) + centerSpacing / 2;
     final centerY = plotArea.top + (row * centerSpacing) + centerSpacing / 2;
     final center = Offset(centerX, centerY);
-    
+
     if (centerY + radius > plotArea.bottom) return;
-    
+
     final startAngle = geometry.startAngle ?? -math.pi;
     final sweepAngle = geometry.sweepAngle ?? math.pi;
     final strokeWidth = geometry.thickness * 0.3;
-    
+
     // Draw background arc
     final backgroundPaint = Paint()
       ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(77)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
-    
+
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       startAngle,
@@ -3193,14 +3221,14 @@ class AnimatedChartPainter extends CustomPainter {
       false,
       backgroundPaint,
     );
-    
+
     // Draw tick marks if enabled
     if (geometry.showTicks) {
       final tickCount = geometry.tickCount ?? 10;
       final tickPaint = Paint()
         ..color = theme.axisColor
         ..strokeWidth = 1.0;
-      
+
       for (int i = 0; i <= tickCount; i++) {
         final tickAngle = startAngle + (sweepAngle * i / tickCount);
         final tickStart = Offset(
@@ -3214,17 +3242,18 @@ class AnimatedChartPainter extends CustomPainter {
         canvas.drawLine(tickStart, tickEnd, tickPaint);
       }
     }
-    
+
     // Draw progress arc
     final progressSweep = sweepAngle * normalizedValue * animationProgress;
     final progressPaint = Paint()
-      ..color = geometry.fillColor ?? (categoryColumn != null 
-          ? colorScale.scale(point[categoryColumn]) 
-          : theme.primaryColor)
+      ..color = geometry.fillColor ??
+          (categoryColumn != null
+              ? colorScale.scale(point[categoryColumn])
+              : theme.primaryColor)
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
-    
+
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       startAngle,
@@ -3232,22 +3261,22 @@ class AnimatedChartPainter extends CustomPainter {
       false,
       progressPaint,
     );
-    
+
     // Draw needle/indicator
     final needleAngle = startAngle + progressSweep;
     final needlePaint = Paint()
       ..color = Colors.red
       ..strokeWidth = 2.0;
-    
+
     final needleEnd = Offset(
       center.dx + (radius - 5) * math.cos(needleAngle),
       center.dy + (radius - 5) * math.sin(needleAngle),
     );
     canvas.drawLine(center, needleEnd, needlePaint);
-    
+
     // Draw center dot
     canvas.drawCircle(center, 3.0, Paint()..color = Colors.red);
-    
+
     // Draw label
     if (geometry.showLabel && labelColumn != null) {
       final labelText = point[labelColumn]?.toString() ?? '';
@@ -3276,25 +3305,29 @@ class AnimatedChartPainter extends CustomPainter {
     int index,
   ) {
     final baseRadius = geometry.thickness;
-    final radii = geometry.concentricRadii ?? [baseRadius, baseRadius * 1.5, baseRadius * 2.0];
-    final thicknesses = geometry.concentricThicknesses ?? [baseRadius * 0.2, baseRadius * 0.2, baseRadius * 0.2];
-    
+    final radii = geometry.concentricRadii ??
+        [baseRadius, baseRadius * 1.5, baseRadius * 2.0];
+    final thicknesses = geometry.concentricThicknesses ??
+        [baseRadius * 0.2, baseRadius * 0.2, baseRadius * 0.2];
+
     final centerSpacing = (radii.last + thicknesses.last) * 2.5;
     final cols = math.max(1, (plotArea.width / centerSpacing).floor());
     final row = index ~/ cols;
     final col = index % cols;
-    
+
     final centerX = plotArea.left + (col * centerSpacing) + centerSpacing / 2;
     final centerY = plotArea.top + (row * centerSpacing) + centerSpacing / 2;
     final center = Offset(centerX, centerY);
-    
+
     if (centerY + radii.last + thicknesses.last > plotArea.bottom) return;
-    
+
     // Draw each concentric ring
     for (int ringIndex = 0; ringIndex < radii.length; ringIndex++) {
       final radius = radii[ringIndex];
-      final thickness = ringIndex < thicknesses.length ? thicknesses[ringIndex] : thicknesses.last;
-      
+      final thickness = ringIndex < thicknesses.length
+          ? thicknesses[ringIndex]
+          : thicknesses.last;
+
       // Vary the progress for each ring
       final ringProgress = normalizedValue * (0.5 + (ringIndex * 0.3));
       final ringColor = HSVColor.fromAHSV(
@@ -3303,15 +3336,15 @@ class AnimatedChartPainter extends CustomPainter {
         0.7 - (ringIndex * 0.1),
         0.8,
       ).toColor();
-      
+
       // Draw background ring
       final backgroundPaint = Paint()
         ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
         ..style = PaintingStyle.stroke
         ..strokeWidth = thickness;
-      
+
       canvas.drawCircle(center, radius, backgroundPaint);
-      
+
       // Draw progress arc
       final progressSweep = 2 * math.pi * ringProgress * animationProgress;
       final progressPaint = Paint()
@@ -3319,7 +3352,7 @@ class AnimatedChartPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = thickness
         ..strokeCap = StrokeCap.round;
-      
+
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         -math.pi / 2, // Start from top
@@ -3328,7 +3361,7 @@ class AnimatedChartPainter extends CustomPainter {
         progressPaint,
       );
     }
-    
+
     // Draw label in the center
     if (geometry.showLabel && labelColumn != null) {
       final labelText = point[labelColumn]?.toString() ?? '';
