@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -135,10 +137,14 @@ void main() {
     });
 
     test('should have correct ProgressStyle values', () {
-      expect(ProgressStyle.values.length, 3);
+      expect(ProgressStyle.values.length, 7);
       expect(ProgressStyle.values, contains(ProgressStyle.filled));
       expect(ProgressStyle.values, contains(ProgressStyle.striped));
       expect(ProgressStyle.values, contains(ProgressStyle.gradient));
+      expect(ProgressStyle.values, contains(ProgressStyle.stacked));
+      expect(ProgressStyle.values, contains(ProgressStyle.grouped));
+      expect(ProgressStyle.values, contains(ProgressStyle.gauge));
+      expect(ProgressStyle.values, contains(ProgressStyle.concentric));
     });
   });
 
@@ -313,6 +319,237 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
+  });
+
+  group('Enhanced Progress Bar Styles Tests', () {
+    test('should create stacked progress bars with segments', () {
+      final geometry = ProgressGeometry(
+        style: ProgressStyle.stacked,
+        segments: [30.0, 45.0, 25.0],
+        segmentColors: [Colors.red, Colors.orange, Colors.green],
+        thickness: 25.0,
+        showLabel: true,
+      );
+
+      expect(geometry.style, equals(ProgressStyle.stacked));
+      expect(geometry.segments, equals([30.0, 45.0, 25.0]));
+      expect(geometry.segmentColors, equals([Colors.red, Colors.orange, Colors.green]));
+      expect(geometry.thickness, equals(25.0));
+      expect(geometry.showLabel, equals(true));
+    });
+
+    test('should create grouped progress bars with spacing', () {
+      final geometry = ProgressGeometry(
+        style: ProgressStyle.grouped,
+        groupCount: 4,
+        groupSpacing: 8.0,
+        thickness: 20.0,
+        orientation: ProgressOrientation.horizontal,
+      );
+
+      expect(geometry.style, equals(ProgressStyle.grouped));
+      expect(geometry.groupCount, equals(4));
+      expect(geometry.groupSpacing, equals(8.0));
+      expect(geometry.thickness, equals(20.0));
+      expect(geometry.orientation, equals(ProgressOrientation.horizontal));
+    });
+
+    test('should create gauge progress bars with ticks', () {
+      final geometry = ProgressGeometry(
+        style: ProgressStyle.gauge,
+        startAngle: -math.pi,
+        sweepAngle: math.pi,
+        showTicks: true,
+        tickCount: 8,
+        gaugeRadius: 50.0,
+        orientation: ProgressOrientation.circular,
+      );
+
+      expect(geometry.style, equals(ProgressStyle.gauge));
+      expect(geometry.startAngle, equals(-math.pi));
+      expect(geometry.sweepAngle, equals(math.pi));
+      expect(geometry.showTicks, equals(true));
+      expect(geometry.tickCount, equals(8));
+      expect(geometry.gaugeRadius, equals(50.0));
+      expect(geometry.orientation, equals(ProgressOrientation.circular));
+    });
+
+    test('should create concentric progress bars with radii', () {
+      final geometry = ProgressGeometry(
+        style: ProgressStyle.concentric,
+        concentricRadii: [30.0, 50.0, 70.0],
+        concentricThicknesses: [8.0, 10.0, 12.0],
+        thickness: 25.0,
+        orientation: ProgressOrientation.circular,
+      );
+
+      expect(geometry.style, equals(ProgressStyle.concentric));
+      expect(geometry.concentricRadii, equals([30.0, 50.0, 70.0]));
+      expect(geometry.concentricThicknesses, equals([8.0, 10.0, 12.0]));
+      expect(geometry.thickness, equals(25.0));
+      expect(geometry.orientation, equals(ProgressOrientation.circular));
+    });
+
+    testWidgets('should render stacked progress bars', (WidgetTester tester) async {
+      final testData = [
+        {'project': 'Mobile App', 'completion': 75.0, 'phase': 'Development'},
+        {'project': 'Web Platform', 'completion': 60.0, 'phase': 'Testing'},
+      ];
+
+      final chart = CristalyseChart()
+        .data(testData)
+        .mappingProgress(
+          value: 'completion',
+          label: 'project',
+          category: 'phase',
+        )
+        .geomProgress(
+          style: ProgressStyle.stacked,
+          orientation: ProgressOrientation.horizontal,
+          segments: [40.0, 35.0],
+          segmentColors: [Colors.blue, Colors.green],
+          thickness: 20.0,
+        );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 400,
+              height: 200,
+              child: chart.build(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
+
+    testWidgets('should render grouped progress bars', (WidgetTester tester) async {
+      final testData = [
+        {'task': 'Frontend', 'completion': 80.0, 'team': 'UI'},
+        {'task': 'Backend', 'completion': 65.0, 'team': 'API'},
+      ];
+
+      final chart = CristalyseChart()
+        .data(testData)
+        .mappingProgress(
+          value: 'completion',
+          label: 'task',
+          category: 'team',
+        )
+        .geomProgress(
+          style: ProgressStyle.grouped,
+          orientation: ProgressOrientation.vertical,
+          groupCount: 3,
+          groupSpacing: 10.0,
+          thickness: 15.0,
+        );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 400,
+              height: 300,
+              child: chart.build(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
+
+    testWidgets('should render gauge progress bars with ticks', (WidgetTester tester) async {
+      final testData = [
+        {'metric': 'CPU Usage', 'completion': 65.0, 'type': 'System'},
+        {'metric': 'Memory', 'completion': 42.0, 'type': 'System'},
+      ];
+
+      final chart = CristalyseChart()
+        .data(testData)
+        .mappingProgress(
+          value: 'completion',
+          label: 'metric',
+          category: 'type',
+        )
+        .geomProgress(
+          style: ProgressStyle.gauge,
+          orientation: ProgressOrientation.circular,
+          showTicks: true,
+          tickCount: 10,
+          startAngle: -math.pi,
+          sweepAngle: math.pi,
+          gaugeRadius: 60.0,
+        );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 400,
+              height: 400,
+              child: chart.build(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
+
+    testWidgets('should render concentric progress rings', (WidgetTester tester) async {
+      final testData = [
+        {'system': 'Database', 'completion': 88.0, 'priority': 'High'},
+        {'system': 'Cache', 'completion': 95.0, 'priority': 'High'},
+      ];
+
+      final chart = CristalyseChart()
+        .data(testData)
+        .mappingProgress(
+          value: 'completion',
+          label: 'system',
+          category: 'priority',
+        )
+        .geomProgress(
+          style: ProgressStyle.concentric,
+          orientation: ProgressOrientation.circular,
+          concentricRadii: [30.0, 50.0, 70.0],
+          concentricThicknesses: [8.0, 10.0, 12.0],
+          thickness: 25.0,
+        );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 400,
+              height: 400,
+              child: chart.build(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
+
+    test('should validate progress style enum values', () {
+      expect(ProgressStyle.values.length, equals(7));
+      expect(ProgressStyle.values.contains(ProgressStyle.filled), isTrue);
+      expect(ProgressStyle.values.contains(ProgressStyle.striped), isTrue);
+      expect(ProgressStyle.values.contains(ProgressStyle.gradient), isTrue);
+      expect(ProgressStyle.values.contains(ProgressStyle.stacked), isTrue);
+      expect(ProgressStyle.values.contains(ProgressStyle.grouped), isTrue);
+      expect(ProgressStyle.values.contains(ProgressStyle.gauge), isTrue);
+      expect(ProgressStyle.values.contains(ProgressStyle.concentric), isTrue);
     });
   });
 }

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -213,9 +215,13 @@ enum ProgressOrientation { horizontal, vertical, circular }
 
 /// Enum for progress bar styles
 enum ProgressStyle {
-  filled,    // Solid fill
-  striped,   // Diagonal stripes
-  gradient   // Gradient fill
+  filled,      // Solid fill
+  striped,     // Diagonal stripes
+  gradient,    // Gradient fill
+  stacked,     // Multiple segments in one bar
+  grouped,     // Multiple bars grouped together
+  gauge,       // Speedometer/arc style
+  concentric   // Multiple concentric circles
 }
 
 /// Progress bar geometry for progress indicators
@@ -224,7 +230,8 @@ enum ProgressStyle {
 /// Perfect for showing completion percentages, loading states, or KPI progress.
 ///
 /// Supports horizontal, vertical, and circular orientations with customizable
-/// styling including gradients, stripes, and labels.
+/// styling including gradients, stripes, stacked segments, grouped bars,
+/// gauge/arc indicators, and concentric circles.
 class ProgressGeometry extends Geometry {
   final ProgressOrientation orientation;
   final double thickness;
@@ -243,6 +250,25 @@ class ProgressGeometry extends Geometry {
   final double strokeWidth;
   final Color? strokeColor;
   final double labelOffset; // Distance from progress bar to label
+  
+  // Properties for stacked progress bars
+  final List<double>? segments; // Values for each segment in stacked bars
+  final List<Color>? segmentColors; // Colors for each segment
+  
+  // Properties for grouped progress bars
+  final double? groupSpacing; // Space between grouped bars
+  final int? groupCount; // Number of bars in a group
+  
+  // Properties for gauge/arc progress bars
+  final double? startAngle; // Starting angle for gauge (in radians)
+  final double? sweepAngle; // Total sweep angle for gauge (in radians)
+  final double? gaugeRadius; // Radius for gauge style
+  final bool showTicks; // Show tick marks on gauge
+  final int? tickCount; // Number of tick marks
+  
+  // Properties for concentric circular progress
+  final List<double>? concentricRadii; // Radii for concentric circles
+  final List<double>? concentricThicknesses; // Thickness for each ring
 
   ProgressGeometry({
     this.orientation = ProgressOrientation.horizontal,
@@ -262,6 +288,21 @@ class ProgressGeometry extends Geometry {
     this.strokeWidth = 1.0,
     this.strokeColor,
     this.labelOffset = 5.0,
+    // Stacked progress properties
+    this.segments,
+    this.segmentColors,
+    // Grouped progress properties
+    this.groupSpacing = 8.0,
+    this.groupCount = 1,
+    // Gauge progress properties
+    this.startAngle = -math.pi / 2, // Start at top
+    this.sweepAngle = math.pi, // Half circle by default
+    this.gaugeRadius,
+    this.showTicks = false,
+    this.tickCount = 10,
+    // Concentric progress properties
+    this.concentricRadii,
+    this.concentricThicknesses,
     super.yAxis,
     super.interactive,
   });

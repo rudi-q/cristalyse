@@ -393,15 +393,32 @@ class CristalyseChart {
   ///
   /// Progress bars visualize completion status or progress towards a goal.
   /// Perfect for showing completion percentages, loading states, or KPI progress.
+  /// Supports multiple styles including stacked, grouped, gauge, and concentric.
   ///
   /// Example:
   /// ```dart
+  /// // Basic progress bar
   /// chart.geomProgress(
   ///   orientation: ProgressOrientation.horizontal,
   ///   thickness: 25.0,
   ///   cornerRadius: 12.0,
   ///   showLabel: true,
   ///   style: ProgressStyle.gradient,
+  /// )
+  ///
+  /// // Stacked progress bar
+  /// chart.geomProgress(
+  ///   style: ProgressStyle.stacked,
+  ///   segments: [30.0, 45.0, 25.0],
+  ///   segmentColors: [Colors.red, Colors.orange, Colors.green],
+  /// )
+  ///
+  /// // Gauge style progress
+  /// chart.geomProgress(
+  ///   style: ProgressStyle.gauge,
+  ///   showTicks: true,
+  ///   startAngle: -math.pi,
+  ///   sweepAngle: math.pi,
   /// )
   /// ```
   CristalyseChart geomProgress({
@@ -420,6 +437,21 @@ class CristalyseChart {
     double? strokeWidth,
     Color? strokeColor,
     double? labelOffset,
+    // Stacked progress properties
+    List<double>? segments,
+    List<Color>? segmentColors,
+    // Grouped progress properties
+    double? groupSpacing,
+    int? groupCount,
+    // Gauge progress properties
+    double? startAngle,
+    double? sweepAngle,
+    double? gaugeRadius,
+    bool? showTicks,
+    int? tickCount,
+    // Concentric progress properties
+    List<double>? concentricRadii,
+    List<double>? concentricThicknesses,
     YAxis? yAxis,
   }) {
     _geometries.add(
@@ -439,6 +471,18 @@ class CristalyseChart {
         strokeWidth: strokeWidth ?? 1.0,
         strokeColor: strokeColor,
         labelOffset: labelOffset ?? 5.0,
+        // Pass enhanced properties
+        segments: segments,
+        segmentColors: segmentColors,
+        groupSpacing: groupSpacing ?? 8.0,
+        groupCount: groupCount ?? 1,
+        startAngle: startAngle ?? -1.5707963267948966, // -π/2
+        sweepAngle: sweepAngle ?? 3.141592653589793, // π
+        gaugeRadius: gaugeRadius,
+        showTicks: showTicks ?? false,
+        tickCount: tickCount ?? 10,
+        concentricRadii: concentricRadii,
+        concentricThicknesses: concentricThicknesses,
         yAxis: yAxis ?? YAxis.primary,
       ),
     );
