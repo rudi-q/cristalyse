@@ -207,3 +207,62 @@ class BubbleGeometry extends Geometry {
     super.interactive,
   });
 }
+
+/// Enum for progress bar orientations
+enum ProgressOrientation { horizontal, vertical, circular }
+
+/// Enum for progress bar styles
+enum ProgressStyle {
+  filled,    // Solid fill
+  striped,   // Diagonal stripes
+  gradient   // Gradient fill
+}
+
+/// Progress bar geometry for progress indicators
+///
+/// Progress bars visualize completion status or progress towards a goal.
+/// Perfect for showing completion percentages, loading states, or KPI progress.
+///
+/// Supports horizontal, vertical, and circular orientations with customizable
+/// styling including gradients, stripes, and labels.
+class ProgressGeometry extends Geometry {
+  final ProgressOrientation orientation;
+  final double thickness;
+  final double cornerRadius;
+  final Color? backgroundColor;
+  final Color? fillColor;
+  final ProgressStyle style;
+  final double? minValue;
+  final double? maxValue;
+  final bool showLabel;
+  final TextStyle? labelStyle;
+  final LabelCallback? labelFormatter;
+  final bool animated;
+  final Duration animationDuration;
+  final Gradient? fillGradient;
+  final double strokeWidth;
+  final Color? strokeColor;
+  final double labelOffset; // Distance from progress bar to label
+
+  ProgressGeometry({
+    this.orientation = ProgressOrientation.horizontal,
+    this.thickness = 20.0,
+    this.cornerRadius = 4.0,
+    this.backgroundColor,
+    this.fillColor,
+    this.style = ProgressStyle.filled,
+    this.minValue = 0.0,
+    this.maxValue = 100.0,
+    this.showLabel = true,
+    this.labelStyle,
+    this.labelFormatter,
+    this.animated = true,
+    this.animationDuration = const Duration(milliseconds: 800),
+    this.fillGradient,
+    this.strokeWidth = 1.0,
+    this.strokeColor,
+    this.labelOffset = 5.0,
+    super.yAxis,
+    super.interactive,
+  });
+}

@@ -371,6 +371,62 @@ class CristalyseChart {
     return this;
   }
 
+  /// Add progress bar visualization
+  ///
+  /// Progress bars visualize completion status or progress towards a goal.
+  /// Perfect for showing completion percentages, loading states, or KPI progress.
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.geomProgress(
+  ///   orientation: ProgressOrientation.horizontal,
+  ///   thickness: 25.0,
+  ///   cornerRadius: 12.0,
+  ///   showLabel: true,
+  ///   style: ProgressStyle.gradient,
+  /// )
+  /// ```
+  CristalyseChart geomProgress({
+    ProgressOrientation? orientation,
+    double? thickness,
+    double? cornerRadius,
+    Color? backgroundColor,
+    Color? fillColor,
+    ProgressStyle? style,
+    double? minValue,
+    double? maxValue,
+    bool? showLabel,
+    TextStyle? labelStyle,
+    LabelCallback? labelFormatter,
+    Gradient? fillGradient,
+    double? strokeWidth,
+    Color? strokeColor,
+    double? labelOffset,
+    YAxis? yAxis,
+  }) {
+    _geometries.add(
+      ProgressGeometry(
+        orientation: orientation ?? ProgressOrientation.horizontal,
+        thickness: thickness ?? 20.0,
+        cornerRadius: cornerRadius ?? 4.0,
+        backgroundColor: backgroundColor,
+        fillColor: fillColor,
+        style: style ?? ProgressStyle.filled,
+        minValue: minValue ?? 0.0,
+        maxValue: maxValue ?? 100.0,
+        showLabel: showLabel ?? true,
+        labelStyle: labelStyle,
+        labelFormatter: labelFormatter,
+        fillGradient: fillGradient,
+        strokeWidth: strokeWidth ?? 1.0,
+        strokeColor: strokeColor,
+        labelOffset: labelOffset ?? 5.0,
+        yAxis: yAxis ?? YAxis.primary,
+      ),
+    );
+    return this;
+  }
+
   /// Configure continuous X scale
   CristalyseChart scaleXContinuous(
       {double? min, double? max, LabelCallback? labels}) {
