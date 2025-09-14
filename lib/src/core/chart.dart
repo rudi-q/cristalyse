@@ -29,6 +29,11 @@ class CristalyseChart {
   String? _heatMapYColumn;
   String? _heatMapValueColumn;
 
+  /// Progress bar specific mappings
+  String? _progressValueColumn;
+  String? _progressLabelColumn;
+  String? _progressCategoryColumn;
+
   final List<Geometry> _geometries = [];
   Scale? _xScale;
   Scale? _yScale;
@@ -112,6 +117,19 @@ class CristalyseChart {
     _heatMapXColumn = x;
     _heatMapYColumn = y;
     _heatMapValueColumn = value;
+    return this;
+  }
+
+  /// Map data for progress bars
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.mappingProgress(value: 'completion', label: 'task_name', category: 'department')
+  /// ```
+  CristalyseChart mappingProgress({String? value, String? label, String? category}) {
+    _progressValueColumn = value;
+    _progressLabelColumn = label;
+    _progressCategoryColumn = category;
     return this;
   }
 
@@ -820,6 +838,9 @@ class CristalyseChart {
       heatMapXColumn: _heatMapXColumn,
       heatMapYColumn: _heatMapYColumn,
       heatMapValueColumn: _heatMapValueColumn,
+      progressValueColumn: _progressValueColumn,
+      progressLabelColumn: _progressLabelColumn,
+      progressCategoryColumn: _progressCategoryColumn,
       geometries: _geometries,
       xScale: _xScale,
       yScale: _yScale,

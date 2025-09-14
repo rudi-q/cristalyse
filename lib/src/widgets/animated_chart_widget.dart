@@ -27,6 +27,9 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
   final String? heatMapXColumn; // Heat map X column
   final String? heatMapYColumn; // Heat map Y column
   final String? heatMapValueColumn; // Heat map value column
+  final String? progressValueColumn; // Progress bar value column
+  final String? progressLabelColumn; // Progress bar label column
+  final String? progressCategoryColumn; // Progress bar category column
   final List<Geometry> geometries;
   final Scale? xScale;
   final Scale? yScale;
@@ -53,6 +56,9 @@ class AnimatedCristalyseChartWidget extends StatefulWidget {
     this.heatMapXColumn,
     this.heatMapYColumn,
     this.heatMapValueColumn,
+    this.progressValueColumn,
+    this.progressLabelColumn,
+    this.progressCategoryColumn,
     required this.geometries,
     this.xScale,
     this.yScale,
