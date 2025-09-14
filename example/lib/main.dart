@@ -20,6 +20,7 @@ import 'graphs/line_chart.dart';
 import 'graphs/multi_series_line_chart.dart';
 import 'graphs/pan_example.dart';
 import 'graphs/pie_chart.dart';
+import 'graphs/progress_bars.dart';
 import 'graphs/scatter_plot.dart';
 import 'graphs/stacked_bar_chart.dart';
 
@@ -119,7 +120,7 @@ class _ExampleHomeState extends State<ExampleHome>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 18, vsync: this);
+    _tabController = TabController(length: 19, vsync: this);
     _fabAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -318,6 +319,9 @@ class _ExampleHomeState extends State<ExampleHome>
       case 9: // Pie chart
         final value = 100.0 + _sliderValue * 50.0;
         return 'Pie Radius: ${value.toStringAsFixed(0)}px';
+      case 13: // Progress bars
+        final value = 15.0 + _sliderValue * 25.0;
+        return 'Thickness: ${value.toStringAsFixed(1)}px';
       default:
         return _sliderValue.toStringAsFixed(2);
     }
@@ -338,6 +342,7 @@ class _ExampleHomeState extends State<ExampleHome>
       'Revenue vs Conversion Performance',
       'Weekly Activity Heatmap',
       'Developer Contributions',
+      'Progress Bars Showcase',
       'Gradient Bar Charts',
       'Advanced Gradient Effects',
     ];
@@ -358,6 +363,7 @@ class _ExampleHomeState extends State<ExampleHome>
       'Revenue growth correlates with improved conversion optimization',
       'Visualize user engagement patterns throughout the week with color-coded intensity',
       'GitHub-style contribution graph showing code activity over the last 12 weeks',
+      'Horizontal, vertical, and circular progress indicators • Task completion and KPI tracking',
       'Beautiful gradient fills for enhanced visual appeal • Linear gradients from light to dark',
       'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
     ];
@@ -687,8 +693,8 @@ class _ExampleHomeState extends State<ExampleHome>
               const PopupMenuItem(
                 value: 14,
                 child: ListTile(
-                  leading: Icon(Icons.timeline, size: 20),
-                  title: Text('Multi-Series Lines'),
+                  leading: Icon(Icons.linear_scale, size: 20),
+                  title: Text('Progress Bars'),
                   subtitle: Text('New!',
                       style: TextStyle(color: Colors.green, fontSize: 10)),
                   dense: true,
@@ -698,6 +704,17 @@ class _ExampleHomeState extends State<ExampleHome>
               const PopupMenuItem(
                 value: 15,
                 child: ListTile(
+                  leading: Icon(Icons.timeline, size: 20),
+                  title: Text('Multi-Series Lines'),
+                  subtitle: Text('New!',
+                      style: TextStyle(color: Colors.green, fontSize: 10)),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem(
+                value: 16,
+                child: ListTile(
                   leading: Icon(Icons.file_download, size: 20),
                   title: Text('Export'),
                   dense: true,
@@ -705,7 +722,7 @@ class _ExampleHomeState extends State<ExampleHome>
                 ),
               ),
               const PopupMenuItem(
-                value: 16,
+                value: 17,
                 child: ListTile(
                   leading: Icon(Icons.gradient, size: 20),
                   title: Text('Gradient Bars'),
@@ -716,7 +733,7 @@ class _ExampleHomeState extends State<ExampleHome>
                 ),
               ),
               const PopupMenuItem(
-                value: 17,
+                value: 18,
                 child: ListTile(
                   leading: Icon(Icons.auto_awesome, size: 20),
                   title: Text('Advanced Gradients'),
@@ -754,6 +771,7 @@ class _ExampleHomeState extends State<ExampleHome>
             Tab(text: 'Dual Y-Axis'),
             Tab(text: 'Heatmap'), // New heatmap tab
             Tab(text: 'Contributions'), // New contributions heatmap tab
+            Tab(text: 'Progress Bars'), // New progress bars tab
             Tab(text: 'Multi-Series'), // New multi-series line chart tab
             Tab(text: 'Export'), // New export tab
             Tab(text: 'Gradient Bars'), // New gradient bars tab
@@ -955,6 +973,20 @@ class _ExampleHomeState extends State<ExampleHome>
                     _buildStatsCard(
                         'Streak Days', '47', 'Current', Colors.blue),
                     _buildStatsCard('Active Days', '73%', '+8%', Colors.purple),
+                  ],
+                ),
+                // Progress Bars Example (Index 13)
+                _buildChartPage(
+                  chartTitles[13],
+                  chartDescriptions[13],
+                  buildProgressBarsTab(currentTheme, _sliderValue),
+                  [
+                    _buildStatsCard(
+                        'Orientations', '3', 'Horizontal, Vertical, Circular', Colors.blue),
+                    _buildStatsCard(
+                        'Styles', '4', 'Filled, Striped, Gradient, Custom', Colors.green),
+                    _buildStatsCard(
+                        'Animations', 'Smooth', 'Customizable Duration', Colors.purple),
                   ],
                 ),
                 _buildChartPage(

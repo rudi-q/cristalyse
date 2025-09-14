@@ -21,6 +21,9 @@ class AnimatedChartPainter extends CustomPainter {
   final String? heatMapXColumn;
   final String? heatMapYColumn;
   final String? heatMapValueColumn;
+  final String? progressValueColumn;
+  final String? progressLabelColumn;
+  final String? progressCategoryColumn;
   final List<Geometry> geometries;
   final Scale? xScale;
   final Scale? yScale;
@@ -74,6 +77,9 @@ class AnimatedChartPainter extends CustomPainter {
     this.heatMapXColumn,
     this.heatMapYColumn,
     this.heatMapValueColumn,
+    this.progressValueColumn,
+    this.progressLabelColumn,
+    this.progressCategoryColumn,
     required this.geometries,
     this.xScale,
     this.yScale,
@@ -663,6 +669,16 @@ class AnimatedChartPainter extends CustomPainter {
         yScale,
         colorScale,
         sizeScale,
+        isSecondaryY,
+      );
+    } else if (geometry is ProgressGeometry) {
+      _drawProgressAnimated(
+        canvas,
+        plotArea,
+        geometry,
+        xScale,
+        yScale,
+        colorScale,
         isSecondaryY,
       );
     }
@@ -2469,6 +2485,377 @@ class AnimatedChartPainter extends CustomPainter {
   }
 
   /// Helper method to compare two nullable lists for equality
+  void _drawProgressAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+    bool isSecondaryY,
+  ) {
+    // Use progress-specific columns or fall back to regular columns
+    final valueColumn = progressValueColumn ?? yColumn;
+    final labelColumn = progressLabelColumn ?? xColumn;
+    final categoryColumn = progressCategoryColumn ?? colorColumn;
+
+    if (valueColumn == null || data.isEmpty) {
+      return;
+    }
+
+    // Animation progress for progress bars
+    final progressBarProgress = math.max(0.0, math.min(1.0, animationProgress));
+    if (progressBarProgress <= 0.001) return;
+
+    for (int i = 0; i < data.length; i++) {
+      final point = data[i];
+      final value = getNumericValue(point[valueColumn]);
+      if (value == null || !value.isFinite) continue;
+
+      // Calculate progress percentage (normalize between min and max)
+      final minVal = geometry.minValue ?? 0.0;
+      final maxVal = geometry.maxValue ?? 100.0;
+      final normalizedValue = ((value - minVal) / (maxVal - minVal)).clamp(0.0, 1.0);
+
+      // Animation delay for each progress bar
+      final barDelay = i / data.length * 0.3; // 30% stagger
+      final barProgress = math.max(
+        0.0,
+        math.min(
+          1.0,
+          (progressBarProgress - barDelay) / math.max(0.001, 1.0 - barDelay),
+        ),
+      );
+
+      if (barProgress <= 0) continue;
+
+      // Draw progress bar based on orientation
+      switch (geometry.orientation) {
+        case ProgressOrientation.horizontal:
+          _drawHorizontalProgressBar(
+            canvas,
+            plotArea,
+            geometry,
+            normalizedValue,
+            barProgress,
+            point,
+            colorScale,
+            categoryColumn,
+            labelColumn,
+            i,
+          );
+          break;
+        case ProgressOrientation.vertical:
+          _drawVerticalProgressBar(
+            canvas,
+            plotArea,
+            geometry,
+            normalizedValue,
+            barProgress,
+            point,
+            colorScale,
+            categoryColumn,
+            labelColumn,
+            i,
+          );
+          break;
+        case ProgressOrientation.circular:
+          _drawCircularProgressBar(
+            canvas,
+            plotArea,
+            geometry,
+            normalizedValue,
+            barProgress,
+            point,
+            colorScale,
+            categoryColumn,
+            labelColumn,
+            i,
+          );
+          break;
+      }
+    }
+  }
+
+  void _drawHorizontalProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    // Calculate bar position and size
+    final barHeight = geometry.thickness;
+    final barSpacing = barHeight + 20.0; // Space between bars
+    final barY = plotArea.top + (index * barSpacing) + 20.0;
+    
+    if (barY + barHeight > plotArea.bottom) return; // Don't draw if outside bounds
+
+    final barWidth = plotArea.width * 0.8; // 80% of available width
+    final barX = plotArea.left + (plotArea.width - barWidth) / 2; // Center horizontally
+
+    final barRect = Rect.fromLTWH(barX, barY, barWidth, barHeight);
+
+    // Draw background
+    final backgroundPaint = Paint()
+      ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+      backgroundPaint,
+    );
+
+    // Draw progress fill with animation
+    final fillWidth = barWidth * normalizedValue * animationProgress;
+    final fillRect = Rect.fromLTWH(barX, barY, fillWidth, barHeight);
+
+    final fillPaint = Paint()..style = PaintingStyle.fill;
+
+    // Determine fill color/gradient
+    Color fillColor = geometry.fillColor ?? 
+        (categoryColumn != null ? colorScale.scale(point[categoryColumn]) : theme.primaryColor);
+
+    if (geometry.fillGradient != null) {
+      // Apply gradient with animation alpha
+      final animatedGradient = _applyAlphaToGradient(geometry.fillGradient!, 1.0);
+      fillPaint.shader = animatedGradient.createShader(fillRect);
+    } else if (geometry.style == ProgressStyle.gradient) {
+      // Default gradient from light to dark version of fill color
+      final gradient = LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: [
+          fillColor.withAlpha(127),
+          fillColor,
+        ],
+      );
+      fillPaint.shader = gradient.createShader(fillRect);
+    } else {
+      fillPaint.color = fillColor;
+    }
+
+    // Draw fill with rounded corners
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(fillRect, Radius.circular(geometry.cornerRadius)),
+      fillPaint,
+    );
+
+    // Draw stroke if specified
+    if (geometry.strokeWidth > 0) {
+      final strokePaint = Paint()
+        ..color = geometry.strokeColor ?? theme.borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = geometry.strokeWidth;
+      
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+        strokePaint,
+      );
+    }
+
+    // Draw label if enabled
+    if (geometry.showLabel && labelColumn != null) {
+      final labelText = point[labelColumn]?.toString() ?? '';
+      if (labelText.isNotEmpty) {
+        _drawProgressLabel(
+          canvas,
+          labelText,
+          Offset(barX, barY - geometry.labelOffset),
+          geometry.labelStyle ?? theme.axisTextStyle,
+        );
+      }
+    }
+  }
+
+  void _drawVerticalProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    // Calculate bar position and size
+    final barWidth = geometry.thickness;
+    final barSpacing = barWidth + 20.0;
+    final barX = plotArea.left + (index * barSpacing) + 20.0;
+    
+    if (barX + barWidth > plotArea.right) return;
+
+    final barHeight = plotArea.height * 0.8;
+    final barY = plotArea.top + (plotArea.height - barHeight) / 2;
+
+    final barRect = Rect.fromLTWH(barX, barY, barWidth, barHeight);
+
+    // Draw background
+    final backgroundPaint = Paint()
+      ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+      backgroundPaint,
+    );
+
+    // Draw progress fill from bottom up
+    final fillHeight = barHeight * normalizedValue * animationProgress;
+    final fillY = barY + barHeight - fillHeight; // Start from bottom
+    final fillRect = Rect.fromLTWH(barX, fillY, barWidth, fillHeight);
+
+    final fillPaint = Paint()..style = PaintingStyle.fill;
+
+    Color fillColor = geometry.fillColor ?? 
+        (categoryColumn != null ? colorScale.scale(point[categoryColumn]) : theme.primaryColor);
+
+    if (geometry.fillGradient != null) {
+      final animatedGradient = _applyAlphaToGradient(geometry.fillGradient!, 1.0);
+      fillPaint.shader = animatedGradient.createShader(fillRect);
+    } else if (geometry.style == ProgressStyle.gradient) {
+      final gradient = LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        colors: [
+          fillColor.withAlpha(127),
+          fillColor,
+        ],
+      );
+      fillPaint.shader = gradient.createShader(fillRect);
+    } else {
+      fillPaint.color = fillColor;
+    }
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(fillRect, Radius.circular(geometry.cornerRadius)),
+      fillPaint,
+    );
+
+    // Draw stroke
+    if (geometry.strokeWidth > 0) {
+      final strokePaint = Paint()
+        ..color = geometry.strokeColor ?? theme.borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = geometry.strokeWidth;
+      
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+        strokePaint,
+      );
+    }
+
+    // Draw label
+    if (geometry.showLabel && labelColumn != null) {
+      final labelText = point[labelColumn]?.toString() ?? '';
+      if (labelText.isNotEmpty) {
+        _drawProgressLabel(
+          canvas,
+          labelText,
+          Offset(barX + barWidth / 2, barY + barHeight + geometry.labelOffset),
+          geometry.labelStyle ?? theme.axisTextStyle,
+        );
+      }
+    }
+  }
+
+  void _drawCircularProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    // Calculate circle properties
+    final radius = geometry.thickness;
+    final centerSpacing = (radius * 2.5);
+    final cols = (plotArea.width / centerSpacing).floor();
+    final row = index ~/ cols;
+    final col = index % cols;
+    
+    final centerX = plotArea.left + (col * centerSpacing) + centerSpacing / 2;
+    final centerY = plotArea.top + (row * centerSpacing) + centerSpacing / 2;
+    final center = Offset(centerX, centerY);
+
+    if (centerY + radius > plotArea.bottom) return;
+
+    // Draw background circle
+    final backgroundPaint = Paint()
+      ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = radius * 0.2;
+
+    canvas.drawCircle(center, radius, backgroundPaint);
+
+    // Draw progress arc
+    final sweepAngle = 2 * math.pi * normalizedValue * animationProgress;
+    final startAngle = -math.pi / 2; // Start from top
+
+    final progressPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = radius * 0.2
+      ..strokeCap = StrokeCap.round;
+
+    Color fillColor = geometry.fillColor ?? 
+        (categoryColumn != null ? colorScale.scale(point[categoryColumn]) : theme.primaryColor);
+    progressPaint.color = fillColor;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle,
+      false,
+      progressPaint,
+    );
+
+    // Draw center label
+    if (geometry.showLabel && labelColumn != null) {
+      final labelText = point[labelColumn]?.toString() ?? '';
+      if (labelText.isNotEmpty) {
+        _drawProgressLabel(
+          canvas,
+          labelText,
+          Offset(center.dx, center.dy + radius + geometry.labelOffset),
+          geometry.labelStyle ?? theme.axisTextStyle,
+        );
+      }
+    }
+  }
+
+  void _drawProgressLabel(
+    Canvas canvas,
+    String text,
+    Offset position,
+    TextStyle style,
+  ) {
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      textAlign: TextAlign.center,
+    );
+    textPainter.layout();
+
+    // Center the text at the position
+    final offset = Offset(
+      position.dx - textPainter.width / 2,
+      position.dy - textPainter.height / 2,
+    );
+
+    textPainter.paint(canvas, offset);
+  }
+
   bool _listEquals<T>(List<T>? a, List<T>? b) {
     if (a == null && b == null) return true;
     if (a == null || b == null) return false;
