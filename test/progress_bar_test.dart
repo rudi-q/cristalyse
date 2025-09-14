@@ -687,5 +687,42 @@ void main() {
       // Should not crash and should render something
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
+
+    testWidgets('should handle out-of-range and invalid progress values without crashing', (WidgetTester tester) async {
+      final testData = [
+        {'task': 'Negative', 'progress': -25.0},
+        {'task': 'Above Max', 'progress': 150.0}, 
+        {'task': 'Null Value', 'progress': null},
+        {'task': 'String', 'progress': 'invalid'},
+        {'task': 'Zero', 'progress': 0.0},
+        {'task': 'Max', 'progress': 100.0},
+        {'task': 'Valid', 'progress': 75.0},
+      ];
+
+      final widget = MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 400,
+            height: 300,
+            child: CristalyseChart()
+                .data(testData)
+                .mappingProgress(value: 'progress', label: 'task')
+                .geomProgress(
+                  minValue: 0.0,
+                  maxValue: 100.0,
+                  orientation: ProgressOrientation.horizontal,
+                  thickness: 20.0,
+                )
+                .build(),
+          ),
+        ),
+      );
+
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      // Should not crash and should render the widget
+      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
   });
 }

@@ -2866,7 +2866,7 @@ class AnimatedChartPainter extends CustomPainter {
     // Calculate circle properties
     final radius = geometry.thickness;
     final centerSpacing = (radius * 2.5);
-    final cols = (plotArea.width / centerSpacing).floor();
+    final cols = math.max(1, (plotArea.width / centerSpacing).floor());
     final row = index ~/ cols;
     final col = index % cols;
     
