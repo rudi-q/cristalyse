@@ -305,5 +305,19 @@ class ProgressGeometry extends Geometry {
     this.concentricThicknesses,
     super.yAxis,
     super.interactive,
-  });
+  }) : assert(minValue != null && maxValue != null && minValue < maxValue,
+           'minValue must be less than maxValue'),
+       assert(animationDuration > Duration.zero,
+           'animationDuration must be positive'),
+       assert(thickness >= 0, 'thickness must be >= 0'),
+       assert(cornerRadius >= 0, 'cornerRadius must be >= 0'),
+       assert(strokeWidth >= 0, 'strokeWidth must be >= 0'),
+       assert(labelOffset >= 0, 'labelOffset must be >= 0'),
+       assert(groupSpacing == null || groupSpacing >= 0, 'groupSpacing must be >= 0'),
+       assert(groupCount == null || groupCount > 0, 'groupCount must be > 0'),
+       assert(tickCount == null || tickCount >= 0, 'tickCount must be >= 0'),
+       assert(gaugeRadius == null || gaugeRadius > 0, 'gaugeRadius must be > 0'),
+       assert(segments == null || segments.every((s) => s >= 0), 'all segments must be >= 0'),
+       assert(concentricRadii == null || concentricRadii.every((r) => r > 0), 'all concentricRadii must be > 0'),
+       assert(concentricThicknesses == null || concentricThicknesses.every((t) => t > 0), 'all concentricThicknesses must be > 0');
 }

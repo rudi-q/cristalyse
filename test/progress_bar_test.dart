@@ -552,4 +552,140 @@ void main() {
       expect(ProgressStyle.values.contains(ProgressStyle.concentric), isTrue);
     });
   });
+
+  group('Progress Bar Input Validation Tests', () {
+    test('should reject invalid minValue/maxValue combinations', () {
+      expect(
+        () => ProgressGeometry(minValue: 100.0, maxValue: 50.0),
+        throwsA(isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('minValue must be less than maxValue'),
+        )),
+      );
+    });
+
+    test('should reject negative thickness', () {
+      expect(
+        () => ProgressGeometry(thickness: -5.0),
+        throwsA(isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('thickness must be >= 0'),
+        )),
+      );
+    });
+
+    test('should reject negative cornerRadius', () {
+      expect(
+        () => ProgressGeometry(cornerRadius: -2.0),
+        throwsA(isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('cornerRadius must be >= 0'),
+        )),
+      );
+    });
+
+    test('should reject zero or negative animationDuration', () {
+      expect(
+        () => ProgressGeometry(animationDuration: Duration.zero),
+        throwsA(isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('animationDuration must be positive'),
+        )),
+      );
+
+      expect(
+        () => ProgressGeometry(animationDuration: const Duration(milliseconds: -100)),
+        throwsA(isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('animationDuration must be positive'),
+        )),
+      );
+    });
+
+    test('should reject invalid segment values', () {
+      expect(
+        () => ProgressGeometry(segments: [10.0, -5.0, 15.0]),
+        throwsA(isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('all segments must be >= 0'),
+        )),
+      );
+    });
+
+    test('should reject invalid concentric radii', () {
+      expect(
+        () => ProgressGeometry(concentricRadii: [10.0, 0.0, 15.0]),
+        throwsA(isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('all concentricRadii must be > 0'),
+        )),
+      );
+    });
+
+    test('should accept valid configurations', () {
+      // Should not throw
+      final geometry = ProgressGeometry(
+        minValue: 0.0,
+        maxValue: 100.0,
+        thickness: 20.0,
+        cornerRadius: 5.0,
+        animationDuration: const Duration(milliseconds: 500),
+        segments: [25.0, 50.0, 25.0],
+        concentricRadii: [30.0, 60.0, 90.0],
+        groupCount: 3,
+        tickCount: 10,
+      );
+
+      expect(geometry.minValue, equals(0.0));
+      expect(geometry.maxValue, equals(100.0));
+      expect(geometry.thickness, equals(20.0));
+    });
+  });
+
+  group('Progress Bar Edge Case Tests', () {
+    test('should validate zero range (minValue == maxValue)', () {
+      // This should be caught by validation during geometry construction
+      expect(
+        () => ProgressGeometry(minValue: 50.0, maxValue: 50.0),
+        throwsA(isA<AssertionError>().having(
+          (e) => e.message,
+          'message',
+          contains('minValue must be less than maxValue'),
+        )),
+      );
+    });
+
+    testWidgets('should handle invalid numeric values gracefully', (WidgetTester tester) async {
+      final testData = [
+        {'task': 'Test', 'completion': double.nan},
+        {'task': 'Test2', 'completion': double.infinity},
+        {'task': 'Test3', 'completion': double.negativeInfinity},
+      ];
+
+      final widget = MaterialApp(
+        home: Scaffold(
+          body: CristalyseChart()
+              .data(testData)
+              .mappingProgress(value: 'completion')
+              .geomProgress(
+                thickness: 20.0,
+              )
+              .build(),
+        ),
+      );
+
+      await tester.pumpWidget(widget);
+      await tester.pumpAndSettle();
+
+      // Should not crash and should render something
+      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
+  });
 }

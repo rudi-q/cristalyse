@@ -2515,7 +2515,14 @@ class AnimatedChartPainter extends CustomPainter {
       // Calculate progress percentage (normalize between min and max)
       final minVal = geometry.minValue ?? 0.0;
       final maxVal = geometry.maxValue ?? 100.0;
-      final normalizedValue = ((value - minVal) / (maxVal - minVal)).clamp(0.0, 1.0);
+      final range = maxVal - minVal;
+      final double normalizedValue;
+      if (range <= 0.0 || !range.isFinite) {
+        // Fallback for invalid range: treat as 50% complete
+        normalizedValue = 0.5;
+      } else {
+        normalizedValue = ((value - minVal) / range).clamp(0.0, 1.0);
+      }
 
       // Animation delay for each progress bar
       final barDelay = i / data.length * 0.3; // 30% stagger
@@ -2678,16 +2685,21 @@ class AnimatedChartPainter extends CustomPainter {
 
     final fillPaint = Paint()..style = PaintingStyle.fill;
 
-    // Determine fill color/gradient
-    Color fillColor = geometry.fillColor ?? 
+    // Determine fill source (can be Color or Gradient)
+    final fillSource = geometry.fillColor ?? 
         (categoryColumn != null ? colorScale.scale(point[categoryColumn]) : theme.primaryColor);
 
     if (geometry.fillGradient != null) {
-      // Apply gradient with animation alpha
+      // Explicit gradient takes precedence
       final animatedGradient = _applyAlphaToGradient(geometry.fillGradient!, 1.0);
+      fillPaint.shader = animatedGradient.createShader(fillRect);
+    } else if (fillSource is Gradient) {
+      // Handle gradient from color scale
+      final animatedGradient = _applyAlphaToGradient(fillSource, 1.0);
       fillPaint.shader = animatedGradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.gradient) {
       // Default gradient from light to dark version of fill color
+      final fillColor = fillSource as Color;
       final gradient = LinearGradient(
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
@@ -2698,6 +2710,8 @@ class AnimatedChartPainter extends CustomPainter {
       );
       fillPaint.shader = gradient.createShader(fillRect);
     } else {
+      // Solid color
+      final fillColor = fillSource as Color;
       fillPaint.color = fillColor;
     }
 
@@ -2775,13 +2789,21 @@ class AnimatedChartPainter extends CustomPainter {
 
     final fillPaint = Paint()..style = PaintingStyle.fill;
 
-    Color fillColor = geometry.fillColor ?? 
+    // Determine fill source (can be Color or Gradient)
+    final fillSource = geometry.fillColor ?? 
         (categoryColumn != null ? colorScale.scale(point[categoryColumn]) : theme.primaryColor);
 
     if (geometry.fillGradient != null) {
+      // Explicit gradient takes precedence
       final animatedGradient = _applyAlphaToGradient(geometry.fillGradient!, 1.0);
       fillPaint.shader = animatedGradient.createShader(fillRect);
+    } else if (fillSource is Gradient) {
+      // Handle gradient from color scale
+      final animatedGradient = _applyAlphaToGradient(fillSource, 1.0);
+      fillPaint.shader = animatedGradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.gradient) {
+      // Default gradient from light to dark version of fill color
+      final fillColor = fillSource as Color;
       final gradient = LinearGradient(
         begin: Alignment.bottomCenter,
         end: Alignment.topCenter,
@@ -2792,6 +2814,8 @@ class AnimatedChartPainter extends CustomPainter {
       );
       fillPaint.shader = gradient.createShader(fillRect);
     } else {
+      // Solid color
+      final fillColor = fillSource as Color;
       fillPaint.color = fillColor;
     }
 
