@@ -316,7 +316,7 @@ class ProgressGeometry extends Geometry {
         assert(groupSpacing == null || groupSpacing >= 0,
             'groupSpacing must be >= 0'),
         assert(groupCount == null || groupCount > 0, 'groupCount must be > 0'),
-        assert(tickCount == null || tickCount >= 0, 'tickCount must be >= 0'),
+        assert(tickCount == null || tickCount > 0, 'tickCount must be > 0'),
         assert(
             gaugeRadius == null || gaugeRadius > 0, 'gaugeRadius must be > 0'),
         assert(segments == null || segments.every((s) => s >= 0),
@@ -326,5 +326,26 @@ class ProgressGeometry extends Geometry {
         assert(
             concentricThicknesses == null ||
                 concentricThicknesses.every((t) => t > 0),
-            'all concentricThicknesses must be > 0');
+            'all concentricThicknesses must be > 0'),
+        assert(
+            sweepAngle == null || (sweepAngle > 0 && sweepAngle <= 2 * math.pi),
+            'sweepAngle must be > 0 and <= 2π (360 degrees)'),
+        assert(
+            segments == null ||
+                segmentColors == null ||
+                segments.length == segmentColors.length,
+            'segments and segmentColors must have the same length'),
+        assert(
+            concentricRadii == null ||
+                concentricThicknesses == null ||
+                concentricRadii.length == concentricThicknesses.length,
+            'concentricRadii and concentricThicknesses must have the same length'),
+        assert(style != ProgressStyle.stacked || segments != null,
+            'stacked style requires non-null segments'),
+        assert(style != ProgressStyle.gauge || gaugeRadius != null,
+            'gauge style requires non-null gaugeRadius'),
+        assert(
+            style != ProgressStyle.concentric ||
+                (concentricRadii != null && concentricThicknesses != null),
+            'concentric style requires non-null concentricRadii and concentricThicknesses');
 }
