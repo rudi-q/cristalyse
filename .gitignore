@@ -32,4 +32,6 @@ build/
 .metadata
 
 # Development tools and configurations
+debug_screenshot.*
+engine.bin
 w***.md

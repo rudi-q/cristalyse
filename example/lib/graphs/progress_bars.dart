@@ -210,6 +210,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
                 tickCount: 8,
                 startAngle: -2.356, // -3π/4 (225 degrees)
                 sweepAngle: 4.712, // 3π/2 (270 degrees)
+                gaugeRadius: 80.0, // Required for gauge style
               )
               .theme(currentTheme)
               .animate(
