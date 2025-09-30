@@ -122,10 +122,40 @@ class CristalyseChart {
 
   /// Map data for progress bars
   ///
+  /// Maps data columns to progress bar properties:
+  /// - [value]: Column containing progress values (typically 0-100)
+  /// - [label]: Column containing labels for each progress bar (optional)
+  /// - [category]: Column for categorizing/coloring progress bars (optional)
+  ///
+  /// **Important**: Progress bars require at least the [value] column to be mapped
+  /// or a standard y-axis mapping. Without proper mapping, the chart may not render.
+  ///
   /// Example:
   /// ```dart
-  /// chart.mappingProgress(value: 'completion', label: 'task_name', category: 'department')
+  /// final data = [
+  ///   {'task': 'Backend API', 'completion': 85.0, 'department': 'Engineering'},
+  ///   {'task': 'Frontend UI', 'completion': 70.0, 'department': 'Engineering'},
+  ///   {'task': 'User Testing', 'completion': 45.0, 'department': 'Product'},
+  /// ];
+  ///
+  /// CristalyseChart()
+  ///   .data(data)
+  ///   .mappingProgress(
+  ///     value: 'completion',  // Required: progress value (0-100)
+  ///     label: 'task',        // Optional: label to display
+  ///     category: 'department' // Optional: for color grouping
+  ///   )
+  ///   .geomProgress(
+  ///     orientation: ProgressOrientation.horizontal,
+  ///     style: ProgressStyle.gradient,
+  ///     thickness: 25.0,
+  ///   );
   /// ```
+  ///
+  /// See also:
+  /// - [geomProgress] for configuring progress bar appearance
+  /// - [ProgressOrientation] for bar orientation options
+  /// - [ProgressStyle] for styling options (filled, gradient, striped, etc.)
   CristalyseChart mappingProgress(
       {String? value, String? label, String? category}) {
     _progressValueColumn = value;

@@ -285,7 +285,7 @@ class _ChartScreenState extends State<ChartScreen>
       case 9: // Pie chart
         final value = 100.0 + _sliderValue * 50.0;
         return 'Pie Radius: ${value.toStringAsFixed(0)}px';
-      case 13: // Progress bars
+      case 14: // Progress bars
         final value = 15.0 + _sliderValue * 25.0;
         return 'Thickness: ${value.toStringAsFixed(1)}px';
       default:
@@ -300,6 +300,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Interactive Panning Demo',
       'User Growth Trends',
       'Website Traffic Analytics',
+      'Market Performance Analysis',
       'Quarterly Revenue',
       'Product Performance by Quarter',
       'Team Size by Department',
@@ -309,6 +310,8 @@ class _ChartScreenState extends State<ChartScreen>
       'Weekly Activity Heatmap',
       'Developer Contributions',
       'Progress Bars Showcase',
+      'Multi Series Line Chart Demo',
+      'Chart Export Demo',
       'Gradient Bar Charts',
       'Advanced Gradient Effects',
     ];
@@ -321,6 +324,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Real-time pan detection with visible range callbacks • Perfect for large datasets',
       'Steady monthly growth with seasonal variations in user acquisition',
       'Smooth area fills with progressive animation • Multi-series support with transparency',
+      'Three-dimensional visualization showing revenue, customer count, and market share',
       'Strong Q4 performance driven by holiday sales and new partnerships',
       'Mobile app leading growth, API services showing steady adoption',
       'Engineering team expansion supporting our product development goals',
@@ -330,6 +334,8 @@ class _ChartScreenState extends State<ChartScreen>
       'Visualize user engagement patterns throughout the week with color-coded intensity',
       'GitHub-style contribution graph showing code activity over the last 12 weeks',
       'Horizontal, vertical, and circular progress indicators • Task completion and KPI tracking',
+      'Platform analytics with brand-specific colors • iOS Blue, Android Green, Web Orange',
+      'Export your charts as scalable SVG vector graphics for reports and presentations',
       'Beautiful gradient fills for enhanced visual appeal • Linear gradients from light to dark',
       'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
     ];
@@ -502,9 +508,6 @@ class _ChartScreenState extends State<ChartScreen>
   }
 
   Widget _getChartWidget() {
-    final chartTitles = _getChartTitles();
-    final chartDescriptions = _getChartDescriptions();
-
     switch (widget.chartIndex) {
       case 0:
         return buildScatterPlotTab(
@@ -806,7 +809,7 @@ class _ChartScreenState extends State<ChartScreen>
                 },
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );
@@ -816,7 +819,6 @@ class _ChartScreenState extends State<ChartScreen>
   Widget build(BuildContext context) {
     final chartTitles = _getChartTitles();
     final chartDescriptions = _getChartDescriptions();
-    final currentRoute = AppRouter.routes[widget.chartIndex];
 
     // Determine chart height based on chart type
     double chartHeight = 380; // Default height

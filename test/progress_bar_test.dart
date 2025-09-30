@@ -125,6 +125,38 @@ void main() {
 
       expect(stripedChart, isA<CristalyseChart>());
     });
+
+    testWidgets('should render striped progress bars',
+        (WidgetTester tester) async {
+      final testData = [
+        {'task': 'Development', 'completion': 75.0},
+        {'task': 'Testing', 'completion': 60.0},
+      ];
+
+      final chart = CristalyseChart()
+          .data(testData)
+          .mappingProgress(value: 'completion', label: 'task')
+          .geomProgress(
+            style: ProgressStyle.striped,
+            orientation: ProgressOrientation.horizontal,
+            thickness: 20.0,
+          );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 400,
+              height: 200,
+              child: chart.build(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
   });
 
   group('Progress Enums Tests', () {

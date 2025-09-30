@@ -101,21 +101,29 @@ List<String> getChartFeatures(int tabIndex) {
         'Animated cell scaling with elastic curves',
         'Perfect for activity tracking and habit visualization'
       ];
-    case 14: // Multi-series line chart
+    case 14: // Progress bars
+      return [
+        'Multiple orientations: horizontal, vertical, and circular progress',
+        'Advanced styles: stacked, grouped, gauge, and concentric rings',
+        'Gradient fills and custom color schemes for visual impact',
+        'Smooth animations with staggered timing for multiple bars',
+        'Label support with automatic positioning and formatting'
+      ];
+    case 15: // Multi-series line chart
       return [
         'Fixed multi-series line rendering with proper separation',
         'Each series gets its own line with distinct colors',
         'Points and lines work together seamlessly',
         'Fully backward compatible with single-series charts'
       ];
-    case 15: // Export demo
+    case 16: // Export demo
       return [
         'Export charts as scalable SVG vector graphics',
         'Infinite zoom and professional quality output',
         'Small file sizes perfect for web and print',
         'Editable in design software and ideal for presentations'
       ];
-    case 16: // Gradient bars
+    case 17: // Gradient bars
       return [
         'Beautiful gradient fills using Flutter\'s native shader system',
         'Linear gradients from bottom to top for depth effect',
@@ -123,7 +131,7 @@ List<String> getChartFeatures(int tabIndex) {
         'Smooth animation compatibility with existing systems',
         'Rounded corners and borders work perfectly with gradients'
       ];
-    case 17: // Advanced gradients
+    case 18: // Advanced gradients
       return [
         'Multiple gradient types: Linear, Radial, Sweep gradients',
         'Mixed gradient effects within single charts',
