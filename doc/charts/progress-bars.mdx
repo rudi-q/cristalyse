@@ -1,0 +1,634 @@
+---
+title: "Progress Bars"
+description: "Professional progress visualization with multiple orientations and advanced styles"
+seo:
+  title: 'Flutter Progress Bar Charts - Multiple Styles & Orientations | Cristalyse'
+  description: 'Create professional progress bars in Flutter with Cristalyse. Horizontal, vertical, circular, stacked, grouped, gauge, and concentric styles for dashboards and analytics.'
+  keywords: 'flutter progress bar, circular progress indicator, horizontal progress bar, vertical progress bar, progress chart flutter, gauge chart, stacked progress'
+  canonical: 'https://docs.cristalyse.com/charts/progress-bars'
+---
+
+## Overview
+
+Progress bars are essential for visualizing completion status, goal achievement, and performance metrics. Cristalyse provides comprehensive progress bar support with multiple orientations and advanced styling options perfect for dashboards, project management tools, and analytics applications.
+
+## Basic Progress Bars
+
+### Horizontal Progress Bar
+
+The classic left-to-right progress visualization:
+
+```dart
+final taskData = [
+  {'task': 'Design', 'completion': 75.0},
+  {'task': 'Development', 'completion': 60.0},
+  {'task': 'Testing', 'completion': 30.0},
+];
+
+CristalyseChart()
+  .data(taskData)
+  .mappingProgress(category: 'task', value: 'completion')
+  .geomProgress(
+    orientation: ProgressOrientation.horizontal,
+    barThickness: 20.0,
+    cornerRadius: 10.0,
+    showLabels: true,
+  )
+  .scaleYContinuous(min: 0, max: 100)
+  .build()
+```
+
+### Vertical Progress Bar
+
+Bottom-to-top progress display:
+
+```dart
+CristalyseChart()
+  .data(taskData)
+  .mappingProgress(category: 'task', value: 'completion')
+  .geomProgress(
+    orientation: ProgressOrientation.vertical,
+    barThickness: 30.0,
+    cornerRadius: 15.0,
+    showLabels: true,
+  )
+  .scaleXContinuous(min: 0, max: 100)
+  .build()
+```
+
+### Circular Progress Bar
+
+Ring-style progress indicators:
+
+```dart
+CristalyseChart()
+  .data([{'metric': 'CPU Usage', 'value': 68.0}])
+  .mappingProgress(category: 'metric', value: 'value')
+  .geomProgress(
+    orientation: ProgressOrientation.circular,
+    barThickness: 15.0,
+    startAngle: -90.0,   // Start at top
+    endAngle: 270.0,     // Full circle
+  )
+  .build()
+```
+
+## Advanced Styles
+
+### Stacked Progress Bars
+
+Multi-segment progress showing completion by category:
+
+```dart
+final projectData = [
+  {'project': 'Mobile App', 'stage': 'Design', 'progress': 30.0},
+  {'project': 'Mobile App', 'stage': 'Development', 'progress': 50.0},
+  {'project': 'Mobile App', 'stage': 'Testing', 'progress': 20.0},
+];
+
+CristalyseChart()
+  .data(projectData)
+  .mappingProgress(
+    category: 'project',
+    value: 'progress',
+    group: 'stage',  // Groups create segments
+  )
+  .geomProgress(
+    style: ProgressStyle.stacked,
+    orientation: ProgressOrientation.horizontal,
+    barThickness: 25.0,
+    showLabels: true,
+  )
+  .build()
+```
+
+**Perfect for:**
+- Project phase tracking
+- Budget allocation visualization
+- Time spent analysis
+- Multi-category completion
+
+### Grouped Progress Bars
+
+Side-by-side progress bars for category comparison:
+
+```dart
+final teamData = [
+  {'team': 'Engineering', 'metric': 'Sprint Goals', 'achievement': 85.0},
+  {'team': 'Engineering', 'metric': 'Code Quality', 'achievement': 92.0},
+  {'team': 'Design', 'metric': 'Sprint Goals', 'achievement': 78.0},
+  {'team': 'Design', 'metric': 'Code Quality', 'achievement': 88.0},
+];
+
+CristalyseChart()
+  .data(teamData)
+  .mappingProgress(
+    category: 'team',
+    value: 'achievement',
+    group: 'metric',
+  )
+  .geomProgress(
+    style: ProgressStyle.grouped,
+    orientation: ProgressOrientation.vertical,
+    barThickness: 20.0,
+  )
+  .legend()
+  .build()
+```
+
+**Perfect for:**
+- Team performance comparison
+- KPI tracking across departments
+- A/B test results
+- Multi-metric dashboards
+
+### Gauge Style
+
+Semi-circular gauge-style indicators:
+
+```dart
+CristalyseChart()
+  .data([
+    {'metric': 'CPU', 'usage': 68.0},
+    {'metric': 'Memory', 'usage': 82.0},
+    {'metric': 'Disk', 'usage': 45.0},
+  ])
+  .mappingProgress(category: 'metric', value: 'usage')
+  .geomProgress(
+    style: ProgressStyle.gauge,
+    orientation: ProgressOrientation.circular,
+    gaugeRadius: 120.0,  // Required for gauge style
+    barThickness: 18.0,
+    startAngle: -135.0,  // Bottom-left
+    endAngle: 135.0,     // Bottom-right (270° arc)
+    showLabels: true,
+  )
+  .build()
+```
+
+<Warning>
+  **Required Parameter:** Gauge style progress bars require the `gaugeRadius` parameter to be specified.
+</Warning>
+
+**Perfect for:**
+- System resource monitoring
+- Performance dashboards
+- Speed/capacity indicators
+- Real-time metrics
+
+### Concentric Circles
+
+Nested circular progress rings for multi-metric displays:
+
+```dart
+final metricsData = [
+  {'metric': 'Sales Target', 'achievement': 85.0},
+  {'metric': 'Quality Score', 'achievement': 92.0},
+  {'metric': 'Customer Satisfaction', 'achievement': 78.0},
+];
+
+CristalyseChart()
+  .data(metricsData)
+  .mappingProgress(category: 'metric', value: 'achievement')
+  .geomProgress(
+    style: ProgressStyle.concentric,
+    orientation: ProgressOrientation.circular,
+    barThickness: 12.0,
+    startAngle: -90.0,
+    endAngle: 270.0,
+  )
+  .legend(position: LegendPosition.bottom)
+  .build()
+```
+
+**Perfect for:**
+- Multi-KPI dashboards
+- Goal achievement tracking
+- Health/fitness metrics
+- Balanced scorecard visualizations
+
+## Styling & Customization
+
+### Colors & Themes
+
+Progress bars automatically adapt to your theme:
+
+```dart
+CristalyseChart()
+  .data(taskData)
+  .mappingProgress(category: 'task', value: 'completion', group: 'priority')
+  .geomProgress(
+    style: ProgressStyle.stacked,
+    orientation: ProgressOrientation.horizontal,
+  )
+  .theme(ChartTheme.darkTheme())  // Dark mode support
+  .legend()
+  .build()
+```
+
+### Custom Colors
+
+Use custom color palettes for semantic meaning:
+
+```dart
+final statusColors = {
+  'Critical': Colors.red,
+  'Warning': Colors.orange,
+  'Normal': Colors.green,
+};
+
+CristalyseChart()
+  .data(systemData)
+  .mappingProgress(category: 'system', value: 'health', group: 'status')
+  .geomProgress(style: ProgressStyle.grouped)
+  .customPalette(categoryColors: statusColors)
+  .build()
+```
+
+### Track Colors
+
+Customize the background track color:
+
+```dart
+CristalyseChart()
+  .data(taskData)
+  .mappingProgress(category: 'task', value: 'completion')
+  .geomProgress(
+    orientation: ProgressOrientation.horizontal,
+    trackColor: Colors.grey.shade200,  // Custom track
+    barThickness: 20.0,
+    cornerRadius: 10.0,
+  )
+  .build()
+```
+
+## Labels & Formatting
+
+### Show Percentage Labels
+
+Display completion percentages:
+
+```dart
+CristalyseChart()
+  .data(taskData)
+  .mappingProgress(category: 'task', value: 'completion')
+  .geomProgress(
+    orientation: ProgressOrientation.horizontal,
+    showLabels: true,
+    labelFormatter: (value) => '${value.toStringAsFixed(1)}%',
+    labelStyle: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+    ),
+  )
+  .build()
+```
+
+### Custom Label Formatting
+
+```dart
+import 'package:intl/intl.dart';
+
+// Currency formatting for budget progress
+CristalyseChart()
+  .data(budgetData)
+  .mappingProgress(category: 'department', value: 'spent')
+  .geomProgress(
+    showLabels: true,
+    labelFormatter: (value) => NumberFormat.simpleCurrency().format(value),
+  )
+  .build()
+```
+
+## Interactive Features
+
+### Tooltips
+
+Add hover information:
+
+```dart
+CristalyseChart()
+  .data(taskData)
+  .mappingProgress(category: 'task', value: 'completion')
+  .geomProgress(orientation: ProgressOrientation.horizontal)
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) {
+        final task = point.getDisplayValue('task');
+        final completion = point.getDisplayValue('completion');
+        
+        return Container(
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.black87,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            '$task: $completion%',
+            style: TextStyle(color: Colors.white),
+          ),
+        );
+      },
+    ),
+  )
+  .build()
+```
+
+### Click Handlers
+
+Respond to user interactions:
+
+```dart
+CristalyseChart()
+  .data(taskData)
+  .mappingProgress(category: 'task', value: 'completion')
+  .geomProgress(orientation: ProgressOrientation.horizontal)
+  .interaction(
+    click: ClickConfig(
+      onTap: (point) {
+        final task = point.getDisplayValue('task');
+        showTaskDetails(context, task);
+      },
+    ),
+  )
+  .build()
+```
+
+## Animations
+
+### Progressive Filling
+
+Animate progress filling:
+
+```dart
+CristalyseChart()
+  .data(taskData)
+  .mappingProgress(category: 'task', value: 'completion')
+  .geomProgress(
+    orientation: ProgressOrientation.horizontal,
+    barThickness: 20.0,
+  )
+  .animate(
+    duration: Duration(milliseconds: 1200),
+    curve: Curves.easeOutCubic,
+  )
+  .build()
+```
+
+### Circular Animations
+
+Smooth circular progress animations:
+
+```dart
+CristalyseChart()
+  .data([{'metric': 'Loading', 'progress': 75.0}])
+  .mappingProgress(category: 'metric', value: 'progress')
+  .geomProgress(
+    orientation: ProgressOrientation.circular,
+    barThickness: 15.0,
+  )
+  .animate(
+    duration: Duration(milliseconds: 1500),
+    curve: Curves.elasticOut,
+  )
+  .build()
+```
+
+## Real-World Examples
+
+### Project Management Dashboard
+
+```dart
+final projectData = [
+  {'project': 'Website Redesign', 'phase': 'Planning', 'progress': 100.0},
+  {'project': 'Website Redesign', 'phase': 'Design', 'progress': 80.0},
+  {'project': 'Website Redesign', 'phase': 'Development', 'progress': 45.0},
+  {'project': 'Website Redesign', 'phase': 'Testing', 'progress': 0.0},
+];
+
+CristalyseChart()
+  .data(projectData)
+  .mappingProgress(
+    category: 'project',
+    value: 'progress',
+    group: 'phase',
+  )
+  .geomProgress(
+    style: ProgressStyle.stacked,
+    orientation: ProgressOrientation.horizontal,
+    barThickness: 30.0,
+    cornerRadius: 15.0,
+    showLabels: true,
+  )
+  .theme(ChartTheme.defaultTheme())
+  .legend(position: LegendPosition.bottom)
+  .build()
+```
+
+### System Monitoring Dashboard
+
+```dart
+final systemMetrics = [
+  {'resource': 'CPU', 'usage': 68.0},
+  {'resource': 'Memory', 'usage': 82.0},
+  {'resource': 'Disk', 'usage': 45.0},
+  {'resource': 'Network', 'usage': 35.0},
+];
+
+final statusColors = {
+  'CPU': Colors.blue,
+  'Memory': Colors.orange,
+  'Disk': Colors.green,
+  'Network': Colors.purple,
+};
+
+CristalyseChart()
+  .data(systemMetrics)
+  .mappingProgress(category: 'resource', value: 'usage')
+  .geomProgress(
+    style: ProgressStyle.gauge,
+    orientation: ProgressOrientation.circular,
+    gaugeRadius: 100.0,
+    barThickness: 16.0,
+    startAngle: -135.0,
+    endAngle: 135.0,
+    showLabels: true,
+  )
+  .customPalette(categoryColors: statusColors)
+  .legend(position: LegendPosition.right)
+  .build()
+```
+
+### Fitness Tracker
+
+```dart
+final fitnessGoals = [
+  {'goal': 'Daily Steps', 'achievement': 85.0},
+  {'goal': 'Calories Burned', 'achievement': 92.0},
+  {'goal': 'Active Minutes', 'achievement': 78.0},
+  {'goal': 'Sleep Hours', 'achievement': 95.0},
+];
+
+CristalyseChart()
+  .data(fitnessGoals)
+  .mappingProgress(category: 'goal', value: 'achievement')
+  .geomProgress(
+    style: ProgressStyle.concentric,
+    orientation: ProgressOrientation.circular,
+    barThickness: 14.0,
+    startAngle: -90.0,
+    endAngle: 270.0,
+  )
+  .theme(ChartTheme.solarizedLightTheme())
+  .legend(position: LegendPosition.bottom)
+  .animate(duration: Duration(milliseconds: 1500))
+  .build()
+```
+
+## Configuration Options
+
+### ProgressOrientation
+
+- `horizontal` - Left-to-right progress
+- `vertical` - Bottom-to-top progress
+- `circular` - Ring-style circular progress
+
+### ProgressStyle
+
+- `standard` - Single progress bar (default)
+- `stacked` - Multi-segment stacked progress
+- `grouped` - Side-by-side grouped progress
+- `gauge` - Semi-circular gauge (requires `gaugeRadius`)
+- `concentric` - Nested circular rings
+
+### Common Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `barThickness` | `double` | Height (horizontal) or width (vertical) of progress bar |
+| `cornerRadius` | `double` | Border radius for rounded corners |
+| `trackColor` | `Color` | Background track color |
+| `showLabels` | `bool` | Display value labels |
+| `labelFormatter` | `Function` | Custom label formatting function |
+| `labelStyle` | `TextStyle` | Text style for labels |
+| `startAngle` | `double` | Start angle for circular progress (degrees) |
+| `endAngle` | `double` | End angle for circular progress (degrees) |
+| `gaugeRadius` | `double` | Radius for gauge-style progress (required for gauge) |
+
+## Best Practices
+
+### Data Structure
+
+Ensure your data has the required fields:
+
+```dart
+// Single progress bar
+final data = [
+  {'category': 'Task Name', 'value': 75.0},
+];
+
+// Grouped/Stacked progress
+final data = [
+  {'category': 'Project A', 'value': 30.0, 'group': 'Phase 1'},
+  {'category': 'Project A', 'value': 50.0, 'group': 'Phase 2'},
+];
+```
+
+### Value Ranges
+
+Keep values within meaningful ranges:
+
+```dart
+// Percentages: 0-100
+.scaleYContinuous(min: 0, max: 100)
+
+// Absolute values
+.scaleYContinuous(min: 0, max: 1000)
+```
+
+### Performance
+
+For real-time updates:
+
+```dart
+// Use StatefulWidget for live progress
+class LiveProgress extends StatefulWidget {
+  @override
+  _LiveProgressState createState() => _LiveProgressState();
+}
+
+class _LiveProgressState extends State<LiveProgress> {
+  double _progress = 0.0;
+  
+  @override
+  void initState() {
+    super.initState();
+    // Update progress periodically
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() => _progress = (_progress + 5) % 100);
+    });
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return CristalyseChart()
+      .data([{'task': 'Processing', 'value': _progress}])
+      .mappingProgress(category: 'task', value: 'value')
+      .geomProgress(orientation: ProgressOrientation.horizontal)
+      .build();
+  }
+}
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Gauge style not displaying">
+    Make sure you've specified the required `gaugeRadius` parameter:
+    ```dart
+    .geomProgress(
+      style: ProgressStyle.gauge,
+      gaugeRadius: 120.0,  // Required!
+    )
+    ```
+  </Accordion>
+  
+  <Accordion title="Progress bar too thin/thick">
+    Adjust the `barThickness` parameter:
+    ```dart
+    .geomProgress(
+      barThickness: 25.0,  // Increase for thicker bars
+    )
+    ```
+  </Accordion>
+  
+  <Accordion title="Stacked segments not showing all categories">
+    Ensure your data includes the `group` parameter in mapping:
+    ```dart
+    .mappingProgress(
+      category: 'project',
+      value: 'progress',
+      group: 'stage',  // Required for stacked/grouped
+    )
+    ```
+  </Accordion>
+  
+  <Accordion title="Circular progress not starting at top">
+    Adjust the `startAngle` parameter:
+    ```dart
+    .geomProgress(
+      startAngle: -90.0,  // Start at top (12 o'clock)
+      endAngle: 270.0,    // Full circle
+    )
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Related Documentation
+
+- [Animations](/features/animations) - Add smooth progress animations
+- [Theming](/features/theming) - Customize progress bar appearance
+- [Interactions](/features/interactions) - Add tooltips and click handlers
+- [Legends](/features/legends) - Display category legends
+
+Need help? Check our [GitHub Discussions](https://github.com/rudi-q/cristalyse/discussions) or [report an issue](https://github.com/rudi-q/cristalyse/issues).

@@ -1,3 +1,153 @@
+## 1.7.0 - 2025-09-30
+
+#### 📊 Major Feature: Progress Bar Charts
+
+- **Comprehensive Progress Bar Support**: Full implementation of progress bars with multiple orientations and advanced styles
+  - **Horizontal Progress Bars**: Left-to-right progress visualization
+  - **Vertical Progress Bars**: Bottom-to-top progress display
+  - **Circular Progress Bars**: Ring-style progress indicators with configurable angles
+- **Advanced Style Options**: Professional progress bar variations for complex use cases
+  - **Stacked Progress**: Multi-segment progress bars showing completion by category
+  - **Grouped Progress**: Side-by-side progress bars for category comparison
+  - **Gauge Style**: Semi-circular gauge-style indicators (requires `gaugeRadius` parameter)
+  - **Concentric Circles**: Nested circular progress rings for multi-metric displays
+- **Grammar of Graphics Integration**: New `.mappingProgress()` and `.geomProgress()` API methods
+- **Robust Input Validation**: Comprehensive validation for all progress bar parameters
+  - Prevents division by zero errors
+  - Handles invalid data gracefully
+  - Proper null safety throughout
+- **Theme-Responsive Design**: Progress bars automatically adapt to theme colors
+  - Full dark mode support
+  - Custom color palette integration
+  - Gradient support (experimental)
+
+#### 🚀 New API Capabilities
+
+- **Progress Data Mapping**: `.mappingProgress(category: 'task', value: 'completion', group: 'team')`
+- **Flexible Orientation Control**: `orientation: ProgressOrientation.horizontal|vertical|circular`
+- **Advanced Styling**: `style: ProgressStyle.standard|stacked|grouped|gauge|concentric`
+- **Customizable Appearance**:
+  - `barThickness`: Progress bar height/width
+  - `cornerRadius`: Rounded corners for modern look
+  - `trackColor`: Background track color
+  - `gaugeRadius`: Required for gauge-style progress bars
+  - `startAngle` / `endAngle`: Control circular progress arc range
+
+#### 📖 Examples Added
+
+```dart
+// Basic Horizontal Progress Bar
+CristalyseChart()
+  .data([{'task': 'Design', 'completion': 75.0}])
+  .mappingProgress(category: 'task', value: 'completion')
+  .geomProgress(
+    orientation: ProgressOrientation.horizontal,
+    barThickness: 20.0,
+    cornerRadius: 10.0,
+  )
+  .build();
+
+// Stacked Progress Bar (Multiple Segments)
+CristalyseChart()
+  .data([
+    {'project': 'App', 'stage': 'Design', 'progress': 30.0},
+    {'project': 'App', 'stage': 'Development', 'progress': 50.0},
+    {'project': 'App', 'stage': 'Testing', 'progress': 20.0},
+  ])
+  .mappingProgress(category: 'project', value: 'progress', group: 'stage')
+  .geomProgress(
+    style: ProgressStyle.stacked,
+    orientation: ProgressOrientation.horizontal,
+  )
+  .build();
+
+// Circular Progress with Gauge Style
+CristalyseChart()
+  .data([{'metric': 'CPU', 'usage': 68.0}])
+  .mappingProgress(category: 'metric', value: 'usage')
+  .geomProgress(
+    style: ProgressStyle.gauge,
+    orientation: ProgressOrientation.circular,
+    gaugeRadius: 120.0,  // Required for gauge style
+    startAngle: -135.0,
+    endAngle: 135.0,
+  )
+  .build();
+
+// Concentric Progress Circles (Multiple Metrics)
+CristalyseChart()
+  .data([
+    {'metric': 'Sales', 'achievement': 85.0},
+    {'metric': 'Quality', 'achievement': 92.0},
+    {'metric': 'Efficiency', 'achievement': 78.0},
+  ])
+  .mappingProgress(category: 'metric', value: 'achievement')
+  .geomProgress(
+    style: ProgressStyle.concentric,
+    orientation: ProgressOrientation.circular,
+  )
+  .build();
+```
+
+#### 🎨 Visual Enhancements
+
+- **Smart Label Positioning**: Automatic label placement based on orientation and space
+- **Smooth Animations**: Progressive filling animations with configurable timing
+- **Professional Styling**: Clean, modern appearance with rounded corners and proper spacing
+- **Color Consistency**: Theme-aware colors that adapt to light/dark mode
+- **Responsive Layout**: Dynamic sizing based on chart container dimensions
+
+#### 🧪 Quality Assurance
+
+- **Comprehensive Input Validation**: All parameters validated for safety
+  - Division by zero prevention in circular layout calculations
+  - Invalid data handling (negative values, NaN, infinity)
+  - Proper bounds checking for angles and dimensions
+- **Edge Case Testing**: Robust handling of edge cases
+  - Empty datasets
+  - Single vs multiple categories
+  - Overlapping progress segments
+- **Cross-Platform Compatibility**: Verified on iOS, Android, Web, and Desktop
+- **Performance Optimized**: Efficient rendering with no memory leaks
+
+#### 🔧 Technical Implementation
+
+- **ProgressGeometry Class**: New geometry type for progress visualization
+- **Route-Based Navigation**: Comprehensive GoRouter implementation for example app
+- **Advanced Layout System**: Intelligent positioning for grouped and concentric styles
+- **Validation Pipeline**: Multi-layer validation ensures data integrity
+- **Theme Integration**: Full support for custom themes and color palettes
+
+#### 📚 Documentation Improvements
+
+- **Enhanced SEO**: Comprehensive metadata, Open Graph, and Twitter Card tags
+- **Custom 404 Page**: Branded error page with helpful navigation
+- **Contextual Menu**: Improved copy for better user engagement
+- **Updates Page**: Subscribable RSS feed with changelog components
+- **Broken Links Fixed**: All internal links validated and corrected
+- **Navigation Polish**: Better organization and user experience
+
+#### 🎯 Use Cases Unlocked
+
+- **Project Management**: Task completion tracking with stacked progress bars
+- **Performance Dashboards**: KPI achievement visualization with gauges
+- **Resource Monitoring**: System metrics with concentric circular indicators
+- **Goal Tracking**: Progress toward targets with horizontal/vertical bars
+- **Analytics Dashboards**: Multi-dimensional progress visualization
+- **Mobile Apps**: Compact progress indicators with responsive layouts
+
+#### ⚡ Performance & Compatibility
+
+- **Zero Breaking Changes**: Fully backward compatible with all existing code
+- **Optional Enhancement**: Progress bars are purely additive functionality
+- **Memory Efficient**: Optimized rendering pipeline with proper cleanup
+- **60fps Animations**: Smooth progress transitions across all styles
+- **Cross-Platform**: Consistent rendering on all Flutter-supported platforms
+
+**This release brings professional progress visualization to Cristalyse with comprehensive style options, robust validation, and significant documentation improvements. Build stunning progress dashboards with ease!** 📊✨
+
+---
+
 ## 1.6.1 - 2025-09-08
 
 #### 🤖 MCP Server Integration
