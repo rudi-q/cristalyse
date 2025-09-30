@@ -1100,7 +1100,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.6.1** - Production ready with comprehensive chart library featuring automatic legend generation, flexible positioning, and professional styling
+**Current Version: 1.7.0** - Production ready with comprehensive chart library featuring automatic legend generation, flexible positioning, and professional styling
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1120,6 +1120,7 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.4.0** - **Custom color palettes** for brand-specific category mapping
 - ✅ **v1.5.0** - **Automatic legend generation** with flexible positioning and styling
 - ✅ **v1.6.0** - **Experimental gradient color support** for customPalette with Linear, Radial, and Sweep gradients
+- ✅ **v1.7.0** - **Progress bar charts** with horizontal, vertical, circular, stacked, grouped, gauge, and concentric styles + comprehensive documentation improvements
 
 ## Support This Project
 

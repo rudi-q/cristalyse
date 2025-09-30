@@ -1,7 +1,10 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "maple",
-  "name": "Data Visualization Library Flutter Guide",
+  "name": "Cristalyse Documentation - Flutter Data Visualization Library",
+  "primaryTab": {
+    "name": "Documentation"
+  },
   "colors": {
     "primary": "#4a9999",
     "light": "#8dd3d3",
@@ -20,7 +23,8 @@
               "cristalyse-mcp-server",
               "installation",
               "quickstart",
-              "examples"
+              "examples",
+              "updates"
             ]
           },
           {
@@ -33,6 +37,7 @@
               "charts/pie-charts",
               "charts/bubble-charts",
               "charts/heat-map-charts",
+              "charts/progress-bars",
               "charts/dual-axis"
             ]
           },
@@ -122,5 +127,71 @@
       "github": "https://github.com/rudi-q",
       "x-twitter": "https://x.com/lofifounder"
     }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode",
+      {
+        "title": "Request a Feature",
+        "description": "Have an idea? Share it with the community and help shape Cristalyse's future",
+        "icon": "plus",
+        "href": "https://github.com/rudi-q/cristalyse/discussions/categories/ideas"
+      },
+      {
+        "title": "Ask a Question",
+        "description": "Get help from the community - no question is too small",
+        "icon": "question",
+        "href": "https://github.com/rudi-q/cristalyse/discussions/categories/q-a"
+      },
+      {
+        "title": "Share on X",
+        "description": "Found this helpful? Share it with other Flutter developers",
+        "icon": "x",
+        "href": {
+          "base": "https://x.com/intent/tweet",
+          "query": [
+            {
+              "key": "text",
+              "value": "📊 Building Flutter charts with @cristalyse - check out this guide: $page"
+            },
+            {
+              "key": "hashtags",
+              "value": "FlutterDev,DataVisualization"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "seo": {
+    "indexHiddenPages": false
+  },
+  "errors": {
+    "404": {
+      "redirect": false,
+      "title": "📊 Chart Not Found",
+      "description": "Looks like this page went off the chart! 📈\n\n**Need help finding something?**\n\n- Start with our [Quick Start Guide](/quickstart) to create your first chart\n- Explore [Chart Types](/charts/scatter-plots) for scatter plots, line charts, and more\n- Check out [Examples](/examples) for real-world use cases\n- Browse the full [Documentation](/)\n\nOr [search our docs](/) to find what you're looking for."
+    }
+  },
+  "metadata": {
+    "description": "Complete documentation for Cristalyse - the Flutter data visualization library that brings grammar of graphics to mobile, web, and desktop apps with 60fps animations.",
+    "og:title": "Cristalyse Documentation - Flutter Data Visualization Library",
+    "og:description": "Create beautiful, interactive charts in Flutter with grammar of graphics. Scatter plots, line charts, bar charts, and more with native 60fps animations.",
+    "og:image": "https://docs.cristalyse.com/images/og-documentation.png",
+    "og:site_name": "Cristalyse Documentation",
+    "og:type": "website",
+    "og:url": "https://docs.cristalyse.com",
+    "twitter:card": "summary_large_image",
+    "twitter:title": "Cristalyse Documentation - Flutter Data Visualization",
+    "twitter:description": "Grammar of graphics visualization library for Flutter. Create stunning charts with 60fps animations across mobile, web & desktop.",
+    "twitter:image": "https://docs.cristalyse.com/images/twitter-card-docs.png",
+    "twitter:site": "@lofifounder",
+    "keywords": "flutter, dart, data visualization, charts, graphs, grammar of graphics, mobile charts, cross-platform, animations, scatter plots, line charts, bar charts"
   }
 }

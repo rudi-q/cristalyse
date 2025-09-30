@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -206,4 +208,144 @@ class BubbleGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+}
+
+/// Enum for progress bar orientations
+enum ProgressOrientation { horizontal, vertical, circular }
+
+/// Enum for progress bar styles
+enum ProgressStyle {
+  filled, // Solid fill
+  striped, // Diagonal stripes
+  gradient, // Gradient fill
+  stacked, // Multiple segments in one bar
+  grouped, // Multiple bars grouped together
+  gauge, // Speedometer/arc style
+  concentric // Multiple concentric circles
+}
+
+/// Progress bar geometry for progress indicators
+///
+/// Progress bars visualize completion status or progress towards a goal.
+/// Perfect for showing completion percentages, loading states, or KPI progress.
+///
+/// Supports horizontal, vertical, and circular orientations with customizable
+/// styling including gradients, stripes, stacked segments, grouped bars,
+/// gauge/arc indicators, and concentric circles.
+class ProgressGeometry extends Geometry {
+  final ProgressOrientation orientation;
+  final double thickness;
+  final double cornerRadius;
+  final Color? backgroundColor;
+  final Color? fillColor;
+  final ProgressStyle style;
+  final double? minValue;
+  final double? maxValue;
+  final bool showLabel;
+  final TextStyle? labelStyle;
+  final LabelCallback? labelFormatter;
+  final bool animated;
+  final Duration animationDuration;
+  final Gradient? fillGradient;
+  final double strokeWidth;
+  final Color? strokeColor;
+  final double labelOffset; // Distance from progress bar to label
+
+  // Properties for stacked progress bars
+  final List<double>? segments; // Values for each segment in stacked bars
+  final List<Color>? segmentColors; // Colors for each segment
+
+  // Properties for grouped progress bars
+  final double? groupSpacing; // Space between grouped bars
+  final int? groupCount; // Number of bars in a group
+
+  // Properties for gauge/arc progress bars
+  final double? startAngle; // Starting angle for gauge (in radians)
+  final double? sweepAngle; // Total sweep angle for gauge (in radians)
+  final double? gaugeRadius; // Radius for gauge style
+  final bool showTicks; // Show tick marks on gauge
+  final int? tickCount; // Number of tick marks
+
+  // Properties for concentric circular progress
+  final List<double>? concentricRadii; // Radii for concentric circles
+  final List<double>? concentricThicknesses; // Thickness for each ring
+
+  ProgressGeometry({
+    this.orientation = ProgressOrientation.horizontal,
+    this.thickness = 20.0,
+    this.cornerRadius = 4.0,
+    this.backgroundColor,
+    this.fillColor,
+    this.style = ProgressStyle.filled,
+    this.minValue = 0.0,
+    this.maxValue = 100.0,
+    this.showLabel = true,
+    this.labelStyle,
+    this.labelFormatter,
+    this.animated = true,
+    this.animationDuration = const Duration(milliseconds: 800),
+    this.fillGradient,
+    this.strokeWidth = 1.0,
+    this.strokeColor,
+    this.labelOffset = 5.0,
+    // Stacked progress properties
+    this.segments,
+    this.segmentColors,
+    // Grouped progress properties
+    this.groupSpacing = 8.0,
+    this.groupCount = 1,
+    // Gauge progress properties
+    this.startAngle = -math.pi / 2, // Start at top
+    this.sweepAngle = math.pi, // Half circle by default
+    this.gaugeRadius,
+    this.showTicks = false,
+    this.tickCount = 10,
+    // Concentric progress properties
+    this.concentricRadii,
+    this.concentricThicknesses,
+    super.yAxis,
+    super.interactive,
+  })  : assert(minValue != null && maxValue != null && minValue < maxValue,
+            'minValue must be less than maxValue'),
+        assert(animationDuration > Duration.zero,
+            'animationDuration must be positive'),
+        assert(thickness >= 0, 'thickness must be >= 0'),
+        assert(cornerRadius >= 0, 'cornerRadius must be >= 0'),
+        assert(strokeWidth >= 0, 'strokeWidth must be >= 0'),
+        assert(labelOffset >= 0, 'labelOffset must be >= 0'),
+        assert(groupSpacing == null || groupSpacing >= 0,
+            'groupSpacing must be >= 0'),
+        assert(groupCount == null || groupCount > 0, 'groupCount must be > 0'),
+        assert(tickCount == null || tickCount > 0, 'tickCount must be > 0'),
+        assert(
+            gaugeRadius == null || gaugeRadius > 0, 'gaugeRadius must be > 0'),
+        assert(segments == null || segments.every((s) => s >= 0),
+            'all segments must be >= 0'),
+        assert(concentricRadii == null || concentricRadii.every((r) => r > 0),
+            'all concentricRadii must be > 0'),
+        assert(
+            concentricThicknesses == null ||
+                concentricThicknesses.every((t) => t > 0),
+            'all concentricThicknesses must be > 0'),
+        assert(
+            sweepAngle == null || (sweepAngle > 0 && sweepAngle <= 2 * math.pi),
+            'sweepAngle must be > 0 and <= 2π (360 degrees)'),
+        assert(
+            segments == null ||
+                segmentColors == null ||
+                segments.length == segmentColors.length,
+            'segments and segmentColors must have the same length'),
+        assert(
+            concentricRadii == null ||
+                concentricThicknesses == null ||
+                concentricRadii.length == concentricThicknesses.length,
+            'concentricRadii and concentricThicknesses must have the same length'),
+        assert(style != ProgressStyle.stacked || segments != null,
+            'stacked style requires non-null segments'),
+        assert(style != ProgressStyle.gauge || gaugeRadius != null,
+            'gauge style requires non-null gaugeRadius'),
+        assert(
+            style != ProgressStyle.concentric ||
+                (concentricRadii != null && concentricThicknesses != null),
+            'concentric style requires non-null concentricRadii and concentricThicknesses');
 }

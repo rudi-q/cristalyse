@@ -29,6 +29,11 @@ class CristalyseChart {
   String? _heatMapYColumn;
   String? _heatMapValueColumn;
 
+  /// Progress bar specific mappings
+  String? _progressValueColumn;
+  String? _progressLabelColumn;
+  String? _progressCategoryColumn;
+
   final List<Geometry> _geometries = [];
   Scale? _xScale;
   Scale? _yScale;
@@ -112,6 +117,50 @@ class CristalyseChart {
     _heatMapXColumn = x;
     _heatMapYColumn = y;
     _heatMapValueColumn = value;
+    return this;
+  }
+
+  /// Map data for progress bars
+  ///
+  /// Maps data columns to progress bar properties:
+  /// - [value]: Column containing progress values (typically 0-100)
+  /// - [label]: Column containing labels for each progress bar (optional)
+  /// - [category]: Column for categorizing/coloring progress bars (optional)
+  ///
+  /// **Important**: Progress bars require at least the [value] column to be mapped
+  /// or a standard y-axis mapping. Without proper mapping, the chart may not render.
+  ///
+  /// Example:
+  /// ```dart
+  /// final data = [
+  ///   {'task': 'Backend API', 'completion': 85.0, 'department': 'Engineering'},
+  ///   {'task': 'Frontend UI', 'completion': 70.0, 'department': 'Engineering'},
+  ///   {'task': 'User Testing', 'completion': 45.0, 'department': 'Product'},
+  /// ];
+  ///
+  /// CristalyseChart()
+  ///   .data(data)
+  ///   .mappingProgress(
+  ///     value: 'completion',  // Required: progress value (0-100)
+  ///     label: 'task',        // Optional: label to display
+  ///     category: 'department' // Optional: for color grouping
+  ///   )
+  ///   .geomProgress(
+  ///     orientation: ProgressOrientation.horizontal,
+  ///     style: ProgressStyle.gradient,
+  ///     thickness: 25.0,
+  ///   );
+  /// ```
+  ///
+  /// See also:
+  /// - [geomProgress] for configuring progress bar appearance
+  /// - [ProgressOrientation] for bar orientation options
+  /// - [ProgressStyle] for styling options (filled, gradient, striped, etc.)
+  CristalyseChart mappingProgress(
+      {String? value, String? label, String? category}) {
+    _progressValueColumn = value;
+    _progressLabelColumn = label;
+    _progressCategoryColumn = category;
     return this;
   }
 
@@ -365,6 +414,106 @@ class CristalyseChart {
         labelStyle: labelStyle,
         labelFormatter: labelFormatter,
         labelOffset: labelOffset ?? 5.0,
+        yAxis: yAxis ?? YAxis.primary,
+      ),
+    );
+    return this;
+  }
+
+  /// Add progress bar visualization
+  ///
+  /// Progress bars visualize completion status or progress towards a goal.
+  /// Perfect for showing completion percentages, loading states, or KPI progress.
+  /// Supports multiple styles including stacked, grouped, gauge, and concentric.
+  ///
+  /// Example:
+  /// ```dart
+  /// // Basic progress bar
+  /// chart.geomProgress(
+  ///   orientation: ProgressOrientation.horizontal,
+  ///   thickness: 25.0,
+  ///   cornerRadius: 12.0,
+  ///   showLabel: true,
+  ///   style: ProgressStyle.gradient,
+  /// )
+  ///
+  /// // Stacked progress bar
+  /// chart.geomProgress(
+  ///   style: ProgressStyle.stacked,
+  ///   segments: [30.0, 45.0, 25.0],
+  ///   segmentColors: [Colors.red, Colors.orange, Colors.green],
+  /// )
+  ///
+  /// // Gauge style progress
+  /// chart.geomProgress(
+  ///   style: ProgressStyle.gauge,
+  ///   showTicks: true,
+  ///   startAngle: -math.pi,
+  ///   sweepAngle: math.pi,
+  /// )
+  /// ```
+  CristalyseChart geomProgress({
+    ProgressOrientation? orientation,
+    double? thickness,
+    double? cornerRadius,
+    Color? backgroundColor,
+    Color? fillColor,
+    ProgressStyle? style,
+    double? minValue,
+    double? maxValue,
+    bool? showLabel,
+    TextStyle? labelStyle,
+    LabelCallback? labelFormatter,
+    Gradient? fillGradient,
+    double? strokeWidth,
+    Color? strokeColor,
+    double? labelOffset,
+    // Stacked progress properties
+    List<double>? segments,
+    List<Color>? segmentColors,
+    // Grouped progress properties
+    double? groupSpacing,
+    int? groupCount,
+    // Gauge progress properties
+    double? startAngle,
+    double? sweepAngle,
+    double? gaugeRadius,
+    bool? showTicks,
+    int? tickCount,
+    // Concentric progress properties
+    List<double>? concentricRadii,
+    List<double>? concentricThicknesses,
+    YAxis? yAxis,
+  }) {
+    _geometries.add(
+      ProgressGeometry(
+        orientation: orientation ?? ProgressOrientation.horizontal,
+        thickness: thickness ?? 20.0,
+        cornerRadius: cornerRadius ?? 4.0,
+        backgroundColor: backgroundColor,
+        fillColor: fillColor,
+        style: style ?? ProgressStyle.filled,
+        minValue: minValue ?? 0.0,
+        maxValue: maxValue ?? 100.0,
+        showLabel: showLabel ?? true,
+        labelStyle: labelStyle,
+        labelFormatter: labelFormatter,
+        fillGradient: fillGradient,
+        strokeWidth: strokeWidth ?? 1.0,
+        strokeColor: strokeColor,
+        labelOffset: labelOffset ?? 5.0,
+        // Pass enhanced properties
+        segments: segments,
+        segmentColors: segmentColors,
+        groupSpacing: groupSpacing ?? 8.0,
+        groupCount: groupCount ?? 1,
+        startAngle: startAngle ?? -1.5707963267948966, // -π/2
+        sweepAngle: sweepAngle ?? 3.141592653589793, // π
+        gaugeRadius: gaugeRadius,
+        showTicks: showTicks ?? false,
+        tickCount: tickCount ?? 10,
+        concentricRadii: concentricRadii,
+        concentricThicknesses: concentricThicknesses,
         yAxis: yAxis ?? YAxis.primary,
       ),
     );
@@ -764,6 +913,9 @@ class CristalyseChart {
       heatMapXColumn: _heatMapXColumn,
       heatMapYColumn: _heatMapYColumn,
       heatMapValueColumn: _heatMapValueColumn,
+      progressValueColumn: _progressValueColumn,
+      progressLabelColumn: _progressLabelColumn,
+      progressCategoryColumn: _progressCategoryColumn,
       geometries: _geometries,
       xScale: _xScale,
       yScale: _yScale,

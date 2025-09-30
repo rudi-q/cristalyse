@@ -21,6 +21,9 @@ class AnimatedChartPainter extends CustomPainter {
   final String? heatMapXColumn;
   final String? heatMapYColumn;
   final String? heatMapValueColumn;
+  final String? progressValueColumn;
+  final String? progressLabelColumn;
+  final String? progressCategoryColumn;
   final List<Geometry> geometries;
   final Scale? xScale;
   final Scale? yScale;
@@ -74,6 +77,9 @@ class AnimatedChartPainter extends CustomPainter {
     this.heatMapXColumn,
     this.heatMapYColumn,
     this.heatMapValueColumn,
+    this.progressValueColumn,
+    this.progressLabelColumn,
+    this.progressCategoryColumn,
     required this.geometries,
     this.xScale,
     this.yScale,
@@ -191,11 +197,15 @@ class AnimatedChartPainter extends CustomPainter {
 
     final hasPieChart = geometries.any((g) => g is PieGeometry);
     final hasHeatMapChart = geometries.any((g) => g is HeatMapGeometry);
+    final hasProgressChart = geometries.any((g) => g is ProgressGeometry);
 
     _drawBackground(canvas, plotArea);
 
-    // Skip grid and axes for pie charts and heatmaps
-    if (!hasPieChart && !hasHeatMapChart) {
+    // Skip grid and axes for pie charts, heatmaps, and progress bars
+    // Force disable for progress charts
+    final shouldSkipGridAndAxes =
+        hasPieChart || hasHeatMapChart || hasProgressChart;
+    if (!shouldSkipGridAndAxes) {
       _drawGrid(canvas, plotArea, xScale, yScale, y2Scale);
     }
 
@@ -222,10 +232,12 @@ class AnimatedChartPainter extends CustomPainter {
     // Restore canvas state to draw axes outside clipped area
     canvas.restore();
 
-    // Skip axes for pie charts, draw special axes for heatmaps
-    if (!hasPieChart && !hasHeatMapChart) {
+    // Skip axes for pie charts, heatmaps, and progress bars
+    // Use the same shouldSkipGridAndAxes variable for consistency
+    if (!shouldSkipGridAndAxes) {
       _drawAxes(canvas, size, plotArea, xScale, yScale, y2Scale);
-    } else if (hasHeatMapChart) {
+    } else if (hasHeatMapChart && !hasProgressChart) {
+      // Only draw heat map axes if it's not a progress chart
       _drawHeatMapAxes(canvas, size, plotArea);
     }
   }
@@ -663,6 +675,16 @@ class AnimatedChartPainter extends CustomPainter {
         yScale,
         colorScale,
         sizeScale,
+        isSecondaryY,
+      );
+    } else if (geometry is ProgressGeometry) {
+      _drawProgressAnimated(
+        canvas,
+        plotArea,
+        geometry,
+        xScale,
+        yScale,
+        colorScale,
         isSecondaryY,
       );
     }
@@ -2469,6 +2491,1146 @@ class AnimatedChartPainter extends CustomPainter {
   }
 
   /// Helper method to compare two nullable lists for equality
+  void _drawProgressAnimated(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    Scale xScale,
+    Scale yScale,
+    ColorScale colorScale,
+    bool isSecondaryY,
+  ) {
+    // Use progress-specific columns or fall back to regular columns
+    final valueColumn = progressValueColumn ?? yColumn;
+    final labelColumn = progressLabelColumn ?? xColumn;
+    final categoryColumn = progressCategoryColumn ?? colorColumn;
+
+    if (valueColumn == null || data.isEmpty) {
+      return;
+    }
+
+    // Animation progress for progress bars
+    final progressBarProgress = math.max(0.0, math.min(1.0, animationProgress));
+    if (progressBarProgress <= 0.001) return;
+
+    for (int i = 0; i < data.length; i++) {
+      final point = data[i];
+      final value = getNumericValue(point[valueColumn]);
+      if (value == null || !value.isFinite) continue;
+
+      // Calculate progress percentage (normalize between min and max)
+      final minVal = geometry.minValue ?? 0.0;
+      final maxVal = geometry.maxValue ?? 100.0;
+      final range = maxVal - minVal;
+      final double normalizedValue;
+      if (range <= 0.0 || !range.isFinite) {
+        // Fallback for invalid range: treat as 50% complete
+        normalizedValue = 0.5;
+      } else {
+        normalizedValue = ((value - minVal) / range).clamp(0.0, 1.0);
+      }
+
+      // Animation delay for each progress bar
+      final barDelay = i / data.length * 0.3; // 30% stagger
+      final barProgress = math.max(
+        0.0,
+        math.min(
+          1.0,
+          (progressBarProgress - barDelay) / math.max(0.001, 1.0 - barDelay),
+        ),
+      );
+
+      if (barProgress <= 0) continue;
+
+      // Draw progress bar based on style first, then orientation
+      switch (geometry.style) {
+        case ProgressStyle.stacked:
+          _drawStackedProgressBar(
+            canvas,
+            plotArea,
+            geometry,
+            normalizedValue,
+            barProgress,
+            point,
+            colorScale,
+            categoryColumn,
+            labelColumn,
+            i,
+          );
+          break;
+        case ProgressStyle.grouped:
+          _drawGroupedProgressBar(
+            canvas,
+            plotArea,
+            geometry,
+            normalizedValue,
+            barProgress,
+            point,
+            colorScale,
+            categoryColumn,
+            labelColumn,
+            i,
+          );
+          break;
+        case ProgressStyle.gauge:
+          _drawGaugeProgressBar(
+            canvas,
+            plotArea,
+            geometry,
+            normalizedValue,
+            barProgress,
+            point,
+            colorScale,
+            categoryColumn,
+            labelColumn,
+            i,
+          );
+          break;
+        case ProgressStyle.concentric:
+          _drawConcentricProgressBar(
+            canvas,
+            plotArea,
+            geometry,
+            normalizedValue,
+            barProgress,
+            point,
+            colorScale,
+            categoryColumn,
+            labelColumn,
+            i,
+          );
+          break;
+        default:
+          // Handle basic styles with existing orientation logic
+          switch (geometry.orientation) {
+            case ProgressOrientation.horizontal:
+              _drawHorizontalProgressBar(
+                canvas,
+                plotArea,
+                geometry,
+                normalizedValue,
+                barProgress,
+                point,
+                colorScale,
+                categoryColumn,
+                labelColumn,
+                i,
+              );
+              break;
+            case ProgressOrientation.vertical:
+              _drawVerticalProgressBar(
+                canvas,
+                plotArea,
+                geometry,
+                normalizedValue,
+                barProgress,
+                point,
+                colorScale,
+                categoryColumn,
+                labelColumn,
+                i,
+              );
+              break;
+            case ProgressOrientation.circular:
+              _drawCircularProgressBar(
+                canvas,
+                plotArea,
+                geometry,
+                normalizedValue,
+                barProgress,
+                point,
+                colorScale,
+                categoryColumn,
+                labelColumn,
+                i,
+              );
+              break;
+          }
+          break;
+      }
+    }
+  }
+
+  void _drawHorizontalProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    // Calculate bar position and size with dynamic spacing
+    final barHeight = geometry.thickness;
+    final barSpacing = math.max(barHeight * 0.3, 8.0); // Dynamic spacing
+    final totalHeight = data.length * (barHeight + barSpacing);
+
+    // Scale down bars if they don't fit
+    final scaleFactor =
+        totalHeight > plotArea.height ? plotArea.height / totalHeight : 1.0;
+    final adjustedBarHeight = barHeight * scaleFactor;
+    final adjustedSpacing = barSpacing * scaleFactor;
+
+    final barY = plotArea.top +
+        (index * (adjustedBarHeight + adjustedSpacing)) +
+        adjustedSpacing;
+
+    if (barY + adjustedBarHeight > plotArea.bottom) {
+      return; // Don't draw if outside bounds
+    }
+
+    final barWidth = plotArea.width * 0.8; // 80% of available width
+    final barX =
+        plotArea.left + (plotArea.width - barWidth) / 2; // Center horizontally
+
+    final barRect = Rect.fromLTWH(barX, barY, barWidth, adjustedBarHeight);
+
+    // Draw background
+    final backgroundPaint = Paint()
+      ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+      backgroundPaint,
+    );
+
+    // Draw progress fill with animation
+    final fillWidth = barWidth * normalizedValue * animationProgress;
+    final fillRect = Rect.fromLTWH(barX, barY, fillWidth, adjustedBarHeight);
+
+    final fillPaint = Paint()..style = PaintingStyle.fill;
+
+    // Determine fill color from geometry or theme palette
+    // Priority: explicit fillColor > theme palette by index (always use theme for responsiveness)
+    final fillColor = geometry.fillColor ??
+        theme.colorPalette[index % theme.colorPalette.length];
+
+    if (geometry.fillGradient != null) {
+      // Explicit gradient takes precedence
+      final animatedGradient =
+          _applyAlphaToGradient(geometry.fillGradient!, 1.0);
+      fillPaint.shader = animatedGradient.createShader(fillRect);
+    } else if (geometry.style == ProgressStyle.gradient) {
+      // Default gradient from light to dark version of fill color
+      final gradient = LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: [
+          fillColor.withAlpha(127),
+          fillColor,
+        ],
+      );
+      fillPaint.shader = gradient.createShader(fillRect);
+    } else if (geometry.style == ProgressStyle.striped) {
+      // Striped pattern
+      fillPaint.color = fillColor;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+            fillRect, Radius.circular(geometry.cornerRadius)),
+        fillPaint,
+      );
+      // Draw diagonal stripes
+      _drawStripes(canvas, fillRect, fillColor, geometry.cornerRadius);
+      // Return early to avoid double-drawing
+      _drawProgressBarStroke(canvas, barRect, geometry);
+      _drawProgressBarLabel(canvas, barRect, point, labelColumn, geometry,
+          adjustedBarHeight, true);
+      return;
+    } else {
+      // Solid color
+      fillPaint.color = fillColor;
+    }
+
+    // Draw fill with rounded corners
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(fillRect, Radius.circular(geometry.cornerRadius)),
+      fillPaint,
+    );
+
+    // Draw stroke if specified
+    _drawProgressBarStroke(canvas, barRect, geometry);
+
+    // Draw label if enabled - positioned to the left of the bar
+    _drawProgressBarLabel(
+        canvas, barRect, point, labelColumn, geometry, adjustedBarHeight, true);
+  }
+
+  void _drawVerticalProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    // Calculate bar position and size with dynamic spacing
+    final barWidth = geometry.thickness;
+
+    // Add extra spacing for labels if they're enabled
+    final labelSpace = geometry.showLabel && labelColumn != null ? 40.0 : 0.0;
+    final minSpacing =
+        20.0 + labelSpace; // Minimum spacing between bars plus label space
+    final barSpacing = math.max(barWidth * 0.8, minSpacing);
+    final totalWidth = data.length * (barWidth + barSpacing);
+
+    // Scale down bars if they don't fit, but maintain minimum spacing
+    final scaleFactor =
+        totalWidth > plotArea.width ? plotArea.width / totalWidth : 1.0;
+    final adjustedBarWidth = barWidth * scaleFactor;
+    final adjustedSpacing =
+        math.max(barSpacing * scaleFactor, minSpacing * 0.5);
+
+    final barX = plotArea.left +
+        (index * (adjustedBarWidth + adjustedSpacing)) +
+        adjustedSpacing;
+
+    if (barX + adjustedBarWidth > plotArea.right) return;
+
+    final barHeight = plotArea.height * 0.8;
+    final barY = plotArea.top + (plotArea.height - barHeight) / 2;
+
+    final barRect = Rect.fromLTWH(barX, barY, adjustedBarWidth, barHeight);
+
+    // Draw background
+    final backgroundPaint = Paint()
+      ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+      backgroundPaint,
+    );
+
+    // Draw progress fill from bottom up
+    final fillHeight = barHeight * normalizedValue * animationProgress;
+    final fillY = barY + barHeight - fillHeight; // Start from bottom
+    final fillRect = Rect.fromLTWH(barX, fillY, adjustedBarWidth, fillHeight);
+
+    final fillPaint = Paint()..style = PaintingStyle.fill;
+
+    // Determine fill color from geometry or theme palette
+    // Priority: explicit fillColor > theme palette by index (always use theme for responsiveness)
+    final fillColor = geometry.fillColor ??
+        theme.colorPalette[index % theme.colorPalette.length];
+
+    if (geometry.fillGradient != null) {
+      // Explicit gradient takes precedence
+      final animatedGradient =
+          _applyAlphaToGradient(geometry.fillGradient!, 1.0);
+      fillPaint.shader = animatedGradient.createShader(fillRect);
+    } else if (geometry.style == ProgressStyle.gradient) {
+      // Default gradient from light to dark version of fill color
+      final gradient = LinearGradient(
+        begin: Alignment.bottomCenter,
+        end: Alignment.topCenter,
+        colors: [
+          fillColor.withAlpha(127),
+          fillColor,
+        ],
+      );
+      fillPaint.shader = gradient.createShader(fillRect);
+    } else if (geometry.style == ProgressStyle.striped) {
+      // Striped pattern
+      fillPaint.color = fillColor;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+            fillRect, Radius.circular(geometry.cornerRadius)),
+        fillPaint,
+      );
+      // Draw diagonal stripes
+      _drawStripes(canvas, fillRect, fillColor, geometry.cornerRadius);
+      // Return early to avoid double-drawing
+      _drawProgressBarStroke(canvas, barRect, geometry);
+      _drawProgressBarLabel(canvas, barRect, point, labelColumn, geometry,
+          adjustedBarWidth, false);
+      return;
+    } else {
+      // Solid color
+      fillPaint.color = fillColor;
+    }
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(fillRect, Radius.circular(geometry.cornerRadius)),
+      fillPaint,
+    );
+
+    // Draw stroke
+    _drawProgressBarStroke(canvas, barRect, geometry);
+
+    // Draw label if enabled - positioned below the bar
+    _drawProgressBarLabel(
+        canvas, barRect, point, labelColumn, geometry, adjustedBarWidth, false);
+  }
+
+  void _drawCircularProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    // Calculate circle properties with proper spacing for labels
+    final radius = geometry.thickness;
+    final labelSpace = geometry.showLabel && labelColumn != null ? 35.0 : 10.0;
+    final minSpacing = 20.0; // Minimum gap between circles
+    final centerSpacing = math.max(
+      (radius * 2.0) + minSpacing + labelSpace,
+      radius * 3.0,
+    );
+
+    final cols = math.max(1, (plotArea.width / centerSpacing).floor());
+    final row = index ~/ cols;
+    final col = index % cols;
+
+    final centerX = plotArea.left + (col * centerSpacing) + centerSpacing / 2;
+    final centerY = plotArea.top + (row * centerSpacing) + centerSpacing / 2;
+    final center = Offset(centerX, centerY);
+
+    if (centerY + radius > plotArea.bottom) return;
+
+    // Draw background circle
+    final backgroundPaint = Paint()
+      ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = radius * 0.2;
+
+    canvas.drawCircle(center, radius, backgroundPaint);
+
+    // Draw progress arc
+    final sweepAngle = 2 * math.pi * normalizedValue * animationProgress;
+    final startAngle = -math.pi / 2; // Start from top
+
+    final progressPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = radius * 0.2
+      ..strokeCap = StrokeCap.round;
+
+    // Priority: explicit fillColor > theme palette by index (always use theme for responsiveness)
+    Color fillColor = geometry.fillColor ??
+        theme.colorPalette[index % theme.colorPalette.length];
+    progressPaint.color = fillColor;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle,
+      false,
+      progressPaint,
+    );
+
+    // Draw label if enabled - positioned below the circular progress
+    if (geometry.showLabel && labelColumn != null) {
+      final labelText = point[labelColumn]?.toString() ?? '';
+      if (labelText.isNotEmpty) {
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: labelText,
+            style: geometry.labelStyle ?? theme.axisTextStyle,
+          ),
+          textDirection: TextDirection.ltr,
+          textAlign: TextAlign.center,
+        );
+        textPainter.layout();
+
+        final position = Offset(
+          center.dx - textPainter.width / 2,
+          center.dy + radius + 10.0,
+        );
+        textPainter.paint(canvas, position);
+      }
+    }
+  }
+
+  /// Helper method to draw stripes for striped progress bars
+  void _drawStripes(
+    Canvas canvas,
+    Rect rect,
+    Color baseColor,
+    double cornerRadius,
+  ) {
+    // Create a darker color for stripes
+    final stripeColor = Color.fromARGB(
+      ((baseColor.a * 255.0).round() * 0.5).round(),
+      (baseColor.r * 255.0).round(),
+      (baseColor.g * 255.0).round(),
+      (baseColor.b * 255.0).round(),
+    );
+
+    final stripePaint = Paint()
+      ..color = stripeColor
+      ..style = PaintingStyle.fill;
+
+    // Draw diagonal stripes
+    final stripeWidth = 8.0;
+    final stripeSpacing = 12.0;
+
+    // Save canvas state for clipping
+    canvas.save();
+    canvas.clipRRect(RRect.fromRectAndRadius(
+      rect,
+      Radius.circular(cornerRadius),
+    ));
+
+    // Draw stripes at 45-degree angle
+    for (double x = rect.left - rect.height;
+        x < rect.right + rect.height;
+        x += stripeSpacing) {
+      final path = Path()
+        ..moveTo(x, rect.top)
+        ..lineTo(x + stripeWidth, rect.top)
+        ..lineTo(x + stripeWidth + rect.height, rect.bottom)
+        ..lineTo(x + rect.height, rect.bottom)
+        ..close();
+      canvas.drawPath(path, stripePaint);
+    }
+
+    canvas.restore();
+  }
+
+  /// Helper method to draw stroke for progress bars
+  void _drawProgressBarStroke(
+    Canvas canvas,
+    Rect barRect,
+    ProgressGeometry geometry,
+  ) {
+    if (geometry.strokeWidth > 0) {
+      final strokePaint = Paint()
+        ..color = geometry.strokeColor ?? theme.borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = geometry.strokeWidth;
+
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+            barRect, Radius.circular(geometry.cornerRadius)),
+        strokePaint,
+      );
+    }
+  }
+
+  /// Helper method to draw label for progress bars
+  void _drawProgressBarLabel(
+    Canvas canvas,
+    Rect barRect,
+    Map<String, dynamic> point,
+    String? labelColumn,
+    ProgressGeometry geometry,
+    double barSize,
+    bool isHorizontal,
+  ) {
+    if (geometry.showLabel && labelColumn != null) {
+      final labelText = point[labelColumn]?.toString() ?? '';
+      if (labelText.isNotEmpty) {
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: labelText,
+            style: geometry.labelStyle ?? theme.axisTextStyle,
+          ),
+          textDirection: TextDirection.ltr,
+          textAlign: isHorizontal ? TextAlign.right : TextAlign.center,
+        );
+        textPainter.layout();
+
+        final Offset position;
+        if (isHorizontal) {
+          // Position label to the LEFT of the bar, right-aligned
+          final labelOffset = 8.0;
+          position = Offset(
+            barRect.left - labelOffset - textPainter.width,
+            barRect.top + (barSize - textPainter.height) / 2,
+          );
+        } else {
+          // Position label BELOW the bar, centered
+          final labelOffset = 8.0;
+          position = Offset(
+            barRect.left + (barSize - textPainter.width) / 2,
+            barRect.bottom + labelOffset,
+          );
+        }
+
+        textPainter.paint(canvas, position);
+      }
+    }
+  }
+
+  /// Draw stacked progress bar with multiple segments
+  void _drawStackedProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    final segments = geometry.segments ?? [normalizedValue];
+    final segmentColors = geometry.segmentColors ?? [];
+
+    // Calculate bar dimensions based on orientation
+    final isHorizontal = geometry.orientation == ProgressOrientation.horizontal;
+    final barThickness = geometry.thickness;
+    final barSpacing = barThickness + 20.0;
+
+    late Rect barRect;
+    if (isHorizontal) {
+      final barY = plotArea.top + (index * barSpacing) + 20.0;
+      if (barY + barThickness > plotArea.bottom) return;
+      final barWidth = plotArea.width * 0.8;
+      final barX = plotArea.left + (plotArea.width - barWidth) / 2;
+      barRect = Rect.fromLTWH(barX, barY, barWidth, barThickness);
+    } else {
+      final barX = plotArea.left + (index * barSpacing) + 20.0;
+      if (barX + barThickness > plotArea.right) return;
+      final barHeight = plotArea.height * 0.8;
+      final barY = plotArea.top + (plotArea.height - barHeight) / 2;
+      barRect = Rect.fromLTWH(barX, barY, barThickness, barHeight);
+    }
+
+    // Draw background
+    final backgroundPaint = Paint()
+      ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
+      ..style = PaintingStyle.fill;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(barRect, Radius.circular(geometry.cornerRadius)),
+      backgroundPaint,
+    );
+
+    // Draw each segment
+    double currentPosition = 0.0;
+    final totalValue = segments.fold(0.0, (sum, segment) => sum + segment);
+
+    // Safety check for division by zero
+    if (totalValue <= 0.0) {
+      return; // Nothing to draw if total is zero
+    }
+
+    for (int i = 0; i < segments.length; i++) {
+      final segmentValue = segments[i];
+      final segmentRatio = segmentValue / totalValue;
+      final animatedRatio = segmentRatio * animationProgress;
+
+      Color segmentColor;
+      if (i < segmentColors.length) {
+        segmentColor = segmentColors[i];
+      } else if (categoryColumn != null) {
+        segmentColor = colorScale.scale(point[categoryColumn]);
+      } else {
+        // Use theme color palette
+        segmentColor = theme.colorPalette[i % theme.colorPalette.length];
+      }
+
+      late Rect segmentRect;
+      if (isHorizontal) {
+        final segmentWidth = barRect.width * animatedRatio;
+        segmentRect = Rect.fromLTWH(
+          barRect.left + (barRect.width * currentPosition),
+          barRect.top,
+          segmentWidth,
+          barRect.height,
+        );
+      } else {
+        final segmentHeight = barRect.height * animatedRatio;
+        segmentRect = Rect.fromLTWH(
+          barRect.left,
+          barRect.bottom - (barRect.height * currentPosition) - segmentHeight,
+          barRect.width,
+          segmentHeight,
+        );
+      }
+
+      final segmentPaint = Paint()
+        ..color = segmentColor
+        ..style = PaintingStyle.fill;
+
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+            segmentRect, Radius.circular(geometry.cornerRadius)),
+        segmentPaint,
+      );
+
+      currentPosition += segmentRatio;
+    }
+
+    // Draw stroke
+    if (geometry.strokeWidth > 0) {
+      final strokePaint = Paint()
+        ..color = geometry.strokeColor ?? theme.borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = geometry.strokeWidth;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+            barRect, Radius.circular(geometry.cornerRadius)),
+        strokePaint,
+      );
+    }
+
+    // Draw label for stacked bars
+    if (geometry.showLabel && labelColumn != null) {
+      final labelText = point[labelColumn]?.toString() ?? '';
+      if (labelText.isNotEmpty) {
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: labelText,
+            style: geometry.labelStyle ?? theme.axisTextStyle,
+          ),
+          textDirection: TextDirection.ltr,
+          textAlign: isHorizontal ? TextAlign.right : TextAlign.center,
+        );
+        textPainter.layout();
+
+        final Offset position;
+        if (isHorizontal) {
+          // Position label to the LEFT of the bar
+          position = Offset(
+            barRect.left - 8.0 - textPainter.width,
+            barRect.top + (barRect.height - textPainter.height) / 2,
+          );
+        } else {
+          // Position label BELOW the bar
+          position = Offset(
+            barRect.left + (barRect.width - textPainter.width) / 2,
+            barRect.bottom + 8.0,
+          );
+        }
+        textPainter.paint(canvas, position);
+      }
+    }
+  }
+
+  /// Draw grouped progress bars (multiple bars side by side)
+  void _drawGroupedProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    final groupCount = geometry.groupCount ?? 3;
+    final groupSpacing = geometry.groupSpacing ?? 8.0;
+    final isHorizontal = geometry.orientation == ProgressOrientation.horizontal;
+    final minGroupSpacing = 30.0; // Minimum space between different data items
+
+    // Calculate group layout
+    // NOTE: In production, each bar in a group should represent different data series
+    // For example: Q1, Q2, Q3, Q4 sales for the same product
+    // Currently showing slight variations of the same value for demonstration purposes
+    for (int groupIndex = 0; groupIndex < groupCount; groupIndex++) {
+      // Apply subtle variation (±5% per group) to demonstrate grouping visually
+      // In real usage, these would be distinct values from your dataset
+      final variation = 0.95 + (groupIndex * 0.033); // 95%, 98%, 101%, 104%
+      final groupValue = (normalizedValue * variation).clamp(0.0, 1.0);
+
+      // Always use theme palette for consistent theme responsiveness
+      final groupColor =
+          theme.colorPalette[groupIndex % theme.colorPalette.length];
+      theme.colorPalette[groupIndex % theme.colorPalette.length];
+
+      late Rect barRect;
+      if (isHorizontal) {
+        final barHeight = geometry.thickness * 0.75;
+        final totalGroupHeight =
+            (barHeight * groupCount) + (groupSpacing * (groupCount - 1));
+        final totalItemHeight = totalGroupHeight + minGroupSpacing;
+
+        // Check if we need to scale down
+        final totalNeededHeight = data.length * totalItemHeight;
+        final scaleFactor = totalNeededHeight > plotArea.height
+            ? plotArea.height / totalNeededHeight
+            : 1.0;
+
+        final adjustedBarHeight = barHeight * scaleFactor;
+        final adjustedGroupSpacing = groupSpacing * scaleFactor;
+        final adjustedTotalHeight = (adjustedBarHeight * groupCount) +
+            (adjustedGroupSpacing * (groupCount - 1));
+
+        final groupY = plotArea.top +
+            (index * (adjustedTotalHeight + (minGroupSpacing * scaleFactor))) +
+            (minGroupSpacing * scaleFactor * 0.5) +
+            (groupIndex * (adjustedBarHeight + adjustedGroupSpacing));
+
+        if (groupY + adjustedBarHeight > plotArea.bottom) continue;
+
+        final barWidth = plotArea.width * 0.75;
+        final barX = plotArea.left + (plotArea.width - barWidth) / 2;
+        barRect = Rect.fromLTWH(barX, groupY, barWidth, adjustedBarHeight);
+      } else {
+        final barWidth = geometry.thickness * 0.75;
+        final totalGroupWidth =
+            (barWidth * groupCount) + (groupSpacing * (groupCount - 1));
+        final totalItemWidth = totalGroupWidth + minGroupSpacing;
+
+        // Check if we need to scale down
+        final totalNeededWidth = data.length * totalItemWidth;
+        final scaleFactor = totalNeededWidth > plotArea.width
+            ? plotArea.width / totalNeededWidth
+            : 1.0;
+
+        final adjustedBarWidth = barWidth * scaleFactor;
+        final adjustedGroupSpacing = groupSpacing * scaleFactor;
+        final adjustedTotalWidth = (adjustedBarWidth * groupCount) +
+            (adjustedGroupSpacing * (groupCount - 1));
+
+        final groupX = plotArea.left +
+            (index * (adjustedTotalWidth + (minGroupSpacing * scaleFactor))) +
+            (minGroupSpacing * scaleFactor * 0.5) +
+            (groupIndex * (adjustedBarWidth + adjustedGroupSpacing));
+
+        if (groupX + adjustedBarWidth > plotArea.right) continue;
+
+        final barHeight = plotArea.height * 0.75;
+        final barY = plotArea.top + (plotArea.height - barHeight) / 2;
+        barRect = Rect.fromLTWH(groupX, barY, adjustedBarWidth, barHeight);
+      }
+
+      // Draw background
+      final backgroundPaint = Paint()
+        ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
+        ..style = PaintingStyle.fill;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+            barRect, Radius.circular(geometry.cornerRadius)),
+        backgroundPaint,
+      );
+
+      // Draw progress fill
+      late Rect fillRect;
+      if (isHorizontal) {
+        final fillWidth = barRect.width * groupValue * animationProgress;
+        fillRect =
+            Rect.fromLTWH(barRect.left, barRect.top, fillWidth, barRect.height);
+      } else {
+        final fillHeight = barRect.height * groupValue * animationProgress;
+        fillRect = Rect.fromLTWH(
+          barRect.left,
+          barRect.bottom - fillHeight,
+          barRect.width,
+          fillHeight,
+        );
+      }
+
+      final fillPaint = Paint()
+        ..color = groupColor
+        ..style = PaintingStyle.fill;
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+            fillRect, Radius.circular(geometry.cornerRadius)),
+        fillPaint,
+      );
+    }
+
+    // Draw label for the group (only once per data item, not per group bar)
+    if (geometry.showLabel && labelColumn != null) {
+      final labelText = point[labelColumn]?.toString() ?? '';
+      if (labelText.isNotEmpty) {
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: labelText,
+            style: geometry.labelStyle ?? theme.axisTextStyle,
+          ),
+          textDirection: TextDirection.ltr,
+          textAlign: isHorizontal ? TextAlign.right : TextAlign.center,
+        );
+        textPainter.layout();
+
+        // Calculate actual bar positioning using the same logic as bar drawing
+        if (isHorizontal) {
+          final barHeight = geometry.thickness * 0.75;
+          final totalGroupHeight =
+              (barHeight * groupCount) + (groupSpacing * (groupCount - 1));
+          final totalItemHeight = totalGroupHeight + minGroupSpacing;
+
+          // Apply the same scaling as the bars
+          final totalNeededHeight = data.length * totalItemHeight;
+          final scaleFactor = totalNeededHeight > plotArea.height
+              ? plotArea.height / totalNeededHeight
+              : 1.0;
+
+          final adjustedBarHeight = barHeight * scaleFactor;
+          final adjustedGroupSpacing = groupSpacing * scaleFactor;
+          final adjustedTotalHeight = (adjustedBarHeight * groupCount) +
+              (adjustedGroupSpacing * (groupCount - 1));
+
+          final groupY = plotArea.top +
+              (index *
+                  (adjustedTotalHeight + (minGroupSpacing * scaleFactor))) +
+              (minGroupSpacing * scaleFactor * 0.5);
+
+          final barWidth = plotArea.width * 0.75;
+          final barX = plotArea.left + (plotArea.width - barWidth) / 2;
+
+          // Position label to the LEFT of the group, vertically centered
+          final position = Offset(
+            barX - 8.0 - textPainter.width,
+            groupY + (adjustedTotalHeight - textPainter.height) / 2,
+          );
+          textPainter.paint(canvas, position);
+        } else {
+          final barWidth = geometry.thickness * 0.75;
+          final totalGroupWidth =
+              (barWidth * groupCount) + (groupSpacing * (groupCount - 1));
+          final totalItemWidth = totalGroupWidth + minGroupSpacing;
+
+          // Apply the same scaling as the bars
+          final totalNeededWidth = data.length * totalItemWidth;
+          final scaleFactor = totalNeededWidth > plotArea.width
+              ? plotArea.width / totalNeededWidth
+              : 1.0;
+
+          final adjustedBarWidth = barWidth * scaleFactor;
+          final adjustedGroupSpacing = groupSpacing * scaleFactor;
+          final adjustedTotalWidth = (adjustedBarWidth * groupCount) +
+              (adjustedGroupSpacing * (groupCount - 1));
+
+          final groupX = plotArea.left +
+              (index * (adjustedTotalWidth + (minGroupSpacing * scaleFactor))) +
+              (minGroupSpacing * scaleFactor * 0.5);
+
+          final barHeight = plotArea.height * 0.75;
+          final barY = plotArea.top + (plotArea.height - barHeight) / 2;
+
+          // Position label BELOW the group, horizontally centered
+          final position = Offset(
+            groupX + (adjustedTotalWidth - textPainter.width) / 2,
+            barY + barHeight + 8.0,
+          );
+          textPainter.paint(canvas, position);
+        }
+      }
+    }
+  }
+
+  /// Draw gauge/speedometer style progress bar
+  void _drawGaugeProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    final radius = geometry.gaugeRadius ??
+        (math.min(plotArea.width, plotArea.height) * 0.3);
+    final centerSpacing = radius * 2.5;
+    final cols = math.max(1, (plotArea.width / centerSpacing).floor());
+    final row = index ~/ cols;
+    final col = index % cols;
+
+    final centerX = plotArea.left + (col * centerSpacing) + centerSpacing / 2;
+    final centerY = plotArea.top + (row * centerSpacing) + centerSpacing / 2;
+    final center = Offset(centerX, centerY);
+
+    if (centerY + radius > plotArea.bottom) return;
+
+    final startAngle = geometry.startAngle ?? -math.pi;
+    final sweepAngle = geometry.sweepAngle ?? math.pi;
+    final strokeWidth = geometry.thickness * 0.3;
+
+    // Draw background arc
+    final backgroundPaint = Paint()
+      ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(77)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      sweepAngle,
+      false,
+      backgroundPaint,
+    );
+
+    // Draw tick marks if enabled
+    if (geometry.showTicks) {
+      final tickCount = geometry.tickCount ?? 10;
+      final tickPaint = Paint()
+        ..color = theme.axisColor
+        ..strokeWidth = 1.0;
+
+      for (int i = 0; i <= tickCount; i++) {
+        final tickAngle = startAngle + (sweepAngle * i / tickCount);
+        final tickStart = Offset(
+          center.dx + (radius - 10) * math.cos(tickAngle),
+          center.dy + (radius - 10) * math.sin(tickAngle),
+        );
+        final tickEnd = Offset(
+          center.dx + radius * math.cos(tickAngle),
+          center.dy + radius * math.sin(tickAngle),
+        );
+        canvas.drawLine(tickStart, tickEnd, tickPaint);
+      }
+    }
+
+    // Draw progress arc
+    final progressSweep = sweepAngle * normalizedValue * animationProgress;
+    final progressPaint = Paint()
+      ..color = geometry.fillColor ??
+          theme.colorPalette[index % theme.colorPalette.length]
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      progressSweep,
+      false,
+      progressPaint,
+    );
+
+    // Draw needle/indicator
+    final needleAngle = startAngle + progressSweep;
+    final needlePaint = Paint()
+      ..color = Colors.red
+      ..strokeWidth = 2.0;
+
+    final needleEnd = Offset(
+      center.dx + (radius - 5) * math.cos(needleAngle),
+      center.dy + (radius - 5) * math.sin(needleAngle),
+    );
+    canvas.drawLine(center, needleEnd, needlePaint);
+
+    // Draw center dot
+    canvas.drawCircle(center, 3.0, Paint()..color = Colors.red);
+
+    // Draw label for gauge
+    if (geometry.showLabel && labelColumn != null) {
+      final labelText = point[labelColumn]?.toString() ?? '';
+      if (labelText.isNotEmpty) {
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: labelText,
+            style: geometry.labelStyle ?? theme.axisTextStyle,
+          ),
+          textDirection: TextDirection.ltr,
+          textAlign: TextAlign.center,
+        );
+        textPainter.layout();
+
+        final position = Offset(
+          center.dx - textPainter.width / 2,
+          center.dy + radius + 10.0,
+        );
+        textPainter.paint(canvas, position);
+      }
+    }
+  }
+
+  /// Draw concentric circular progress bars
+  void _drawConcentricProgressBar(
+    Canvas canvas,
+    Rect plotArea,
+    ProgressGeometry geometry,
+    double normalizedValue,
+    double animationProgress,
+    Map<String, dynamic> point,
+    ColorScale colorScale,
+    String? categoryColumn,
+    String? labelColumn,
+    int index,
+  ) {
+    final baseRadius = geometry.thickness;
+    final radii = geometry.concentricRadii ??
+        [baseRadius, baseRadius * 1.5, baseRadius * 2.0];
+    final thicknesses = geometry.concentricThicknesses ??
+        [baseRadius * 0.2, baseRadius * 0.2, baseRadius * 0.2];
+
+    final centerSpacing = (radii.last + thicknesses.last) * 2.5;
+    final cols = math.max(1, (plotArea.width / centerSpacing).floor());
+    final row = index ~/ cols;
+    final col = index % cols;
+
+    final centerX = plotArea.left + (col * centerSpacing) + centerSpacing / 2;
+    final centerY = plotArea.top + (row * centerSpacing) + centerSpacing / 2;
+    final center = Offset(centerX, centerY);
+
+    if (centerY + radii.last + thicknesses.last > plotArea.bottom) return;
+
+    // Draw each concentric ring
+    for (int ringIndex = 0; ringIndex < radii.length; ringIndex++) {
+      final radius = radii[ringIndex];
+      final thickness = ringIndex < thicknesses.length
+          ? thicknesses[ringIndex]
+          : thicknesses.last;
+
+      // Vary the progress for each ring
+      final ringProgress = normalizedValue * (0.5 + (ringIndex * 0.3));
+      // Use theme color palette for rings
+      final ringColor =
+          theme.colorPalette[ringIndex % theme.colorPalette.length];
+
+      // Draw background ring
+      final backgroundPaint = Paint()
+        ..color = geometry.backgroundColor ?? theme.gridColor.withAlpha(51)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = thickness;
+
+      canvas.drawCircle(center, radius, backgroundPaint);
+
+      // Draw progress arc
+      final progressSweep = 2 * math.pi * ringProgress * animationProgress;
+      final progressPaint = Paint()
+        ..color = ringColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = thickness
+        ..strokeCap = StrokeCap.round;
+
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        -math.pi / 2, // Start from top
+        progressSweep,
+        false,
+        progressPaint,
+      );
+    }
+
+    // Draw label below concentric rings
+    if (geometry.showLabel && labelColumn != null) {
+      final labelText = point[labelColumn]?.toString() ?? '';
+      if (labelText.isNotEmpty) {
+        final textPainter = TextPainter(
+          text: TextSpan(
+            text: labelText,
+            style: geometry.labelStyle ?? theme.axisTextStyle,
+          ),
+          textDirection: TextDirection.ltr,
+          textAlign: TextAlign.center,
+        );
+        textPainter.layout();
+
+        final position = Offset(
+          center.dx - textPainter.width / 2,
+          center.dy + radii.last + thicknesses.last + 10.0,
+        );
+        textPainter.paint(canvas, position);
+      }
+    }
+  }
+
   bool _listEquals<T>(List<T>? a, List<T>? b) {
     if (a == null && b == null) return true;
     if (a == null || b == null) return false;

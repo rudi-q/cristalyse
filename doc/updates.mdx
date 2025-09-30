@@ -1,0 +1,401 @@
+---
+title: "Updates"
+description: "Latest features, improvements, and fixes in Cristalyse"
+seo:
+  title: 'Cristalyse Updates & Changelog - Flutter Chart Library Release Notes'
+  description: 'Stay up to date with the latest Cristalyse releases. New features, bug fixes, and improvements for Flutter data visualization.'
+  keywords: 'cristalyse updates, flutter charts changelog, release notes, new features, bug fixes'
+  canonical: 'https://docs.cristalyse.com/updates'
+---
+
+# Updates & Changelog
+
+Stay informed about the latest features, improvements, and fixes in Cristalyse.
+
+<Update label="September 30, 2025" description="v1.7.0">
+  ### 📊 Progress Bar Charts
+  
+  **Professional progress visualization with multiple styles!**
+  
+  - **Multiple Orientations**: Horizontal, vertical, and circular progress bars
+  - **Advanced Styles**: Stacked, grouped, gauge, and concentric layouts
+  - **Theme-Responsive**: Full dark mode and custom palette support
+  - **Robust Validation**: Comprehensive input validation and error handling
+  
+  ```dart
+  // Stacked Progress Bar
+  CristalyseChart()
+    .data([
+      {'project': 'App', 'stage': 'Design', 'progress': 30.0},
+      {'project': 'App', 'stage': 'Development', 'progress': 50.0},
+      {'project': 'App', 'stage': 'Testing', 'progress': 20.0},
+    ])
+    .mappingProgress(category: 'project', value: 'progress', group: 'stage')
+    .geomProgress(
+      style: ProgressStyle.stacked,
+      orientation: ProgressOrientation.horizontal,
+    )
+    .build()
+  ```
+  
+  **Documentation Improvements:**
+  - Enhanced SEO with comprehensive metadata
+  - Custom 404 page with helpful navigation
+  - Subscribable RSS feed for updates
+  - Fixed all broken links
+  - Improved contextual menu copy
+</Update>
+
+<Update label="September 8, 2025" description="v1.6.1">
+  ### 🤖 MCP Server Integration
+  
+  **Cristalyse now integrates with AI coding assistants!**
+  
+  - New documentation guide for connecting Cristalyse docs to AI coding assistants (Cursor, Windsurf, Warp, Claude)
+  - Enable AI assistants to access complete documentation, examples, and best practices directly in your IDE
+  - Setup instructions: Add `"cristalyse_docs": {"url": "https://docs.cristalyse.com/mcp"}` to MCP settings
+  
+  [Learn more about MCP Server](/cristalyse-mcp-server)
+</Update>
+
+<Update label="September 7, 2025" description="v1.6.0">
+  ### 🌈 Gradient Color Support (Experimental)
+  
+  **Transform your charts with stunning gradient effects!**
+  
+  - Category-specific gradients with `categoryGradients` property
+  - Support for Linear, Radial, and Sweep gradients
+  - Advanced alpha blending that respects animation transparency
+  - Works with bar charts and scatter plots
+  
+  ```dart
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
+    .geomBar()
+    .customPalette(categoryGradients: {
+      'Q1': LinearGradient(colors: [Colors.blue, Colors.cyan]),
+      'Q2': RadialGradient(colors: [Colors.red, Colors.orange]),
+    })
+    .build()
+  ```
+  
+  ⚠️ **Note:** Not advisable for production use as of v1.6.0
+</Update>
+
+<Update label="September 5, 2025" description="v1.5.0">
+  ### 🔥 Built-In Legend Support
+  
+  **Professional legends with zero configuration!**
+  
+  - Simple `.legend()` method with smart defaults
+  - 8 flexible positioning options (topLeft, topRight, bottom, etc.)
+  - Automatic symbol generation based on chart type
+  - Full dark mode support with theme-aware text colors
+  
+  ```dart
+  CristalyseChart()
+    .data(salesData)
+    .mapping(x: 'quarter', y: 'revenue', color: 'product')
+    .geomBar(style: BarStyle.grouped)
+    .legend() // That's it! ✨
+    .build()
+  ```
+  
+  [View legend documentation](/features/legends)
+</Update>
+
+<Update label="September 3, 2025" description="v1.4.0">
+  ### 🎨 Custom Category Colors
+  
+  **Brand-consistent charts with custom color palettes!**
+  
+  - New `customPalette()` method for category-specific colors
+  - Smart fallback system for unmapped categories
+  - Perfect for corporate dashboards and brand consistency
+  
+  ```dart
+  final platformColors = {
+    'iOS': const Color(0xFF007ACC),      // Apple Blue
+    'Android': const Color(0xFF3DDC84),  // Android Green
+    'Web': const Color(0xFFFF6B35),      // Web Orange
+  };
+
+  CristalyseChart()
+    .customPalette(categoryColors: platformColors)
+    .build()
+  ```
+</Update>
+
+<Update label="September 3, 2025" description="v1.3.1">
+  ### 🐛 Multi-Series Line Chart Fixes
+  
+  - Fixed critical rendering issues with multi-series line charts
+  - Resolved missing data points on multi-series visualizations
+  - Fixed overlapping series lines for better visual separation
+</Update>
+
+<Update label="September 2, 2025" description="v1.3.0">
+  ### 🫧 Bubble Chart Support
+  
+  **Three-dimensional data visualization is here!**
+  
+  - Full bubble chart implementation with size mapping
+  - Advanced `SizeScale` class for proportional bubble sizing
+  - Interactive tooltips with rich hover information
+  - New `geomBubble()` API following grammar of graphics
+  
+  ```dart
+  CristalyseChart()
+    .data(companyData)
+    .mapping(
+      x: 'revenue',
+      y: 'customers',
+      size: 'marketShare',
+      color: 'category',
+    )
+    .geomBubble(
+      minSize: 8.0,
+      maxSize: 25.0,
+      alpha: 0.75,
+    )
+    .build()
+  ```
+  
+  [View bubble chart documentation](/charts/bubble-charts)
+</Update>
+
+<Update label="August 30, 2025" description="v1.2.4">
+  ### Bug Fixes & Improvements
+  
+  - Fixed heatmap cell ordering to match axis labels
+  - Fixed horizontal grouped bar charts crash
+  - Fixed heatmap alpha calculation overflow
+  - Improved code quality with comprehensive docstrings
+</Update>
+
+<Update label="August 24, 2025" description="v1.2.2">
+  ### 🎨 Enhanced HeatMap Text Readability
+  
+  - Improved text visibility for low-value cells
+  - Values < 15% now display with black text for guaranteed readability
+  - Values ≥ 15% use smart brightness-based contrast
+  - Zero breaking changes - fully backward compatible
+</Update>
+
+<Update label="August 18, 2025" description="v1.2.0">
+  ### 🔥 Heat Map Chart Support
+  
+  **Visualize 2D data patterns with professional heat maps!**
+  
+  - Comprehensive heat map implementation with customizable styling
+  - Advanced color mapping with smooth gradients
+  - Wave-effect animations with staggered cell appearance
+  - Smart value visualization with automatic contrast detection
+  
+  ```dart
+  CristalyseChart()
+    .data(salesData)
+    .mappingHeatMap(x: 'month', y: 'region', value: 'revenue')
+    .geomHeatMap(
+      cellSpacing: 2.0,
+      colorGradient: [Colors.red, Colors.yellow, Colors.green],
+      showValues: true,
+    )
+    .build()
+  ```
+  
+  [View heat map documentation](/charts/heat-map-charts)
+</Update>
+
+<Update label="August 5, 2025" description="v1.1.0">
+  ### 🎯 Advanced Label Formatting
+  
+  **Professional data visualization with NumberFormat integration!**
+  
+  - Full callback-based label formatting system
+  - Seamless integration with Flutter's `intl` package
+  - Currency, percentages, compact notation support
+  
+  ```dart
+  CristalyseChart()
+    .scaleYContinuous(
+      labels: NumberFormat.simpleCurrency().format  // $1,234.56
+    )
+    .build()
+  ```
+  
+  🙏 **Feature authored by [@davidlrichmond](https://github.com/davidlrichmond)**
+</Update>
+
+<Update label="July 31, 2025" description="v1.0.1">
+  ### Fixed
+  
+  - **Grouped Bar Chart Alignment**: Fixed positioning of grouped bars on ordinal scales
+  - Bars now center properly on tick marks
+  - Thanks [@davidlrichmond](https://github.com/davidlrichmond)!
+</Update>
+
+<Update label="July 10, 2025" description="v1.0.0">
+  ### 🥧 Pie & Donut Charts
+  
+  **Major v1.0 release with comprehensive pie chart support!**
+  
+  - Full pie chart and donut chart implementation
+  - Smooth slice animations with staggered timing
+  - Smart label positioning with percentage display
+  - Exploded slice functionality for emphasis
+  - New `.mappingPie()` and `.geomPie()` API
+  
+  ```dart
+  CristalyseChart()
+    .mappingPie(value: 'revenue', category: 'department')
+    .geomPie(
+      outerRadius: 120.0,
+      innerRadius: 60.0,  // Creates donut
+      showLabels: true,
+    )
+    .build()
+  ```
+  
+  [View pie chart documentation](/charts/pie-charts)
+</Update>
+
+<Update label="July 4, 2025" description="v0.9.4 - v0.9.3">
+  ### 📖 Documentation Site Launch
+  
+  - **[docs.cristalyse.com](https://docs.cristalyse.com)** is now live!
+  - Comprehensive guides, examples, and API reference
+  - Improved web WASM compatibility
+</Update>
+
+<Update label="July 3, 2025" description="v0.9.2">
+  ### Advanced Pan Control System
+  
+  - Fixed chart position reset bug
+  - Infinite panning capability in any direction
+  - Visual clipping implementation for clean boundaries
+  - Selective axis panning with `updateXDomain` and `updateYDomain`
+  
+  Perfect for exploring large datasets!
+</Update>
+
+<Update label="July 2, 2025" description="v0.9.0">
+  ### Enhanced SVG Export
+  
+  - Professional-quality vector graphics output
+  - Support for all chart types
+  - Perfect for presentations and reports
+  - Editable in Figma, Adobe Illustrator, etc.
+</Update>
+
+<Update label="July 2, 2025" description="v0.8.0">
+  ### 🎨 Area Chart Support
+  
+  **Visualize volume and trends with area charts!**
+  
+  - Comprehensive `AreaGeometry` with customizable styling
+  - Progressive area animations
+  - Multi-series support with transparency
+  - Dual Y-axis compatibility
+  
+  ```dart
+  CristalyseChart()
+    .geomArea(
+      strokeWidth: 2.0,
+      alpha: 0.3,
+      fillArea: true,
+    )
+    .build()
+  ```
+  
+  [View area chart documentation](/charts/area-charts)
+</Update>
+
+<Update label="June 30, 2025" description="v0.7.0">
+  ### Interactive Panning System
+  
+  - Persistent pan state across gestures
+  - Real-time visible range synchronization
+  - Comprehensive `PanConfig` API with callbacks
+  - Perfect for time series data exploration
+</Update>
+
+<Update label="June 21, 2025" description="v0.6.0">
+  ### 🎯 Interactive Chart Layer
+  
+  **Tooltips, hover, and click interactions!**
+  
+  - New interaction system for user engagement
+  - Flexible tooltip system with `TooltipConfig`
+  - `onHover`, `onExit`, and `onTap` callbacks
+  
+  ```dart
+  CristalyseChart()
+    .interaction(
+      tooltip: TooltipConfig(
+        builder: (point) => MyCustomTooltip(point: point),
+      ),
+      click: ClickConfig(
+        onTap: (point) => showDetails(point),
+      ),
+    )
+    .build()
+  ```
+  
+  [View interaction documentation](/features/interactions)
+</Update>
+
+<Update label="June 14, 2025" description="v0.5.0">
+  ### 🚀 Dual Y-Axis Support
+  
+  **Professional business dashboards unlocked!**
+  
+  - Independent left and right Y-axes
+  - New `.mappingY2()` and `.scaleY2Continuous()` methods
+  - Perfect for Revenue vs Conversion Rate charts
+  - Fixed ordinal scale support for lines and points
+  
+  ```dart
+  CristalyseChart()
+    .mapping(x: 'month', y: 'revenue')
+    .mappingY2('conversion_rate')
+    .geomBar(yAxis: YAxis.primary)
+    .geomLine(yAxis: YAxis.secondary)
+    .scaleY2Continuous(min: 0, max: 100)
+    .build()
+  ```
+  
+  [View dual axis documentation](/charts/dual-axis)
+</Update>
+
+<Update label="June 12, 2025" description="v0.4.4 - v0.4.0">
+  ### Bar Charts & Theming
+  
+  - **Stacked Bar Charts**: Full support with progressive animations
+  - **Enhanced Theming**: Solarized Light/Dark themes
+  - **Color Palettes**: Warm, cool, and pastel options
+  - **Horizontal Bars**: Via `coordFlip()` method
+</Update>
+
+<Update label="June 8, 2025" description="v0.2.0">
+  ### Line Charts & Animations
+  
+  - Line chart support with `geomLine()`
+  - Configurable animations with curves
+  - Multi-series support with color grouping
+  - Progressive line drawing animations
+  - Dark theme support
+</Update>
+
+<Update label="June 8, 2025" description="v0.1.0">
+  ### 🎉 Initial Release
+  
+  **Cristalyse is born!**
+  
+  - Basic scatter plot support
+  - Grammar of graphics API
+  - Linear scales for continuous data
+  - Light and dark themes
+  - Cross-platform Flutter support
+</Update>
