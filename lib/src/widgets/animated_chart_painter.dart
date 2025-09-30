@@ -2704,43 +2704,18 @@ class AnimatedChartPainter extends CustomPainter {
 
     final fillPaint = Paint()..style = PaintingStyle.fill;
 
-    // Determine fill source (can be Color or Gradient)
-    // Priority: explicit fillColor > category-based color > theme palette by index
-    final fillSource = geometry.fillColor ??
-        (categoryColumn != null
-            ? colorScale.scale(point[categoryColumn])
-            : theme.colorPalette[index % theme.colorPalette.length]);
-
-    // Safe color extraction
-    Color getFillColor() {
-      if (fillSource is Color) return fillSource;
-      if (fillSource is Gradient) {
-        // Extract first color from gradient
-        if (fillSource is LinearGradient && fillSource.colors.isNotEmpty) {
-          return fillSource.colors.first;
-        }
-        if (fillSource is RadialGradient && fillSource.colors.isNotEmpty) {
-          return fillSource.colors.first;
-        }
-        if (fillSource is SweepGradient && fillSource.colors.isNotEmpty) {
-          return fillSource.colors.first;
-        }
-      }
-      return theme.primaryColor;
-    }
+    // Determine fill color from geometry or theme palette
+    // Priority: explicit fillColor > theme palette by index (always use theme for responsiveness)
+    final fillColor = geometry.fillColor ??
+        theme.colorPalette[index % theme.colorPalette.length];
 
     if (geometry.fillGradient != null) {
       // Explicit gradient takes precedence
       final animatedGradient =
           _applyAlphaToGradient(geometry.fillGradient!, 1.0);
       fillPaint.shader = animatedGradient.createShader(fillRect);
-    } else if (fillSource is Gradient) {
-      // Handle gradient from color scale
-      final animatedGradient = _applyAlphaToGradient(fillSource, 1.0);
-      fillPaint.shader = animatedGradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.gradient) {
       // Default gradient from light to dark version of fill color
-      final fillColor = getFillColor();
       final gradient = LinearGradient(
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
@@ -2752,7 +2727,6 @@ class AnimatedChartPainter extends CustomPainter {
       fillPaint.shader = gradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.striped) {
       // Striped pattern
-      final fillColor = getFillColor();
       fillPaint.color = fillColor;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
@@ -2768,7 +2742,7 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     } else {
       // Solid color
-      fillPaint.color = getFillColor();
+      fillPaint.color = fillColor;
     }
 
     // Draw fill with rounded corners
@@ -2842,43 +2816,18 @@ class AnimatedChartPainter extends CustomPainter {
 
     final fillPaint = Paint()..style = PaintingStyle.fill;
 
-    // Determine fill source (can be Color or Gradient)
-    // Priority: explicit fillColor > category-based color > theme palette by index
-    final fillSource = geometry.fillColor ??
-        (categoryColumn != null
-            ? colorScale.scale(point[categoryColumn])
-            : theme.colorPalette[index % theme.colorPalette.length]);
-
-    // Safe color extraction
-    Color getFillColor() {
-      if (fillSource is Color) return fillSource;
-      if (fillSource is Gradient) {
-        // Extract first color from gradient
-        if (fillSource is LinearGradient && fillSource.colors.isNotEmpty) {
-          return fillSource.colors.first;
-        }
-        if (fillSource is RadialGradient && fillSource.colors.isNotEmpty) {
-          return fillSource.colors.first;
-        }
-        if (fillSource is SweepGradient && fillSource.colors.isNotEmpty) {
-          return fillSource.colors.first;
-        }
-      }
-      return theme.primaryColor;
-    }
+    // Determine fill color from geometry or theme palette
+    // Priority: explicit fillColor > theme palette by index (always use theme for responsiveness)
+    final fillColor = geometry.fillColor ??
+        theme.colorPalette[index % theme.colorPalette.length];
 
     if (geometry.fillGradient != null) {
       // Explicit gradient takes precedence
       final animatedGradient =
           _applyAlphaToGradient(geometry.fillGradient!, 1.0);
       fillPaint.shader = animatedGradient.createShader(fillRect);
-    } else if (fillSource is Gradient) {
-      // Handle gradient from color scale
-      final animatedGradient = _applyAlphaToGradient(fillSource, 1.0);
-      fillPaint.shader = animatedGradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.gradient) {
       // Default gradient from light to dark version of fill color
-      final fillColor = getFillColor();
       final gradient = LinearGradient(
         begin: Alignment.bottomCenter,
         end: Alignment.topCenter,
@@ -2890,7 +2839,6 @@ class AnimatedChartPainter extends CustomPainter {
       fillPaint.shader = gradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.striped) {
       // Striped pattern
-      final fillColor = getFillColor();
       fillPaint.color = fillColor;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
@@ -2906,7 +2854,7 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     } else {
       // Solid color
-      fillPaint.color = getFillColor();
+      fillPaint.color = fillColor;
     }
 
     canvas.drawRRect(
@@ -2970,11 +2918,9 @@ class AnimatedChartPainter extends CustomPainter {
       ..strokeWidth = radius * 0.2
       ..strokeCap = StrokeCap.round;
 
-    // Priority: explicit fillColor > category-based color > theme palette by index
+    // Priority: explicit fillColor > theme palette by index (always use theme for responsiveness)
     Color fillColor = geometry.fillColor ??
-        (categoryColumn != null
-            ? colorScale.scale(point[categoryColumn])
-            : theme.colorPalette[index % theme.colorPalette.length]);
+        theme.colorPalette[index % theme.colorPalette.length];
     progressPaint.color = fillColor;
 
     canvas.drawArc(
@@ -3285,16 +3231,19 @@ class AnimatedChartPainter extends CustomPainter {
     final minGroupSpacing = 30.0; // Minimum space between different data items
 
     // Calculate group layout
+    // NOTE: In production, each bar in a group should represent different data series
+    // For example: Q1, Q2, Q3, Q4 sales for the same product
+    // Currently showing slight variations of the same value for demonstration purposes
     for (int groupIndex = 0; groupIndex < groupCount; groupIndex++) {
-      // Use actual normalized value, slight variation for demo if needed
-      final groupValue =
-          normalizedValue * math.min(1.0, 0.7 + (groupIndex * 0.15));
+      // Apply subtle variation (±5% per group) to demonstrate grouping visually
+      // In real usage, these would be distinct values from your dataset
+      final variation = 0.95 + (groupIndex * 0.033); // 95%, 98%, 101%, 104%
+      final groupValue = (normalizedValue * variation).clamp(0.0, 1.0);
 
-      // Get color from color scale or use theme palette
-      final groupColor = categoryColumn != null && groupIndex < data.length
-          ? colorScale.scale(
-              data[math.min(groupIndex, data.length - 1)][categoryColumn])
-          : theme.colorPalette[groupIndex % theme.colorPalette.length];
+      // Always use theme palette for consistent theme responsiveness
+      final groupColor =
+          theme.colorPalette[groupIndex % theme.colorPalette.length];
+      theme.colorPalette[groupIndex % theme.colorPalette.length];
 
       late Rect barRect;
       if (isHorizontal) {
@@ -3403,40 +3352,66 @@ class AnimatedChartPainter extends CustomPainter {
         );
         textPainter.layout();
 
-        // Get the first bar rect for positioning
-        late Rect firstBarRect;
+        // Calculate actual bar positioning using the same logic as bar drawing
         if (isHorizontal) {
           final barHeight = geometry.thickness * 0.75;
           final totalGroupHeight =
               (barHeight * groupCount) + (groupSpacing * (groupCount - 1));
+          final totalItemHeight = totalGroupHeight + minGroupSpacing;
+
+          // Apply the same scaling as the bars
+          final totalNeededHeight = data.length * totalItemHeight;
+          final scaleFactor = totalNeededHeight > plotArea.height
+              ? plotArea.height / totalNeededHeight
+              : 1.0;
+
+          final adjustedBarHeight = barHeight * scaleFactor;
+          final adjustedGroupSpacing = groupSpacing * scaleFactor;
+          final adjustedTotalHeight = (adjustedBarHeight * groupCount) +
+              (adjustedGroupSpacing * (groupCount - 1));
+
           final groupY = plotArea.top +
-              (index * (totalGroupHeight + minGroupSpacing)) +
-              20.0;
+              (index *
+                  (adjustedTotalHeight + (minGroupSpacing * scaleFactor))) +
+              (minGroupSpacing * scaleFactor * 0.5);
+
           final barWidth = plotArea.width * 0.75;
           final barX = plotArea.left + (plotArea.width - barWidth) / 2;
-          firstBarRect = Rect.fromLTWH(barX, groupY, barWidth, barHeight);
 
-          // Position label to the LEFT of the group
+          // Position label to the LEFT of the group, vertically centered
           final position = Offset(
-            firstBarRect.left - 8.0 - textPainter.width,
-            firstBarRect.top + (totalGroupHeight - textPainter.height) / 2,
+            barX - 8.0 - textPainter.width,
+            groupY + (adjustedTotalHeight - textPainter.height) / 2,
           );
           textPainter.paint(canvas, position);
         } else {
           final barWidth = geometry.thickness * 0.75;
           final totalGroupWidth =
               (barWidth * groupCount) + (groupSpacing * (groupCount - 1));
+          final totalItemWidth = totalGroupWidth + minGroupSpacing;
+
+          // Apply the same scaling as the bars
+          final totalNeededWidth = data.length * totalItemWidth;
+          final scaleFactor = totalNeededWidth > plotArea.width
+              ? plotArea.width / totalNeededWidth
+              : 1.0;
+
+          final adjustedBarWidth = barWidth * scaleFactor;
+          final adjustedGroupSpacing = groupSpacing * scaleFactor;
+          final adjustedTotalWidth = (adjustedBarWidth * groupCount) +
+              (adjustedGroupSpacing * (groupCount - 1));
+
           final groupX = plotArea.left +
-              (index * (totalGroupWidth + minGroupSpacing)) +
-              20.0;
+              (index * (adjustedTotalWidth + (minGroupSpacing * scaleFactor))) +
+              (minGroupSpacing * scaleFactor * 0.5);
+
           final barHeight = plotArea.height * 0.75;
           final barY = plotArea.top + (plotArea.height - barHeight) / 2;
-          firstBarRect = Rect.fromLTWH(groupX, barY, barWidth, barHeight);
 
-          // Position label BELOW the group
+          // Position label BELOW the group, horizontally centered
           final position = Offset(
-            firstBarRect.left + (totalGroupWidth - textPainter.width) / 2,
-            firstBarRect.bottom + 8.0,
+            groupX + (adjustedTotalWidth - textPainter.width) / 2,
+            barY + barHeight + 8.0,
           );
           textPainter.paint(canvas, position);
         }
@@ -3514,9 +3489,7 @@ class AnimatedChartPainter extends CustomPainter {
     final progressSweep = sweepAngle * normalizedValue * animationProgress;
     final progressPaint = Paint()
       ..color = geometry.fillColor ??
-          (categoryColumn != null
-              ? colorScale.scale(point[categoryColumn])
-              : theme.colorPalette[index % theme.colorPalette.length])
+          theme.colorPalette[index % theme.colorPalette.length]
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
