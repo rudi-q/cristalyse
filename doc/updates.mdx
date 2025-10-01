@@ -12,6 +12,51 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="October 1, 2025" description="v1.8.0">
+  ### 🎯 Intelligent Axis Bounds & Labeling
+  
+  **Authored by [@davidlrichmond](https://github.com/davidrichmond)** - Exceptional contribution!
+  
+  **Wilkinson Extended Algorithm for professional axis labels:**
+  - Based on IEEE paper by Talbot, Lin, and Hanrahan (2010)
+  - Generates "nice" round numbers: 0, 5, 10, 50, 100
+  - Optimizes simplicity, coverage, density, and legibility
+  - Smart pruning for performance
+  
+  **Geometry-Aware Bounds:**
+  - Bar/area charts: Zero baseline for quantity comparison
+  - Line/scatter charts: Data-driven bounds for trend analysis
+  - Automatic appropriate defaults based on chart type
+  
+  ```dart
+  // Prettier axis labels automatically!
+  // Before: 0.47, 5.23, 10.88, 15.91, 21.07
+  // After:  0, 5, 10, 15, 20
+  
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'time', y: 'value')
+    .geomLine()
+    .scaleYContinuous()  // Smart bounds automatically!
+    .build()
+  
+  // New bubble size limits
+  chart.geomBubble(
+    minSize: 8.0,
+    maxSize: 25.0,
+    limits: (1000, 50000),  // Scale domain control
+  )
+  ```
+  
+  **Testing & Quality:**
+  - 803 lines of new tests added
+  - All 263 tests passing
+  - Zero breaking changes
+  - Production ready
+  
+  [View axis bounds documentation](/advanced/scales)
+</Update>
+
 <Update label="September 30, 2025" description="v1.7.0">
   ### 📊 Progress Bar Charts
   

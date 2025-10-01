@@ -17,6 +17,7 @@
 [![pub package](https://img.shields.io/pub/v/cristalyse.svg?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse)
 [![pub points](https://img.shields.io/pub/points/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
 [![likes](https://img.shields.io/pub/likes/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
+[![Pub Downloads](https://img.shields.io/pub/dm/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2cacbf.svg?labelColor=145261)](https://opensource.org/licenses/MIT)
 
 [![Web](https://img.shields.io/badge/Web-145261?logo=google-chrome&logoColor=white)](https://flutter.dev/)
@@ -1100,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.7.0** - Production ready with comprehensive chart library featuring automatic legend generation, flexible positioning, and professional styling
+**Current Version: 1.8.0** - Production ready with intelligent axis bounds & labeling, automatic legend generation, and professional styling
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1114,13 +1115,14 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v0.8.0** - **Area chart support** with animations and multi-series capabilities
 - ✅ **v0.9.0** - **Enhanced dual Y-axis SVG export** with comprehensive scale support
 - ✅ **v1.0.0** - **Pie charts and donut charts** with exploded slices and smart label positioning
-- ✅ **v1.1.0** - **Advanced label formatting system** with NumberFormat integration
+- ✅ **v1.1.0** - **Advanced label formatting system** with NumberFormat integration (by [@davidlrichmond](https://github.com/davidlrichmond))
 - ✅ **v1.2.0** - **Heat map charts** with 2D data visualization and customizable color gradients
 - ✅ **v1.3.0** - **Bubble charts** with 3D data visualization and professional size encoding
 - ✅ **v1.4.0** - **Custom color palettes** for brand-specific category mapping
 - ✅ **v1.5.0** - **Automatic legend generation** with flexible positioning and styling
 - ✅ **v1.6.0** - **Experimental gradient color support** for customPalette with Linear, Radial, and Sweep gradients
 - ✅ **v1.7.0** - **Progress bar charts** with horizontal, vertical, circular, stacked, grouped, gauge, and concentric styles + comprehensive documentation improvements
+- ✅ **v1.8.0** - **Intelligent axis bounds & labeling** with Wilkinson Extended algorithm (by [@davidlrichmond](https://github.com/davidlrichmond)) - professional round-number ticks, geometry-aware defaults, comprehensive testing
 
 ## Support This Project
 
