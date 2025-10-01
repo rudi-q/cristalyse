@@ -79,7 +79,8 @@ class OrdinalScale extends Scale {
   List<dynamic> get domain => _domain;
   set domain(List<dynamic> value) {
     _domain = value;
-    debugPrint('OrdinalScale: Setting domain with ${value.length} items: ${value.take(10)}...');
+    debugPrint(
+        'OrdinalScale: Setting domain with ${value.length} items: ${value.take(10)}...');
     _calculateBandWidth();
   }
 

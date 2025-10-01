@@ -178,7 +178,8 @@ class _AnimatedCristalyseChartWidgetState
 
     // Check tooltip trigger mode
     final tooltipConfig = widget.interaction.tooltip;
-    final useAxisMode = tooltipConfig?.triggerMode == ChartTooltipTriggerMode.axis;
+    final useAxisMode =
+        tooltipConfig?.triggerMode == ChartTooltipTriggerMode.axis;
 
     if (useAxisMode) {
       // Axis mode: detect all points at X position
@@ -199,7 +200,8 @@ class _AnimatedCristalyseChartWidgetState
       }
 
       // Handle hover callbacks (use first point for backward compatibility)
-      widget.interaction.hover?.onHover?.call(points.isNotEmpty ? points.first : null);
+      widget.interaction.hover?.onHover
+          ?.call(points.isNotEmpty ? points.first : null);
 
       // Handle tooltips
       if (tooltipConfig != null) {
@@ -373,7 +375,8 @@ class _AnimatedCristalyseChartWidgetState
       );
 
       final tooltipConfig = widget.interaction.tooltip;
-      final useAxisMode = tooltipConfig?.triggerMode == ChartTooltipTriggerMode.axis;
+      final useAxisMode =
+          tooltipConfig?.triggerMode == ChartTooltipTriggerMode.axis;
 
       if (useAxisMode) {
         // Axis mode: detect all points at X position
@@ -394,7 +397,8 @@ class _AnimatedCristalyseChartWidgetState
         }
 
         // Handle hover callbacks (use first point)
-        widget.interaction.hover?.onHover?.call(points.isNotEmpty ? points.first : null);
+        widget.interaction.hover?.onHover
+            ?.call(points.isNotEmpty ? points.first : null);
 
         // Handle tooltips
         if (tooltipConfig != null && tooltipConfig.followPointer) {

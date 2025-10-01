@@ -2,7 +2,7 @@ import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
 /// Example demonstrating axis-based tooltips with crosshair indicator
-/// 
+///
 /// This example shows:
 /// - Axis-based tooltip triggering (hover anywhere on X position)
 /// - Multi-series tooltip display
@@ -98,23 +98,23 @@ class AxisTooltipExample extends StatelessWidget {
           tooltip: TooltipConfig(
             // Enable axis-based triggering
             triggerMode: ChartTooltipTriggerMode.axis,
-            
+
             // Show crosshair line
             showCrosshair: true,
             crosshairColor: Colors.grey.shade400,
             crosshairWidth: 1.5,
             crosshairStyle: StrokeStyle.dashed,
-            
+
             // Use multi-point tooltip builder
             multiPointBuilder: DefaultTooltips.multiPoint(
               xColumn: 'quarter',
               yColumn: 'value',
             ),
-            
+
             // Smooth tooltip behavior
             showDelay: Duration(milliseconds: 50),
             followPointer: true,
-            
+
             // Styling
             backgroundColor: Colors.black87,
             borderRadius: 8.0,
@@ -123,9 +123,9 @@ class AxisTooltipExample extends StatelessWidget {
         )
         .customPalette(
           categoryColors: {
-            'iOS': Color(0xFF007AFF),      // Apple blue
-            'Android': Color(0xFF3DDC84),  // Android green
-            'Web': Color(0xFFFF6B35),      // Orange
+            'iOS': Color(0xFF007AFF), // Apple blue
+            'Android': Color(0xFF3DDC84), // Android green
+            'Web': Color(0xFFFF6B35), // Orange
           },
         )
         .legend(
@@ -150,13 +150,15 @@ class AxisTooltipExample extends StatelessWidget {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: features.map((feature) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4.0),
-        child: Text(
-          feature,
-          style: const TextStyle(fontSize: 14),
-        ),
-      )).toList(),
+      children: features
+          .map((feature) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Text(
+                  feature,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ))
+          .toList(),
     );
   }
 }

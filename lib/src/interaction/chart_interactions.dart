@@ -39,10 +39,10 @@ class ChartInteraction {
 /// Configuration for tooltip display
 class TooltipConfig {
   final TooltipBuilder? builder;
-  
+
   /// Builder for multi-point tooltips (used in axis mode)
   final MultiPointTooltipBuilder? multiPointBuilder;
-  
+
   final Duration showDelay;
   final Duration hideDelay;
   final bool followPointer;
@@ -316,7 +316,7 @@ class DefaultTooltips {
   }
 
   /// Multi-point tooltip for axis mode (shows all series at X position)
-  /// 
+  ///
   /// This is the default tooltip builder for axis-based tooltips.
   /// It shows all series values at a given X position, with color indicators.
   static Column Function(List<DataPointInfo> points) multiPoint({
@@ -337,7 +337,8 @@ class DefaultTooltips {
       }
 
       // Get X value from first point (all should have same X)
-      final xValue = xColumn != null ? points.first.getDisplayValue(xColumn) : null;
+      final xValue =
+          xColumn != null ? points.first.getDisplayValue(xColumn) : null;
 
       return Column(
         mainAxisSize: MainAxisSize.min,
@@ -357,7 +358,8 @@ class DefaultTooltips {
           // Show each series
           ...points.map((point) {
             final seriesName = point.seriesName ?? 'Series';
-            final yValue = yColumn != null ? point.getDisplayValue(yColumn) : '';
+            final yValue =
+                yColumn != null ? point.getDisplayValue(yColumn) : '';
             final color = point.color ?? Colors.blue;
 
             return Padding(

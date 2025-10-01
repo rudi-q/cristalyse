@@ -153,7 +153,9 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
     _showTimer?.cancel();
     _showTimer = Timer(widget.config.showDelay, () {
       if (_shouldShow && mounted) {
-        if (isMultiPoint && _currentPoints != null && _currentPoints!.isNotEmpty) {
+        if (isMultiPoint &&
+            _currentPoints != null &&
+            _currentPoints!.isNotEmpty) {
           _createTooltip();
         } else if (!isMultiPoint && _currentPoint != null) {
           _createTooltip();
@@ -200,10 +202,11 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
   }
 
   /// Check if two lists of DataPointInfo have the same data
-  bool _hasSameDataMulti(List<DataPointInfo>? oldPoints, List<DataPointInfo>? newPoints) {
+  bool _hasSameDataMulti(
+      List<DataPointInfo>? oldPoints, List<DataPointInfo>? newPoints) {
     if (oldPoints == null || newPoints == null) return false;
     if (oldPoints.length != newPoints.length) return false;
-    
+
     // Compare each point in the list
     for (int i = 0; i < oldPoints.length; i++) {
       if (!_hasSameData(oldPoints[i], newPoints[i])) {
@@ -436,7 +439,8 @@ mixin TooltipMixin {
   }
 
   /// Show tooltip for multiple data points (axis mode)
-  void showMultiPointTooltip(BuildContext context, List<DataPointInfo> points, Offset position) {
+  void showMultiPointTooltip(
+      BuildContext context, List<DataPointInfo> points, Offset position) {
     final provider = ChartTooltipProvider.of(context);
     provider?.showMultiPointTooltip(points, position);
   }

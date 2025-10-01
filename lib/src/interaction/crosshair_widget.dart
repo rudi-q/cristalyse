@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'chart_interactions.dart';
 
 /// Crosshair overlay widget for axis-based tooltips
-/// 
+///
 /// Displays a vertical line indicator that follows the cursor's X position
 /// when tooltips are in axis mode.
 class CrosshairOverlay extends StatelessWidget {

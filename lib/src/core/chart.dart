@@ -1067,17 +1067,16 @@ extension ChartThemeExtension on ChartTheme {
       required Map<String, Color> categoryColors}) {
     // Extract unique categories
     final categories = data.map((d) => d[color] as String).toSet().toList();
-    debugPrint('CustomPalette: Found ${categories.length} categories: $categories');
-    debugPrint('CustomPalette: Original palette length: ${this.colorPalette.length}');
+    debugPrint(
+        'CustomPalette: Found ${categories.length} categories: $categories');
+    debugPrint(
+        'CustomPalette: Original palette length: ${this.colorPalette.length}');
     // Build color palette in the order categories appear
-    final colorPalette = categories
-        .map((category) {
-          final categoryIndex = categories.indexOf(category);
-          final fallbackIndex = categoryIndex % this.colorPalette.length;
-          return categoryColors[category] ??
-              this.colorPalette[fallbackIndex];
-        })
-        .toList();
+    final colorPalette = categories.map((category) {
+      final categoryIndex = categories.indexOf(category);
+      final fallbackIndex = categoryIndex % this.colorPalette.length;
+      return categoryColors[category] ?? this.colorPalette[fallbackIndex];
+    }).toList();
     debugPrint('CustomPalette: New palette length: ${colorPalette.length}');
     return copyWith(
       colorPalette: colorPalette,
