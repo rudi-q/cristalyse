@@ -35,8 +35,3 @@ build/
 debug_screenshot.*
 engine.bin
 w***.md
-
-# Xcode build artifacts
-**/macos/Runner.xcodeproj/project.pbxproj
-**/macos/Runner.xcodeproj/xcshareddata/
-**/macos/Runner.xcworkspace/

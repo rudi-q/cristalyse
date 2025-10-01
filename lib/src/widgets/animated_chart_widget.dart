@@ -848,14 +848,7 @@ class _AnimatedCristalyseChartWidgetState
 
       if (values.isNotEmpty) {
         // Use geometry-aware bounds calculation
-        // Apply stacked bar scaling if needed
-        if (hasStackedBars) {
-          final currentDomain = scale.domain;
-          scale.setBounds(values, (currentDomain[0], currentDomain[1] * 1.1),
-              widget.geometries);
-        } else {
-          scale.setBounds(values, null, widget.geometries);
-        }
+        scale.setBounds(values, null, widget.geometries);
       } else {
         scale.setBounds([], null, widget.geometries);
       }

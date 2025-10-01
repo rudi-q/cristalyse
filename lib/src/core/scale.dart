@@ -111,6 +111,13 @@ class LinearScale extends Scale {
       // Use Wilkinson algorithm to extend bounds to nice round numbers
       final screenLength = (range[1] - range[0]).abs();
 
+      // Guard against zero or negative range during layout/bootstrap
+      if (screenLength <= 0) {
+        _ticks = null;
+        _domain = [bounds.min, bounds.max];
+        return;
+      }
+
       final targetLabelCount =
           (screenLength / Scale.optimalPixelsPerLabel).round();
       final targetDensity = targetLabelCount / screenLength; // labels per pixel
@@ -285,8 +292,8 @@ class SizeScale extends Scale {
     List<double> range = const [3, 10],
     super.limits,
     super.labelFormatter,
-  }) : _domain = domain {
-    _range = range;
+  }) : _domain = List.from(domain) {
+    _range = List.from(range);
   }
 
   @override
@@ -336,7 +343,7 @@ class GradientColorScale extends Scale {
     this.interpolate = true,
     super.limits,
     super.labelFormatter,
-  }) : _domain = domain;
+  }) : _domain = List.from(domain);
 
   @override
   List<double> get domain => _domain;

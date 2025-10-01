@@ -190,19 +190,25 @@ class WilkinsonLabeling {
     return 1.0;
   }
 
-  /// Calculate density score per paper's formula
-  /// Uses labels per screen pixel: density = 1 - max(ρ/ρₜ, ρₜ/ρ)
+  /// Calculate density score per Talbot/Lin/Hanrahan (2010)
+  /// Uses labels per screen pixel: density = 2 - max(ρ/ρₜ, ρₜ/ρ)
+  ///
+  /// Note: The published paper states "1 - max(...)" in Section 4.3, but this
+  /// appears to be a typo. The reference R implementation by the paper's authors
+  /// uses "2 - max(...)", which is necessary for perfect density (ρ = ρₜ) to
+  /// score 1.0 as stated in the paper's optimization bounds.
+  /// Reference: https://rdrr.io/cran/labeling/src/R/labeling.R
   static double _density(int k, double screenLength, double targetDensity) {
     if (screenLength == 0 || targetDensity == 0) return 0.0;
 
     // Actual density = labels per pixel
     final actualDensity = k / screenLength;
 
-    // Paper's formula: 1 - max(ρ/ρₜ, ρₜ/ρ)
+    // Correct formula: 2 - max(ρ/ρₜ, ρₜ/ρ)
     // Treats over-density and under-density symmetrically
     final ratio1 = actualDensity / targetDensity;
     final ratio2 = targetDensity / actualDensity;
-    return 1.0 - math.max(ratio1, ratio2);
+    return 2.0 - math.max(ratio1, ratio2);
   }
 
   /// Maximum possible density (used for pruning)

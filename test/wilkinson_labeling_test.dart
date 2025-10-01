@@ -122,8 +122,8 @@ void main() {
 
       // Algorithm produces 7 ticks from 0.12 to 0.18 with step of 0.01
       expect(ticks.length, 7);
-      expect(ticks.first, 0.12);
-      expect(ticks.last, 0.18);
+      expect(ticks.first, closeTo(0.12, 1e-9));
+      expect(ticks.last, closeTo(0.18, 1e-9));
 
       // Step should be approximately 0.01
       final step = ticks[1] - ticks[0];

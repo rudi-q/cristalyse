@@ -98,11 +98,14 @@ class BoundsCalculator {
       return const Bounds.ignored();
     }
 
-    if (values.isEmpty) return const Bounds(0, 1);
-
-    // If limits are fully specified, use them directly
+    // If limits are fully specified, use them directly (even if values.isEmpty)
     if (limits != null && limits.$1 != null && limits.$2 != null) {
       return Bounds(limits.$1!, limits.$2!);
+    }
+
+    // Handle empty values with partial or no limits
+    if (values.isEmpty) {
+      return Bounds(limits?.$1 ?? 0, limits?.$2 ?? 1);
     }
 
     // Calculate data-driven bounds

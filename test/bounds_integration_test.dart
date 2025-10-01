@@ -4,8 +4,7 @@ import 'package:cristalyse/src/core/util/bounds_calculator.dart';
 
 void main() {
   group('Bounds Integration Tests', () {
-    testWidgets('LinearScale calculateBounds works with geometry context',
-        (tester) async {
+    test('LinearScale calculateBounds works with geometry context', () {
       final barGeometry = BarGeometry();
       final lineGeometry = LineGeometry();
 
