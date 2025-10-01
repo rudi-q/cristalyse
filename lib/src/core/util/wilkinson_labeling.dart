@@ -145,7 +145,7 @@ class WilkinsonLabeling {
     // Fallback: if search failed, return simple linear ticks
     // Estimate a reasonable count from screen length and target density
     final estimatedCount = (targetDensity * screenLength).round().clamp(2, 10);
-    return _fallbackTicks(dmin, dmax, estimatedCount);
+    return _fallbackTicks(dmin, dmax, estimatedCount, limits);
   }
 
   /// Calculate simplicity score
@@ -225,6 +225,8 @@ class WilkinsonLabeling {
 
   /// Calculate weighted score from component scores
   static double _score(List<double> scores) {
+    assert(scores.length == weights.length,
+        'scores.length must match weights.length (${weights.length})');
     double total = 0.0;
     for (int i = 0; i < scores.length; i++) {
       total += weights[i] * scores[i];
@@ -246,9 +248,16 @@ class WilkinsonLabeling {
   }
 
   /// Fallback tick generation if search fails
-  static List<double> _fallbackTicks(double dmin, double dmax, int count) {
-    if (count <= 1) return [dmin];
-    final step = (dmax - dmin) / (count - 1);
-    return List.generate(count, (i) => dmin + i * step);
+  static List<double> _fallbackTicks(
+      double dmin, double dmax, int count, (double?, double?)? limits) {
+    // Constrain to limits, if provided
+    final constrainedMin =
+        limits?.$1 != null && limits!.$1! > dmin ? limits.$1! : dmin;
+    final constrainedMax =
+        limits?.$2 != null && limits!.$2! < dmax ? limits.$2! : dmax;
+
+    if (count <= 1) return [constrainedMin];
+    final step = (constrainedMax - constrainedMin) / (count - 1);
+    return List.generate(count, (i) => constrainedMin + i * step);
   }
 }

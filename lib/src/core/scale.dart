@@ -28,6 +28,10 @@ abstract class Scale {
       get domain; // Abstract - each scale implements its own domain type
 
   /// Map any value to 0-1 position within domain.
+  ///
+  /// This method applies only to continuous (numeric) domains. While OrdinalScale
+  /// inherits this method, it should not invoke it. Ordinal scales use indexOf
+  /// for positioning instead.
   double normalize(dynamic value, {bool clamp = true}) {
     final numericDomain = domain.cast<double>();
     final domainSpan = numericDomain[1] - numericDomain[0];
@@ -223,7 +227,13 @@ class OrdinalScale extends Scale {
     // We know _domain.length > targetLabelCount, so step >= 2
     final step = (_domain.length / targetLabelCount).ceil();
     final count = (_domain.length / step).ceil();
-    return List.generate(count, (i) => _domain[(i * step)]);
+    final result = List.generate(count, (i) => _domain[(i * step)]);
+
+    // Always include the last domain entry if not already present
+    if (result.last != _domain.last) {
+      result.add(_domain.last);
+    }
+    return result;
   }
 
   /// Convert screen coordinate back to category value

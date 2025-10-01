@@ -4,7 +4,7 @@ import '../geometry.dart';
 
 /// Enum for axis bounds calculation behaviors with options as follows.
 ///
-/// - `nonApplicable`: In BoundsCalculator, returns sentinel value for ignored bounds
+/// - `notApplicable`: In BoundsCalculator, returns sentinel value for ignored bounds
 /// as highest precedence (`Bounds.ignored()` of `(min, max) = (0, 0)`) for charts
 /// (e.g., pie charts) that don't use continuous axes.
 ///

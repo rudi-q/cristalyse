@@ -217,5 +217,24 @@ void main() {
       expect(ticks.length, greaterThanOrEqualTo(testLabelCount - 4));
       expect(ticks.length, lessThanOrEqualTo(testLabelCount + 4));
     });
+
+    test('Restrictive limits force fallback and respect constraints', () {
+      // Very restrictive limits (50, 51) with data range (0, 100)
+      // Should force fallback and constrain ticks to limits
+      final ticks = WilkinsonLabeling.extended(
+          0, 100, testScreenLength, testDensity,
+          limits: (50.0, 51.0));
+
+      // All ticks must be within limits
+      expect(ticks.isNotEmpty, true);
+      for (final tick in ticks) {
+        expect(tick, greaterThanOrEqualTo(50.0));
+        expect(tick, lessThanOrEqualTo(51.0));
+      }
+
+      // First and last should respect limits
+      expect(ticks.first, greaterThanOrEqualTo(50.0));
+      expect(ticks.last, lessThanOrEqualTo(51.0));
+    });
   });
 }
