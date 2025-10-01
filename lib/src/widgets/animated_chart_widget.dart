@@ -183,9 +183,9 @@ class _AnimatedCristalyseChartWidgetState
 
     if (useAxisMode) {
       // Axis mode: detect all points at X position
+      // Always snaps to nearest X position for continuous tooltip display
       final points = _interactionDetector!.detectPointsByXPosition(
         event.localPosition,
-        xTolerance: 15.0,
       );
 
       // Update crosshair position if needed
@@ -380,9 +380,9 @@ class _AnimatedCristalyseChartWidgetState
 
       if (useAxisMode) {
         // Axis mode: detect all points at X position
+        // Always snaps to nearest X position for continuous tooltip display
         final points = _interactionDetector!.detectPointsByXPosition(
           details.localPosition,
-          xTolerance: 15.0,
         );
 
         // Update crosshair position if needed
@@ -461,11 +461,18 @@ class _AnimatedCristalyseChartWidgetState
     // Keep pan domains to maintain the panned view
     // Don't reset them so the chart stays in the panned position
 
+    // Clear crosshair on gesture end
+    if (_crosshairPosition != null) {
+      setState(() {
+        _crosshairPosition = null;
+      });
+    }
+
     widget.interaction.hover?.onExit?.call(null);
 
-    if (widget.interaction.tooltip?.builder != null) {
-      hideTooltip(panEndContext);
-    }
+    // Always hide tooltip on gesture end (not just when builder != null)
+    // This ensures both single-point and multi-point tooltips are hidden
+    hideTooltip(panEndContext);
   }
 
   void _handleTap(
