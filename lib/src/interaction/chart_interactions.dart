@@ -364,7 +364,7 @@ class DefaultTooltips {
                 ? point.getDisplayValue(yColumn)
                 : (point.yValue?.toString() ??
                     point.data['y']?.toString() ??
-                    '');
+                    'N/A');
             final color = point.color ?? Colors.blue;
 
             return Padding(

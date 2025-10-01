@@ -112,14 +112,7 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
     required Offset position,
     required bool isMultiPoint,
   }) {
-    // Update current state
-    _currentPoint = singlePoint;
-    _currentPoints = multiPoints;
-    _currentPosition = position;
-    _shouldShow = true;
-    _isMultiPoint = isMultiPoint;
-
-    // Check if we have a builder
+    // Check if we have a builder FIRST before doing anything
     final hasBuilder = isMultiPoint
         ? widget.config.multiPointBuilder != null
         : widget.config.builder != null;
@@ -128,15 +121,27 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
       return;
     }
 
+    // Capture previous state BEFORE overwriting for comparison
+    final previousPoint = _currentPoint;
+    final previousPoints = _currentPoints;
+
     // Cancel any pending hide operation
     _hideTimer?.cancel();
     _hideTimer = null;
 
     // If already showing a tooltip, check if we need to update
     if (_isVisible && _overlayEntry != null) {
+      // Compare NEW data against PREVIOUS data (not against itself!)
       final shouldRecreate = isMultiPoint
-          ? !_hasSameDataMulti(_currentPoints, multiPoints)
-          : !_hasSameData(_currentPoint, singlePoint);
+          ? !_hasSameDataMulti(previousPoints, multiPoints)
+          : !_hasSameData(previousPoint, singlePoint);
+
+      // Now update state AFTER comparison
+      _currentPoint = singlePoint;
+      _currentPoints = multiPoints;
+      _currentPosition = position;
+      _shouldShow = true;
+      _isMultiPoint = isMultiPoint;
 
       if (shouldRecreate) {
         // Data changed - recreate tooltip with smooth transition
@@ -148,6 +153,13 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
       }
       return;
     }
+
+    // Update state for new tooltip
+    _currentPoint = singlePoint;
+    _currentPoints = multiPoints;
+    _currentPosition = position;
+    _shouldShow = true;
+    _isMultiPoint = isMultiPoint;
 
     // Cancel any existing show timer and start a new one
     _showTimer?.cancel();
