@@ -3243,7 +3243,6 @@ class AnimatedChartPainter extends CustomPainter {
       // Always use theme palette for consistent theme responsiveness
       final groupColor =
           theme.colorPalette[groupIndex % theme.colorPalette.length];
-      theme.colorPalette[groupIndex % theme.colorPalette.length];
 
       late Rect barRect;
       if (isHorizontal) {

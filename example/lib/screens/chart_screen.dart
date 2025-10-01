@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 
 import '../graphs/advanced_gradient_example.dart';
 import '../graphs/area_chart.dart';
+import '../graphs/axis_tooltip_example.dart';
 import '../graphs/bar_chart.dart';
 import '../graphs/bubble_chart.dart';
 import '../graphs/debug_gradient.dart';
@@ -557,6 +558,8 @@ class _ChartScreenState extends State<ChartScreen>
         return const DebugGradientExample();
       case 18:
         return const AdvancedGradientExample();
+      case 19:
+        return const AxisTooltipExample();
       default:
         return Container();
     }
@@ -684,6 +687,12 @@ class _ChartScreenState extends State<ChartScreen>
           _buildStatsCard('Gradient Types', 'Mixed', 'All Types', Colors.blue),
           _buildStatsCard('Chart Types', '2', 'Bars + Points', Colors.green),
           _buildStatsCard('Creativity', '∞', 'Unlimited', Colors.orange),
+        ];
+      case 19:
+        return [
+          _buildStatsCard('Trigger Mode', 'Axis', 'X-Position', Colors.blue),
+          _buildStatsCard('Smoothness', '100%', 'No Flicker', Colors.green),
+          _buildStatsCard('Crosshair', 'Active', 'Dashed Style', Colors.purple),
         ];
       default:
         return [];
