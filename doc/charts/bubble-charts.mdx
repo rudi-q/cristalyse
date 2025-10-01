@@ -74,7 +74,7 @@ CristalyseChart()
 
 ### Size Range Control
 
-Control the minimum and maximum bubble sizes:
+Control the minimum and maximum bubble sizes for typical data:
 
 ```dart
 CristalyseChart()
@@ -87,6 +87,36 @@ CristalyseChart()
   )
   .build()
 ```
+
+### Advanced Bubble Sizing
+
+For precise control over the scale domain and visual presentation, use both `limits` and `minSize`/`maxSize`:
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'revenue', y: 'profit', size: 'dealSize', color: 'region')
+  .geomBubble(
+    minSize: 10.0,              // Visual: minimum bubble radius in pixels
+    maxSize: 40.0,              // Visual: maximum bubble radius in pixels
+    limits: (50000, 1000000),   // Scale domain: $50K maps to 10px, $1M maps to 40px
+    alpha: 0.8,
+    borderWidth: 1.5,
+  )
+  .build()
+```
+
+In this example:
+- `minSize`/`maxSize` control how bubbles appear visually (10-40 pixel radius)
+- `limits` set the scale's reference range: deals at $50K get 10px radius, deals at $1M get 40px radius
+- **All deals still render** - deals outside limits are scaled proportionally (e.g., $2M deal gets 80px radius)
+- Deals within the limits range will be scaled linearly to the visual size range
+
+**Important: Outlier Behavior**
+- **Without `limits`**: Scale domain uses actual data range, so `minSize`/`maxSize` map to actual min/max data values
+- **With `limits`**: Scale domain is set to limits; values outside limits still render, scaled proportionally beyond minSize/maxSize
+- This preserves data accuracy - all values render, with outliers appearing larger/smaller than the reference range
+- Use `limits` to set a consistent scale domain across multiple charts, not to filter data
 
 ### Dynamic Size Scaling
 

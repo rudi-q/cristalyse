@@ -138,10 +138,7 @@ class _ChartPainter extends CustomPainter {
         .where((v) => v != null)
         .cast<double>();
     if (values.isNotEmpty) {
-      scale.domain = [
-        scale.min ?? values.reduce(math.min),
-        scale.max ?? values.reduce(math.max),
-      ];
+      scale.setBounds(values.toList(), null, geometries);
     }
     scale.range = [0, width];
     return scale;
@@ -154,10 +151,7 @@ class _ChartPainter extends CustomPainter {
         .where((v) => v != null)
         .cast<double>();
     if (values.isNotEmpty) {
-      scale.domain = [
-        scale.min ?? values.reduce(math.min),
-        scale.max ?? values.reduce(math.max),
-      ];
+      scale.setBounds(values.toList(), null, geometries);
     }
     scale.range = [height, 0]; // Inverted for screen coordinates
     return scale;
@@ -178,10 +172,18 @@ class _ChartPainter extends CustomPainter {
         .where((v) => v != null)
         .cast<double>();
     if (values.isNotEmpty) {
-      return SizeScale(
-        domain: [values.reduce(math.min), values.reduce(math.max)],
+      // Visual range always comes from theme
+      final sizeScale = SizeScale(
         range: [theme.pointSizeMin, theme.pointSizeMax],
       );
+
+      // Get domain limits from bubble geometry if available
+      final bubbleGeometries = geometries.whereType<BubbleGeometry>().toList();
+      final limits =
+          bubbleGeometries.isNotEmpty ? bubbleGeometries.first.limits : null;
+
+      sizeScale.setBounds(values.toList(), limits, geometries);
+      return sizeScale;
     }
     return SizeScale();
   }
@@ -208,7 +210,7 @@ class _ChartPainter extends CustomPainter {
       ..strokeWidth = theme.gridWidth;
 
     // Vertical grid lines
-    final xTicks = xScale.getTicks(5);
+    final xTicks = xScale.getTicks();
     for (final tick in xTicks) {
       final x = plotArea.left + xScale.scale(tick);
       canvas.drawLine(
@@ -219,7 +221,7 @@ class _ChartPainter extends CustomPainter {
     }
 
     // Horizontal grid lines
-    final yTicks = yScale.getTicks(5);
+    final yTicks = yScale.getTicks();
     for (final tick in yTicks) {
       final y = plotArea.top + yScale.scale(tick);
       canvas.drawLine(
@@ -408,7 +410,7 @@ class _ChartPainter extends CustomPainter {
     );
 
     // X axis labels
-    final xTicks = xScale.getTicks(5);
+    final xTicks = xScale.getTicks();
     for (final tick in xTicks) {
       final x = plotArea.left + xScale.scale(tick);
       _drawText(
@@ -420,7 +422,7 @@ class _ChartPainter extends CustomPainter {
     }
 
     // Y axis labels
-    final yTicks = yScale.getTicks(5);
+    final yTicks = yScale.getTicks();
     for (final tick in yTicks) {
       final y = plotArea.top + yScale.scale(tick);
       _drawText(

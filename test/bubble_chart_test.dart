@@ -7,9 +7,10 @@ void main() {
     test('SizeScale should properly map data values to pixel sizes', () {
       // This is the CORE test - if this fails, bubbles won't scale correctly
       final sizeScale = SizeScale(
-        domain: [5.0, 35.0], // Data range: 5% to 35% market share
         range: [8.0, 25.0], // Pixel range: 8px to 25px radius
       );
+      // Data range: 5% to 35% market share
+      sizeScale.setBounds([5.0, 35.0], null, []);
 
       // Test exact mappings
       expect(sizeScale.scale(5.0), equals(8.0),
@@ -93,9 +94,9 @@ void main() {
       final bubbleMaxSize = 25.0; // Maximum radius in pixels
 
       final sizeScale = SizeScale(
-        domain: [minShare, maxShare],
         range: [bubbleMinSize, bubbleMaxSize],
       );
+      sizeScale.setBounds([minShare, maxShare], null, []);
 
       // Verify each company gets appropriate size
       expect(sizeScale.scale(5.0), equals(8.0),
@@ -213,9 +214,9 @@ void main() {
       final defaultMax = 30.0;
 
       final sizeScale = SizeScale(
-        domain: [minShare, maxShare],
         range: [defaultMin, defaultMax],
       );
+      sizeScale.setBounds([minShare, maxShare], null, []);
 
       // Verify specific companies get correct sizes
       final sportsFitSize = sizeScale.scale(5.0);
@@ -254,6 +255,7 @@ void main() {
 
       expect(geometry.minSize, 5.0);
       expect(geometry.maxSize, 30.0);
+      expect(geometry.limits, null);
       expect(geometry.alpha, 0.7);
       expect(geometry.shape, PointShape.circle);
       expect(geometry.borderWidth, 1.0);
@@ -267,6 +269,7 @@ void main() {
       final geometry = BubbleGeometry(
         minSize: 10.0,
         maxSize: 50.0,
+        limits: (1000, 50000),
         alpha: 0.5,
         shape: PointShape.square,
         borderWidth: 2.0,
@@ -278,6 +281,7 @@ void main() {
 
       expect(geometry.minSize, 10.0);
       expect(geometry.maxSize, 50.0);
+      expect(geometry.limits, equals((1000, 50000)));
       expect(geometry.alpha, 0.5);
       expect(geometry.shape, PointShape.square);
       expect(geometry.borderWidth, 2.0);

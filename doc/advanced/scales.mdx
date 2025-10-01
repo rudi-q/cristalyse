@@ -15,8 +15,8 @@ Linear scales map continuous data to a range, such as pixels:
 CristalyseChart()
   .data(data)
   .mapping(x: 'time', y: 'value')
-  .scaleXContinuous(min: 0, max: 100) // X-axis
-  .scaleYContinuous(min: 0, max: 200) // Y-axis
+  .scaleXContinuous(min: 0, max: 100) // X-axis with fixed visual range
+  .scaleYContinuous(min: 0, max: 200) // Y-axis with fixed visual range
   .geomLine()
   .build()
 ```
@@ -25,7 +25,42 @@ CristalyseChart()
 
 - **Domain**: Data range mapped to chart space.
 - **Range**: Pixel space where the data is plotted.
+- **Limits**: Optional `min`/`max` parameters to constrain the displayed scale range.
 - **Invertible**: Values can map back to the data space.
+
+### Scale Limits and Data Filtering
+
+Use `min` and `max` parameters to control scale behavior:
+
+```dart
+// Data-driven scaling (default behavior)
+CristalyseChart()
+  .data(temperatureData) // Values: [15.2, 22.8, 19.5, 16.1]
+  .mapping(x: 'hour', y: 'temp')
+  .scaleYContinuous() // Scale automatically fits data range
+  .geomLine()
+  .build()
+
+// Fixed range scaling with limits
+CristalyseChart()
+  .data(temperatureData)
+  .mapping(x: 'hour', y: 'temp')
+  .scaleYContinuous(min: 10, max: 30) // Fixed 10-30°C range
+  .geomLine()
+  .build()
+```
+
+Use limits for consistent ranges across multiple charts and to set explicit
+meaningful baselines (like 0 for revenue).
+
+Without limits, the behavior varies by geometry. Geometries that are value
+comparisons (Bar Charts, Area Charts) have zero baseline by default. For other
+geometries, the scale domain is fit to the actual data range (15.2-22.8°C). 
+
+With limits, the scale domain uses the specified range (10-30°C), including 
+overriding a zero baseline for e.g. Bar Charts and Area Charts. Data points 
+beyond the limits still render proportionally beyond the visual range.
+
 
 ## Ordinal Scales
 

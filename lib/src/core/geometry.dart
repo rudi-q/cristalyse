@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'label_formatter.dart';
+import 'util/bounds_calculator.dart';
 
 /// Enum for specifying which Y-axis to use
 enum YAxis { primary, secondary }
@@ -14,6 +15,14 @@ abstract class Geometry {
   final bool interactive;
 
   Geometry({this.yAxis = YAxis.primary, this.interactive = true});
+
+  /// Returns the appropriate bounds behavior for this geometry type.
+  ///
+  /// Each geometry type must define its fallback behavior when bounds are
+  /// not explicitly specified in the grammar of graphics for a continuous axis.
+  /// Use BoundsBehavior.notApplicable if the geometry type does not support a
+  /// continuous axis (e.g., for a pie chart).
+  BoundsBehavior getBoundsBehavior();
 }
 
 /// Enum for point shapes
@@ -36,6 +45,9 @@ class PointGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.dataDriven;
 }
 
 /// Line geometry for line charts
@@ -53,6 +65,9 @@ class LineGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.dataDriven;
 }
 
 /// Bar geometry for bar charts
@@ -76,6 +91,9 @@ class BarGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.zeroBaseline;
 }
 
 /// Line styles for line geometry
@@ -107,6 +125,9 @@ class AreaGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.zeroBaseline;
 }
 
 /// Pie geometry for pie and donut charts
@@ -143,6 +164,9 @@ class PieGeometry extends Geometry {
     super.interactive = true,
   })  : labelFormatter = labelFormatter ?? _defaultPercentageFormatter.format,
         super(yAxis: YAxis.primary); // Pie charts don't use Y-axis
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.notApplicable;
 }
 
 /// Heat map geometry for 2D matrix visualization
@@ -173,6 +197,9 @@ class HeatMapGeometry extends Geometry {
     this.cellAspectRatio,
     super.interactive = true,
   }) : super(yAxis: YAxis.primary);
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.dataDriven;
 }
 
 /// Bubble geometry for bubble charts
@@ -183,6 +210,7 @@ class HeatMapGeometry extends Geometry {
 class BubbleGeometry extends Geometry {
   final double? minSize;
   final double? maxSize;
+  final (double?, double?)? limits;
   final Color? color;
   final double alpha;
   final PointShape shape;
@@ -196,6 +224,7 @@ class BubbleGeometry extends Geometry {
   BubbleGeometry({
     this.minSize = 5.0,
     this.maxSize = 30.0,
+    this.limits,
     this.color,
     this.alpha = 0.7,
     this.shape = PointShape.circle,
@@ -208,6 +237,9 @@ class BubbleGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.dataDriven;
 }
 
 /// Enum for progress bar orientations
@@ -348,4 +380,7 @@ class ProgressGeometry extends Geometry {
             style != ProgressStyle.concentric ||
                 (concentricRadii != null && concentricThicknesses != null),
             'concentric style requires non-null concentricRadii and concentricThicknesses');
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.notApplicable;
 }

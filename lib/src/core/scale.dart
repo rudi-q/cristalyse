@@ -1,74 +1,146 @@
 import 'package:flutter/material.dart';
 
+import 'geometry.dart';
 import 'label_formatter.dart';
+import 'util/bounds_calculator.dart';
+import 'util/wilkinson_labeling.dart';
 
 /// Base class for all scales
 abstract class Scale {
   final LabelFormatter _formatter;
 
-  Scale({LabelCallback? labelFormatter})
+  /// Default range for scales. Numeric for all scale types
+  List<double> _range = [0, 1];
+
+  /// Optional limits for this scale - used when setBounds is called with null limits
+  (double?, double?)? limits;
+
+  /// Optimal pixels per axis label for readability
+  /// Could be threaded as a parameter into API if users demand it
+  static const double optimalPixelsPerLabel = 60.0;
+
+  Scale({LabelCallback? labelFormatter, this.limits})
       : _formatter = LabelFormatter(labelFormatter);
 
-  double scale(dynamic value);
-  List<dynamic> getTicks(int count);
-  List<dynamic> get domain;
-  List<double> get range;
+  /// Return display parameter within range from value on domain.
+  dynamic scale(dynamic value);
+  List<dynamic>
+      get domain; // Abstract - each scale implements its own domain type
 
-  /// Inverse transformation: convert screen coordinate back to data value
-  dynamic invert(double screenValue);
+  /// Map any value to 0-1 position within domain.
+  double normalize(dynamic value, {bool clamp = true}) {
+    final numericDomain = domain.cast<double>();
+    final domainSpan = numericDomain[1] - numericDomain[0];
+    if (domainSpan == 0) return 0.0;
+    final numValue = (value is num) ? value.toDouble() : 0.0;
+    final result = (numValue - numericDomain[0]) / domainSpan;
+    return clamp ? result.clamp(0.0, 1.0) : result;
+  }
+
+  /// Map a 0-1 normalized value to range.
+  double scaleToRange(double normalized) {
+    final rangeSpan = range[1] - range[0];
+    return range[0] + normalized * rangeSpan;
+  }
+
+  /// Unified range implementation for all scales
+  List<double> get range => _range;
+  set range(List<double> value) => _range = List.from(value);
+
+  /// Inverse transformation: convert screen coordinate back to data value.
+  /// This default implementation is for linear scales.
+  dynamic invert(double screenValue) {
+    final numericDomain = domain.cast<double>();
+    final rangeSpan = range[1] - range[0];
+    final domainSpan = numericDomain[1] - numericDomain[0];
+    if (rangeSpan == 0) return numericDomain[0];
+    return numericDomain[0] + (screenValue - range[0]) / rangeSpan * domainSpan;
+  }
+
+  /// Get tick values for axis display
+  List<dynamic> getTicks();
 
   /// Format a value for display using this Scale instance's label formatter
   String formatLabel(dynamic value) => _formatter.format(value);
+
+  /// Set bounds for this scale given data values, limits, and geometry context.
+  /// Uses passed limits, or falls back to scale's own limits, or geometry behavior.
+  void setBounds(List<double> values, (double?, double?)? passedLimits,
+      List<Geometry> geometries) {
+    final effectiveLimits = passedLimits ?? limits;
+    setBoundsInternal(values, effectiveLimits, geometries);
+  }
+
+  /// Internal bounds setting - each scale implements its own logic.
+  void setBoundsInternal(List<double> values,
+      (double?, double?)? effectiveLimits, List<Geometry> geometries);
 }
 
 /// Linear scale for continuous data
 class LinearScale extends Scale {
   List<double> _domain = [0, 1];
-  List<double> _range = [0, 1];
-  final double? min;
-  final double? max;
+  List<double>? _ticks; // Cached ticks from Wilkinson algorithm
 
-  LinearScale({this.min, this.max, super.labelFormatter});
+  LinearScale({super.limits, super.labelFormatter});
 
   @override
   List<double> get domain => _domain;
-  set domain(List<double> value) => _domain = value;
-
-  @override
-  List<double> get range => _range;
-  set range(List<double> value) => _range = value;
+  set domain(List<double> value) => _domain = List.from(value);
 
   @override
   double scale(dynamic value) {
-    if (value is! num) return _range[0];
-    final numValue = value.toDouble();
-    final domainSpan = _domain[1] - _domain[0];
-    final rangeSpan = _range[1] - _range[0];
-    if (domainSpan == 0) return _range[0];
-    return _range[0] + (numValue - _domain[0]) / domainSpan * rangeSpan;
+    // normalize, but do not clamp any values out of bounds
+    return scaleToRange(normalize(value, clamp: false));
   }
 
   @override
-  List<double> getTicks(int count) {
-    if (count <= 1) return [_domain[0]];
-    final step = (_domain[1] - _domain[0]) / (count - 1);
-    return List.generate(count, (i) => _domain[0] + i * step);
+  // Return cached ticks computed during setBoundsInternal()
+  // As long as range is set BEFORE setBounds(), cache is always valid
+  List<dynamic> getTicks() {
+    return _ticks ?? [];
   }
 
-  /// Convert screen coordinate back to data value
   @override
-  double invert(double screenValue) {
-    final rangeSpan = _range[1] - _range[0];
-    final domainSpan = _domain[1] - _domain[0];
-    if (rangeSpan == 0) return _domain[0];
-    return _domain[0] + (screenValue - _range[0]) / rangeSpan * domainSpan;
+  void setBoundsInternal(List<double> values,
+      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+    final bounds = BoundsCalculator.calculateBounds(
+        values, effectiveLimits, geometries,
+        applyPadding: true);
+
+    if (bounds != const Bounds.ignored()) {
+      // Use Wilkinson algorithm to extend bounds to nice round numbers
+      final screenLength = (range[1] - range[0]).abs();
+
+      final targetLabelCount =
+          (screenLength / Scale.optimalPixelsPerLabel).round();
+      final targetDensity = targetLabelCount / screenLength; // labels per pixel
+
+      final niceTicks = WilkinsonLabeling.extended(
+          bounds.min, bounds.max, screenLength, targetDensity,
+          limits: effectiveLimits);
+
+      if (niceTicks.isNotEmpty) {
+        // Cache ticks for getTicks() to avoid recomputing
+        _ticks = niceTicks;
+
+        // Ensure domain covers the actual data range
+        // Use nice ticks if they cover the data, otherwise expand to ensure coverage
+        final niceMin =
+            niceTicks.first <= bounds.min ? niceTicks.first : bounds.min;
+        final niceMax =
+            niceTicks.last >= bounds.max ? niceTicks.last : bounds.max;
+        _domain = [niceMin, niceMax];
+      } else {
+        _ticks = null;
+        _domain = [bounds.min, bounds.max];
+      }
+    }
   }
 }
 
 /// Ordinal scale for categorical data (essential for bar charts)
 class OrdinalScale extends Scale {
   List<dynamic> _domain = [];
-  List<double> _range = [0, 1];
   final double _padding; // 10% padding between bands
   double _bandWidth = 0;
 
@@ -78,14 +150,13 @@ class OrdinalScale extends Scale {
   @override
   List<dynamic> get domain => _domain;
   set domain(List<dynamic> value) {
-    _domain = value;
+    _domain = List.from(value);
     _calculateBandWidth();
   }
 
   @override
-  List<double> get range => _range;
   set range(List<double> value) {
-    _range = value;
+    _range = List.from(value);
     _calculateBandWidth();
   }
 
@@ -123,12 +194,29 @@ class OrdinalScale extends Scale {
   }
 
   @override
-  List<dynamic> getTicks(int count) {
-    // For ordinal scales, return all domain values or subset
-    if (count >= _domain.length) return List.from(_domain);
+  // For ordinal scales, return all domain values or subset
+  List<dynamic> getTicks() {
+    if (_domain.isEmpty) return [];
 
-    final step = _domain.length / count;
-    return List.generate(count, (i) => _domain[(i * step).floor()]);
+    final screenLength = (_range[1] - _range[0]).abs();
+
+    // Handle edge case: zero-size screen (e.g., during initialization)
+    if (screenLength == 0) return List.from(_domain);
+
+    final targetLabelCount = (screenLength / Scale.optimalPixelsPerLabel)
+        .round()
+        .clamp(1, _domain.length);
+
+    // If we have fewer categories than target, show all
+    if (_domain.length <= targetLabelCount) {
+      return List.from(_domain);
+    }
+
+    // Otherwise, intelligently subset by showing every nth category
+    // We know _domain.length > targetLabelCount, so step >= 2
+    final step = (_domain.length / targetLabelCount).ceil();
+    final count = (_domain.length / step).ceil();
+    return List.generate(count, (i) => _domain[(i * step)]);
   }
 
   /// Convert screen coordinate back to category value
@@ -147,6 +235,12 @@ class OrdinalScale extends Scale {
 
     if (index >= _domain.length) return _domain.last;
     return _domain[index];
+  }
+
+  @override
+  void setBoundsInternal(List<double> values,
+      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+    // Ordinal scales don't use continuous bounds - so this is a no-op
   }
 }
 
@@ -183,42 +277,82 @@ class ColorScale {
 }
 
 /// Size scale for point size mapping
-class SizeScale {
-  final List<double> domain;
-  final List<double> range;
+class SizeScale extends Scale {
+  List<double> _domain;
 
-  SizeScale({this.domain = const [0, 1], this.range = const [3, 10]});
+  SizeScale({
+    List<double> domain = const [0, 1],
+    List<double> range = const [3, 10],
+    super.limits,
+    super.labelFormatter,
+  }) : _domain = domain {
+    _range = range;
+  }
 
-  double scale(double value) {
-    final domainSpan = domain[1] - domain[0];
-    final rangeSpan = range[1] - range[0];
-    if (domainSpan == 0) return range[0];
-    return range[0] + (value - domain[0]) / domainSpan * rangeSpan;
+  @override
+  List<double> get domain => _domain;
+  set domain(List<double> value) => _domain = List.from(value);
+
+  @override
+  double scale(dynamic value) {
+    // normalize, but do not clamp any values out of bounds
+    return scaleToRange(normalize(value, clamp: false));
+  }
+
+  @override
+  List<dynamic> getTicks() {
+    // Size scales do not use axes w/ tick marks
+    return [];
+  }
+
+  @override
+  void setBoundsInternal(List<double> values,
+      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+    if (values.isEmpty) {
+      _domain = [0, 1];
+      return;
+    }
+
+    // For size scales, we want exact data bounds without padding
+    final bounds = BoundsCalculator.calculateBounds(
+        values, effectiveLimits, geometries,
+        applyPadding: false);
+
+    if (bounds != const Bounds.ignored()) {
+      _domain = [bounds.min, bounds.max];
+    }
   }
 }
 
 /// Gradient color scale for continuous color mapping (e.g., heat maps)
-class GradientColorScale {
-  final List<double> domain;
+class GradientColorScale extends Scale {
+  List<double> _domain;
   final List<Color> colors;
   final bool interpolate;
 
   GradientColorScale({
-    this.domain = const [0, 1],
+    List<double> domain = const [0, 1],
     this.colors = const [Colors.blue, Colors.red],
     this.interpolate = true,
-  });
+    super.limits,
+    super.labelFormatter,
+  }) : _domain = domain;
 
-  Color scale(double value) {
+  @override
+  List<double> get domain => _domain;
+  set domain(List<double> value) => _domain = List.from(value);
+
+  @override
+  List<double> get range =>
+      [0, 1]; // Gradient color scales always use 0, 1 range
+
+  @override
+  Color scale(dynamic value) {
     if (colors.isEmpty) return Colors.grey;
     if (colors.length == 1) return colors[0];
 
-    // Normalize value to 0-1 range
-    final minDomain = domain.isNotEmpty ? domain.first : 0;
-    final maxDomain = domain.length > 1 ? domain.last : 1;
-    final normalizedValue = maxDomain > minDomain
-        ? ((value - minDomain) / (maxDomain - minDomain)).clamp(0.0, 1.0)
-        : 0.0;
+    // Normalize to get 0-1 value (clamped)
+    final normalizedValue = normalize(value);
 
     if (!interpolate) {
       // Discrete colors based on segments
@@ -237,6 +371,29 @@ class GradientColorScale {
 
     final t = scaledValue - lowerIndex;
     return Color.lerp(colors[lowerIndex], colors[upperIndex], t)!;
+  }
+
+  @override
+  double invert(double screenValue) {
+    // Not applicable for color scale
+    return 0;
+  }
+
+  @override
+  List<dynamic> getTicks() {
+    // Gradient color scales do not use axes w/ tick marks
+    return [];
+  }
+
+  @override
+  void setBoundsInternal(List<double> values,
+      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+    final bounds =
+        BoundsCalculator.calculateBounds(values, effectiveLimits, geometries);
+
+    if (bounds != const Bounds.ignored()) {
+      _domain = [bounds.min, bounds.max];
+    }
   }
 
   /// Predefined gradient themes
