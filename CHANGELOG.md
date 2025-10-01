@@ -1,3 +1,98 @@
+## 1.8.0 - 2025-10-01
+
+#### 🎯 Major Feature: Intelligent Axis Bounds & Labeling
+
+**Authored by [@davidlrichmond](https://github.com/davidrichmond)** - Thank you for this exceptional contribution!
+
+- **Wilkinson Extended Algorithm**: Industry-standard tick labeling for "nice" round numbers
+  - Based on IEEE paper by Talbot, Lin, and Hanrahan (2010)
+  - Optimizes simplicity, coverage, density, and legibility
+  - Generates clean axis labels like 0, 5, 10, 50, 100 instead of arbitrary decimals
+  - Smart pruning for performance optimization
+- **Geometry-Aware Bounds**: Different chart types automatically use appropriate scale defaults
+  - **Zero Baseline**: Bar and area charts start from zero for quantity comparison
+  - **Data-Driven**: Line and scatter charts use tight bounds for trend analysis
+  - **Precedence Logic**: Explicit limits → Geometry behavior → Fallback defaults
+- **Unified Scale Architecture**: Cleaner, more maintainable scale system
+  - New `setBounds()` API across all scale types
+  - Added `normalize()` and `scaleToRange()` helpers
+  - Size and gradient scales now properly extend `Scale` base class
+  - Removed duplicate bounds logic from painters
+
+#### ✨ New API Capabilities
+
+- **Bubble Chart Size Limits**: New `limits` parameter for bubble geometry
+  ```dart
+  chart.geomBubble(
+    minSize: 8.0,           // Visual: minimum bubble radius in pixels
+    maxSize: 25.0,          // Visual: maximum bubble radius in pixels
+    limits: (1000, 50000),  // Scale domain: $1K → 8px, $50K → 25px
+    alpha: 0.8,
+  )
+  ```
+- **Scale Limits as Tuples**: Cleaner API with `(min, max)` tuples
+  - `scaleYContinuous(min: 0, max: 100)` still works (backward compatible)
+  - Internally converted to `limits: (0, 100)` tuple
+  - Partial limits supported: `(0, null)` or `(null, 100)`
+
+#### 📈 User-Visible Improvements
+
+- **Prettier Axis Labels**: Ticks now show round numbers optimized for readability
+  - Before: 0.47, 5.23, 10.88, 15.91, 21.07
+  - After: 0, 5, 10, 15, 20
+- **Better Default Bounds**: Charts automatically use appropriate scale behavior
+  - Bar charts properly start at zero baseline
+  - Line charts focus on data range with minimal padding
+  - Consistent behavior across chart types
+- **Smarter Tick Density**: Optimal ~60 pixels per label for readability
+  - Prevents label overlap on small screens
+  - Maximizes information on large displays
+
+#### 🧪 Comprehensive Testing
+
+- **New Test Files** (803 lines of tests added):
+  - `axis_bounds_test.dart`: Bounds calculation with all behaviors
+  - `wilkinson_labeling_test.dart`: Algorithm validation with real-world scenarios
+  - `bounds_integration_test.dart`: End-to-end integration tests
+- **All 263 Tests Passing**: No regressions, fully backward compatible
+
+#### 📚 Documentation Updates
+
+- **Enhanced Scale Documentation** (`scales.mdx`):
+  - Comprehensive limits behavior explanation
+  - Data filtering vs. visual range clarification
+  - Practical examples for all use cases
+- **Bubble Chart Sizing Guide** (`bubble-charts.mdx`):
+  - Advanced bubble sizing with limits parameter
+  - Outlier behavior explanation
+  - Visual vs. domain scale distinction
+
+#### 🔧 Technical Implementation
+
+- **New Core Utilities**:
+  - `wilkinson_labeling.dart` (263 lines): IEEE-standard algorithm
+  - `bounds_calculator.dart` (230 lines): Geometry-aware bounds
+- **Refactored Scale System**:
+  - Unified `setBounds()` API
+  - Centralized bounds logic (no duplication)
+  - Cleaner abstractions and inheritance
+
+#### 🐛 Bug Fixes
+
+- Fixed Hero tag conflict with multiple FloatingActionButtons in example app
+- Removed unused `dart:math` import from `chart_widget.dart`
+- Cleaned up duplicate bounds calculation logic across widgets
+
+#### ⚡ Performance & Compatibility
+
+- **Zero Breaking Changes**: Fully backward compatible
+- **Negligible Performance Impact**: Ticks computed once and cached
+- **Production Ready**: Well-tested, documented, and reviewed
+
+**This release brings professional, publication-quality axis rendering to Cristalyse charts!** 📊✨
+
+---
+
 ## 1.7.0 - 2025-09-30
 
 #### 📊 Major Feature: Progress Bar Charts

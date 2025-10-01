@@ -60,9 +60,9 @@ void main() {
       final maxBubbleSize = 15.0; // 15px radius maximum
 
       final sizeScale = SizeScale(
-        domain: [minMarketShare, maxMarketShare],
         range: [minBubbleSize, maxBubbleSize],
       );
+      sizeScale.setBounds([minMarketShare, maxMarketShare], null, []);
 
       // Verify each company gets appropriate bubble size
       for (final company in bubbleData) {
@@ -97,9 +97,9 @@ void main() {
       final maxBubbleSizeMax = 25.0; // 25px radius at max slider
 
       final sizeScaleMax = SizeScale(
-        domain: [minMarketShare, maxMarketShare],
         range: [minBubbleSizeMax, maxBubbleSizeMax],
       );
+      sizeScaleMax.setBounds([minMarketShare, maxMarketShare], null, []);
 
       // Verify slider scaling maintains proportions
       for (final company in bubbleData) {

@@ -994,6 +994,7 @@ class _ChartScreenState extends State<ChartScreen>
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 FloatingActionButton.extended(
+                  heroTag: "theme_fab",
                   onPressed: () {
                     setState(() {
                       _currentThemeIndex =
@@ -1007,6 +1008,7 @@ class _ChartScreenState extends State<ChartScreen>
                 ),
                 const SizedBox(width: 16),
                 FloatingActionButton(
+                  heroTag: "palette_fab",
                   onPressed: () {
                     setState(() {
                       _currentPaletteIndex =

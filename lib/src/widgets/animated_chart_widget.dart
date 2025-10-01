@@ -712,9 +712,7 @@ class _AnimatedCristalyseChartWidgetState
       final dataCol = widget.yColumn;
 
       if (dataCol == null || widget.data.isEmpty) {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, widget.geometries);
         scale.range = [0, width];
         return scale;
       }
@@ -726,32 +724,10 @@ class _AnimatedCristalyseChartWidgetState
           .toList();
 
       if (values.isNotEmpty) {
-        double domainMin = scale.min ?? values.reduce(math.min);
-        double domainMax = scale.max ?? values.reduce(math.max);
-
-        if (domainMin == domainMax) {
-          if (domainMin == 0) {
-            domainMin = -0.5;
-            domainMax = 0.5;
-          } else if (domainMin > 0) {
-            domainMax = domainMin + domainMin.abs() * 0.2;
-            domainMin = 0;
-          } else {
-            domainMin = domainMin - domainMin.abs() * 0.2;
-            domainMax = 0;
-          }
-        } else {
-          if (domainMin > 0) domainMin = 0;
-          if (domainMax < 0) domainMax = 0;
-        }
-        scale.domain = [domainMin, domainMax];
-        if (scale.domain[0] == scale.domain[1]) {
-          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
-        }
+        // Use geometry-aware bounds calculation
+        scale.setBounds(values, null, widget.geometries);
       } else {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, widget.geometries);
       }
       scale.range = [0, width];
       return scale;
@@ -781,9 +757,7 @@ class _AnimatedCristalyseChartWidgetState
         final scale =
             (preconfigured is LinearScale ? preconfigured : LinearScale());
         if (dataCol == null || widget.data.isEmpty) {
-          scale.domain = scale.min != null && scale.max != null
-              ? [scale.min!, scale.max!]
-              : [0, 1];
+          scale.setBounds([], null, widget.geometries);
           scale.range = [0, width];
           return scale;
         }
@@ -794,32 +768,10 @@ class _AnimatedCristalyseChartWidgetState
             .toList();
 
         if (values.isNotEmpty) {
-          double domainMin = scale.min ?? values.reduce(math.min);
-          double domainMax = scale.max ?? values.reduce(math.max);
-
-          if (domainMin == domainMax) {
-            if (domainMin == 0) {
-              domainMin = -0.5;
-              domainMax = 0.5;
-            } else if (domainMin > 0) {
-              domainMax = domainMin + domainMin.abs() * 0.2;
-              domainMin = 0;
-            } else {
-              domainMin = domainMin - domainMin.abs() * 0.2;
-              domainMax = 0;
-            }
-          } else {
-            if (domainMin > 0) domainMin = 0;
-            if (domainMax < 0) domainMax = 0;
-          }
-          scale.domain = [domainMin, domainMax];
-          if (scale.domain[0] == scale.domain[1]) {
-            scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
-          }
+          // Use geometry-aware bounds calculation
+          scale.setBounds(values, null, widget.geometries);
         } else {
-          scale.domain = scale.min != null && scale.max != null
-              ? [scale.min!, scale.max!]
-              : [0, 1];
+          scale.setBounds([], null, widget.geometries);
         }
         scale.range = [0, width];
         return scale;
@@ -857,9 +809,7 @@ class _AnimatedCristalyseChartWidgetState
       final scale =
           (preconfigured is LinearScale ? preconfigured : LinearScale());
       if (dataCol == null || widget.data.isEmpty) {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, widget.geometries);
         scale.range = [height, 0];
         return scale;
       }
@@ -867,7 +817,7 @@ class _AnimatedCristalyseChartWidgetState
       final relevantGeometries =
           widget.geometries.where((g) => g.yAxis == axis).toList();
       if (relevantGeometries.isEmpty) {
-        scale.domain = [0, 1];
+        scale.setBounds([0, 1], null, widget.geometries);
         scale.range = [height, 0];
         return scale;
       }
@@ -897,37 +847,10 @@ class _AnimatedCristalyseChartWidgetState
       }
 
       if (values.isNotEmpty) {
-        double domainMin = scale.min ?? 0;
-        double domainMax = scale.max ?? values.reduce(math.max);
-
-        if (hasStackedBars) {
-          domainMax = domainMax * 1.1;
-        }
-
-        if (domainMin == domainMax) {
-          if (domainMax == 0) {
-            domainMin = -0.5;
-            domainMax = 0.5;
-          } else if (domainMax > 0) {
-            domainMax = domainMax + domainMax * 0.2;
-            domainMin = 0;
-          } else {
-            domainMin = domainMin - domainMin.abs() * 0.2;
-            domainMax = 0;
-          }
-        } else {
-          if (domainMin > 0) domainMin = 0;
-          if (domainMax < 0) domainMax = 0;
-        }
-
-        scale.domain = [domainMin, domainMax];
-        if (scale.domain[0] == scale.domain[1]) {
-          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
-        }
+        // Use geometry-aware bounds calculation
+        scale.setBounds(values, null, widget.geometries);
       } else {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, widget.geometries);
       }
       scale.range = [height, 0];
       return scale;

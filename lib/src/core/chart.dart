@@ -366,11 +366,18 @@ class CristalyseChart {
   /// represent two dimensions, and the bubble size represents the third dimension.
   /// Perfect for showing relationships between multiple continuous variables.
   ///
+  /// Size Scaling Behavior:
+  /// - Without `limits`: Scale domain uses actual data range, so `minSize`/`maxSize` map to actual min/max data values
+  /// - With `limits`: Scale domain is set to limits range; values outside limits still render but are scaled proportionally
+  /// - This preserves data accuracy - all values render, with outliers appearing larger/smaller than minSize/maxSize
+  /// - Use `limits` to set the scale's reference range for more consistent bubble sizing e.g. across charts
+  ///
   /// Example:
   /// ```dart
   /// chart.geomBubble(
-  ///   minSize: 10.0,
-  ///   maxSize: 50.0,
+  ///   minSize: 8.0,           // Bubble radius when value equals limits min (or data min if no limits)
+  ///   maxSize: 25.0,          // Bubble radius when value equals limits max (or data max if no limits)
+  ///   limits: (1000, 50000),  // Optional: set scale domain (in this example, values at 1000→8px, 50000→25px)
   ///   alpha: 0.7,
   ///   borderWidth: 2.0,
   ///   showLabels: true,
@@ -380,6 +387,7 @@ class CristalyseChart {
   CristalyseChart geomBubble({
     double? minSize,
     double? maxSize,
+    (double?, double?)? limits,
     Color? color,
     double? alpha,
     PointShape? shape,
@@ -405,6 +413,7 @@ class CristalyseChart {
       BubbleGeometry(
         minSize: normalizedMinSize,
         maxSize: normalizedMaxSize,
+        limits: limits,
         color: color,
         alpha: alpha ?? 0.7,
         shape: shape ?? PointShape.circle,
@@ -521,16 +530,22 @@ class CristalyseChart {
   }
 
   /// Configure continuous X scale
-  CristalyseChart scaleXContinuous(
-      {double? min, double? max, LabelCallback? labels}) {
-    _xScale = LinearScale(min: min, max: max, labelFormatter: labels);
+  CristalyseChart scaleXContinuous({
+    double? min,
+    double? max,
+    LabelCallback? labels,
+  }) {
+    _xScale = LinearScale(limits: (min, max), labelFormatter: labels);
     return this;
   }
 
   /// Configure continuous Y scale (primary/left axis)
-  CristalyseChart scaleYContinuous(
-      {double? min, double? max, LabelCallback? labels}) {
-    _yScale = LinearScale(min: min, max: max, labelFormatter: labels);
+  CristalyseChart scaleYContinuous({
+    double? min,
+    double? max,
+    LabelCallback? labels,
+  }) {
+    _yScale = LinearScale(limits: (min, max), labelFormatter: labels);
     return this;
   }
 
@@ -540,9 +555,12 @@ class CristalyseChart {
   /// ```dart
   /// chart.scaleY2Continuous(min: 0, max: 100) // For percentage data
   /// ```
-  CristalyseChart scaleY2Continuous(
-      {double? min, double? max, LabelCallback? labels}) {
-    _y2Scale = LinearScale(min: min, max: max, labelFormatter: labels);
+  CristalyseChart scaleY2Continuous({
+    double? min,
+    double? max,
+    LabelCallback? labels,
+  }) {
+    _y2Scale = LinearScale(limits: (min, max), labelFormatter: labels);
     return this;
   }
 

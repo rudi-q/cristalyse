@@ -249,11 +249,13 @@ class AnimatedChartPainter extends CustomPainter {
           (preconfigured is LinearScale ? preconfigured : LinearScale());
       final dataCol = yColumn;
 
+      scale.range = [
+        0,
+        width
+      ]; // Set range BEFORE setBounds for correct Wilkinson computation
+
       if (dataCol == null || data.isEmpty) {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
-        scale.range = [0, width];
+        scale.setBounds([], null, geometries);
         return scale;
       }
 
@@ -264,34 +266,10 @@ class AnimatedChartPainter extends CustomPainter {
           .toList();
 
       if (values.isNotEmpty) {
-        double domainMin = scale.min ?? values.reduce(math.min);
-        double domainMax = scale.max ?? values.reduce(math.max);
-
-        if (domainMin == domainMax) {
-          if (domainMin == 0) {
-            domainMin = -0.5;
-            domainMax = 0.5;
-          } else if (domainMin > 0) {
-            domainMax = domainMin + domainMin.abs() * 0.2;
-            domainMin = 0;
-          } else {
-            domainMin = domainMin - domainMin.abs() * 0.2;
-            domainMax = 0;
-          }
-        } else {
-          if (domainMin > 0) domainMin = 0;
-          if (domainMax < 0) domainMax = 0;
-        }
-        scale.domain = [domainMin, domainMax];
-        if (scale.domain[0] == scale.domain[1]) {
-          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
-        }
+        scale.setBounds(values, null, geometries);
       } else {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, geometries);
       }
-      scale.range = [0, width];
       return scale;
     } else {
       final preconfigured = xScale;
@@ -318,11 +296,13 @@ class AnimatedChartPainter extends CustomPainter {
       } else {
         final scale =
             (preconfigured is LinearScale ? preconfigured : LinearScale());
+        scale.range = [
+          0,
+          width
+        ]; // Set range BEFORE setBounds for correct Wilkinson computation
+
         if (dataCol == null || data.isEmpty) {
-          scale.domain = scale.min != null && scale.max != null
-              ? [scale.min!, scale.max!]
-              : [0, 1];
-          scale.range = [0, width];
+          scale.setBounds([], null, geometries);
           return scale;
         }
         final values = data
@@ -332,41 +312,17 @@ class AnimatedChartPainter extends CustomPainter {
             .toList();
 
         if (values.isNotEmpty) {
-          double domainMin = scale.min ?? values.reduce(math.min);
-          double domainMax = scale.max ?? values.reduce(math.max);
-
-          if (domainMin == domainMax) {
-            if (domainMin == 0) {
-              domainMin = -0.5;
-              domainMax = 0.5;
-            } else if (domainMin > 0) {
-              domainMax = domainMin + domainMin.abs() * 0.2;
-              domainMin = 0;
-            } else {
-              domainMin = domainMin - domainMin.abs() * 0.2;
-              domainMax = 0;
-            }
-          } else {
-            if (domainMin > 0) domainMin = 0;
-            if (domainMax < 0) domainMax = 0;
-          }
+          // Use setBounds for consistent bounds calculation
+          scale.setBounds(values, null, geometries);
 
           // Use pan domain if available (for visual panning)
           if (!coordFlipped && panXDomain != null) {
-            scale.domain = [panXDomain![0], panXDomain![1]];
-          } else {
-            scale.domain = [domainMin, domainMax];
-          }
-
-          if (scale.domain[0] == scale.domain[1]) {
-            scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+            scale.setBounds(
+                values, (panXDomain![0], panXDomain![1]), geometries);
           }
         } else {
-          scale.domain = scale.min != null && scale.max != null
-              ? [scale.min!, scale.max!]
-              : [0, 1];
+          scale.setBounds([], null, geometries);
         }
-        scale.range = [0, width];
         return scale;
       }
     }
@@ -400,19 +356,20 @@ class AnimatedChartPainter extends CustomPainter {
 
       final scale =
           (preconfigured is LinearScale ? preconfigured : LinearScale());
+      scale.range = [
+        height,
+        0
+      ]; // Set range BEFORE setBounds for correct Wilkinson computation
+
       if (dataCol == null || data.isEmpty) {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
-        scale.range = [height, 0];
+        scale.setBounds([], null, geometries);
         return scale;
       }
 
       final relevantGeometries =
           geometries.where((g) => g.yAxis == axis).toList();
       if (relevantGeometries.isEmpty) {
-        scale.domain = [0, 1];
-        scale.range = [height, 0];
+        scale.setBounds([0, 1], null, geometries);
         return scale;
       }
 
@@ -441,45 +398,17 @@ class AnimatedChartPainter extends CustomPainter {
       }
 
       if (values.isNotEmpty) {
-        double domainMin = scale.min ?? 0;
-        double domainMax = scale.max ?? values.reduce(math.max);
-
-        if (hasStackedBars) {
-          domainMax = domainMax * 1.1;
-        }
-
-        if (domainMin == domainMax) {
-          if (domainMax == 0) {
-            domainMin = -0.5;
-            domainMax = 0.5;
-          } else if (domainMax > 0) {
-            domainMax = domainMax + domainMax * 0.2;
-            domainMin = 0;
-          } else {
-            domainMin = domainMin - domainMin.abs() * 0.2;
-            domainMax = 0;
-          }
-        } else {
-          if (domainMin > 0) domainMin = 0;
-          if (domainMax < 0) domainMax = 0;
-        }
+        // Use setBounds for consistent bounds calculation
+        // Wilkinson algorithm provides visual padding
+        scale.setBounds(values, null, geometries);
 
         // Use pan domain if available (for visual panning)
         if (!coordFlipped && axis == YAxis.primary && panYDomain != null) {
-          scale.domain = [panYDomain![0], panYDomain![1]];
-        } else {
-          scale.domain = [domainMin, domainMax];
-        }
-
-        if (scale.domain[0] == scale.domain[1]) {
-          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+          scale.setBounds(values, (panYDomain![0], panYDomain![1]), geometries);
         }
       } else {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, geometries);
       }
-      scale.range = [height, 0];
       return scale;
     }
   }
@@ -521,17 +450,18 @@ class AnimatedChartPainter extends CustomPainter {
         .cast<double>()
         .toList();
     if (values.isNotEmpty) {
-      // Check if we have a bubble geometry to use its size range
-      final bubbleGeometries = geometries.whereType<BubbleGeometry>().toList();
-      final bubbleGeometry =
-          bubbleGeometries.isNotEmpty ? bubbleGeometries.first : null;
-      final minSize = bubbleGeometry?.minSize ?? theme.pointSizeMin;
-      final maxSize = bubbleGeometry?.maxSize ?? theme.pointSizeMax;
-
-      return SizeScale(
-        domain: [values.reduce(math.min), values.reduce(math.max)],
-        range: [minSize, maxSize],
+      // Visual range always comes from theme
+      final sizeScale = SizeScale(
+        range: [theme.pointSizeMin, theme.pointSizeMax],
       );
+
+      // Get domain limits from bubble geometry if available
+      final bubbleGeometries = geometries.whereType<BubbleGeometry>().toList();
+      final limits =
+          bubbleGeometries.isNotEmpty ? bubbleGeometries.first.limits : null;
+
+      sizeScale.setBounds(values, limits, geometries);
+      return sizeScale;
     }
     return SizeScale();
   }
@@ -555,7 +485,7 @@ class AnimatedChartPainter extends CustomPainter {
       ..strokeWidth = math.max(0.1, theme.gridWidth);
 
     // Vertical grid lines
-    final xTicks = xScale.getTicks(5);
+    final xTicks = xScale.getTicks();
     for (final tick in xTicks) {
       double x;
       if (xScale is OrdinalScale) {
@@ -578,7 +508,7 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     // Horizontal grid lines (based on primary Y-axis)
-    final yTicks = yScale.getTicks(5);
+    final yTicks = yScale.getTicks();
     for (final tick in yTicks) {
       double y;
       if (yScale is OrdinalScale) {
@@ -1816,7 +1746,7 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     // X-axis labels
-    final xTicks = xScale.getTicks(5);
+    final xTicks = xScale.getTicks();
     for (final tick in xTicks) {
       // Use bandCenter for OrdinalScale to center ticks on bars
       final pos = plotArea.left +
@@ -1847,7 +1777,7 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     // Primary Y-axis labels (left)
-    final yTicks = yScale.getTicks(5);
+    final yTicks = yScale.getTicks();
     for (final tick in yTicks) {
       // Use bandCenter for OrdinalScale to center ticks on bars (for horizontal bar charts)
       final pos = plotArea.top +
@@ -1879,7 +1809,7 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Secondary Y-axis labels (right)
     if (y2Scale != null) {
-      final y2Ticks = y2Scale.getTicks(5);
+      final y2Ticks = y2Scale.getTicks();
       for (final tick in y2Ticks) {
         final pos = plotArea.top + y2Scale.scale(tick);
         canvas.drawLine(
