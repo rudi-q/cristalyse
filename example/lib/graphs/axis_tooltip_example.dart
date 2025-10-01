@@ -41,49 +41,8 @@ class AxisTooltipExample extends StatelessWidget {
       });
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Axis-Based Tooltips'),
-        backgroundColor: Colors.blue.shade700,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Sales by Platform',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Hover anywhere on the chart to see all platforms at that quarter',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Expanded(
-              child: _buildLineChart(chartData),
-            ),
-            const SizedBox(height: 32),
-            const Text(
-              'Key Features:',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            _buildFeatureList(),
-          ],
-        ),
-      ),
-    );
+    // Return just the chart widget for ChartScreen integration
+    return _buildLineChart(chartData);
   }
 
   Widget _buildLineChart(List<Map<String, dynamic>> data) {
@@ -137,28 +96,5 @@ class AxisTooltipExample extends StatelessWidget {
           gridColor: Colors.grey.shade300,
         ))
         .build();
-  }
-
-  Widget _buildFeatureList() {
-    final features = [
-      '✓ Hover anywhere on X-axis to trigger tooltip',
-      '✓ Shows all series values at once',
-      '✓ Crosshair line follows cursor',
-      '✓ Smooth rendering without flicker',
-      '✓ Color-coded series indicators',
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: features
-          .map((feature) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(
-                  feature,
-                  style: const TextStyle(fontSize: 14),
-                ),
-              ))
-          .toList(),
-    );
   }
 }
