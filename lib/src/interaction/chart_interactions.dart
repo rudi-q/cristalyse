@@ -362,7 +362,9 @@ class DefaultTooltips {
             // Fallback to point's actual yValue if yColumn is not specified
             final yValue = yColumn != null
                 ? point.getDisplayValue(yColumn)
-                : (point.yValue?.toString() ?? point.data['y']?.toString() ?? '');
+                : (point.yValue?.toString() ??
+                    point.data['y']?.toString() ??
+                    '');
             final color = point.color ?? Colors.blue;
 
             return Padding(

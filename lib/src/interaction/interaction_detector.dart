@@ -73,10 +73,10 @@ class InteractionDetector {
   }
 
   /// Find all data points at a given X position (for axis-based tooltips)
-  /// 
+  ///
   /// This is perfect for line and bar charts where you want to show all
   /// series values at a particular X coordinate.
-  /// 
+  ///
   /// Returns a list of [DataPointInfo] sorted by Y value (top to bottom).
   /// Always snaps to the closest X position - no tolerance limit.
   /// This ensures tooltips always appear when hovering over the chart.
@@ -118,18 +118,21 @@ class InteractionDetector {
     if (pointsAtX.isEmpty) return [];
 
     // Sort by Y position (top to bottom) for consistent ordering
-    pointsAtX.sort((a, b) => a.screenPosition.dy.compareTo(b.screenPosition.dy));
+    pointsAtX
+        .sort((a, b) => a.screenPosition.dy.compareTo(b.screenPosition.dy));
 
     // Convert to DataPointInfo list
-    return pointsAtX.map((point) => DataPointInfo(
-      data: point.data,
-      screenPosition: point.screenPosition,
-      dataIndex: point.dataIndex,
-      seriesName: point.seriesName,
-      xValue: point.xValue,
-      yValue: point.yValue,
-      color: point.color,
-    )).toList();
+    return pointsAtX
+        .map((point) => DataPointInfo(
+              data: point.data,
+              screenPosition: point.screenPosition,
+              dataIndex: point.dataIndex,
+              seriesName: point.seriesName,
+              xValue: point.xValue,
+              yValue: point.yValue,
+              color: point.color,
+            ))
+        .toList();
   }
 
   /// Build index of all interactive points
