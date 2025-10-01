@@ -94,14 +94,15 @@ class TooltipConfig {
       );
 
   /// Default config for axis-based tooltips (line/bar charts)
-  static TooltipConfig get axisConfig => const TooltipConfig(
-        shadow: BoxShadow(
+  static TooltipConfig get axisConfig => TooltipConfig(
+        shadow: const BoxShadow(
           color: Color(0x44000000),
           blurRadius: 8.0,
           offset: Offset(0, 2),
         ),
         triggerMode: ChartTooltipTriggerMode.axis,
         showCrosshair: true,
+        multiPointBuilder: DefaultTooltips.multiPoint(),
       );
 }
 
@@ -358,8 +359,10 @@ class DefaultTooltips {
           // Show each series
           ...points.map((point) {
             final seriesName = point.seriesName ?? 'Series';
-            final yValue =
-                yColumn != null ? point.getDisplayValue(yColumn) : '';
+            // Fallback to point's actual yValue if yColumn is not specified
+            final yValue = yColumn != null
+                ? point.getDisplayValue(yColumn)
+                : (point.yValue?.toString() ?? point.data['y']?.toString() ?? '');
             final color = point.color ?? Colors.blue;
 
             return Padding(
