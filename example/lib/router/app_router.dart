@@ -121,6 +121,12 @@ class AppRouter {
           return const ChartScreen(chartIndex: 18);
         },
       ),
+      GoRoute(
+        path: '/axis-tooltip',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ChartScreen(chartIndex: 19);
+        },
+      ),
     ],
   );
 
@@ -249,6 +255,13 @@ class AppRouter {
       icon: Icons.auto_awesome,
       description: 'Multiple gradient types: Linear, Radial, Sweep',
       isExperimental: true,
+    ),
+    RouteInfo(
+      path: '/axis-tooltip',
+      title: 'Axis Tooltips',
+      icon: Icons.track_changes,
+      description: 'Smooth axis-based tooltips with crosshair indicator',
+      isNew: true,
     ),
   ];
 }

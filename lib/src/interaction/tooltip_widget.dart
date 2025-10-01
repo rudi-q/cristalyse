@@ -11,6 +11,9 @@ abstract class TooltipController {
 
   /// Shows the tooltip for a given data point at a specific position.
   void showTooltip(DataPointInfo point, Offset position);
+
+  /// Shows the tooltip for multiple data points (axis mode)
+  void showMultiPointTooltip(List<DataPointInfo> points, Offset position);
 }
 
 /// Tooltip overlay widget for chart interactions
@@ -41,9 +44,11 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
   late Animation<double> _scaleAnimation;
 
   DataPointInfo? _currentPoint;
+  List<DataPointInfo>? _currentPoints; // For multi-point tooltips
   Offset? _currentPosition;
   bool _isVisible = false;
   bool _shouldShow = false; // Track intended state
+  bool _isMultiPoint = false; // Track if showing multi-point tooltip
 
   @override
   void initState() {
@@ -83,32 +88,90 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
   /// Show tooltip for a data point
   @override
   void showTooltip(DataPointInfo point, Offset position) {
-    // Update current state
-    _currentPoint = point;
-    _currentPosition = position;
-    _shouldShow = true;
+    _showTooltipInternal(
+      singlePoint: point,
+      position: position,
+      isMultiPoint: false,
+    );
+  }
 
-    if (widget.config.builder == null) {
+  /// Show tooltip for multiple data points (axis mode)
+  @override
+  void showMultiPointTooltip(List<DataPointInfo> points, Offset position) {
+    _showTooltipInternal(
+      multiPoints: points,
+      position: position,
+      isMultiPoint: true,
+    );
+  }
+
+  /// Internal method to handle tooltip display logic
+  void _showTooltipInternal({
+    DataPointInfo? singlePoint,
+    List<DataPointInfo>? multiPoints,
+    required Offset position,
+    required bool isMultiPoint,
+  }) {
+    // Check if we have a builder FIRST before doing anything
+    final hasBuilder = isMultiPoint
+        ? widget.config.multiPointBuilder != null
+        : widget.config.builder != null;
+
+    if (!hasBuilder) {
       return;
     }
+
+    // Capture previous state BEFORE overwriting for comparison
+    final previousPoint = _currentPoint;
+    final previousPoints = _currentPoints;
 
     // Cancel any pending hide operation
     _hideTimer?.cancel();
     _hideTimer = null;
 
-    // If already showing a tooltip, immediately switch to new point
+    // If already showing a tooltip, check if we need to update
     if (_isVisible && _overlayEntry != null) {
-      // Update position and recreate with new data
-      _removeTooltip();
-      _createTooltip();
+      // Compare NEW data against PREVIOUS data (not against itself!)
+      final shouldRecreate = isMultiPoint
+          ? !_hasSameDataMulti(previousPoints, multiPoints)
+          : !_hasSameData(previousPoint, singlePoint);
+
+      // Now update state AFTER comparison
+      _currentPoint = singlePoint;
+      _currentPoints = multiPoints;
+      _currentPosition = position;
+      _shouldShow = true;
+      _isMultiPoint = isMultiPoint;
+
+      if (shouldRecreate) {
+        // Data changed - recreate tooltip with smooth transition
+        _removeTooltip();
+        _createTooltip();
+      } else {
+        // Same data, just update position smoothly
+        _updateTooltipPosition(position);
+      }
       return;
     }
+
+    // Update state for new tooltip
+    _currentPoint = singlePoint;
+    _currentPoints = multiPoints;
+    _currentPosition = position;
+    _shouldShow = true;
+    _isMultiPoint = isMultiPoint;
 
     // Cancel any existing show timer and start a new one
     _showTimer?.cancel();
     _showTimer = Timer(widget.config.showDelay, () {
-      if (_shouldShow && _currentPoint != null && mounted) {
-        _createTooltip();
+      if (_shouldShow && mounted) {
+        if (isMultiPoint &&
+            _currentPoints != null &&
+            _currentPoints!.isNotEmpty) {
+          _createTooltip();
+        } else if (!isMultiPoint && _currentPoint != null) {
+          _createTooltip();
+        }
       }
     });
   }
@@ -142,10 +205,50 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
     }
   }
 
+  /// Check if two DataPointInfo have the same data
+  bool _hasSameData(DataPointInfo? oldPoint, DataPointInfo? newPoint) {
+    if (oldPoint == null || newPoint == null) return false;
+    // Compare based on data index - same data point
+    return oldPoint.dataIndex == newPoint.dataIndex &&
+        oldPoint.seriesName == newPoint.seriesName;
+  }
+
+  /// Check if two lists of DataPointInfo have the same data
+  bool _hasSameDataMulti(
+      List<DataPointInfo>? oldPoints, List<DataPointInfo>? newPoints) {
+    if (oldPoints == null || newPoints == null) return false;
+    if (oldPoints.length != newPoints.length) return false;
+
+    // Compare each point in the list
+    for (int i = 0; i < oldPoints.length; i++) {
+      if (!_hasSameData(oldPoints[i], newPoints[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Update tooltip position without recreating
+  void _updateTooltipPosition(Offset newPosition) {
+    if (_overlayEntry != null && mounted) {
+      _currentPosition = newPosition;
+      // Force overlay to rebuild with new position
+      _overlayEntry!.markNeedsBuild();
+    }
+  }
+
   /// Create and show tooltip overlay
   void _createTooltip() {
-    if (!_shouldShow || _currentPosition == null || _currentPoint == null) {
+    // Check if we should show based on current state
+    if (!_shouldShow || _currentPosition == null) {
       return;
+    }
+
+    // Validate we have data
+    if (_isMultiPoint) {
+      if (_currentPoints == null || _currentPoints!.isEmpty) return;
+    } else {
+      if (_currentPoint == null) return;
     }
 
     // Remove existing tooltip
@@ -156,7 +259,18 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
 
     final Offset capturedPosition = _currentPosition!;
     final TooltipConfig capturedConfig = widget.config;
-    final DataPointInfo capturedPoint = _currentPoint!;
+
+    // Build tooltip content based on mode
+    Widget tooltipContent;
+    if (_isMultiPoint && capturedConfig.multiPointBuilder != null) {
+      final List<DataPointInfo> capturedPoints = List.from(_currentPoints!);
+      tooltipContent = capturedConfig.multiPointBuilder!(capturedPoints);
+    } else if (!_isMultiPoint && capturedConfig.builder != null) {
+      final DataPointInfo capturedPoint = _currentPoint!;
+      tooltipContent = capturedConfig.builder!(capturedPoint);
+    } else {
+      return; // No appropriate builder
+    }
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
@@ -165,7 +279,7 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
           config: capturedConfig,
           fadeAnimation: _fadeAnimation,
           scaleAnimation: _scaleAnimation,
-          child: capturedConfig.builder!(capturedPoint),
+          child: tooltipContent,
         );
       },
     );
@@ -190,10 +304,12 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
     _isVisible = false;
     _animationController.reset();
 
-    // Clear current point reference when removing
+    // Clear current point/points reference when removing
     if (!_shouldShow) {
       _currentPoint = null;
+      _currentPoints = null;
       _currentPosition = null;
+      _isMultiPoint = false;
     }
   }
 
@@ -332,6 +448,13 @@ mixin TooltipMixin {
   void showTooltip(BuildContext context, DataPointInfo point, Offset position) {
     final provider = ChartTooltipProvider.of(context);
     provider?.showTooltip(point, position);
+  }
+
+  /// Show tooltip for multiple data points (axis mode)
+  void showMultiPointTooltip(
+      BuildContext context, List<DataPointInfo> points, Offset position) {
+    final provider = ChartTooltipProvider.of(context);
+    provider?.showMultiPointTooltip(points, position);
   }
 
   /// Hide tooltip

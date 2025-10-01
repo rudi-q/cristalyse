@@ -139,6 +139,14 @@ List<String> getChartFeatures(int tabIndex) {
         'Custom gradient directions and color stops',
         'Performance optimized with gradient caching and reuse'
       ];
+    case 19: // Axis tooltips
+      return [
+        'Axis-based tooltip triggering - hover anywhere on X position',
+        'Multi-point tooltips showing all series simultaneously',
+        'Vertical crosshair indicator with customizable styling',
+        'Smooth rendering without flickering on mouse movement',
+        'Color-coded series indicators for easy identification'
+      ];
     default:
       return [];
   }

@@ -79,6 +79,8 @@ class OrdinalScale extends Scale {
   List<dynamic> get domain => _domain;
   set domain(List<dynamic> value) {
     _domain = value;
+    debugPrint(
+        'OrdinalScale: Setting domain with ${value.length} items: ${value.take(10)}...');
     _calculateBandWidth();
   }
 
@@ -128,7 +130,11 @@ class OrdinalScale extends Scale {
     if (count >= _domain.length) return List.from(_domain);
 
     final step = _domain.length / count;
-    return List.generate(count, (i) => _domain[(i * step).floor()]);
+    return List.generate(count, (i) {
+      final index = (i * step).floor();
+      // Safety check to prevent index out of bounds
+      return _domain[index.clamp(0, _domain.length - 1)];
+    });
   }
 
   /// Convert screen coordinate back to category value
