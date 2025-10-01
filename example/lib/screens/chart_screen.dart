@@ -315,6 +315,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Chart Export Demo',
       'Gradient Bar Charts',
       'Advanced Gradient Effects',
+      'Axis-Based Tooltips',
     ];
   }
 
@@ -339,6 +340,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Export your charts as scalable SVG vector graphics for reports and presentations',
       'Beautiful gradient fills for enhanced visual appeal • Linear gradients from light to dark',
       'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
+      'Hover anywhere on X-axis to see all platforms • Smooth crosshair indicator • Zero flickering',
     ];
   }
 
