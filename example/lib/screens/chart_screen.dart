@@ -815,9 +815,11 @@ class _ChartScreenState extends State<ChartScreen>
                   ),
                 ),
                 onTap: () {
-                  Navigator.of(context).pop();
                   if (!isSelected) {
+                    // Navigate directly - go_router handles drawer closing
                     context.go(route.path);
+                  } else {
+                    Navigator.of(context).pop();
                   }
                 },
               ),
