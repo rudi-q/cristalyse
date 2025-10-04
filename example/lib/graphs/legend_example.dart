@@ -24,7 +24,50 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
         ),
         const SizedBox(height: 24),
 
-        // Example 1: Basic legend (default topRight position)
+        // Example 1: Floating Legend
+        _buildExampleSection(
+          title: 'Floating Legend with Custom Position & Interactivity',
+          description:
+              'Free-floating legend with absolute positioning - perfect for overlays',
+          child: SizedBox(
+            height: 300,
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                    width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                    style: BarStyle.grouped,
+                    alpha: 0.9)
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(currentTheme)
+                .legend(
+                  position: LegendPosition.floating,
+                  interactive: true,
+                  floatingOffset: const Offset(100, 30), // x: 100, y: 30
+                  backgroundColor:
+                      currentTheme.backgroundColor.withValues(alpha: 0.95),
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  symbolSize: 12.0,
+                  itemSpacing: 10.0,
+                  borderRadius: 8.0,
+                ) // <- Floating legend
+                .animate(
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOutCubic)
+                .build(),
+          ),
+        ),
+
+        const SizedBox(height: 32),
+
+        // Example 2: Basic legend (default topRight position)
         _buildExampleSection(
           title: 'Basic Legend (Default Position)',
           description: 'Simple .legend() call with smart defaults',
@@ -53,7 +96,7 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
 
         const SizedBox(height: 32),
 
-        // Example 2: Bottom positioned legend
+        // Example 3: Bottom positioned legend
         _buildExampleSection(
           title: 'Bottom Legend',
           description: 'Legend positioned at the bottom of the chart',
@@ -82,7 +125,7 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
 
         const SizedBox(height: 32),
 
-        // Example 3: Right positioned legend with custom styling
+        // Example 4: Right positioned legend with custom styling
         _buildExampleSection(
           title: 'Right Legend with Custom Styling',
           description:
@@ -123,7 +166,7 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
 
         const SizedBox(height: 32),
 
-        // Example 4: Dark Theme Demonstration
+        // Example 5: Dark Theme Demonstration
         _buildExampleSection(
           title: 'Dark Theme Support',
           description: 'Legend text automatically adapts to dark themes',
@@ -152,7 +195,7 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
 
         const SizedBox(height: 32),
 
-        // Example 5: Line chart with legend
+        // Example 6: Line chart with legend
         _buildExampleSection(
           title: 'Line Chart with Legend',
           description: 'Legend automatically adapts to line chart geometry',
@@ -173,6 +216,48 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                 .animate(
                     duration: const Duration(milliseconds: 1200),
                     curve: Curves.easeOutCubic)
+                .build(),
+          ),
+        ),
+
+        const SizedBox(height: 32),
+
+        // Example 7: Interactive Legend
+        _buildExampleSection(
+          title: 'Interactive Legend (Click to Toggle)',
+          description:
+              'Click legend items to show/hide categories • Auto-managed state',
+          child: SizedBox(
+            height: 300,
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                    width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                    style: BarStyle.grouped,
+                    alpha: 0.9)
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(currentTheme)
+                .legend(
+                  position: LegendPosition.topRight,
+                  interactive: true, // <- Enable click-to-toggle
+                  backgroundColor:
+                      currentTheme.backgroundColor.withValues(alpha: 0.95),
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  symbolSize: 12.0,
+                  itemSpacing: 10.0,
+                  borderRadius: 8.0,
+                )
+                .animate(
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.easeInOut)
                 .build(),
           ),
         ),

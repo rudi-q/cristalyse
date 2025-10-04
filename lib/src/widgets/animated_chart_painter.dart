@@ -414,6 +414,13 @@ class AnimatedChartPainter extends CustomPainter {
   }
 
   ColorScale _setupColorScale() {
+    // If a colorScale was provided (e.g., for interactive legends with filtering),
+    // use it to preserve color-to-category mapping
+    if (colorScale != null) {
+      return colorScale!;
+    }
+
+    // Otherwise, create a new ColorScale from the data
     // For pie charts, use category column; otherwise use color column
     final hasPieChart = geometries.any((g) => g is PieGeometry);
     final columnToUse = hasPieChart && pieCategoryColumn != null

@@ -835,6 +835,36 @@ class CristalyseChart {
   /// chart.legend(position: LegendPosition.bottom)
   /// ```
   ///
+  /// With floating position:
+  /// ```dart
+  /// chart.legend(
+  ///   position: LegendPosition.floating,
+  ///   floatingOffset: Offset(100, 50), // x: 100, y: 50 from top-left
+  /// )
+  /// ```
+  ///
+  /// With interactive legend (click to toggle visibility):
+  /// ```dart
+  /// chart.legend(interactive: true) // Auto-managed state
+  /// ```
+  ///
+  /// With external state management:
+  /// ```dart
+  /// final hiddenCategories = useState(<String>{});
+  /// chart.legend(
+  ///   interactive: true,
+  ///   hiddenCategories: hiddenCategories.value,
+  ///   onToggle: (category, visible) {
+  ///     if (visible) {
+  ///       hiddenCategories.value.remove(category);
+  ///     } else {
+  ///       hiddenCategories.value.add(category);
+  ///     }
+  ///     hiddenCategories.value = {...hiddenCategories.value};
+  ///   },
+  /// )
+  /// ```
+  ///
   /// With custom styling:
   /// ```dart
   /// chart.legend(
@@ -853,6 +883,11 @@ class CristalyseChart {
     Color? backgroundColor,
     EdgeInsets? padding,
     double? borderRadius,
+    Offset? floatingOffset,
+    bool? floatingDraggable,
+    bool? interactive,
+    Set<String>? hiddenCategories,
+    void Function(String category, bool visible)? onToggle,
   }) {
     _legendConfig = LegendConfig(
       position: position ?? LegendPosition.topRight,
@@ -864,6 +899,11 @@ class CristalyseChart {
       backgroundColor: backgroundColor,
       padding: padding ?? const EdgeInsets.all(8.0),
       borderRadius: borderRadius ?? 4.0,
+      floatingOffset: floatingOffset,
+      floatingDraggable: floatingDraggable ?? false,
+      interactive: interactive ?? false,
+      hiddenCategories: hiddenCategories,
+      onToggle: onToggle,
     );
     return this;
   }

@@ -5,7 +5,7 @@ import '../core/legend.dart';
 import '../themes/chart_theme.dart';
 
 /// Widget that renders a chart legend
-class LegendWidget extends StatelessWidget {
+class LegendWidget extends StatefulWidget {
   final List<LegendItem> items;
   final LegendConfig config;
   final ChartTheme theme;
@@ -18,38 +18,109 @@ class LegendWidget extends StatelessWidget {
   });
 
   @override
+  State<LegendWidget> createState() => _LegendWidgetState();
+}
+
+class _LegendWidgetState extends State<LegendWidget> {
+  // Internal state for hidden categories (only used if not externally managed)
+  final Set<String> _internalHiddenCategories = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // Seed internal state from hiddenCategories if provided without external control
+    if (widget.config.hiddenCategories != null &&
+        widget.config.onToggle == null) {
+      _internalHiddenCategories.addAll(widget.config.hiddenCategories!);
+    }
+  }
+
+  @override
+  void didUpdateWidget(LegendWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update internal state if hiddenCategories changed and no external control
+    if (widget.config.hiddenCategories != oldWidget.config.hiddenCategories &&
+        widget.config.hiddenCategories != null &&
+        widget.config.onToggle == null) {
+      _internalHiddenCategories.clear();
+      _internalHiddenCategories.addAll(widget.config.hiddenCategories!);
+    }
+  }
+
+  Set<String> get _effectiveHiddenCategories {
+    // Use external state only if BOTH hiddenCategories and onToggle are provided
+    final external = widget.config.hiddenCategories;
+    if (external != null && widget.config.onToggle != null) {
+      return external;
+    }
+    // Otherwise use internal state management
+    return _internalHiddenCategories;
+  }
+
+  void _handleToggle(String category) {
+    if (!widget.config.interactive) return;
+
+    final isCurrentlyHidden = _effectiveHiddenCategories.contains(category);
+    final willBeVisible = isCurrentlyHidden;
+
+    // Determine if we're using external state management
+    final external = widget.config.hiddenCategories;
+    final usesExternalState =
+        external != null && widget.config.onToggle != null;
+
+    if (usesExternalState) {
+      // External state management: delegate to callback
+      widget.config.onToggle!(category, willBeVisible);
+      return;
+    }
+
+    // Internal state management: mutate local state
+    setState(() {
+      if (isCurrentlyHidden) {
+        _internalHiddenCategories.remove(category);
+      } else {
+        _internalHiddenCategories.add(category);
+      }
+    });
+
+    // Optionally notify via callback (for user-side logging/analytics)
+    widget.config.onToggle?.call(category, willBeVisible);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) return const SizedBox.shrink();
+    if (widget.items.isEmpty) return const SizedBox.shrink();
 
     // Create default text style using theme colors
-    final defaultTextStyle = TextStyle(fontSize: 12, color: theme.axisColor);
+    final defaultTextStyle =
+        TextStyle(fontSize: 12, color: widget.theme.axisColor);
 
     // Merge with custom text style, preserving theme color if no color is specified
-    final effectiveTextStyle = config.textStyle != null
-        ? defaultTextStyle.merge(config.textStyle!)
+    final effectiveTextStyle = widget.config.textStyle != null
+        ? defaultTextStyle.merge(widget.config.textStyle!)
         : defaultTextStyle;
 
     Widget legendContent;
 
-    if (config.effectiveOrientation == LegendOrientation.horizontal) {
+    if (widget.config.effectiveOrientation == LegendOrientation.horizontal) {
       legendContent = _buildHorizontalLegend(effectiveTextStyle);
     } else {
       legendContent = _buildVerticalLegend(effectiveTextStyle);
     }
 
     // Wrap with background if specified
-    if (config.backgroundColor != null) {
+    if (widget.config.backgroundColor != null) {
       legendContent = Container(
         decoration: BoxDecoration(
-          color: config.backgroundColor,
-          borderRadius: BorderRadius.circular(config.borderRadius),
+          color: widget.config.backgroundColor,
+          borderRadius: BorderRadius.circular(widget.config.borderRadius),
         ),
-        padding: config.padding,
+        padding: widget.config.padding,
         child: legendContent,
       );
     } else {
       legendContent = Padding(
-        padding: config.padding,
+        padding: widget.config.padding,
         child: legendContent,
       );
     }
@@ -59,9 +130,11 @@ class LegendWidget extends StatelessWidget {
 
   Widget _buildHorizontalLegend(TextStyle textStyle) {
     return Wrap(
-      spacing: config.itemSpacing,
-      runSpacing: config.itemSpacing / 2,
-      children: items.map((item) => _buildLegendItem(item, textStyle)).toList(),
+      spacing: widget.config.itemSpacing,
+      runSpacing: widget.config.itemSpacing / 2,
+      children: widget.items
+          .map((item) => _buildLegendItem(item, textStyle))
+          .toList(),
     );
   }
 
@@ -69,9 +142,9 @@ class LegendWidget extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: items
+      children: widget.items
           .map((item) => Padding(
-                padding: EdgeInsets.only(bottom: config.itemSpacing),
+                padding: EdgeInsets.only(bottom: widget.config.itemSpacing),
                 child: _buildLegendItem(item, textStyle),
               ))
           .toList(),
@@ -79,21 +152,49 @@ class LegendWidget extends StatelessWidget {
   }
 
   Widget _buildLegendItem(LegendItem item, TextStyle textStyle) {
-    return Row(
+    final isHidden = _effectiveHiddenCategories.contains(item.label);
+    final isActive = !isHidden;
+
+    Widget content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildSymbol(item),
-        SizedBox(width: config.itemSpacing / 2),
+        _buildSymbol(item, isActive),
+        SizedBox(width: widget.config.itemSpacing / 2),
         Text(
           item.label,
-          style: textStyle,
+          style: textStyle.copyWith(
+            decoration: isHidden ? TextDecoration.lineThrough : null,
+            decorationThickness: 2.0,
+          ),
         ),
       ],
     );
+
+    // Wrap with animated opacity for smooth transitions
+    content = AnimatedOpacity(
+      opacity: isActive ? 1.0 : 0.4,
+      duration: const Duration(milliseconds: 200),
+      child: content,
+    );
+
+    // Add tap handling if interactive
+    if (widget.config.interactive) {
+      content = MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: () => _handleToggle(item.label),
+          child: content,
+        ),
+      );
+    }
+
+    return content;
   }
 
-  Widget _buildSymbol(LegendItem item) {
-    final size = config.symbolSize;
+  Widget _buildSymbol(LegendItem item, bool isActive) {
+    final size = widget.config.symbolSize;
+    final effectiveColor =
+        isActive ? item.color : item.color.withValues(alpha: 0.3);
 
     switch (item.symbol) {
       case LegendSymbol.circle:
@@ -102,7 +203,7 @@ class LegendWidget extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: item.color,
+            color: effectiveColor,
             shape: BoxShape.circle,
           ),
         );
@@ -112,7 +213,7 @@ class LegendWidget extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: item.color,
+            color: effectiveColor,
             borderRadius: BorderRadius.circular(2),
           ),
         );
@@ -122,7 +223,7 @@ class LegendWidget extends StatelessWidget {
           width: size + 4, // Slightly wider for lines
           height: 3,
           decoration: BoxDecoration(
-            color: item.color,
+            color: effectiveColor,
             borderRadius: BorderRadius.circular(1.5),
           ),
           margin: EdgeInsets.symmetric(vertical: (size - 3) / 2),
