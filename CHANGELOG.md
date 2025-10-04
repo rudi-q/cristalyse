@@ -1,4 +1,4 @@
-## 1.9.0 - 2025-10-05
+## 1.9.0 - 2025-10-06
 
 #### 🎯 Major Feature: Interactive & Floating Legends
 
