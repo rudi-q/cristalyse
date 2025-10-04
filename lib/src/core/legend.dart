@@ -68,11 +68,12 @@ class LegendConfig {
   // Floating legend configuration
   final Offset? floatingOffset; // Absolute position when position is floating
   final bool floatingDraggable; // Whether floating legend is draggable
-  
+
   // Interactive legend configuration
   final bool interactive; // Enable click-to-toggle visibility
   final Set<String>? hiddenCategories; // Categories that are currently hidden
-  final void Function(String category, bool visible)? onToggle; // Callback when legend item is toggled
+  final void Function(String category, bool visible)?
+      onToggle; // Callback when legend item is toggled
 
   const LegendConfig({
     this.position = LegendPosition.topRight,

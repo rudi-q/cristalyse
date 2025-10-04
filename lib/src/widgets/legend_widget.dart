@@ -97,8 +97,9 @@ class _LegendWidgetState extends State<LegendWidget> {
     return Wrap(
       spacing: widget.config.itemSpacing,
       runSpacing: widget.config.itemSpacing / 2,
-      children:
-          widget.items.map((item) => _buildLegendItem(item, textStyle)).toList(),
+      children: widget.items
+          .map((item) => _buildLegendItem(item, textStyle))
+          .toList(),
     );
   }
 
@@ -157,7 +158,8 @@ class _LegendWidgetState extends State<LegendWidget> {
 
   Widget _buildSymbol(LegendItem item, bool isActive) {
     final size = widget.config.symbolSize;
-    final effectiveColor = isActive ? item.color : item.color.withValues(alpha: 0.3);
+    final effectiveColor =
+        isActive ? item.color : item.color.withValues(alpha: 0.3);
 
     switch (item.symbol) {
       case LegendSymbol.circle:

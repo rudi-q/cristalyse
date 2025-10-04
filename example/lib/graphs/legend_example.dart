@@ -202,7 +202,8 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                 .legend(
                   position: LegendPosition.floating,
                   floatingOffset: const Offset(100, 30), // x: 100, y: 30
-                  backgroundColor: Colors.white.withValues(alpha: 0.95),
+                  backgroundColor:
+                      currentTheme.backgroundColor.withValues(alpha: 0.95),
                   textStyle: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -243,7 +244,8 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                 .legend(
                   position: LegendPosition.topRight,
                   interactive: true, // <- Enable click-to-toggle
-                  backgroundColor: Colors.white.withValues(alpha: 0.95),
+                  backgroundColor:
+                      currentTheme.backgroundColor.withValues(alpha: 0.95),
                   textStyle: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,

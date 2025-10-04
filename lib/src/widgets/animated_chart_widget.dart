@@ -537,7 +537,7 @@ class _AnimatedCristalyseChartWidgetState
   /// Get filtered data based on hidden categories in legend
   List<Map<String, dynamic>> _getFilteredData(Set<String> hiddenCategories) {
     // If not interactive or no hidden categories, return original data
-    if (!widget.legendConfig!.interactive || 
+    if (!widget.legendConfig!.interactive ||
         hiddenCategories.isEmpty ||
         widget.colorColumn == null) {
       return widget.data;
@@ -567,39 +567,35 @@ class _AnimatedCristalyseChartWidgetState
 
     // Use StatefulBuilder to manage interactive legend state
     if (config.interactive && config.hiddenCategories == null) {
-      // Internal state management
-      return StatefulBuilder(
-        builder: (context, setLegendState) {
-          final enhancedConfig = config.copyWith(
-            hiddenCategories: _internalHiddenCategories,
-            onToggle: (category, visible) {
-              setLegendState(() {
-                if (visible) {
-                  _internalHiddenCategories.remove(category);
-                } else {
-                  _internalHiddenCategories.add(category);
-                }
-              });
-              
-              // Also trigger parent rebuild to update chart
-              setState(() {});
-              
-              config.onToggle?.call(category, visible);
-            },
-          );
+      // Internal state management - pass hidden categories TO the legend config
+      // so the LegendWidget's internal state can be properly synchronized
+      final enhancedConfig = config.copyWith(
+        hiddenCategories: _internalHiddenCategories,
+        onToggle: (category, visible) {
+          // Update our internal state
+          setState(() {
+            if (visible) {
+              _internalHiddenCategories.remove(category);
+            } else {
+              _internalHiddenCategories.add(category);
+            }
+          });
 
-          final filteredData = _getFilteredData(_internalHiddenCategories);
-          final filteredChart = _buildChartWidget(context, filteredData);
-
-          final legend = LegendWidget(
-            items: legendItems,
-            config: enhancedConfig,
-            theme: widget.theme,
-          );
-
-          return _positionLegend(filteredChart, legend, enhancedConfig);
+          // Call user callback if provided
+          config.onToggle?.call(category, visible);
         },
       );
+
+      final filteredData = _getFilteredData(_internalHiddenCategories);
+      final filteredChart = _buildChartWidget(context, filteredData);
+
+      final legend = LegendWidget(
+        items: legendItems,
+        config: enhancedConfig,
+        theme: widget.theme,
+      );
+
+      return _positionLegend(filteredChart, legend, enhancedConfig);
     } else if (config.interactive && config.hiddenCategories != null) {
       // External state management
       final filteredData = _getFilteredData(config.hiddenCategories!);
@@ -625,7 +621,29 @@ class _AnimatedCristalyseChartWidgetState
   }
 
   /// Build the actual chart widget with filtered data
-  Widget _buildChartWidget(BuildContext context, List<Map<String, dynamic>> data) {
+  Widget _buildChartWidget(
+      BuildContext context, List<Map<String, dynamic>> data) {
+    // IMPORTANT: Create a ColorScale based on the ORIGINAL (unfiltered) data
+    // to preserve color-to-category mapping when filtering
+    ColorScale? preservedColorScale;
+    if (widget.colorColumn != null && widget.legendConfig!.interactive) {
+      final originalValues =
+          widget.data.map((d) => d[widget.colorColumn]).toSet().toList();
+
+      preservedColorScale = ColorScale(
+        values: originalValues,
+        colors: widget.theme.colorPalette,
+        gradients: widget.theme.categoryGradients != null
+            ? {
+                for (final value in originalValues)
+                  if (widget.theme.categoryGradients!
+                      .containsKey(value.toString()))
+                    value: widget.theme.categoryGradients![value.toString()]!
+              }
+            : null,
+      );
+    }
+
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
@@ -651,7 +669,8 @@ class _AnimatedCristalyseChartWidgetState
               xScale: widget.xScale,
               yScale: widget.yScale,
               y2Scale: widget.y2Scale,
-              colorScale: widget.colorScale,
+              colorScale: preservedColorScale ??
+                  widget.colorScale, // Use preserved scale
               sizeScale: widget.sizeScale,
               theme: widget.theme,
               animationDuration: widget.animationDuration,
@@ -660,8 +679,9 @@ class _AnimatedCristalyseChartWidgetState
               interaction: widget.interaction,
               legendConfig: null, // Don't add legend again
             );
-            
-            return _buildInteractiveChartForData(context, constraints.biggest, tempWidget);
+
+            return _buildInteractiveChartForData(
+                context, constraints.biggest, tempWidget);
           },
         );
       },
@@ -669,8 +689,8 @@ class _AnimatedCristalyseChartWidgetState
   }
 
   /// Build interactive chart with custom data
-  Widget _buildInteractiveChartForData(
-      BuildContext context, Size size, AnimatedCristalyseChartWidget tempWidget) {
+  Widget _buildInteractiveChartForData(BuildContext context, Size size,
+      AnimatedCristalyseChartWidget tempWidget) {
     final animationValue = _animation.value;
 
     // For very small sizes, return placeholder
