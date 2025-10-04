@@ -1,4 +1,4 @@
-## 1.8.1 - 2025-10-03
+## 1.8.1 - 2025-10-04
 
 #### 🔗 Enhanced Developer Experience
 

@@ -30,8 +30,8 @@ CristalyseChart()
   <Card title="Zero Configuration" icon="magic-wand-sparkles">
     Works automatically with smart defaults - just add `.legend()`
   </Card>
-  <Card title="8 Positioning Options" icon="arrows-to-circle">
-    Flexible positioning: corners, edges, with auto-orientation
+  <Card title="9 Positioning Options" icon="arrows-to-circle">
+    Flexible positioning: corners, edges, floating with custom coordinates
   </Card>
   <Card title="Smart Symbol Detection" icon="eye">
     Automatically matches your chart type: squares, circles, lines
@@ -60,7 +60,7 @@ Control legend placement with the `position` parameter:
 
 ### All Position Options
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Corner Positions">
     - `LegendPosition.topLeft`
     - `LegendPosition.topRight` (default)
@@ -72,6 +72,11 @@ Control legend placement with the `position` parameter:
     - `LegendPosition.bottom`
     - `LegendPosition.left`
     - `LegendPosition.right`
+  </Card>
+  <Card title="Free Positioning">
+    - `LegendPosition.floating`
+    - Set custom coordinates with `floatingOffset`
+    - Perfect for overlay layouts
   </Card>
 </CardGroup>
 
@@ -113,7 +118,117 @@ Control legend placement with the `position` parameter:
     ```
     Legend appears on the right side with vertical layout.
   </Tab>
+  
+  <Tab title="Floating Position">
+    ```dart
+    CristalyseChart()
+      .data(data)
+      .mapping(x: 'month', y: 'sales', color: 'region')
+      .geomBar()
+      .legend(
+        position: LegendPosition.floating,
+        floatingOffset: Offset(100, 30), // x: 100, y: 30 from top-left
+      )
+      .build();
+    ```
+    Legend floats at specified coordinates with absolute positioning.
+  </Tab>
 </Tabs>
+
+## Floating Legends
+
+<Info>
+**New Feature**: Floating legends give you complete control over legend positioning with pixel-perfect placement!
+</Info>
+
+### Basic Floating Legend
+
+Use floating position for custom positioning:
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar()
+  .legend(
+    position: LegendPosition.floating,
+    floatingOffset: Offset(50, 20), // x: 50px, y: 20px from top-left
+  )
+  .build();
+```
+
+### Styled Floating Legend
+
+Combine floating position with custom styling:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'date', y: 'value', color: 'metric')
+  .geomLine()
+  .legend(
+    position: LegendPosition.floating,
+    floatingOffset: Offset(120, 40),
+    backgroundColor: Colors.white.withValues(alpha: 0.95),
+    textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+    symbolSize: 14.0,
+    itemSpacing: 10.0,
+    borderRadius: 8.0,
+  )
+  .build();
+```
+
+### Use Cases for Floating Legends
+
+<AccordionGroup>
+  <Accordion title="Dashboard Overlays" icon="layer-group">
+    Perfect for complex dashboards where legends need to float over chart content without taking up layout space.
+    
+    ```dart
+    .legend(
+      position: LegendPosition.floating,
+      floatingOffset: Offset(200, 50),
+      backgroundColor: Colors.white.withValues(alpha: 0.9),
+    )
+    ```
+  </Accordion>
+  
+  <Accordion title="Custom Chart Layouts" icon="compass-drafting">
+    When you need precise control over legend placement in complex multi-chart layouts.
+    
+    ```dart
+    .legend(
+      position: LegendPosition.floating,
+      floatingOffset: Offset(chartWidth - 150, 30),
+    )
+    ```
+  </Accordion>
+  
+  <Accordion title="Responsive Designs" icon="mobile">
+    Programmatically adjust floating position based on screen size or device.
+    
+    ```dart
+    final offset = isMobile ? Offset(20, 20) : Offset(100, 50);
+    
+    .legend(
+      position: LegendPosition.floating,
+      floatingOffset: offset,
+    )
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Floating Legend Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `position` | `LegendPosition.floating` | Required - enables floating mode |
+| `floatingOffset` | `Offset?` | Coordinates from top-left corner. Default: `Offset(16, 16)` |
+| `floatingDraggable` | `bool` | Enable drag-to-reposition (future feature). Default: `false` |
+
+<Tip>
+**Coordinate System**: The `floatingOffset` uses the Flutter coordinate system where `Offset(x, y)` positions the legend `x` pixels from the left edge and `y` pixels from the top edge.
+</Tip>
 
 ## Symbol Generation
 
@@ -121,11 +236,11 @@ Legends automatically choose appropriate symbols based on your chart type:
 
 | Chart Type | Symbol | Description |
 |------------|--------|-------------|
-|| **Bar Charts** | ◼ Square | Solid colored squares for categorical bars |
+| **Bar Charts** | ◼ Square | Solid colored squares for categorical bars |
 | **Line Charts** | ━ Line | Horizontal line segments matching chart lines |
-|| **Scatter Plots** | ● Circle | Circular symbols for point data |
+| **Scatter Plots** | ● Circle | Circular symbols for point data |
 | **Area Charts** | ━ Line | Line symbols representing area boundaries |
-|| **Bubble Charts** | ● Circle | Circular symbols for bubble data |
+| **Bubble Charts** | ● Circle | Circular symbols for bubble data |
 
 <Note>
 Symbol selection is automatic but can be overridden with custom styling if needed.

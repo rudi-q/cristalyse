@@ -10,6 +10,7 @@ enum LegendPosition {
   bottom,
   left,
   right,
+  floating, // Free-floating legend with custom positioning
 }
 
 /// Orientation for legend items
@@ -64,6 +65,10 @@ class LegendConfig {
   final EdgeInsets padding;
   final double borderRadius;
 
+  // Floating legend configuration
+  final Offset? floatingOffset; // Absolute position when position is floating
+  final bool floatingDraggable; // Whether floating legend is draggable
+
   const LegendConfig({
     this.position = LegendPosition.topRight,
     this.orientation = LegendOrientation.auto,
@@ -74,6 +79,8 @@ class LegendConfig {
     this.backgroundColor,
     this.padding = const EdgeInsets.all(8.0),
     this.borderRadius = 4.0,
+    this.floatingOffset,
+    this.floatingDraggable = false,
   });
 
   /// Get the effective orientation based on position
@@ -91,6 +98,8 @@ class LegendConfig {
       case LegendPosition.top:
       case LegendPosition.bottom:
         return LegendOrientation.horizontal;
+      case LegendPosition.floating:
+        return LegendOrientation.vertical; // Default for floating
     }
   }
 
@@ -135,7 +144,9 @@ class LegendConfig {
           textStyle == other.textStyle &&
           backgroundColor == other.backgroundColor &&
           padding == other.padding &&
-          borderRadius == other.borderRadius;
+          borderRadius == other.borderRadius &&
+          floatingOffset == other.floatingOffset &&
+          floatingDraggable == other.floatingDraggable;
 
   @override
   int get hashCode =>
@@ -147,7 +158,9 @@ class LegendConfig {
       textStyle.hashCode ^
       backgroundColor.hashCode ^
       padding.hashCode ^
-      borderRadius.hashCode;
+      borderRadius.hashCode ^
+      floatingOffset.hashCode ^
+      floatingDraggable.hashCode;
 
   LegendConfig copyWith({
     LegendPosition? position,
@@ -159,6 +172,8 @@ class LegendConfig {
     Color? backgroundColor,
     EdgeInsets? padding,
     double? borderRadius,
+    Offset? floatingOffset,
+    bool? floatingDraggable,
   }) {
     return LegendConfig(
       position: position ?? this.position,
@@ -170,6 +185,8 @@ class LegendConfig {
       backgroundColor: backgroundColor ?? this.backgroundColor,
       padding: padding ?? this.padding,
       borderRadius: borderRadius ?? this.borderRadius,
+      floatingOffset: floatingOffset ?? this.floatingOffset,
+      floatingDraggable: floatingDraggable ?? this.floatingDraggable,
     );
   }
 }

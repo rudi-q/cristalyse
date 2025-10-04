@@ -198,5 +198,103 @@ void main() {
 
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
+
+    testWidgets('Chart with floating legend should build without errors',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CristalyseChart()
+                .data(testData)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(style: BarStyle.grouped)
+                .legend(
+                  position: LegendPosition.floating,
+                  floatingOffset: const Offset(50, 30),
+                )
+                .build(),
+          ),
+        ),
+      );
+
+      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
+
+    testWidgets(
+        'Chart with floating legend and custom styling should build without errors',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: CristalyseChart()
+                .data(testData)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(style: BarStyle.grouped)
+                .legend(
+                  position: LegendPosition.floating,
+                  floatingOffset: const Offset(100, 50),
+                  backgroundColor: Colors.white.withValues(alpha: 0.95),
+                  textStyle: const TextStyle(fontSize: 14),
+                  symbolSize: 16.0,
+                  borderRadius: 8.0,
+                )
+                .build(),
+          ),
+        ),
+      );
+
+      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+    });
+
+    test('LegendConfig with floating position should set correct defaults', () {
+      const config = LegendConfig(
+        position: LegendPosition.floating,
+        floatingOffset: Offset(100, 50),
+      );
+
+      expect(config.position, LegendPosition.floating);
+      expect(config.floatingOffset, const Offset(100, 50));
+      expect(config.floatingDraggable, false);
+      expect(config.effectiveOrientation, LegendOrientation.vertical);
+    });
+
+    test('LegendConfig copyWith should preserve floating parameters', () {
+      const original = LegendConfig(
+        position: LegendPosition.floating,
+        floatingOffset: Offset(50, 30),
+        floatingDraggable: false,
+      );
+
+      final copied = original.copyWith(
+        floatingOffset: const Offset(100, 60),
+      );
+
+      expect(copied.position, LegendPosition.floating);
+      expect(copied.floatingOffset, const Offset(100, 60));
+      expect(copied.floatingDraggable, false);
+    });
+
+    test('LegendConfig equality should include floating parameters', () {
+      const config1 = LegendConfig(
+        position: LegendPosition.floating,
+        floatingOffset: Offset(100, 50),
+        floatingDraggable: false,
+      );
+
+      const config2 = LegendConfig(
+        position: LegendPosition.floating,
+        floatingOffset: Offset(100, 50),
+        floatingDraggable: false,
+      );
+
+      const config3 = LegendConfig(
+        position: LegendPosition.floating,
+        floatingOffset: Offset(200, 100), // Different offset
+        floatingDraggable: false,
+      );
+
+      expect(config1, equals(config2));
+      expect(config1, isNot(equals(config3)));
+    });
   });
 }

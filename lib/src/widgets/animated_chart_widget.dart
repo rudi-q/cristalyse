@@ -558,6 +558,11 @@ class _AnimatedCristalyseChartWidgetState
 
   /// Position legend relative to chart based on configuration
   Widget _positionLegend(Widget chart, Widget legend, LegendConfig config) {
+    // If floating position, always use floating layout
+    if (config.position == LegendPosition.floating) {
+      return _buildFloatingLegend(chart, legend, config);
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         // Check if we have bounded constraints
@@ -618,6 +623,11 @@ class _AnimatedCristalyseChartWidgetState
         padding =
             EdgeInsets.only(bottom: config.spacing, right: config.spacing);
         break;
+      case LegendPosition.floating:
+        // This should not be reached, but provide a fallback
+        alignment = Alignment.topRight;
+        padding = EdgeInsets.only(top: config.spacing, right: config.spacing);
+        break;
     }
 
     return Stack(
@@ -629,6 +639,24 @@ class _AnimatedCristalyseChartWidgetState
             padding: padding,
             child: legend,
           ),
+        ),
+      ],
+    );
+  }
+
+  /// Build floating legend with absolute positioning
+  Widget _buildFloatingLegend(
+      Widget chart, Widget legend, LegendConfig config) {
+    // Default to top-left with 16px offset if not specified
+    final offset = config.floatingOffset ?? const Offset(16, 16);
+
+    return Stack(
+      children: [
+        chart,
+        Positioned(
+          left: offset.dx,
+          top: offset.dy,
+          child: legend,
         ),
       ],
     );
@@ -698,6 +726,22 @@ class _AnimatedCristalyseChartWidgetState
             spacing,
             Row(
               children: [Flexible(child: Container()), legend],
+            ),
+          ],
+        );
+
+      case LegendPosition.floating:
+        // Floating position doesn't use flex layout, this shouldn't be reached
+        // But provide a fallback - just overlay the chart
+        return Stack(
+          children: [
+            chart,
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: EdgeInsets.all(config.spacing),
+                child: legend,
+              ),
             ),
           ],
         );

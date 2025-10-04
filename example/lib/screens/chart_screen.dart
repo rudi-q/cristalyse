@@ -17,6 +17,7 @@ import '../graphs/grouped_bar.dart';
 import '../graphs/heatmap_chart.dart';
 import '../graphs/horizontal_bar_chart.dart';
 import '../graphs/interactive_scatter.dart';
+import '../graphs/legend_example.dart';
 import '../graphs/line_chart.dart';
 import '../graphs/multi_series_line_chart.dart';
 import '../graphs/pan_example.dart';
@@ -315,6 +316,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Chart Export Demo',
       'Gradient Bar Charts',
       'Advanced Gradient Effects',
+      'Legend Examples',
     ];
   }
 
@@ -339,6 +341,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Export your charts as scalable SVG vector graphics for reports and presentations',
       'Beautiful gradient fills for enhanced visual appeal • Linear gradients from light to dark',
       'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
+      'Comprehensive legend showcase • 9 positioning options including new floating legends',
     ];
   }
 
@@ -558,6 +561,9 @@ class _ChartScreenState extends State<ChartScreen>
         return const DebugGradientExample();
       case 18:
         return const AdvancedGradientExample();
+      case 19:
+        return buildLegendExampleTab(
+            currentTheme, _groupedBarData, _sliderValue);
       default:
         return Container();
     }
@@ -685,6 +691,12 @@ class _ChartScreenState extends State<ChartScreen>
           _buildStatsCard('Gradient Types', 'Mixed', 'All Types', Colors.blue),
           _buildStatsCard('Chart Types', '2', 'Bars + Points', Colors.green),
           _buildStatsCard('Creativity', '∞', 'Unlimited', Colors.orange),
+        ];
+      case 19:
+        return [
+          _buildStatsCard('Positions', '9', 'Including Floating', Colors.blue),
+          _buildStatsCard('Auto-Orient', 'Yes', 'Smart Layout', Colors.green),
+          _buildStatsCard('Themes', 'All', 'Dark Mode Ready', Colors.purple),
         ];
       default:
         return [];

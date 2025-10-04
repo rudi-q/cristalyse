@@ -176,6 +176,47 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                 .build(),
           ),
         ),
+
+        const SizedBox(height: 32),
+
+        // Example 6: Floating Legend
+        _buildExampleSection(
+          title: 'Floating Legend with Custom Position',
+          description:
+              'Free-floating legend with absolute positioning - perfect for overlays',
+          child: SizedBox(
+            height: 300,
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                    width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                    style: BarStyle.grouped,
+                    alpha: 0.9)
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(currentTheme)
+                .legend(
+                  position: LegendPosition.floating,
+                  floatingOffset: const Offset(100, 30), // x: 100, y: 30
+                  backgroundColor: Colors.white.withValues(alpha: 0.95),
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  symbolSize: 12.0,
+                  itemSpacing: 10.0,
+                  borderRadius: 8.0,
+                ) // <- Floating legend
+                .animate(
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOutCubic)
+                .build(),
+          ),
+        ),
       ],
     ),
   );
