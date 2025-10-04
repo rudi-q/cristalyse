@@ -25,9 +25,36 @@ class _LegendWidgetState extends State<LegendWidget> {
   // Internal state for hidden categories (only used if not externally managed)
   final Set<String> _internalHiddenCategories = {};
 
+  @override
+  void initState() {
+    super.initState();
+    // Seed internal state from hiddenCategories if provided without external control
+    if (widget.config.hiddenCategories != null &&
+        widget.config.onToggle == null) {
+      _internalHiddenCategories.addAll(widget.config.hiddenCategories!);
+    }
+  }
+
+  @override
+  void didUpdateWidget(LegendWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Update internal state if hiddenCategories changed and no external control
+    if (widget.config.hiddenCategories != oldWidget.config.hiddenCategories &&
+        widget.config.hiddenCategories != null &&
+        widget.config.onToggle == null) {
+      _internalHiddenCategories.clear();
+      _internalHiddenCategories.addAll(widget.config.hiddenCategories!);
+    }
+  }
+
   Set<String> get _effectiveHiddenCategories {
-    // Use external state if provided, otherwise use internal state
-    return widget.config.hiddenCategories ?? _internalHiddenCategories;
+    // Use external state only if BOTH hiddenCategories and onToggle are provided
+    final external = widget.config.hiddenCategories;
+    if (external != null && widget.config.onToggle != null) {
+      return external;
+    }
+    // Otherwise use internal state management
+    return _internalHiddenCategories;
   }
 
   void _handleToggle(String category) {
@@ -36,20 +63,28 @@ class _LegendWidgetState extends State<LegendWidget> {
     final isCurrentlyHidden = _effectiveHiddenCategories.contains(category);
     final willBeVisible = isCurrentlyHidden;
 
-    // If using external state management, just call the callback
-    if (widget.config.hiddenCategories != null) {
-      widget.config.onToggle?.call(category, willBeVisible);
-    } else {
-      // Use internal state management
-      setState(() {
-        if (isCurrentlyHidden) {
-          _internalHiddenCategories.remove(category);
-        } else {
-          _internalHiddenCategories.add(category);
-        }
-      });
-      widget.config.onToggle?.call(category, willBeVisible);
+    // Determine if we're using external state management
+    final external = widget.config.hiddenCategories;
+    final usesExternalState =
+        external != null && widget.config.onToggle != null;
+
+    if (usesExternalState) {
+      // External state management: delegate to callback
+      widget.config.onToggle!(category, willBeVisible);
+      return;
     }
+
+    // Internal state management: mutate local state
+    setState(() {
+      if (isCurrentlyHidden) {
+        _internalHiddenCategories.remove(category);
+      } else {
+        _internalHiddenCategories.add(category);
+      }
+    });
+
+    // Optionally notify via callback (for user-side logging/analytics)
+    widget.config.onToggle?.call(category, willBeVisible);
   }
 
   @override
