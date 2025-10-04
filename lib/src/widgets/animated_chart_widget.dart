@@ -531,6 +531,25 @@ class _AnimatedCristalyseChartWidgetState
     return chart;
   }
 
+  // Internal state for managing hidden categories when not externally provided
+  final Set<String> _internalHiddenCategories = {};
+
+  /// Get filtered data based on hidden categories in legend
+  List<Map<String, dynamic>> _getFilteredData(Set<String> hiddenCategories) {
+    // If not interactive or no hidden categories, return original data
+    if (!widget.legendConfig!.interactive || 
+        hiddenCategories.isEmpty ||
+        widget.colorColumn == null) {
+      return widget.data;
+    }
+
+    // Filter out data points for hidden categories
+    return widget.data.where((datum) {
+      final category = datum[widget.colorColumn]?.toString();
+      return category != null && !hiddenCategories.contains(category);
+    }).toList();
+  }
+
   /// Build chart with legend positioned according to configuration
   Widget _buildChartWithLegend(BuildContext context, Widget chart) {
     final config = widget.legendConfig!;
@@ -546,14 +565,188 @@ class _AnimatedCristalyseChartWidgetState
     // If no legend items, return chart as-is
     if (legendItems.isEmpty) return chart;
 
-    final legend = LegendWidget(
-      items: legendItems,
-      config: config,
-      theme: widget.theme,
+    // Use StatefulBuilder to manage interactive legend state
+    if (config.interactive && config.hiddenCategories == null) {
+      // Internal state management
+      return StatefulBuilder(
+        builder: (context, setLegendState) {
+          final enhancedConfig = config.copyWith(
+            hiddenCategories: _internalHiddenCategories,
+            onToggle: (category, visible) {
+              setLegendState(() {
+                if (visible) {
+                  _internalHiddenCategories.remove(category);
+                } else {
+                  _internalHiddenCategories.add(category);
+                }
+              });
+              
+              // Also trigger parent rebuild to update chart
+              setState(() {});
+              
+              config.onToggle?.call(category, visible);
+            },
+          );
+
+          final filteredData = _getFilteredData(_internalHiddenCategories);
+          final filteredChart = _buildChartWidget(context, filteredData);
+
+          final legend = LegendWidget(
+            items: legendItems,
+            config: enhancedConfig,
+            theme: widget.theme,
+          );
+
+          return _positionLegend(filteredChart, legend, enhancedConfig);
+        },
+      );
+    } else if (config.interactive && config.hiddenCategories != null) {
+      // External state management
+      final filteredData = _getFilteredData(config.hiddenCategories!);
+      final filteredChart = _buildChartWidget(context, filteredData);
+
+      final legend = LegendWidget(
+        items: legendItems,
+        config: config,
+        theme: widget.theme,
+      );
+
+      return _positionLegend(filteredChart, legend, config);
+    } else {
+      // Non-interactive legend
+      final legend = LegendWidget(
+        items: legendItems,
+        config: config,
+        theme: widget.theme,
+      );
+
+      return _positionLegend(chart, legend, config);
+    }
+  }
+
+  /// Build the actual chart widget with filtered data
+  Widget _buildChartWidget(BuildContext context, List<Map<String, dynamic>> data) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // Create a temporary widget with filtered data
+            final tempWidget = AnimatedCristalyseChartWidget(
+              data: data,
+              xColumn: widget.xColumn,
+              yColumn: widget.yColumn,
+              y2Column: widget.y2Column,
+              colorColumn: widget.colorColumn,
+              sizeColumn: widget.sizeColumn,
+              pieValueColumn: widget.pieValueColumn,
+              pieCategoryColumn: widget.pieCategoryColumn,
+              heatMapXColumn: widget.heatMapXColumn,
+              heatMapYColumn: widget.heatMapYColumn,
+              heatMapValueColumn: widget.heatMapValueColumn,
+              progressValueColumn: widget.progressValueColumn,
+              progressLabelColumn: widget.progressLabelColumn,
+              progressCategoryColumn: widget.progressCategoryColumn,
+              geometries: widget.geometries,
+              xScale: widget.xScale,
+              yScale: widget.yScale,
+              y2Scale: widget.y2Scale,
+              colorScale: widget.colorScale,
+              sizeScale: widget.sizeScale,
+              theme: widget.theme,
+              animationDuration: widget.animationDuration,
+              animationCurve: widget.animationCurve,
+              coordFlipped: widget.coordFlipped,
+              interaction: widget.interaction,
+              legendConfig: null, // Don't add legend again
+            );
+            
+            return _buildInteractiveChartForData(context, constraints.biggest, tempWidget);
+          },
+        );
+      },
+    );
+  }
+
+  /// Build interactive chart with custom data
+  Widget _buildInteractiveChartForData(
+      BuildContext context, Size size, AnimatedCristalyseChartWidget tempWidget) {
+    final animationValue = _animation.value;
+
+    // For very small sizes, return placeholder
+    if (size.width < 50 || size.height < 50) {
+      return Container(
+        decoration: BoxDecoration(
+          color: tempWidget.theme.backgroundColor,
+          border: Border.all(color: tempWidget.theme.borderColor),
+        ),
+      );
+    }
+
+    // For small sizes during animation, skip some expensive rendering
+    if (size.width < 200 || size.height < 150) {
+      return Container(
+        decoration: BoxDecoration(
+          color: tempWidget.theme.backgroundColor,
+          border: Border.all(color: tempWidget.theme.borderColor),
+        ),
+        child: CustomPaint(
+          painter: chartPainterAnimated(
+              widget: tempWidget,
+              context: context,
+              size: size,
+              animationProgress: 1.0,
+              panXDomain: _panXDomain,
+              panYDomain: _panYDomain),
+          child: Container(),
+        ),
+      );
+    }
+
+    final hasSecondaryY = hasSecondaryYAxis(
+        y2Column: tempWidget.y2Column, geometries: tempWidget.geometries);
+    final rightPadding = hasSecondaryY ? 80.0 : tempWidget.theme.padding.right;
+
+    final plotArea = Rect.fromLTWH(
+      tempWidget.theme.padding.left,
+      tempWidget.theme.padding.top,
+      size.width - tempWidget.theme.padding.left - rightPadding,
+      size.height - tempWidget.theme.padding.vertical,
     );
 
-    // Position legend based on configuration
-    return _positionLegend(chart, legend, config);
+    final chartPainter = chartPainterAnimated(
+        widget: tempWidget,
+        context: context,
+        size: size,
+        animationProgress: math.max(0.0, math.min(1.0, animationValue)),
+        panXDomain: _panXDomain,
+        panYDomain: _panYDomain);
+
+    Widget chart = CustomPaint(painter: chartPainter, child: Container());
+
+    // Wrap with gesture detection if interactions are enabled
+    if (tempWidget.interaction.enabled) {
+      chart = MouseRegion(
+        onHover: (event) => _handleMouseHover(context, event, plotArea),
+        onExit: (event) => _handleMouseExit(context, event),
+        child: GestureDetector(
+          onPanStart: (details) => _handlePanStart(context, details, plotArea),
+          onPanUpdate: (details) =>
+              _handlePanUpdate(context, details, plotArea),
+          onPanEnd: (details) => _handlePanEnd(context, details, plotArea),
+          onTapUp: (details) => _handleTap(context, details, plotArea),
+          child: chart,
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: tempWidget.theme.backgroundColor,
+        border: Border.all(color: tempWidget.theme.borderColor),
+      ),
+      child: chart,
+    );
   }
 
   /// Position legend relative to chart based on configuration

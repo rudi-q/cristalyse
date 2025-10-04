@@ -68,6 +68,11 @@ class LegendConfig {
   // Floating legend configuration
   final Offset? floatingOffset; // Absolute position when position is floating
   final bool floatingDraggable; // Whether floating legend is draggable
+  
+  // Interactive legend configuration
+  final bool interactive; // Enable click-to-toggle visibility
+  final Set<String>? hiddenCategories; // Categories that are currently hidden
+  final void Function(String category, bool visible)? onToggle; // Callback when legend item is toggled
 
   const LegendConfig({
     this.position = LegendPosition.topRight,
@@ -81,6 +86,9 @@ class LegendConfig {
     this.borderRadius = 4.0,
     this.floatingOffset,
     this.floatingDraggable = false,
+    this.interactive = false,
+    this.hiddenCategories,
+    this.onToggle,
   });
 
   /// Get the effective orientation based on position
@@ -146,7 +154,9 @@ class LegendConfig {
           padding == other.padding &&
           borderRadius == other.borderRadius &&
           floatingOffset == other.floatingOffset &&
-          floatingDraggable == other.floatingDraggable;
+          floatingDraggable == other.floatingDraggable &&
+          interactive == other.interactive;
+  // Note: hiddenCategories and onToggle intentionally excluded from equality
 
   @override
   int get hashCode =>
@@ -160,7 +170,9 @@ class LegendConfig {
       padding.hashCode ^
       borderRadius.hashCode ^
       floatingOffset.hashCode ^
-      floatingDraggable.hashCode;
+      floatingDraggable.hashCode ^
+      interactive.hashCode;
+  // Note: hiddenCategories and onToggle intentionally excluded from hashCode
 
   LegendConfig copyWith({
     LegendPosition? position,
@@ -174,6 +186,9 @@ class LegendConfig {
     double? borderRadius,
     Offset? floatingOffset,
     bool? floatingDraggable,
+    bool? interactive,
+    Set<String>? hiddenCategories,
+    void Function(String, bool)? onToggle,
   }) {
     return LegendConfig(
       position: position ?? this.position,
@@ -187,6 +202,9 @@ class LegendConfig {
       borderRadius: borderRadius ?? this.borderRadius,
       floatingOffset: floatingOffset ?? this.floatingOffset,
       floatingDraggable: floatingDraggable ?? this.floatingDraggable,
+      interactive: interactive ?? this.interactive,
+      hiddenCategories: hiddenCategories ?? this.hiddenCategories,
+      onToggle: onToggle ?? this.onToggle,
     );
   }
 }

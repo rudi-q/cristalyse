@@ -217,6 +217,47 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                 .build(),
           ),
         ),
+
+        const SizedBox(height: 32),
+
+        // Example 7: Interactive Legend
+        _buildExampleSection(
+          title: 'Interactive Legend (Click to Toggle)',
+          description:
+              'Click legend items to show/hide categories • Auto-managed state',
+          child: SizedBox(
+            height: 300,
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                    width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                    style: BarStyle.grouped,
+                    alpha: 0.9)
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(currentTheme)
+                .legend(
+                  position: LegendPosition.topRight,
+                  interactive: true, // <- Enable click-to-toggle
+                  backgroundColor: Colors.white.withValues(alpha: 0.95),
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  symbolSize: 12.0,
+                  itemSpacing: 10.0,
+                  borderRadius: 8.0,
+                )
+                .animate(
+                    duration: const Duration(milliseconds: 800),
+                    curve: Curves.easeInOut)
+                .build(),
+          ),
+        ),
       ],
     ),
   );

@@ -843,6 +843,28 @@ class CristalyseChart {
   /// )
   /// ```
   ///
+  /// With interactive legend (click to toggle visibility):
+  /// ```dart
+  /// chart.legend(interactive: true) // Auto-managed state
+  /// ```
+  ///
+  /// With external state management:
+  /// ```dart
+  /// final hiddenCategories = useState(<String>{});
+  /// chart.legend(
+  ///   interactive: true,
+  ///   hiddenCategories: hiddenCategories.value,
+  ///   onToggle: (category, visible) {
+  ///     if (visible) {
+  ///       hiddenCategories.value.remove(category);
+  ///     } else {
+  ///       hiddenCategories.value.add(category);
+  ///     }
+  ///     hiddenCategories.value = {...hiddenCategories.value};
+  ///   },
+  /// )
+  /// ```
+  ///
   /// With custom styling:
   /// ```dart
   /// chart.legend(
@@ -863,6 +885,9 @@ class CristalyseChart {
     double? borderRadius,
     Offset? floatingOffset,
     bool? floatingDraggable,
+    bool? interactive,
+    Set<String>? hiddenCategories,
+    void Function(String category, bool visible)? onToggle,
   }) {
     _legendConfig = LegendConfig(
       position: position ?? LegendPosition.topRight,
@@ -876,6 +901,9 @@ class CristalyseChart {
       borderRadius: borderRadius ?? 4.0,
       floatingOffset: floatingOffset,
       floatingDraggable: floatingDraggable ?? false,
+      interactive: interactive ?? false,
+      hiddenCategories: hiddenCategories,
+      onToggle: onToggle,
     );
     return this;
   }

@@ -230,6 +230,117 @@ CristalyseChart()
 **Coordinate System**: The `floatingOffset` uses the Flutter coordinate system where `Offset(x, y)` positions the legend `x` pixels from the left edge and `y` pixels from the top edge.
 </Tip>
 
+## Interactive Legends
+
+<Info>
+**New Feature**: Interactive legends allow users to click legend items to show/hide data categories!
+</Info>
+
+### Basic Interactive Legend
+
+Enable click-to-toggle with one parameter:
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .legend(interactive: true) // ✨ Click to toggle visibility
+  .build();
+```
+
+**Features**:
+- **Click legend items** to show/hide categories
+- **Visual feedback**: Hidden items appear dimmed with strikethrough
+- **Smooth animations**: Data fades in/out gracefully
+- **Auto-managed state**: No additional code needed
+
+### External State Management
+
+For advanced control, manage hidden categories externally:
+
+```dart
+class MyChart extends StatefulWidget {
+  @override
+  State<MyChart> createState() => _MyChartState();
+}
+
+class _MyChartState extends State<MyChart> {
+  final Set<String> hiddenCategories = {};
+
+  @override
+  Widget build(BuildContext context) {
+    return CristalyseChart()
+      .data(salesData)
+      .mapping(x: 'quarter', y: 'revenue', color: 'product')
+      .geomBar()
+      .legend(
+        interactive: true,
+        hiddenCategories: hiddenCategories,
+        onToggle: (category, visible) {
+          setState(() {
+            if (visible) {
+              hiddenCategories.remove(category);
+            } else {
+              hiddenCategories.add(category);
+            }
+          });
+          print('$category is now ${visible ? "visible" : "hidden"}');
+        },
+      )
+      .build();
+  }
+}
+```
+
+### Interactive Legend Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `interactive` | `bool` | Enable click-to-toggle functionality. Default: `false` |
+| `hiddenCategories` | `Set<String>?` | Externally managed set of hidden categories. Optional |
+| `onToggle` | `Function(String, bool)?` | Callback when legend item is toggled. `(category, visible)` |
+
+### Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Data Exploration" icon="magnifying-glass">
+    Users can focus on specific categories by hiding others, making complex charts easier to analyze.
+  </Card>
+  <Card title="Comparison Analysis" icon="chart-line">
+    Quickly compare subsets of data by toggling relevant categories on and off.
+  </Card>
+  <Card title="Presentation Mode" icon="presentation-screen">
+    Interactively show/hide data during presentations to highlight key insights.
+  </Card>
+  <Card title="User Preferences" icon="sliders">
+    Save user's hidden categories to provide personalized dashboard views.
+  </Card>
+</CardGroup>
+
+### Interactive with Floating Position
+
+Combine interactive and floating for maximum flexibility:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'date', y: 'value', color: 'metric')
+  .geomLine()
+  .legend(
+    position: LegendPosition.floating,
+    floatingOffset: Offset(120, 40),
+    interactive: true, // Click-to-toggle enabled
+    backgroundColor: Colors.white.withValues(alpha: 0.95),
+    borderRadius: 8.0,
+  )
+  .build();
+```
+
+<Tip>
+**Performance**: Data filtering is efficient and only rebuilds the chart when categories are toggled.
+</Tip>
+
 ## Symbol Generation
 
 Legends automatically choose appropriate symbols based on your chart type:
