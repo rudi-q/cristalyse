@@ -12,10 +12,44 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="October 3, 2025" description="v1.8.1">
+  ### 🔗 Enhanced Developer Experience
+  
+  **Seamless navigation between documentation and live examples!**
+  
+  - **Bidirectional Links**: Jump between docs and example app instantly
+  - **View Docs Button**: All 19 example app screens link to documentation
+  - **View Live Example Cards**: 9 chart docs pages link to interactive examples
+  - **Better Learning Flow**: Quickly switch from reading to seeing live code
+  
+  **Documentation Navigation:**
+  - Scatter plots, line charts, bar charts, area charts
+  - Bubble charts, pie charts, dual-axis charts
+  - Heat maps, progress bars
+  - Opens in appropriate context (external browser for app, new tab for docs)
+  
+  **Technical Improvements:**
+  - Clean architecture with single source of truth for URL mappings
+  - Type-safe implementation with proper null checks
+  - Consistent UI patterns across both navigation methods
+  - Added `url_launcher` package for external link handling
+  
+  ```dart
+  // Example app now has "View Docs" button on each chart
+  // Documentation now has "View Live Example" cards
+  // Perfect for learning and exploring!
+  ```
+  
+  **Quality Assurance:**
+  - All Flutter analyze checks passing
+  - Zero breaking changes
+  - Backward compatible
+</Update>
+
 <Update label="October 1, 2025" description="v1.8.0">
   ### 🎯 Intelligent Axis Bounds & Labeling
   
-  **Authored by [@davidlrichmond](https://github.com/davidrichmond)** - Exceptional contribution!
+  **Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Exceptional contribution!
   
   **Wilkinson Extended Algorithm for professional axis labels:**
   - Based on IEEE paper by Talbot, Lin, and Hanrahan (2010)

@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.8.0** - Production ready with intelligent axis bounds & labeling, automatic legend generation, and professional styling
+**Current Version: 1.8.1** - Production ready with intelligent axis bounds & labeling, automatic legend generation, and professional styling
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 

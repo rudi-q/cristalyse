@@ -1,8 +1,48 @@
+## 1.8.1 - 2025-10-03
+
+#### 🔗 Enhanced Developer Experience
+
+- **Bidirectional Documentation Links**: Seamless navigation between docs and example app
+  - Added "View Docs" button to example app chart screens
+  - Added "View Live Example" cards to all chart documentation pages
+  - Enables quick switching between reading docs and seeing live examples
+  - Improves learning workflow for developers
+
+#### 📚 Documentation Navigation Improvements
+
+- **Example App Links**: 9 chart documentation pages now link to live examples
+  - Scatter plots, line charts, bar charts, area charts, bubble charts
+  - Pie charts, dual-axis charts, heat maps, progress bars
+  - Opens in new tab at `https://example.cristalyse.com/#/[chart-type]`
+- **Documentation Links**: All 19 example app routes link to corresponding docs
+  - Clean button UI with icon and proper spacing
+  - Opens in external browser with error handling
+  - Added `url_launcher` package (v6.3.1) dependency
+
+#### 🛠️ Technical Implementation
+
+- **Clean Architecture**: Single source of truth for URL mappings
+  - New `docsUrl` field in `RouteInfo` class (optional)
+  - Consistent URL mapping across 19 chart types
+  - Type-safe with proper null checks
+- **User-Friendly Design**: Both navigation methods follow consistent UI patterns
+  - "View Docs" button in example app (icon + text)
+  - "View Live Example" card in documentation (Mintlify Card component)
+  - Opens in appropriate context (external browser for app, new tab for docs)
+
+#### ✅ Quality Assurance
+
+- All Flutter analyze checks passing
+- No breaking changes
+- Backward compatible
+
+---
+
 ## 1.8.0 - 2025-10-01
 
 #### 🎯 Major Feature: Intelligent Axis Bounds & Labeling
 
-**Authored by [@davidlrichmond](https://github.com/davidrichmond)** - Thank you for this exceptional contribution!
+**Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Thank you for this exceptional contribution!
 
 - **Wilkinson Extended Algorithm**: Industry-standard tick labeling for "nice" round numbers
   - Based on IEEE paper by Talbot, Lin, and Hanrahan (2010)

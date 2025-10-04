@@ -134,24 +134,28 @@ class AppRouter {
       icon: Icons.scatter_plot,
       description:
           'Interactive scatter plots with custom sizing and categorization',
+      docsUrl: 'https://docs.cristalyse.com/charts/scatter-plots',
     ),
     RouteInfo(
       path: '/interactive',
       title: 'Interactive',
       icon: Icons.touch_app,
       description: 'Hover and tap for detailed insights with rich tooltips',
+      docsUrl: 'https://docs.cristalyse.com/features/interactions',
     ),
     RouteInfo(
       path: '/panning',
       title: 'Panning',
       icon: Icons.pan_tool,
       description: 'Real-time pan detection with visible range callbacks',
+      docsUrl: 'https://docs.cristalyse.com/features/interactions',
     ),
     RouteInfo(
       path: '/line-chart',
       title: 'Line Chart',
       icon: Icons.show_chart,
       description: 'Smooth line charts with customizable styles and animations',
+      docsUrl: 'https://docs.cristalyse.com/charts/line-charts',
     ),
     RouteInfo(
       path: '/area-chart',
@@ -159,6 +163,7 @@ class AppRouter {
       icon: Icons.area_chart,
       description:
           'Smooth area fills with progressive animation and transparency',
+      docsUrl: 'https://docs.cristalyse.com/charts/area-charts',
     ),
     RouteInfo(
       path: '/bubble-chart',
@@ -166,54 +171,63 @@ class AppRouter {
       icon: Icons.bubble_chart,
       description: 'Three-dimensional data visualization with size encoding',
       isNew: true,
+      docsUrl: 'https://docs.cristalyse.com/charts/bubble-charts',
     ),
     RouteInfo(
       path: '/bar-chart',
       title: 'Bar Chart',
       icon: Icons.bar_chart,
       description: 'Classic bar charts with customizable colors and animations',
+      docsUrl: 'https://docs.cristalyse.com/charts/bar-charts',
     ),
     RouteInfo(
       path: '/grouped-bars',
       title: 'Grouped Bars',
       icon: Icons.stacked_bar_chart,
       description: 'Multiple bar groups for comparative analysis',
+      docsUrl: 'https://docs.cristalyse.com/charts/bar-charts',
     ),
     RouteInfo(
       path: '/horizontal-bars',
       title: 'Horizontal Bars',
       icon: Icons.horizontal_rule,
       description: 'Horizontal bar charts perfect for categorical data',
+      docsUrl: 'https://docs.cristalyse.com/charts/bar-charts',
     ),
     RouteInfo(
       path: '/stacked-bars',
       title: 'Stacked Bars',
       icon: Icons.stacked_line_chart,
       description: 'Stacked bar charts showing part-to-whole relationships',
+      docsUrl: 'https://docs.cristalyse.com/charts/bar-charts',
     ),
     RouteInfo(
       path: '/pie-chart',
       title: 'Pie Chart',
       icon: Icons.pie_chart,
       description: 'Interactive pie charts with customizable segments',
+      docsUrl: 'https://docs.cristalyse.com/charts/pie-charts',
     ),
     RouteInfo(
       path: '/dual-y-axis',
       title: 'Dual Y-Axis',
       icon: Icons.analytics,
       description: 'Dual-axis charts for comparing different metrics',
+      docsUrl: 'https://docs.cristalyse.com/charts/dual-axis',
     ),
     RouteInfo(
       path: '/heatmap',
       title: 'Heatmap',
       icon: Icons.grid_on,
       description: 'Color-coded heatmaps for pattern visualization',
+      docsUrl: 'https://docs.cristalyse.com/charts/heat-map-charts',
     ),
     RouteInfo(
       path: '/contributions',
       title: 'Contributions',
       icon: Icons.calendar_view_day,
       description: 'GitHub-style contribution graphs for activity tracking',
+      docsUrl: 'https://docs.cristalyse.com/charts/heat-map-charts',
     ),
     RouteInfo(
       path: '/progress-bars',
@@ -222,6 +236,7 @@ class AppRouter {
       description:
           'Multiple progress bar styles including gauge and concentric',
       isNew: true,
+      docsUrl: 'https://docs.cristalyse.com/charts/progress-bars',
     ),
     RouteInfo(
       path: '/multi-series',
@@ -229,12 +244,14 @@ class AppRouter {
       icon: Icons.timeline,
       description: 'Multi-series line charts with custom category colors',
       isNew: true,
+      docsUrl: 'https://docs.cristalyse.com/charts/line-charts',
     ),
     RouteInfo(
       path: '/export',
       title: 'Export',
       icon: Icons.file_download,
       description: 'Export charts as scalable SVG vector graphics',
+      docsUrl: 'https://docs.cristalyse.com/features/export',
     ),
     RouteInfo(
       path: '/gradient-bars',
@@ -242,6 +259,7 @@ class AppRouter {
       icon: Icons.gradient,
       description: 'Beautiful gradient fills for enhanced visual appeal',
       isExperimental: true,
+      docsUrl: 'https://docs.cristalyse.com/charts/bar-charts',
     ),
     RouteInfo(
       path: '/advanced-gradients',
@@ -249,6 +267,7 @@ class AppRouter {
       icon: Icons.auto_awesome,
       description: 'Multiple gradient types: Linear, Radial, Sweep',
       isExperimental: true,
+      docsUrl: 'https://docs.cristalyse.com/charts/bar-charts',
     ),
   ];
 }
@@ -261,6 +280,7 @@ class RouteInfo {
     required this.description,
     this.isNew = false,
     this.isExperimental = false,
+    this.docsUrl,
   });
 
   final String path;
@@ -269,4 +289,5 @@ class RouteInfo {
   final String description;
   final bool isNew;
   final bool isExperimental;
+  final String? docsUrl;
 }

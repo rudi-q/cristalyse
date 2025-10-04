@@ -4,6 +4,7 @@ import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../graphs/advanced_gradient_example.dart';
 import '../graphs/area_chart.dart';
@@ -888,21 +889,39 @@ class _ChartScreenState extends State<ChartScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    chartTitles[widget.chartIndex],
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    chartDescriptions[widget.chartIndex],
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                      height: 1.3,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              chartTitles[widget.chartIndex],
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              chartDescriptions[widget.chartIndex],
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (AppRouter.routes[widget.chartIndex].docsUrl != null)
+                        const SizedBox(width: 12),
+                      if (AppRouter.routes[widget.chartIndex].docsUrl != null)
+                        _buildViewDocsButton(
+                          AppRouter.routes[widget.chartIndex].docsUrl!,
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 16),
 
@@ -1059,5 +1078,51 @@ class _ChartScreenState extends State<ChartScreen>
               ))
           .toList(),
     );
+  }
+
+  Widget _buildViewDocsButton(String docsUrl) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor.withAlpha(26),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: OutlinedButton.icon(
+        onPressed: () => _launchUrl(docsUrl),
+        icon: const Icon(Icons.menu_book, size: 18),
+        label: const Text(
+          'View Docs',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Colors.white,
+          side: BorderSide(
+            color: Theme.of(context).primaryColor,
+            width: 2.0,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Could not open documentation: $urlString'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
