@@ -1,3 +1,106 @@
+## 1.9.0 - 2025-10-05
+
+#### 🎯 Major Feature: Interactive & Floating Legends
+
+- **Interactive Legend Toggle**: Click-to-hide/show data points with visual feedback
+  - Simple `.legend(interactive: true)` to enable interactivity
+  - Toggled items show reduced opacity and strikethrough styling
+  - Smooth chart updates with preserved color consistency
+  - Supports both auto-managed and external state control
+- **Floating Legend Positioning**: Advanced positioning with custom offsets
+  - New `LegendPosition.floating` with `floatingOffset` parameter
+  - Negative offsets supported for legends outside chart bounds
+  - `clipBehavior: Clip.none` enables overflow rendering
+  - Full creative control over legend placement
+- **Enhanced Legend API**: Expanded configuration options
+  - `interactive`: Enable click-to-toggle functionality
+  - `hiddenCategories`: External state management for advanced use cases
+  - `onToggle`: Callback for custom toggle handling
+  - `floatingOffset`: Precise positioning with Offset coordinates
+- **Color Consistency**: Fixed color mapping preservation when toggling
+  - Original ColorScale maintained when filtering data
+  - Chart painter respects provided ColorScale
+  - No color shifting when hiding/showing categories
+- **Theme-Aware Backgrounds**: Legend backgrounds adapt to theme colors
+  - No hardcoded white backgrounds
+  - Automatic contrast for light/dark modes
+  - Customizable via theme configuration
+
+#### ✨ New API Examples
+
+```dart
+// Interactive Legend (Auto-Managed State)
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .legend(interactive: true) // Click to toggle!
+  .build()
+
+// Floating Legend with Custom Position
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint()
+  .legend(
+    position: LegendPosition.floating,
+    floatingOffset: Offset(20, 20), // Top-left, 20px from corner
+  )
+  .build()
+
+// Interactive + Floating + External State Control
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomLine()
+  .legend(
+    interactive: true,
+    position: LegendPosition.floating,
+    floatingOffset: Offset(-10, 30), // Can overflow outside chart!
+    hiddenCategories: myHiddenSet, // External state
+    onToggle: (category, visible) => handleToggle(category, visible),
+  )
+  .build()
+```
+
+#### 📚 Documentation Updates
+
+- **Enhanced Legend Documentation** (`legends.mdx`):
+  - Comprehensive interactive legends section
+  - Floating position examples with negative offsets
+  - State management patterns (auto vs external)
+  - Visual feedback customization guide
+- **Updated Example App** (`legend_example.dart`):
+  - Interactive legend demo with grouped bars
+  - Auto-managed state demonstration
+  - Real-world usage patterns
+
+#### 🧪 Comprehensive Testing
+
+- **All 268 Tests Passing**: Zero regressions, fully backward compatible
+- **State Management**: Tested internal and external state patterns
+- **Color Preservation**: Validated consistent color mapping
+- **Overflow Rendering**: Verified legends render outside bounds
+
+#### 🔧 Technical Implementation
+
+- **State Management**: Clean separation of internal/external state
+- **ColorScale Preservation**: Original scale maintained through filtering
+- **Painter Updates**: Respects provided ColorScale for consistency
+- **Overflow Support**: `clipBehavior: Clip.none` for Stack widgets
+- **Visual Feedback**: Opacity + strikethrough for toggled items
+
+#### ⚡ Performance & Compatibility
+
+- **Zero Breaking Changes**: Fully backward compatible
+- **Smooth Animations**: Preserved during toggle interactions
+- **Negligible Overhead**: Efficient state updates and filtering
+- **Production Ready**: Well-tested, documented, and reviewed
+
+**Interactive legends bring a new level of data exploration to Cristalyse charts!** 🎨✨
+
+---
+
 ## 1.8.1 - 2025-10-04
 
 #### 🔗 Enhanced Developer Experience

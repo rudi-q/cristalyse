@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.8.1** - Production ready with intelligent axis bounds & labeling, automatic legend generation, and professional styling
+**Current Version: 1.9.0** - Production ready with interactive legends, floating positioning, intelligent axis bounds, and professional styling
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1123,6 +1123,7 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.6.0** - **Experimental gradient color support** for customPalette with Linear, Radial, and Sweep gradients
 - ✅ **v1.7.0** - **Progress bar charts** with horizontal, vertical, circular, stacked, grouped, gauge, and concentric styles + comprehensive documentation improvements
 - ✅ **v1.8.0** - **Intelligent axis bounds & labeling** with Wilkinson Extended algorithm (by [@davidlrichmond](https://github.com/davidlrichmond)) - professional round-number ticks, geometry-aware defaults, comprehensive testing
+- ✅ **v1.9.0** - **Interactive & floating legends** with click-to-toggle visibility, custom positioning with offsets, color consistency preservation, and overflow rendering support
 
 ## Support This Project
 
