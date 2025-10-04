@@ -844,6 +844,7 @@ class _AnimatedCristalyseChartWidgetState
     }
 
     return Stack(
+      clipBehavior: Clip.none,
       children: [
         chart,
         Align(
@@ -864,6 +865,7 @@ class _AnimatedCristalyseChartWidgetState
     final offset = config.floatingOffset ?? const Offset(16, 16);
 
     return Stack(
+      clipBehavior: Clip.none,
       children: [
         chart,
         Positioned(
