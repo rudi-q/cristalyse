@@ -170,17 +170,14 @@ class _ChartPainter extends CustomPainter {
         .where((v) => v != null)
         .cast<double>();
     if (values.isNotEmpty) {
-      // Visual range always comes from theme
-      final sizeScale = SizeScale(
-        range: [theme.pointSizeMin, theme.pointSizeMax],
-      );
-
-      // Get domain limits from bubble geometry if available
+      // Get bubble geometry and use its preconfigured size scale
       final bubbleGeometries = geometries.whereType<BubbleGeometry>().toList();
-      final limits =
-          bubbleGeometries.isNotEmpty ? bubbleGeometries.first.limits : null;
+      final sizeScale = bubbleGeometries.isNotEmpty
+          ? bubbleGeometries.first.createSizeScale()
+          : SizeScale(range: [theme.pointSizeMin, theme.pointSizeMax]);
 
-      sizeScale.setBounds(values.toList(), limits, geometries);
+      // Set domain from data - limits are already in the scale
+      sizeScale.setBounds(values.toList(), null, geometries);
       return sizeScale;
     }
     return SizeScale();

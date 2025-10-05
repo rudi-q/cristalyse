@@ -23,8 +23,8 @@ Widget buildLineChartTab(ChartTheme currentTheme,
               .data(data)
               .mapping(x: 'x', y: 'y')
               .geomLine(strokeWidth: 1.0 + sliderValue * 9.0, alpha: 0.9)
-              .scaleXContinuous()
-              .scaleYContinuous()
+              .scaleXContinuous(title: 'Time (seconds)')
+              .scaleYContinuous(title: 'Value (units)')
               .theme(currentTheme)
               .animate(duration: const Duration(milliseconds: 1200))
               .build(),

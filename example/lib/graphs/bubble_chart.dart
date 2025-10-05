@@ -93,6 +93,7 @@ Widget buildBubbleChartTab(
                 .geomBubble(
                   minSize: minSize,
                   maxSize: maxSize,
+                  title: 'Market Share (%)',
                   alpha: 0.75, // Slightly transparent for overlapping bubbles
                   borderWidth: 2.0,
                   borderColor: Colors.white, // White border for better contrast
@@ -107,7 +108,7 @@ Widget buildBubbleChartTab(
                 )
                 .theme(enhancedTheme)
                 .legend(
-                  position: LegendPosition.top,
+                  position: LegendPosition.right,
                   backgroundColor: Colors.white.withValues(alpha: 0.95),
                   borderRadius: 8.0,
                   symbolSize: 14.0,

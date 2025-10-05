@@ -47,14 +47,16 @@ Widget buildDualAxisTab(ChartTheme currentTheme,
                       ? currentTheme.colorPalette[1]
                       : Colors.orange,
                   yAxis: YAxis.secondary) // Uses right Y-axis
-              .scaleXOrdinal()
+              .scaleXOrdinal(title: 'Month')
               .scaleYContinuous(
                   min: 0,
+                  title: 'Revenue (\$K)',
                   labels: (value) =>
                       '\$${value.toStringAsFixed(0)}K') // Revenue in $K format
               .scaleY2Continuous(
                   min: 0,
                   max: 30,
+                  title: 'Conversion Rate (%)',
                   labels: (value) =>
                       '${value.toStringAsFixed(1)}%') // Conversion rates as %, adjusted range
               .theme(currentTheme)
