@@ -163,7 +163,8 @@ class _LegendWidgetState extends State<LegendWidget> {
 
     // fontSize is guaranteed non-null from effectiveTextStyle in build()
     final baseFontSize = textStyle.fontSize!;
-    final bubbleLabelFontSize = baseFontSize * LegendWidget._bubbleLabelFontSizeRatio;
+    final bubbleLabelFontSize =
+        baseFontSize * LegendWidget._bubbleLabelFontSizeRatio;
 
     final bubbleGuideHeight = baseFontSize +
         LegendWidget._bubbleTitleSpacing +
@@ -172,10 +173,11 @@ class _LegendWidgetState extends State<LegendWidget> {
         bubbleLabelFontSize;
 
     // Calculate stacked color items height
-    final itemHeight =
-        widget.config.symbolSize > baseFontSize ? widget.config.symbolSize : baseFontSize;
-    final totalItemsHeight =
-        (itemHeight * widget.items.length) + (widget.config.itemSpacing * (widget.items.length - 1));
+    final itemHeight = widget.config.symbolSize > baseFontSize
+        ? widget.config.symbolSize
+        : baseFontSize;
+    final totalItemsHeight = (itemHeight * widget.items.length) +
+        (widget.config.itemSpacing * (widget.items.length - 1));
 
     return totalItemsHeight <= bubbleGuideHeight;
   }
@@ -200,8 +202,8 @@ class _LegendWidgetState extends State<LegendWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: widget.items
                     .map((item) => Padding(
-                          padding:
-                              EdgeInsets.only(bottom: widget.config.itemSpacing / 2),
+                          padding: EdgeInsets.only(
+                              bottom: widget.config.itemSpacing / 2),
                           child: _buildLegendItem(item, textStyle),
                         ))
                     .toList(),
