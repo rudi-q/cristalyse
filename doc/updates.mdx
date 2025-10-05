@@ -12,7 +12,84 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
-<Update label="October 3, 2025" description="v1.8.1">
+<Update label="October 6, 2025" description="v1.9.0">
+  ### 🎯 Interactive & Floating Legends
+  
+  **Transform your charts with interactive legend controls and advanced positioning!**
+  
+  **Interactive Legend Toggle:**
+  - Click-to-hide/show data points with visual feedback
+  - Simple `.legend(interactive: true)` to enable
+  - Toggled items show reduced opacity + strikethrough styling
+  - Smooth chart updates with preserved color consistency
+  - Both auto-managed and external state control
+  
+  **Floating Legend Positioning:**
+  - New `LegendPosition.floating` with custom offsets
+  - Negative offsets supported (legends outside chart bounds!)
+  - `clipBehavior: Clip.none` enables overflow rendering
+  - Full creative control over placement
+  
+  ```dart
+  // Interactive Legend (Auto-Managed)
+  CristalyseChart()
+    .data(salesData)
+    .mapping(x: 'quarter', y: 'revenue', color: 'product')
+    .geomBar(style: BarStyle.grouped)
+    .legend(interactive: true) // Click to toggle!
+    .build()
+  
+  // Floating Legend with Custom Position
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'x', y: 'y', color: 'category')
+    .geomPoint()
+    .legend(
+      position: LegendPosition.floating,
+      floatingOffset: Offset(20, 20), // Custom position
+    )
+    .build()
+  
+  // Interactive + Floating + External State
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'x', y: 'y', color: 'category')
+    .geomLine()
+    .legend(
+      interactive: true,
+      position: LegendPosition.floating,
+      floatingOffset: Offset(-10, 30), // Can overflow!
+      hiddenCategories: myHiddenSet,
+      onToggle: (category, visible) => handleToggle(category, visible),
+    )
+    .build()
+  ```
+  
+  **Enhanced API:**
+  - `interactive`: Enable click-to-toggle functionality
+  - `hiddenCategories`: External state management
+  - `onToggle`: Custom toggle callbacks
+  - `floatingOffset`: Precise Offset positioning
+  
+  **Color Consistency Fixed:**
+  - Original ColorScale preserved when filtering
+  - No color shifting when toggling categories
+  - Chart painter respects provided ColorScale
+  
+  **Theme-Aware Backgrounds:**
+  - Legend backgrounds adapt to theme colors
+  - Automatic contrast for light/dark modes
+  - No hardcoded white backgrounds
+  
+  **Quality Assurance:**
+  - All 268 tests passing
+  - Zero breaking changes
+  - Production ready
+  
+  [View legend documentation](/features/legends)
+</Update>
+
+<Update label="October 4, 2025" description="v1.8.1">
   ### 🔗 Enhanced Developer Experience
   
   **Seamless navigation between documentation and live examples!**

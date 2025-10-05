@@ -121,6 +121,12 @@ class AppRouter {
           return const ChartScreen(chartIndex: 18);
         },
       ),
+      GoRoute(
+        path: '/legends',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ChartScreen(chartIndex: 19);
+        },
+      ),
     ],
   );
 
@@ -268,6 +274,14 @@ class AppRouter {
       description: 'Multiple gradient types: Linear, Radial, Sweep',
       isExperimental: true,
       docsUrl: 'https://docs.cristalyse.com/charts/bar-charts',
+    ),
+    RouteInfo(
+      path: '/legends',
+      title: 'Legends',
+      icon: Icons.legend_toggle,
+      description: 'Built-in legends with 9 positions including floating',
+      isNew: true,
+      docsUrl: 'https://docs.cristalyse.com/features/legends',
     ),
   ];
 }

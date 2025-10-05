@@ -30,8 +30,8 @@ CristalyseChart()
   <Card title="Zero Configuration" icon="magic-wand-sparkles">
     Works automatically with smart defaults - just add `.legend()`
   </Card>
-  <Card title="8 Positioning Options" icon="arrows-to-circle">
-    Flexible positioning: corners, edges, with auto-orientation
+  <Card title="9 Positioning Options" icon="arrows-to-circle">
+    Flexible positioning: corners, edges, floating with custom coordinates
   </Card>
   <Card title="Smart Symbol Detection" icon="eye">
     Automatically matches your chart type: squares, circles, lines
@@ -60,7 +60,7 @@ Control legend placement with the `position` parameter:
 
 ### All Position Options
 
-<CardGroup cols={2}>
+<CardGroup cols={3}>
   <Card title="Corner Positions">
     - `LegendPosition.topLeft`
     - `LegendPosition.topRight` (default)
@@ -72,6 +72,11 @@ Control legend placement with the `position` parameter:
     - `LegendPosition.bottom`
     - `LegendPosition.left`
     - `LegendPosition.right`
+  </Card>
+  <Card title="Free Positioning">
+    - `LegendPosition.floating`
+    - Set custom coordinates with `floatingOffset`
+    - Perfect for overlay layouts
   </Card>
 </CardGroup>
 
@@ -113,7 +118,228 @@ Control legend placement with the `position` parameter:
     ```
     Legend appears on the right side with vertical layout.
   </Tab>
+  
+  <Tab title="Floating Position">
+    ```dart
+    CristalyseChart()
+      .data(data)
+      .mapping(x: 'month', y: 'sales', color: 'region')
+      .geomBar()
+      .legend(
+        position: LegendPosition.floating,
+        floatingOffset: Offset(100, 30), // x: 100, y: 30 from top-left
+      )
+      .build();
+    ```
+    Legend floats at specified coordinates with absolute positioning.
+  </Tab>
 </Tabs>
+
+## Floating Legends
+
+<Info>
+**New Feature**: Floating legends give you complete control over legend positioning with pixel-perfect placement!
+</Info>
+
+### Basic Floating Legend
+
+Use floating position for custom positioning:
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar()
+  .legend(
+    position: LegendPosition.floating,
+    floatingOffset: Offset(50, 20), // x: 50px, y: 20px from top-left
+  )
+  .build();
+```
+
+### Styled Floating Legend
+
+Combine floating position with custom styling:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'date', y: 'value', color: 'metric')
+  .geomLine()
+  .legend(
+    position: LegendPosition.floating,
+    floatingOffset: Offset(120, 40),
+    backgroundColor: Colors.white.withValues(alpha: 0.95),
+    textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+    symbolSize: 14.0,
+    itemSpacing: 10.0,
+    borderRadius: 8.0,
+  )
+  .build();
+```
+
+### Use Cases for Floating Legends
+
+<AccordionGroup>
+  <Accordion title="Dashboard Overlays" icon="layer-group">
+    Perfect for complex dashboards where legends need to float over chart content without taking up layout space.
+    
+    ```dart
+    .legend(
+      position: LegendPosition.floating,
+      floatingOffset: Offset(200, 50),
+      backgroundColor: Colors.white.withValues(alpha: 0.9),
+    )
+    ```
+  </Accordion>
+  
+  <Accordion title="Custom Chart Layouts" icon="compass-drafting">
+    When you need precise control over legend placement in complex multi-chart layouts.
+    
+    ```dart
+    .legend(
+      position: LegendPosition.floating,
+      floatingOffset: Offset(chartWidth - 150, 30),
+    )
+    ```
+  </Accordion>
+  
+  <Accordion title="Responsive Designs" icon="mobile">
+    Programmatically adjust floating position based on screen size or device.
+    
+    ```dart
+    final offset = isMobile ? Offset(20, 20) : Offset(100, 50);
+    
+    .legend(
+      position: LegendPosition.floating,
+      floatingOffset: offset,
+    )
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Floating Legend Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `position` | `LegendPosition.floating` | Required - enables floating mode |
+| `floatingOffset` | `Offset?` | Coordinates from top-left corner. Default: `Offset(16, 16)` |
+| `floatingDraggable` | `bool` | Enable drag-to-reposition (future feature). Default: `false` |
+
+<Tip>
+**Coordinate System**: The `floatingOffset` uses the Flutter coordinate system where `Offset(x, y)` positions the legend `x` pixels from the left edge and `y` pixels from the top edge.
+</Tip>
+
+## Interactive Legends
+
+<Info>
+**New Feature**: Interactive legends allow users to click legend items to show/hide data categories!
+</Info>
+
+### Basic Interactive Legend
+
+Enable click-to-toggle with one parameter:
+
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .legend(interactive: true) // ✨ Click to toggle visibility
+  .build();
+```
+
+**Features**:
+- **Click legend items** to show/hide categories
+- **Visual feedback**: Hidden items appear dimmed with strikethrough
+- **Smooth animations**: Data fades in/out gracefully
+- **Auto-managed state**: No additional code needed
+
+### External State Management
+
+For advanced control, manage hidden categories externally:
+
+```dart
+class MyChart extends StatefulWidget {
+  @override
+  State<MyChart> createState() => _MyChartState();
+}
+
+class _MyChartState extends State<MyChart> {
+  final Set<String> hiddenCategories = {};
+
+  @override
+  Widget build(BuildContext context) {
+    return CristalyseChart()
+      .data(salesData)
+      .mapping(x: 'quarter', y: 'revenue', color: 'product')
+      .geomBar()
+      .legend(
+        interactive: true,
+        hiddenCategories: hiddenCategories,
+        onToggle: (category, visible) {
+          setState(() {
+            if (visible) {
+              hiddenCategories.remove(category);
+            } else {
+              hiddenCategories.add(category);
+            }
+          });
+          print('$category is now ${visible ? "visible" : "hidden"}');
+        },
+      )
+      .build();
+  }
+}
+```
+
+### Interactive Legend Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `interactive` | `bool` | Enable click-to-toggle functionality. Default: `false` |
+| `hiddenCategories` | `Set<String>?` | Externally managed set of hidden categories. Optional |
+| `onToggle` | `Function(String, bool)?` | Callback when legend item is toggled. `(category, visible)` |
+
+### Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Data Exploration" icon="magnifying-glass">
+    Users can focus on specific categories by hiding others, making complex charts easier to analyze.
+  </Card>
+  <Card title="Comparison Analysis" icon="chart-line">
+    Quickly compare subsets of data by toggling relevant categories on and off.
+  </Card>
+  <Card title="Presentation Mode" icon="presentation-screen">
+    Interactively show/hide data during presentations to highlight key insights.
+  </Card>
+  <Card title="User Preferences" icon="sliders">
+    Save user's hidden categories to provide personalized dashboard views.
+  </Card>
+</CardGroup>
+
+### Interactive with Floating Position
+
+Combine interactive and floating for maximum flexibility:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'date', y: 'value', color: 'metric')
+  .geomLine()
+  .legend(
+    position: LegendPosition.floating,
+    floatingOffset: Offset(120, 40),
+    interactive: true, // Click-to-toggle enabled
+    backgroundColor: Colors.white.withValues(alpha: 0.95),
+    borderRadius: 8.0,
+  )
+  .build();
+```
+
+<Tip>
+**Performance**: Data filtering is efficient and only rebuilds the chart when categories are toggled.
+</Tip>
 
 ## Symbol Generation
 
@@ -121,11 +347,11 @@ Legends automatically choose appropriate symbols based on your chart type:
 
 | Chart Type | Symbol | Description |
 |------------|--------|-------------|
-|| **Bar Charts** | ◼ Square | Solid colored squares for categorical bars |
+| **Bar Charts** | ◼ Square | Solid colored squares for categorical bars |
 | **Line Charts** | ━ Line | Horizontal line segments matching chart lines |
-|| **Scatter Plots** | ● Circle | Circular symbols for point data |
+| **Scatter Plots** | ● Circle | Circular symbols for point data |
 | **Area Charts** | ━ Line | Line symbols representing area boundaries |
-|| **Bubble Charts** | ● Circle | Circular symbols for bubble data |
+| **Bubble Charts** | ● Circle | Circular symbols for bubble data |
 
 <Note>
 Symbol selection is automatic but can be overridden with custom styling if needed.

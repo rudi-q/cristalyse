@@ -1,6 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:cristalyse/src/core/util/bounds_calculator.dart';
 import 'package:cristalyse/src/core/geometry.dart';
+import 'package:cristalyse/src/core/util/bounds_calculator.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 // Test geometries for bounds behavior testing
 class TestZeroBaselineGeometry extends Geometry {

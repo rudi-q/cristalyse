@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:cristalyse/src/core/util/wilkinson_labeling.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   // Helper: Use realistic density calculation matching Scale.getTicks()
