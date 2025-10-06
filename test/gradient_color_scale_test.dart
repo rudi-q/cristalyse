@@ -30,8 +30,8 @@ void main() {
       expect(lowColor, Colors.blue);
       expect(highColor, Colors.red);
       // Mid should be interpolated
-      expect(midColor.red, greaterThan(0));
-      expect(midColor.blue, greaterThan(0));
+      expect(midColor.r, greaterThan(0));
+      expect(midColor.b, greaterThan(0));
     });
 
     test('custom gradient without interpolation (discrete)', () {
@@ -82,8 +82,8 @@ void main() {
       final highColor = scale.scale(1);
 
       // Cool colors should be bluer, warm colors redder
-      expect(lowColor.blue, greaterThan(lowColor.red));
-      expect(highColor.red, greaterThan(highColor.blue));
+      expect(lowColor.b, greaterThan(lowColor.r));
+      expect(highColor.r, greaterThan(highColor.b));
     });
 
     test('handles single color gradient', () {
