@@ -452,13 +452,18 @@ class AnimatedChartPainter extends CustomPainter {
 
   GradientColorScale _setupGradientColorScale() {
     // Find heat map geometry if present
-    final heatMapGeom = geometries.firstWhere(
-      (g) => g is HeatMapGeometry,
-      orElse: () => HeatMapGeometry(),
-    ) as HeatMapGeometry;
+    HeatMapGeometry? heatMapGeom;
+    for (final geom in geometries) {
+      if (geom is HeatMapGeometry) {
+        heatMapGeom = geom;
+        break;
+      }
+    }
 
-    // Determine value column for heat map
-    final valueCol = heatMapValueColumn ?? colorColumn;
+    // If no heat map configured, return default scale without scanning data
+    if (heatMapGeom == null) {
+      return GradientColorScale.heatMap();
+    }
 
     // Create gradient color scale based on heat map configuration
     GradientColorScale scale;
@@ -476,6 +481,7 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     // Set domain based on data values if available
+    final valueCol = heatMapValueColumn ?? colorColumn;
     if (valueCol != null && data.isNotEmpty) {
       final values = data
           .map((d) => getNumericValue(d[valueCol]))
@@ -486,6 +492,12 @@ class AnimatedChartPainter extends CustomPainter {
       if (values.isNotEmpty) {
         final minValue = heatMapGeom.minValue ?? values.reduce(math.min);
         final maxValue = heatMapGeom.maxValue ?? values.reduce(math.max);
+
+        if (minValue > maxValue) {
+          throw ArgumentError(
+            'Invalid heat map bounds: minValue ($minValue) cannot be greater than maxValue ($maxValue)');
+        }
+
         scale.domain = [minValue, maxValue];
       }
     }
