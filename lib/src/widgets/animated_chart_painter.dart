@@ -495,7 +495,7 @@ class AnimatedChartPainter extends CustomPainter {
 
         if (minValue > maxValue) {
           throw ArgumentError(
-            'Invalid heat map bounds: minValue ($minValue) cannot be greater than maxValue ($maxValue)');
+              'Invalid heat map bounds: minValue ($minValue) cannot be greater than maxValue ($maxValue)');
         }
 
         scale.domain = [minValue, maxValue];
@@ -2164,7 +2164,6 @@ class AnimatedChartPainter extends CustomPainter {
         cellWidth = cellHeight * geometry.cellAspectRatio!;
       }
     }
-
 
     // Create a map for quick lookup
     final dataMap = <String, double>{};
