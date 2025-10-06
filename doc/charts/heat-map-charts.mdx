@@ -9,7 +9,11 @@ description: "Visualize 2D data patterns with color-coded intensity heat maps"
 
 ## Overview
 
-Heat maps are perfect for visualizing 2D data patterns where color intensity represents value magnitude. Cristalyse heat maps support customizable color schemes, interactive tooltips, and responsive layouts for effective data exploration.
+Heat maps are perfect for visualizing 2D data patterns where color intensity represents value magnitude. Cristalyse heat maps support customizable color schemes (via `colorGradient`), interactive tooltips, and responsive layouts for effective data exploration.
+
+<Note>
+**API Note**: Heat maps use `.mappingHeatMap()` instead of `.mapping()`, and color gradients are specified via the `colorGradient` parameter in `.geomHeatMap()`. If no `colorGradient` is specified, the default `GradientColorScale.heatMap()` gradient (dark blue → cyan → lime green → bright red) is automatically applied.
+</Note>
 
 <div align="center">
   <em>Heat maps with customizable color gradients and interactive cell highlighting</em>
@@ -34,22 +38,17 @@ final performanceData = [
 
 CristalyseChart()
   .data(performanceData)
-  .mapping(
-    x: 'month',
-    y: 'region', 
-    color: 'sales',
-  )
+  .mappingHeatMap(x: 'month', y: 'region', value: 'sales')
   .geomHeatMap(
-    cellWidth: 60,
-    cellHeight: 40,
-    showLabels: true,
+    cellSpacing: 2.0,
+    cellBorderRadius: BorderRadius.circular(4),
     showValues: true,
+    // Specify custom gradient or omit for default GradientColorScale.heatMap()
+    colorGradient: [Colors.lightBlue.shade100, Colors.blue.shade800],
+    interpolateColors: true,
   )
   .scaleXOrdinal()
   .scaleYOrdinal()
-  .scaleColorContinuous(
-    range: [Colors.lightBlue.shade100, Colors.blue.shade800],
-  )
   .theme(ChartTheme.defaultTheme())
   .build()
 ```
@@ -76,25 +75,21 @@ final businessData = [
 
 CristalyseChart()
   .data(businessData)
-  .mapping(
-    x: 'month',
-    y: 'region',
-    color: 'sales',
-  )
+  .mappingHeatMap(x: 'month', y: 'region', value: 'sales')
   .geomHeatMap(
-    cellWidth: 80,
-    cellHeight: 50,
-    showLabels: true,
+    cellSpacing: 2.0,
+    cellBorderRadius: BorderRadius.circular(6),
     showValues: true,
-    borderRadius: BorderRadius.circular(6),
-    borderWidth: 1.0,
-    borderColor: Colors.white,
+    colorGradient: [Colors.red.shade200, Colors.orange, Colors.green.shade600],
+    interpolateColors: true,
+    valueFormatter: (value) => '\$${value.toStringAsFixed(0)}K',
+    valueTextStyle: TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w600,
+    ),
   )
   .scaleXOrdinal()
   .scaleYOrdinal()
-  .scaleColorContinuous(
-    range: [Colors.red.shade200, Colors.orange, Colors.green.shade600],
-  )
   .theme(ChartTheme.defaultTheme())
   .build()
 ```
@@ -121,30 +116,29 @@ final monitoringData = [
 
 CristalyseChart()
   .data(monitoringData)
-  .mapping(
-    x: 'hour',
-    y: 'service',
-    color: 'responseTime',
-  )
+  .mappingHeatMap(x: 'hour', y: 'service', value: 'responseTime')
   .geomHeatMap(
-    cellWidth: 70,
-    cellHeight: 45,
-    showLabels: true,
+    cellSpacing: 1.0,
+    cellBorderRadius: BorderRadius.circular(2),
     showValues: true,
     minValue: 0,
     maxValue: 250,
+    colorGradient: [
+      Colors.green.shade400,
+      Colors.yellow,
+      Colors.red.shade600,
+    ],
+    interpolateColors: true,
     nullValueColor: Colors.grey.shade300,
-    textStyle: TextStyle(
-      fontSize: 12,
+    valueFormatter: (value) => '${value.toInt()}ms',
+    valueTextStyle: TextStyle(
+      fontSize: 10,
       fontWeight: FontWeight.w600,
       color: Colors.white,
     ),
   )
   .scaleXOrdinal()
   .scaleYOrdinal()
-  .scaleColorContinuous(
-    range: [Colors.green.shade400, Colors.yellow, Colors.red.shade600],
-  )
   .theme(ChartTheme.darkTheme())
   .build()
 ```
@@ -171,26 +165,26 @@ final correlationData = [
 
 CristalyseChart()
   .data(correlationData)
-  .mapping(
-    x: 'var1',
-    y: 'var2',
-    color: 'correlation',
-  )
+  .mappingHeatMap(x: 'var1', y: 'var2', value: 'correlation')
   .geomHeatMap(
-    cellWidth: 80,
-    cellHeight: 80,
-    showLabels: true,
+    cellSpacing: 2.0,
+    cellBorderRadius: BorderRadius.circular(3),
     showValues: true,
     minValue: -1.0,
     maxValue: 1.0,
+    // Diverging gradient: negative (blue) → neutral (white) → positive (red)
+    colorGradient: [
+      Colors.blue.shade700,
+      Colors.white,
+      Colors.red.shade700,
+    ],
+    interpolateColors: true,
     valueFormatter: (value) => value.toStringAsFixed(2),
+    valueTextStyle: TextStyle(fontSize: 11),
+    cellAspectRatio: 1.0, // Square cells
   )
   .scaleXOrdinal()
   .scaleYOrdinal()
-  .scaleColorContinuous(
-    range: [Colors.blue.shade700, Colors.white, Colors.red.shade700],
-    center: 0.0,
-  )
   .theme(ChartTheme.defaultTheme())
   .build()
 ```
@@ -205,37 +199,36 @@ Define custom color schemes for different data types:
 // Single color gradient (low to high)
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
-  .geomHeatMap()
-  .scaleColorContinuous(
-    range: [Colors.white, Colors.deepPurple],
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
+  .geomHeatMap(
+    colorGradient: [Colors.white, Colors.deepPurple],
+    interpolateColors: true,
   )
   .build()
 
 // Multi-step gradient
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
-  .geomHeatMap()
-  .scaleColorContinuous(
-    range: [
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
+  .geomHeatMap(
+    colorGradient: [
       Colors.blue.shade900,
       Colors.blue.shade300,
       Colors.white,
       Colors.orange.shade300,
       Colors.red.shade900,
     ],
+    interpolateColors: true,
   )
   .build()
 
-// Diverging gradient with center
+// Diverging gradient
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
-  .geomHeatMap()
-  .scaleColorContinuous(
-    range: [Colors.blue, Colors.white, Colors.red],
-    center: 0.0,
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
+  .geomHeatMap(
+    colorGradient: [Colors.blue, Colors.white, Colors.red],
+    interpolateColors: true,
   )
   .build()
 ```
@@ -247,38 +240,30 @@ Customize cell appearance and borders:
 ```dart
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
   .geomHeatMap(
-    cellWidth: 60,
-    cellHeight: 40,
-    borderRadius: BorderRadius.circular(8),
-    borderWidth: 2.0,
-    borderColor: Colors.grey.shade300,
-    showLabels: true,
+    cellSpacing: 3.0,
+    cellBorderRadius: BorderRadius.circular(8),
+    cellAspectRatio: 1.5, // width:height ratio
     showValues: true,
   )
   .build()
 ```
 
-### Text Styling
+### Value Text Styling
 
-Control label and value text appearance:
+Control value text appearance:
 
 ```dart
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
   .geomHeatMap(
-    showLabels: true,
     showValues: true,
-    textStyle: TextStyle(
+    valueTextStyle: TextStyle(
       fontSize: 14,
       fontWeight: FontWeight.bold,
       color: Colors.black87,
-    ),
-    labelStyle: TextStyle(
-      fontSize: 12,
-      color: Colors.grey.shade600,
     ),
   )
   .build()
@@ -293,11 +278,9 @@ Handle null or missing data points:
 ```dart
 CristalyseChart()
   .data(dataWithNulls)
-  .mapping(x: 'x', y: 'y', color: 'value')
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
   .geomHeatMap(
     nullValueColor: Colors.grey.shade200,
-    showNullValues: true,
-    nullValueText: 'N/A',
   )
   .build()
 ```
@@ -309,15 +292,13 @@ Set explicit minimum and maximum values:
 ```dart
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
   .geomHeatMap(
     minValue: 0,
     maxValue: 100,
-    clampValues: true, // Values outside range are clamped
-  )
-  .scaleColorContinuous(
-    domain: [0, 100],
-    range: [Colors.white, Colors.red],
+    // values outside range are clamped
+    colorGradient: [Colors.white, Colors.red],
+    interpolateColors: true,
   )
   .build()
 ```
@@ -332,7 +313,7 @@ import 'package:intl/intl.dart';
 // Currency formatting
 CristalyseChart()
   .data(salesData)
-  .mapping(x: 'month', y: 'region', color: 'revenue')
+  .mappingHeatMap(x: 'month', y: 'region', value: 'revenue')
   .geomHeatMap(
     showValues: true,
     valueFormatter: (value) => NumberFormat.simpleCurrency().format(value),
@@ -342,7 +323,7 @@ CristalyseChart()
 // Percentage formatting
 CristalyseChart()
   .data(percentageData)
-  .mapping(x: 'category', y: 'segment', color: 'percentage')
+  .mappingHeatMap(x: 'category', y: 'segment', value: 'percentage')
   .geomHeatMap(
     showValues: true,
     valueFormatter: (value) => '${(value * 100).toStringAsFixed(1)}%',
@@ -352,7 +333,7 @@ CristalyseChart()
 // Custom formatting
 CristalyseChart()
   .data(temperatureData)
-  .mapping(x: 'hour', y: 'day', color: 'temperature')
+  .mappingHeatMap(x: 'hour', y: 'day', value: 'temperature')
   .geomHeatMap(
     showValues: true,
     valueFormatter: (value) => '${value.toStringAsFixed(1)}°C',
@@ -369,7 +350,7 @@ Add rich tooltips on cell hover:
 ```dart
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
   .geomHeatMap()
   .interaction(
     tooltip: TooltipConfig(
@@ -411,7 +392,7 @@ React to cell selection:
 ```dart
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
   .geomHeatMap()
   .interaction(
     click: ClickConfig(
@@ -434,7 +415,7 @@ Cells appear with smooth fade transition:
 ```dart
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
   .geomHeatMap()
   .animate(
     duration: Duration(milliseconds: 1000),
@@ -450,54 +431,12 @@ Each cell animates with a slight delay:
 ```dart
 CristalyseChart()
   .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
+  .mappingHeatMap(x: 'x', y: 'y', value: 'value')
   .geomHeatMap()
   .animate(
     duration: Duration(milliseconds: 1500),
     curve: Curves.elasticOut,
     stagger: Duration(milliseconds: 50),
-  )
-  .build()
-```
-
-## Advanced Features
-
-### Responsive Layout
-
-Automatically adjust cell sizes based on available space:
-
-```dart
-LayoutBuilder(
-  builder: (context, constraints) {
-    final cellSize = (constraints.maxWidth / dataColumns).clamp(30.0, 80.0);
-    
-    return CristalyseChart()
-      .data(data)
-      .mapping(x: 'x', y: 'y', color: 'value')
-      .geomHeatMap(
-        cellWidth: cellSize,
-        cellHeight: cellSize,
-        showLabels: constraints.maxWidth > 400,
-        showValues: cellSize > 50,
-      )
-      .build();
-  },
-)
-```
-
-### Dynamic Color Scales
-
-Adjust color mapping based on data distribution:
-
-```dart
-CristalyseChart()
-  .data(data)
-  .mapping(x: 'x', y: 'y', color: 'value')
-  .geomHeatMap()
-  .scaleColorContinuous(
-    domain: calculateDataRange(data), // Auto-calculate range
-    range: [Colors.white, Colors.red],
-    interpolation: ColorInterpolation.lab, // Better color transitions
   )
   .build()
 ```
@@ -550,15 +489,12 @@ final analyticsData = [
 
 CristalyseChart()
   .data(analyticsData)
-  .mapping(x: 'hour', y: 'page', color: 'visitors')
+  .mappingHeatMap(x: 'hour', y: 'page', value: 'visitors')
   .geomHeatMap(
-    cellWidth: 70,
-    cellHeight: 50,
-    showLabels: true,
+    cellSpacing: 2.0,
     showValues: true,
-  )
-  .scaleColorContinuous(
-    range: [Colors.blue.shade100, Colors.blue.shade800],
+    colorGradient: [Colors.blue.shade100, Colors.blue.shade800],
+    interpolateColors: true,
   )
   .build()
 ```
@@ -580,15 +516,13 @@ final riskData = [
 
 CristalyseChart()
   .data(riskData)
-  .mapping(x: 'probability', y: 'impact', color: 'risk')
+  .mappingHeatMap(x: 'probability', y: 'impact', value: 'risk')
   .geomHeatMap(
-    cellWidth: 100,
-    cellHeight: 80,
-    showLabels: true,
+    cellSpacing: 2.0,
+    cellAspectRatio: 1.25,
     showValues: true,
-  )
-  .scaleColorContinuous(
-    range: [Colors.green, Colors.yellow, Colors.red],
+    colorGradient: [Colors.green, Colors.yellow, Colors.red],
+    interpolateColors: true,
   )
   .build()
 ```
