@@ -480,26 +480,23 @@ class AnimatedChartPainter extends CustomPainter {
       scale = GradientColorScale.heatMap();
     }
 
-    // Set domain based on data values if available
-    final valueCol = heatMapValueColumn ?? colorColumn;
-    if (valueCol != null && data.isNotEmpty) {
+    // Validate heat map value column requirement
+    if (heatMapValueColumn == null) {
+      throw ArgumentError('Heat maps require a value column for color mapping. '
+          'Use .mappingHeatMap(x: "xCol", y: "yCol", value: "valueCol") '
+          'instead of .mapping() when creating heat maps.');
+    }
+
+    // Set domain using Scale's setBounds()
+    if (data.isNotEmpty) {
       final values = data
-          .map((d) => getNumericValue(d[valueCol]))
+          .map((d) => getNumericValue(d[heatMapValueColumn]))
           .where((v) => v != null && v.isFinite)
           .cast<double>()
           .toList();
 
-      if (values.isNotEmpty) {
-        final minValue = heatMapGeom.minValue ?? values.reduce(math.min);
-        final maxValue = heatMapGeom.maxValue ?? values.reduce(math.max);
-
-        if (minValue > maxValue) {
-          throw ArgumentError(
-              'Invalid heat map bounds: minValue ($minValue) cannot be greater than maxValue ($maxValue)');
-        }
-
-        scale.domain = [minValue, maxValue];
-      }
+      scale.setBounds(
+          values, (heatMapGeom.minValue, heatMapGeom.maxValue), geometries);
     }
 
     return scale;
@@ -2129,9 +2126,14 @@ class AnimatedChartPainter extends CustomPainter {
     // Use heat map specific columns
     final xCol = heatMapXColumn ?? xColumn;
     final yCol = heatMapYColumn ?? yColumn;
-    final valueCol = heatMapValueColumn ?? colorColumn;
+    final valueCol = heatMapValueColumn;
 
-    if (xCol == null || yCol == null || valueCol == null || data.isEmpty) {
+    if (valueCol == null) {
+      throw ArgumentError('Heat maps require heatMapValueColumn. '
+          'Use .mappingHeatMap(x: "xCol", y: "yCol", value: "valueCol").');
+    }
+
+    if (xCol == null || yCol == null || data.isEmpty) {
       return;
     }
 
@@ -2330,9 +2332,14 @@ class AnimatedChartPainter extends CustomPainter {
     // Use heat map specific columns
     final xCol = heatMapXColumn ?? xColumn;
     final yCol = heatMapYColumn ?? yColumn;
-    final valueCol = heatMapValueColumn ?? colorColumn;
+    final valueCol = heatMapValueColumn;
 
-    if (xCol == null || yCol == null || valueCol == null || data.isEmpty) {
+    if (valueCol == null) {
+      throw ArgumentError('Heat maps require heatMapValueColumn. '
+          'Use .mappingHeatMap(x: "xCol", y: "yCol", value: "valueCol").');
+    }
+
+    if (xCol == null || yCol == null || data.isEmpty) {
       return;
     }
 
