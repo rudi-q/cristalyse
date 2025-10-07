@@ -322,4 +322,38 @@ void main() {
       expect(bounds.max, equals(0.0));
     });
   });
+
+  group('limit validation', () {
+    test('accepts equal limits (min == max)', () {
+      final values = [10.0, 20.0, 30.0];
+      final limits = (15.0, 15.0); // Equal limits
+      final geometries = [TestDataDrivenGeometry()];
+
+      final bounds =
+          BoundsCalculator.calculateBounds(values, limits, geometries);
+
+      // Should return valid bounds with min and max both equal to specified value
+      expect(bounds.min, equals(15.0));
+      expect(bounds.max, equals(15.0));
+    });
+
+    test('throws ArgumentError for inverted limits (min > max)', () {
+      final values = [10.0, 20.0, 30.0];
+      final limits = (50.0, 20.0); // Inverted limits: min > max
+      final geometries = [TestDataDrivenGeometry()];
+
+      // Should throw ArgumentError with specific message
+      expect(
+        () => BoundsCalculator.calculateBounds(values, limits, geometries),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            equals(
+                'Specified limits were inverted: min (50.0) > max (20.0). Min must be less than or equal to max.'),
+          ),
+        ),
+      );
+    });
+  });
 }

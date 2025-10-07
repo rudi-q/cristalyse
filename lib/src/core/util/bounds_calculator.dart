@@ -67,6 +67,8 @@ class BoundsCalculator {
   /// - [geometries]: List of chart geometries defining `BoundsBehavior` fallbacks for the [values] set.
   /// - [applyPadding]: Whether to apply padding to calculated bounds. Defaults to true.
   ///
+  /// Throws [ArgumentError] if [limits] are fully specified and (min) > (max).
+  ///
   /// Returns Bounds object with min and max values.
   ///
   /// Examples:
