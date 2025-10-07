@@ -100,6 +100,12 @@ class BoundsCalculator {
 
     // If limits are fully specified, use them directly (even if values.isEmpty)
     if (limits != null && limits.$1 != null && limits.$2 != null) {
+      if (limits.$1! > limits.$2!) {
+        throw ArgumentError(
+          'Specified limits were inverted: min (${limits.$1}) > max (${limits.$2}). '
+          'Min must be less than or equal to max.'
+        );
+      }
       return Bounds(limits.$1!, limits.$2!);
     }
 
