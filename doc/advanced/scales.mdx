@@ -21,11 +21,50 @@ CristalyseChart()
   .build()
 ```
 
+### Axis Titles
+
+<Info>
+**New in v1.10.0:** Add descriptive titles to your axes for better data context!
+</Info>
+
+All scale methods now accept an optional `title` parameter to display descriptive axis labels:
+
+```dart
+CristalyseChart()
+  .data(temperatureData)
+  .mapping(x: 'hour', y: 'temperature')
+  .scaleXContinuous(title: 'Time (hours)')
+  .scaleYContinuous(title: 'Temperature (°C)')
+  .geomLine()
+  .build()
+```
+
+**Title Features:**
+- **Smart Positioning**: Automatically positioned with optimal spacing
+- **Rotated Text**: Y-axis titles rotate -90°, Y2-axis titles rotate +90°
+- **Theme-Aware**: Inherits text style from theme with slightly larger font
+- **Optional**: Only renders when provided (fully backward compatible)
+
+**Dual-Axis Example:**
+```dart
+CristalyseChart()
+  .data(businessData)
+  .mapping(x: 'month', y: 'revenue')
+  .mappingY2('conversion')
+  .geomBar(yAxis: YAxis.primary)
+  .geomLine(yAxis: YAxis.secondary)
+  .scaleXOrdinal(title: 'Month')
+  .scaleYContinuous(title: 'Revenue ($K)')  // Left axis
+  .scaleY2Continuous(title: 'Conversion Rate (%)') // Right axis
+  .build()
+```
+
 ### Configuration
 
 - **Domain**: Data range mapped to chart space.
 - **Range**: Pixel space where the data is plotted.
 - **Limits**: Optional `min`/`max` parameters to constrain the displayed scale range.
+- **Title**: Optional descriptive label for the axis (v1.10.0+)
 - **Invertible**: Values can map back to the data space.
 
 ### Scale Limits and Data Filtering
@@ -75,11 +114,23 @@ CristalyseChart()
   .build()
 ```
 
+**With Axis Title:**
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'product', y: 'revenue')
+  .scaleXOrdinal(title: 'Product Category')
+  .scaleYContinuous(title: 'Revenue ($K)')
+  .geomBar()
+  .build()
+```
+
 ### Configuration
 
 - **Domain**: List of categories.
 - **Range**: Space for categories to be displayed.
 - **BandWidth**: Space allocated to each category.
+- **Title**: Optional descriptive label for the axis (v1.10.0+)
 
 ## Color Scales
 

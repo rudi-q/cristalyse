@@ -1,3 +1,63 @@
+## 1.10.0 - 2025-10-07
+
+#### 🎨 Axis Titles & Bubble Size Guide
+
+**Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Thank you for this valuable contribution!
+
+**New Features:**
+- **Axis Titles**: Add descriptive titles to X, Y, and Y2 axes
+  - Optional `title` parameter on all scale methods
+  - Smart positioning with automatic spacing
+  - Rotated titles for vertical axes
+  - Theme-aware styling with customizable fonts
+- **Bubble Size Guide**: Visual legend for bubble charts
+  - Shows min, mid, and max size values from data
+  - Appears when `title` provided on `geomBubble()`
+  - Horizontal and vertical layout support
+  - Integrates with existing legend system
+
+**Enhanced API:**
+```dart
+// Axis titles
+CristalyseChart()
+  .scaleXContinuous(title: 'Time (seconds)')
+  .scaleYContinuous(title: 'Revenue (USD)')
+  .scaleY2Continuous(title: 'Conversion Rate (%)')
+  .build()
+
+// Bubble size guide
+CristalyseChart()
+  .geomBubble(
+    title: 'Market Share (%)',  // Enables size guide in legend
+    minSize: 5.0,
+    maxSize: 30.0,
+  )
+  .legend()
+  .build()
+```
+
+**Bug Fixes:**
+- **Bubble Legend Validation**: Fixed edge case where zero/negative bubble sizes could cause rendering issues
+  - Added validation to ensure bubble sizes are always positive
+  - Clamps invalid values to safe minimum (1.0px radius)
+  - Includes debug assertions for development feedback
+  - Prevents Container dimension errors with edge-case data
+
+**Technical Improvements:**
+- Precise axis label and title spacing calculations
+- Pre-calculated label dimensions for optimal layout
+- Consistent spacing constants across all axes
+- Validated bubble sizes in legend rendering
+- Comprehensive edge case test coverage (8 new tests)
+
+**Quality Assurance:**
+- All 285 tests passing (20 new tests added)
+- Zero breaking changes - fully backward compatible
+- Titles are optional and render only when provided
+- Production ready with comprehensive testing
+
+---
+
 ## 1.9.0 - 2025-10-06
 
 #### 🎯 Major Feature: Interactive & Floating Legends

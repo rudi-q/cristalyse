@@ -12,8 +12,82 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="October 7, 2025" description="v1.10.0">
+  ### 🎨 Axis Titles & Bubble Size Guide
+  
+  **Descriptive axis titles and visual bubble size legends!**
+  
+  **Axis Titles:**
+  - Add titles to X, Y, and Y2 axes with optional `title` parameter
+  - Smart positioning with automatic spacing calculations
+  - Vertical axes display rotated titles (-90° for Y, +90° for Y2)
+  - Theme-aware styling with customizable fonts
+  
+  **Bubble Size Guide:**
+  - Visual legend shows min, mid, and max bubble sizes
+  - Automatically appears when `title` provided on `geomBubble()`
+  - Horizontal and vertical layout support
+  - Seamlessly integrates with existing legend system
+  
+  ```dart
+  // Axis titles for clearer data context
+  CristalyseChart()
+    .data(timeSeriesData)
+    .mapping(x: 'time', y: 'value')
+    .geomLine()
+    .scaleXContinuous(title: 'Time (seconds)')
+    .scaleYContinuous(title: 'Temperature (°C)')
+    .build()
+  
+  // Dual axis with titles
+  CristalyseChart()
+    .data(businessData)
+    .mapping(x: 'month', y: 'revenue')
+    .mappingY2('conversion')
+    .geomBar(yAxis: YAxis.primary)
+    .geomLine(yAxis: YAxis.secondary)
+    .scaleXOrdinal(title: 'Month')
+    .scaleYContinuous(title: 'Revenue ($K)')
+    .scaleY2Continuous(title: 'Conversion Rate (%)')
+    .build()
+  
+  // Bubble size guide in legend
+  CristalyseChart()
+    .data(companyData)
+    .mapping(x: 'revenue', y: 'customers', size: 'marketShare')
+    .geomBubble(
+      title: 'Market Share (%)',  // Enables size guide
+      minSize: 8.0,
+      maxSize: 25.0,
+    )
+    .legend()  // Shows both category colors and size guide
+    .build()
+  ```
+  
+  **Bug Fixes:**
+  - Fixed edge case where zero/negative bubble sizes could cause rendering errors
+  - Added validation to ensure bubble legend sizes are always positive
+  - Clamps invalid values to safe minimum (1.0px radius)
+  - Prevents Container dimension errors with edge-case data
+  
+  **Technical Improvements:**
+  - Precise spacing calculations for axis labels and titles
+  - Pre-calculated label dimensions for optimal layout
+  - Consistent spacing constants across all axes
+  - Validated bubble sizes in legend rendering
+  - 8 new edge case tests for bubble validation
+  
+  **Quality Assurance:**
+  - All 285 tests passing (20 new tests added)
+  - Zero breaking changes - fully backward compatible
+  - Titles optional and render only when provided
+  - Production ready
+</Update>
+
 <Update label="October 6, 2025" description="v1.9.0">
   ### 🎯 Interactive & Floating Legends
+
+  **Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Valuable contribution!
   
   **Transform your charts with interactive legend controls and advanced positioning!**
   
