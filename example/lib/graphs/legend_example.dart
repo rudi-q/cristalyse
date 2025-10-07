@@ -40,10 +40,9 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                     alpha: 0.9)
                 .scaleXOrdinal()
                 .scaleYContinuous(
-                  min: 10,
-                  labels: NumberFormat.simpleCurrency().format,
-                  title: 'Revenue'
-                )
+                    min: 10,
+                    labels: NumberFormat.simpleCurrency().format,
+                    title: 'Revenue')
                 .theme(currentTheme)
                 .legend(
                   position: LegendPosition.floating,

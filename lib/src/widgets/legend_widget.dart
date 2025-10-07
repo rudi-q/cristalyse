@@ -29,6 +29,8 @@ class LegendWidget extends StatefulWidget {
   static const double _bubbleTitleSpacing = 6.0;
   static const double _bubbleLabelSpacing = 4.0;
   static const double _bubbleLabelFontSizeRatio = 0.85; // 85% of main text size
+  static const double _minBubbleRadius =
+      1.0; // Minimum safe bubble radius for rendering
 
   const LegendWidget({
     super.key,
@@ -155,10 +157,14 @@ class _LegendWidgetState extends State<LegendWidget> {
   bool _shouldStackColorItems(TextStyle textStyle) {
     if (widget.bubbleGuide == null || widget.items.isEmpty) return false;
 
-    // Calculate bubble guide height
-    final maxBubbleRadius = widget.bubbleGuide!.sizeScale.scale(
+    // Calculate bubble guide height with validated size
+    final rawMaxBubbleRadius = widget.bubbleGuide!.sizeScale.scale(
       widget.bubbleGuide!.sizeScale.domain[1],
     );
+    // Ensure positive radius for layout calculations
+    final maxBubbleRadius = rawMaxBubbleRadius > 0
+        ? rawMaxBubbleRadius
+        : LegendWidget._minBubbleRadius;
     final maxBubbleDiameter = maxBubbleRadius * 2;
 
     // fontSize is guaranteed non-null from effectiveTextStyle in build()
@@ -351,9 +357,26 @@ class _LegendWidgetState extends State<LegendWidget> {
 
     // Get actual bubble sizes by mapping domain values through the scale
     // These are the exact sizes that will be rendered in the chart
-    final displayMinSize = guide.sizeScale.scale(minValue);
-    final displayMaxSize = guide.sizeScale.scale(maxValue);
-    final displayMidSize = guide.sizeScale.scale(midValue);
+    final rawMinSize = guide.sizeScale.scale(minValue);
+    final rawMaxSize = guide.sizeScale.scale(maxValue);
+    final rawMidSize = guide.sizeScale.scale(midValue);
+
+    // Validate and clamp sizes to ensure they're always positive and visible
+    // This prevents rendering issues with zero/negative Container dimensions
+    final displayMinSize =
+        rawMinSize > 0 ? rawMinSize : LegendWidget._minBubbleRadius;
+    final displayMaxSize =
+        rawMaxSize > 0 ? rawMaxSize : LegendWidget._minBubbleRadius;
+    final displayMidSize =
+        rawMidSize > 0 ? rawMidSize : LegendWidget._minBubbleRadius;
+
+    // Debug assertion to catch potential scale configuration issues
+    assert(
+      rawMinSize > 0 && rawMaxSize > 0 && rawMidSize > 0,
+      'Bubble sizes from scale should be positive. '
+      'Got: min=$rawMinSize, mid=$rawMidSize, max=$rawMaxSize. '
+      'Check SizeScale domain and range configuration.',
+    );
 
     // fontSize is guaranteed non-null from effectiveTextStyle in build()
     final baseFontSize = textStyle.fontSize!;
@@ -406,9 +429,26 @@ class _LegendWidgetState extends State<LegendWidget> {
 
     // Get actual bubble sizes by mapping domain values through the scale
     // These are the exact sizes that will be rendered in the chart
-    final displayMinSize = guide.sizeScale.scale(minValue);
-    final displayMaxSize = guide.sizeScale.scale(maxValue);
-    final displayMidSize = guide.sizeScale.scale(midValue);
+    final rawMinSize = guide.sizeScale.scale(minValue);
+    final rawMaxSize = guide.sizeScale.scale(maxValue);
+    final rawMidSize = guide.sizeScale.scale(midValue);
+
+    // Validate and clamp sizes to ensure they're always positive and visible
+    // This prevents rendering issues with zero/negative Container dimensions
+    final displayMinSize =
+        rawMinSize > 0 ? rawMinSize : LegendWidget._minBubbleRadius;
+    final displayMaxSize =
+        rawMaxSize > 0 ? rawMaxSize : LegendWidget._minBubbleRadius;
+    final displayMidSize =
+        rawMidSize > 0 ? rawMidSize : LegendWidget._minBubbleRadius;
+
+    // Debug assertion to catch potential scale configuration issues
+    assert(
+      rawMinSize > 0 && rawMaxSize > 0 && rawMidSize > 0,
+      'Bubble sizes from scale should be positive. '
+      'Got: min=$rawMinSize, mid=$rawMidSize, max=$rawMaxSize. '
+      'Check SizeScale domain and range configuration.',
+    );
 
     final maxDiameter = displayMaxSize * 2;
 
