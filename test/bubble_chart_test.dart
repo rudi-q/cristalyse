@@ -527,17 +527,40 @@ void main() {
       expect(minSize, lessThan(maxSize));
     });
 
-    test('SizeScale with negative range values', () {
-      final sizeScale = SizeScale(
-        range: [-5.0, 30.0], // Range starts negative
+    test('SizeScale with negative range values should throw ArgumentError', () {
+      // Test constructor validation
+      expect(
+        () => SizeScale(range: [-5.0, 30.0]),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('SizeScale range values must be non-negative'),
+          ),
+        ),
+        reason: 'Constructor should reject negative range values',
       );
-      sizeScale.setBounds([10.0, 50.0], null, []);
 
-      final minSize = sizeScale.scale(10.0);
+      // Test setter validation
+      final sizeScale = SizeScale(range: [5.0, 30.0]);
+      expect(
+        () => sizeScale.range = [-5.0, 30.0],
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('SizeScale range values must be non-negative'),
+          ),
+        ),
+        reason: 'Setter should reject negative range values',
+      );
 
-      // Min value maps to -5, which should be caught by legend validation
-      expect(minSize, equals(-5.0),
-          reason: 'Scale should return negative value if configured');
+      // Also test when second value is negative
+      expect(
+        () => SizeScale(range: [5.0, -10.0]),
+        throwsA(isA<ArgumentError>()),
+        reason: 'Should reject when second range value is negative',
+      );
     });
 
     testWidgets('Legend should render with zero domain span bubble guide',

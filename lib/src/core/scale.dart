@@ -307,12 +307,23 @@ class SizeScale extends Scale {
     super.labelFormatter,
     super.title,
   }) : _domain = List.from(domain) {
-    _range = List.from(range);
+    this.range = range; // Use setter to trigger validation
   }
 
   @override
   List<double> get domain => _domain;
   set domain(List<double> value) => _domain = List.from(value);
+
+  @override
+  set range(List<double> value) {
+    if (value[0] < 0 || value[1] < 0) {
+      throw ArgumentError(
+        'SizeScale range values must be non-negative. '
+        'Got range: [${value[0]}, ${value[1]}]',
+      );
+    }
+    super.range = value;
+  }
 
   @override
   double scale(dynamic value) {
