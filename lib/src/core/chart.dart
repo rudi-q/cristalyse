@@ -378,6 +378,7 @@ class CristalyseChart {
   ///   minSize: 8.0,           // Bubble radius when value equals limits min (or data min if no limits)
   ///   maxSize: 25.0,          // Bubble radius when value equals limits max (or data max if no limits)
   ///   limits: (1000, 50000),  // Optional: set scale domain (in this example, values at 1000→8px, 50000→25px)
+  ///   title: 'Market Share (%)', // Optional: title for bubble size guide. Size guide displays if provided.
   ///   alpha: 0.7,
   ///   borderWidth: 2.0,
   ///   showLabels: true,
@@ -388,6 +389,7 @@ class CristalyseChart {
     double? minSize,
     double? maxSize,
     (double?, double?)? limits,
+    String? title,
     Color? color,
     double? alpha,
     PointShape? shape,
@@ -414,6 +416,7 @@ class CristalyseChart {
         minSize: normalizedMinSize,
         maxSize: normalizedMaxSize,
         limits: limits,
+        title: title,
         color: color,
         alpha: alpha ?? 0.7,
         shape: shape ?? PointShape.circle,
@@ -534,8 +537,10 @@ class CristalyseChart {
     double? min,
     double? max,
     LabelCallback? labels,
+    String? title,
   }) {
-    _xScale = LinearScale(limits: (min, max), labelFormatter: labels);
+    _xScale =
+        LinearScale(limits: (min, max), labelFormatter: labels, title: title);
     return this;
   }
 
@@ -544,8 +549,10 @@ class CristalyseChart {
     double? min,
     double? max,
     LabelCallback? labels,
+    String? title,
   }) {
-    _yScale = LinearScale(limits: (min, max), labelFormatter: labels);
+    _yScale =
+        LinearScale(limits: (min, max), labelFormatter: labels, title: title);
     return this;
   }
 
@@ -553,26 +560,28 @@ class CristalyseChart {
   ///
   /// Example:
   /// ```dart
-  /// chart.scaleY2Continuous(min: 0, max: 100) // For percentage data
+  /// chart.scaleY2Continuous(min: 0, max: 100, title: 'Conversion Rate (%)') // For percentage data
   /// ```
   CristalyseChart scaleY2Continuous({
     double? min,
     double? max,
     LabelCallback? labels,
+    String? title,
   }) {
-    _y2Scale = LinearScale(limits: (min, max), labelFormatter: labels);
+    _y2Scale =
+        LinearScale(limits: (min, max), labelFormatter: labels, title: title);
     return this;
   }
 
   /// Configure categorical X scale (useful for bar charts)
-  CristalyseChart scaleXOrdinal({LabelCallback? labels}) {
-    _xScale = OrdinalScale(labelFormatter: labels);
+  CristalyseChart scaleXOrdinal({LabelCallback? labels, String? title}) {
+    _xScale = OrdinalScale(labelFormatter: labels, title: title);
     return this;
   }
 
   /// Configure categorical Y scale
-  CristalyseChart scaleYOrdinal({LabelCallback? labels}) {
-    _yScale = OrdinalScale(labelFormatter: labels);
+  CristalyseChart scaleYOrdinal({LabelCallback? labels, String? title}) {
+    _yScale = OrdinalScale(labelFormatter: labels, title: title);
     return this;
   }
 

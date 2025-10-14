@@ -15,11 +15,14 @@ abstract class Scale {
   /// Optional limits for this scale - used when setBounds is called with null limits
   (double?, double?)? limits;
 
+  /// Optional title for this scale (e.g., "Revenue (USD)", "Temperature (°C)")
+  final String? title;
+
   /// Optimal pixels per axis label for readability
   /// Could be threaded as a parameter into API if users demand it
   static const double optimalPixelsPerLabel = 60.0;
 
-  Scale({LabelCallback? labelFormatter, this.limits})
+  Scale({LabelCallback? labelFormatter, this.limits, this.title})
       : _formatter = LabelFormatter(labelFormatter);
 
   /// Return display parameter within range from value on domain.
@@ -85,7 +88,7 @@ class LinearScale extends Scale {
   List<double> _domain = [0, 1];
   List<double>? _ticks; // Cached ticks from Wilkinson algorithm
 
-  LinearScale({super.limits, super.labelFormatter});
+  LinearScale({super.limits, super.labelFormatter, super.title});
 
   @override
   List<double> get domain => _domain;
@@ -155,7 +158,7 @@ class OrdinalScale extends Scale {
   final double _padding; // 10% padding between bands
   double _bandWidth = 0;
 
-  OrdinalScale({double padding = 0.1, super.labelFormatter})
+  OrdinalScale({double padding = 0.1, super.labelFormatter, super.title})
       : _padding = padding;
 
   @override
@@ -302,13 +305,25 @@ class SizeScale extends Scale {
     List<double> range = const [3, 10],
     super.limits,
     super.labelFormatter,
+    super.title,
   }) : _domain = List.from(domain) {
-    _range = List.from(range);
+    this.range = range; // Use setter to trigger validation
   }
 
   @override
   List<double> get domain => _domain;
   set domain(List<double> value) => _domain = List.from(value);
+
+  @override
+  set range(List<double> value) {
+    if (value[0] < 0 || value[1] < 0) {
+      throw ArgumentError(
+        'SizeScale range values must be non-negative. '
+        'Got range: [${value[0]}, ${value[1]}]',
+      );
+    }
+    super.range = value;
+  }
 
   @override
   double scale(dynamic value) {
@@ -353,6 +368,7 @@ class GradientColorScale extends Scale {
     this.interpolate = true,
     super.limits,
     super.labelFormatter,
+    super.title,
   }) : _domain = List.from(domain);
 
   @override

@@ -815,9 +815,11 @@ class _ChartScreenState extends State<ChartScreen>
                   ),
                 ),
                 onTap: () {
-                  Navigator.of(context).pop();
                   if (!isSelected) {
+                    // Navigate directly - go_router handles drawer closing
                     context.go(route.path);
+                  } else {
+                    Navigator.of(context).pop();
                   }
                 },
               ),
@@ -838,7 +840,7 @@ class _ChartScreenState extends State<ChartScreen>
     final title = chartTitles[widget.chartIndex];
     if (title.contains('Market Performance Analysis') ||
         title.contains('Bubble')) {
-      chartHeight = 500; // Larger height for bubble charts to prevent cutoff
+      chartHeight = 600; // Larger height for bubble charts to prevent cutoff
     } else if (title.contains('Heatmap') || title.contains('Contributions')) {
       chartHeight = 450; // Slightly larger for heatmaps
     }

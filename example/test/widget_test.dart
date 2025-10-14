@@ -1,28 +1,38 @@
 import 'package:cristalyse_example/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('CristalyseExampleApp Tests', () {
-    testWidgets('App should start and display main title',
+    testWidgets('App should start and display logo',
         (WidgetTester tester) async {
       // Build our app and trigger a frame.
       await tester.pumpWidget(const CristalyseExampleApp());
       await tester.pumpAndSettle();
 
-      // Verify that the app title is displayed
-      expect(find.text('🔮 Cristalyse'), findsOneWidget);
-      expect(find.text('Grammar of Graphics for Flutter'), findsOneWidget);
+      // Verify that the SVG logo is displayed
+      expect(find.byType(SvgPicture), findsOneWidget);
     });
 
-    testWidgets('TabBar should contain expected tabs',
+    testWidgets('Drawer should contain navigation routes',
         (WidgetTester tester) async {
       await tester.pumpWidget(const CristalyseExampleApp());
       await tester.pumpAndSettle();
 
-      // Verify some key tabs are present
+      // Open the drawer
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+
+      // Verify some key routes are present in drawer (visible without scrolling)
       expect(find.text('Scatter Plot'), findsOneWidget);
+      expect(find.text('Interactive'), findsOneWidget);
       expect(find.text('Line Chart'), findsOneWidget);
+
+      // Scroll down to find Bar Chart
+      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.pumpAndSettle();
+
       expect(find.text('Bar Chart'), findsOneWidget);
     });
 

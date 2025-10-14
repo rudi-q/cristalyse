@@ -40,14 +40,14 @@ Widget buildLegendExampleTab(ChartTheme currentTheme,
                     alpha: 0.9)
                 .scaleXOrdinal()
                 .scaleYContinuous(
-                  min: 0,
-                  labels: NumberFormat.simpleCurrency().format,
-                )
+                    min: 10,
+                    labels: NumberFormat.simpleCurrency().format,
+                    title: 'Revenue')
                 .theme(currentTheme)
                 .legend(
                   position: LegendPosition.floating,
                   interactive: true,
-                  floatingOffset: const Offset(100, 30), // x: 100, y: 30
+                  floatingOffset: const Offset(150, 30), // x: 150, y: 30
                   backgroundColor:
                       currentTheme.backgroundColor.withValues(alpha: 0.95),
                   textStyle: const TextStyle(
