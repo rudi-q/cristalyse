@@ -466,6 +466,8 @@ class _AnimatedCristalyseChartWidgetState
       size.height - widget.theme.padding.vertical,
     );
 
+    _setupScales(plotArea.width, plotArea.height);
+
     final chartPainter = chartPainterAnimated(
         widget: widget,
         context: context,
@@ -744,6 +746,8 @@ class _AnimatedCristalyseChartWidgetState
       size.height - tempWidget.theme.padding.vertical,
     );
 
+    _setupScales(plotArea.width, plotArea.height);
+
     final chartPainter = chartPainterAnimated(
         widget: tempWidget,
         context: context,
@@ -971,6 +975,14 @@ class _AnimatedCristalyseChartWidgetState
           ],
         );
     }
+  }
+
+  void _setupScales(double width, double height) {
+    _setupXScale(width, widget.geometries.any((g) => g is BarGeometry));
+    _setupYScale(
+        height, widget.geometries.any((g) => g is BarGeometry), YAxis.primary);
+    _setupYScale(height, widget.geometries.any((g) => g is BarGeometry),
+        YAxis.secondary);
   }
 
   Scale _setupXScale(double width, bool hasBarGeometry) {
