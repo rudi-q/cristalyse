@@ -1,3 +1,29 @@
+## 1.10.1 - 2025-10-21
+
+#### 🐛 Bug Fixes & Testing
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Wilkinson Labeling Precision:**
+- Fixed floating-point rounding in epoch millisecond label calculations
+  - Replaced `round()` with `roundToDouble()` for proper double precision handling
+  - Resolves issues with large number labeling (e.g., epoch timestamps)
+  - Added comprehensive test case for epoch millisecond labeling
+  - Test validates correct tick generation: [1760527000000.0, 1760528000000.0, 1760529000000.0, 1760530000000.0]
+
+**Technical Details:**
+- `_cleanNumber()` method in `WilkinsonLabeling` class now uses `roundToDouble()` instead of `round()`
+- Fixes edge case with very large timestamp values (>1.7 trillion milliseconds)
+- Maintains precision in float arithmetic for astronomical numbers
+
+#### 🧪 Quality Assurance
+
+- Added new test: "Bigger numbers, replicate epoch ms" to `wilkinson_labeling_test.dart`
+- All 286 tests passing (285 existing + 1 new test)
+- Zero breaking changes - fully backward compatible
+
+---
+
 ## 1.10.0 - 2025-10-07
 
 #### 🎨 Axis Titles & Bubble Size Guide
