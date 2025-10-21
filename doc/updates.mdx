@@ -12,6 +12,56 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="October 21, 2025" description="v1.10.2">
+  ### 🎨 Heat Map Unification & Bounds Validation
+  
+  **Authored by [@davidlrichmond](https://github.com/davidlrichmond)**
+  
+  **Heat Map Color System Unification:**
+  - Unified heat maps to use `GradientColorScale` for consistent color handling
+  - Eliminates duplicate color logic between heat maps and other chart types
+  - Improves code maintainability and reduces technical debt
+  - Heat map colors now follow the same scaling principles as other geometries
+  
+  **Bounds Edge Cases & Validation:**
+  - Fixed guard condition for corner case where `min > max` in bounds calculations
+  - Prevents invalid scale configurations that could crash rendering
+  - Added comprehensive test coverage for edge cases
+  - Improved documentation for bounds behavior with notes on invalid configurations
+  
+  **Code Quality:**
+  - Addressed code review feedback on refactored code
+  - Fixed deprecated `int` RGB getters for Flutter compatibility
+  - Applied code formatting linter fixes
+  
+  **Quality Assurance:**
+  - Added 34 new test cases for bounds edge cases
+  - Added 106 lines of tests for GradientColorScale functionality
+  - All existing tests continue to pass
+  - Zero breaking changes - fully backward compatible
+</Update>
+
+<Update label="October 21, 2025" description="v1.10.1">
+  ### 🐛 Wilkinson Labeling Precision
+  
+  **Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+  
+  **Fixed floating-point rounding in epoch millisecond label calculations**
+  - Replaced `round()` with `roundToDouble()` for proper double precision handling
+  - Resolves issues with large number labeling (e.g., epoch timestamps)
+  - Added comprehensive test case for epoch millisecond labeling
+  - Test validates correct tick generation: [1760527000000.0, 1760528000000.0, 1760529000000.0, 1760530000000.0]
+  
+  **Technical Details:**
+  - `_cleanNumber()` method in `WilkinsonLabeling` class now uses `roundToDouble()` instead of `round()`
+  - Fixes edge case with very large timestamp values (>1.7 trillion milliseconds)
+  - Maintains precision in float arithmetic for astronomical numbers
+  
+  **Quality Assurance:**
+  - All 286 tests passing (285 existing + 1 new test)
+  - Zero breaking changes - fully backward compatible
+</Update>
+
 <Update label="October 7, 2025" description="v1.10.0">
   ### 🎨 Axis Titles & Bubble Size Guide
   

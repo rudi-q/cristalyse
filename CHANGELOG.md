@@ -1,3 +1,34 @@
+## 1.10.2 - 2025-10-21
+
+#### 🎨 Heat Map Unification & Bounds Fixes
+
+**Authored by [@davidlrichmond](https://github.com/davidlrichmond)**
+
+**Heat Map Color System Unification:**
+- Unified heat maps to use `GradientColorScale` for consistent color handling
+  - Eliminates duplicate color logic between heat maps and other chart types
+  - Improves maintainability and reduces technical debt
+  - Heat map colors now follow the same scaling principles as other geometries
+
+**Bounds Edge Cases & Validation:**
+- Fixed guard condition for corner case where `min > max` in bounds calculations
+  - Prevents invalid scale configurations that could crash rendering
+  - Added comprehensive test coverage for edge cases
+  - Improved documentation for bounds behavior with notes on invalid configurations
+
+**Code Quality:**
+- Addressed code rabbit review feedback on refactored code
+- Fixed deprecated `int` RGB getters for Flutter compatibility
+- Applied code formatting linter fixes
+
+#### 🧪 Quality Assurance
+
+- Added documentation and comprehensive test cases for bounds edge cases
+- All existing tests continue to pass
+- Zero breaking changes - fully backward compatible
+
+---
+
 ## 1.10.1 - 2025-10-21
 
 #### 🐛 Bug Fixes & Testing
