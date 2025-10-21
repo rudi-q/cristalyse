@@ -562,8 +562,15 @@ class _AnimatedCristalyseChartWidgetState
       geometries: widget.geometries,
     );
 
-    // If no legend items, return chart as-is
-    if (legendItems.isEmpty) return chart;
+    // Extract information for bubble size guide, if present
+    final sizeScale = widget.sizeColumn != null ? _setupSizeScale() : null;
+    final bubbleGuide = LegendGenerator.extractBubbleGuide(
+      geometries: widget.geometries,
+      sizeScale: sizeScale,
+    );
+
+    // If no legend items and no bubble guide, return chart as-is
+    if (legendItems.isEmpty && bubbleGuide == null) return chart;
 
     // Use StatefulBuilder to manage interactive legend state
     if (config.interactive && config.hiddenCategories == null) {
@@ -593,6 +600,7 @@ class _AnimatedCristalyseChartWidgetState
         items: legendItems,
         config: enhancedConfig,
         theme: widget.theme,
+        bubbleGuide: bubbleGuide,
       );
 
       return _positionLegend(filteredChart, legend, enhancedConfig);
@@ -605,6 +613,7 @@ class _AnimatedCristalyseChartWidgetState
         items: legendItems,
         config: config,
         theme: widget.theme,
+        bubbleGuide: bubbleGuide,
       );
 
       return _positionLegend(filteredChart, legend, config);
@@ -614,6 +623,7 @@ class _AnimatedCristalyseChartWidgetState
         items: legendItems,
         config: config,
         theme: widget.theme,
+        bubbleGuide: bubbleGuide,
       );
 
       return _positionLegend(chart, legend, config);
@@ -1114,6 +1124,32 @@ class _AnimatedCristalyseChartWidgetState
       scale.range = [height, 0];
       return scale;
     }
+  }
+
+  /// Set up size scale for bubble charts
+  SizeScale _setupSizeScale() {
+    if (widget.sizeColumn == null) return SizeScale();
+
+    final values = widget.data
+        .map((d) => getNumericValue(d[widget.sizeColumn!]))
+        .where((v) => v != null)
+        .cast<double>()
+        .toList();
+
+    if (values.isEmpty) return SizeScale();
+
+    // Get bubble geometry and use its preconfigured size scale
+    final bubbleGeometries =
+        widget.geometries.whereType<BubbleGeometry>().toList();
+    final sizeScale = bubbleGeometries.isNotEmpty
+        ? bubbleGeometries.first.createSizeScale()
+        : (widget.sizeScale ??
+            SizeScale(
+                range: [widget.theme.pointSizeMin, widget.theme.pointSizeMax]));
+
+    // Set domain from data - limits are already in the scale
+    sizeScale.setBounds(values, null, widget.geometries);
+    return sizeScale;
   }
 
   /// Update pan domains based on delta movement

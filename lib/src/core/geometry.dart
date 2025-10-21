@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'label_formatter.dart';
+import 'scale.dart';
 import 'util/bounds_calculator.dart';
 
 /// Enum for specifying which Y-axis to use
@@ -211,6 +212,8 @@ class BubbleGeometry extends Geometry {
   final double? minSize;
   final double? maxSize;
   final (double?, double?)? limits;
+  final String? title; // Title for a bubble size guide
+  // size guide is displayed if title is non-null
   final Color? color;
   final double alpha;
   final PointShape shape;
@@ -225,6 +228,7 @@ class BubbleGeometry extends Geometry {
     this.minSize = 5.0,
     this.maxSize = 30.0,
     this.limits,
+    this.title,
     this.color,
     this.alpha = 0.7,
     this.shape = PointShape.circle,
@@ -237,6 +241,16 @@ class BubbleGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  /// Create a SizeScale configured with this geometry's parameters
+  SizeScale createSizeScale() {
+    return SizeScale(
+      range: [minSize ?? 5.0, maxSize ?? 30.0],
+      limits: limits,
+      labelFormatter: labelFormatter,
+      title: title,
+    );
+  }
 
   @override
   BoundsBehavior getBoundsBehavior() => BoundsBehavior.dataDriven;

@@ -92,6 +92,58 @@ CristalyseChart()
   .build()
 ```
 
+### Size Guide in Legend
+
+<Info>
+**New in v1.10.0:** Add a visual size guide to your legend showing min, mid, and max bubble sizes!
+</Info>
+
+Provide a `title` parameter to `geomBubble()` to automatically display a bubble size guide in the legend:
+
+```dart
+CristalyseChart()
+  .data(companyData)
+  .mapping(x: 'revenue', y: 'customers', size: 'marketShare', color: 'category')
+  .geomBubble(
+    title: 'Market Share (%)',  // Enables size guide in legend
+    minSize: 8.0,
+    maxSize: 25.0,
+    alpha: 0.75,
+    borderWidth: 2.0,
+  )
+  .legend()  // Shows both category colors AND bubble size guide
+  .build()
+```
+
+**Size Guide Features:**
+- **Visual Reference**: Shows three bubbles (min, mid, max) with actual data values
+- **Automatic Scaling**: Values and sizes match your data and scale configuration
+- **Layout Aware**: Adapts to horizontal or vertical legend positioning
+- **Integrated**: Works seamlessly with existing legend items and color keys
+
+**Example with Custom Legend Position:**
+```dart
+CristalyseChart()
+  .data(marketData)
+  .mapping(
+    x: 'revenue',
+    y: 'customers',
+    size: 'marketShare',
+    color: 'category',
+  )
+  .geomBubble(
+    title: 'Market Share (%)',
+    minSize: 10.0,
+    maxSize: 30.0,
+    alpha: 0.8,
+  )
+  .legend(
+    position: LegendPosition.right,  // Size guide on right side
+    interactive: true,               // Enable click-to-toggle
+  )
+  .build()
+```
+
 ### Advanced Bubble Sizing
 
 For precise control over the scale domain and visual presentation, use both `limits` and `minSize`/`maxSize`:

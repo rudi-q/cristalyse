@@ -446,4 +446,194 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
   });
+
+  group('Bubble Size Edge Cases - Validation', () {
+    test(
+        'SizeScale with zero domain span should not produce negative/zero sizes',
+        () {
+      final sizeScale = SizeScale(
+        range: [5.0, 30.0],
+      );
+
+      // Single value dataset - domain span = 0
+      sizeScale.setBounds([10.0, 10.0], null, []);
+
+      final size = sizeScale.scale(10.0);
+
+      // The scale may return 0 due to zero domain span
+      // Legend widget should handle this gracefully
+      expect(size.isFinite, isTrue,
+          reason: 'Size should be finite even with zero domain span');
+    });
+
+    test('SizeScale with values outside domain should not crash', () {
+      final sizeScale = SizeScale(
+        range: [5.0, 30.0],
+      );
+      sizeScale.setBounds([10.0, 50.0], null, []);
+
+      // Test values outside the domain (unclamped)
+      final belowMin = sizeScale.scale(0.0); // Below domain
+      final aboveMax = sizeScale.scale(100.0); // Above domain
+
+      // These may be negative or very large, but should be finite
+      expect(belowMin.isFinite, isTrue,
+          reason: 'Below-domain values should produce finite output');
+      expect(aboveMax.isFinite, isTrue,
+          reason: 'Above-domain values should produce finite output');
+    });
+
+    test('SizeScale with inverted range should not break legend', () {
+      final sizeScale = SizeScale(
+        range: [30.0, 5.0], // Inverted: larger values map to smaller sizes
+      );
+      sizeScale.setBounds([10.0, 50.0], null, []);
+
+      final minSize = sizeScale.scale(10.0);
+      final maxSize = sizeScale.scale(50.0);
+
+      expect(minSize.isFinite, isTrue);
+      expect(maxSize.isFinite, isTrue);
+
+      // With inverted range, min value should map to larger size
+      expect(minSize, greaterThan(maxSize),
+          reason: 'Inverted range should produce inverted sizes');
+    });
+
+    test('SizeScale with range starting at zero', () {
+      final sizeScale = SizeScale(
+        range: [0.0, 30.0],
+      );
+      sizeScale.setBounds([5.0, 35.0], null, []);
+
+      final minSize = sizeScale.scale(5.0);
+
+      // Min value maps to 0, which should be handled by legend validation
+      expect(minSize, equals(0.0),
+          reason: 'Min domain value should map to min range (0)');
+    });
+
+    test('SizeScale with very small positive range', () {
+      final sizeScale = SizeScale(
+        range: [0.1, 0.5], // Very small sizes
+      );
+      sizeScale.setBounds([10.0, 50.0], null, []);
+
+      final minSize = sizeScale.scale(10.0);
+      final maxSize = sizeScale.scale(50.0);
+
+      expect(minSize, equals(0.1));
+      expect(maxSize, equals(0.5));
+      expect(minSize, lessThan(maxSize));
+    });
+
+    test('SizeScale with negative range values should throw ArgumentError', () {
+      // Test constructor validation
+      expect(
+        () => SizeScale(range: [-5.0, 30.0]),
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('SizeScale range values must be non-negative'),
+          ),
+        ),
+        reason: 'Constructor should reject negative range values',
+      );
+
+      // Test setter validation
+      final sizeScale = SizeScale(range: [5.0, 30.0]);
+      expect(
+        () => sizeScale.range = [-5.0, 30.0],
+        throwsA(
+          isA<ArgumentError>().having(
+            (e) => e.message,
+            'message',
+            contains('SizeScale range values must be non-negative'),
+          ),
+        ),
+        reason: 'Setter should reject negative range values',
+      );
+
+      // Also test when second value is negative
+      expect(
+        () => SizeScale(range: [5.0, -10.0]),
+        throwsA(isA<ArgumentError>()),
+        reason: 'Should reject when second range value is negative',
+      );
+    });
+
+    testWidgets('Legend should render with zero domain span bubble guide',
+        (WidgetTester tester) async {
+      // Create chart with single size value (zero domain span)
+      final chart = CristalyseChart()
+          .data([
+            {'x': 1.0, 'y': 2.0, 'size': 10.0, 'category': 'A'},
+            {'x': 2.0, 'y': 3.0, 'size': 10.0, 'category': 'B'}, // Same size
+          ])
+          .mapping(x: 'x', y: 'y', size: 'size', color: 'category')
+          .geomBubble(
+            minSize: 5.0,
+            maxSize: 30.0,
+            title: 'Size Guide',
+          )
+          .scaleXContinuous()
+          .scaleYContinuous()
+          .theme(ChartTheme.defaultTheme())
+          .legend(position: LegendPosition.right);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 500,
+              height: 300,
+              child: chart.build(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Should not crash - legend validation should handle zero domain span
+      expect(find.byType(CustomPaint), findsWidgets);
+    });
+
+    testWidgets('Legend should render with range starting at zero',
+        (WidgetTester tester) async {
+      final chart = CristalyseChart()
+          .data([
+            {'x': 1.0, 'y': 2.0, 'size': 5.0, 'category': 'A'},
+            {'x': 2.0, 'y': 3.0, 'size': 35.0, 'category': 'B'},
+          ])
+          .mapping(x: 'x', y: 'y', size: 'size', color: 'category')
+          .geomBubble(
+            minSize: 0.0, // Zero minimum
+            maxSize: 30.0,
+            title: 'Size Guide',
+          )
+          .scaleXContinuous()
+          .scaleYContinuous()
+          .theme(ChartTheme.defaultTheme())
+          .legend(position: LegendPosition.right);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 500,
+              height: 300,
+              child: chart.build(),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      // Should not crash - legend validation should clamp zero to minimum
+      expect(find.byType(CustomPaint), findsWidgets);
+    });
+  });
 }
