@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../core/geometry.dart';
 import '../core/scale.dart';
-import '../core/util/colors.dart';
 import '../core/util/helper.dart';
 import '../themes/chart_theme.dart';
 
@@ -245,6 +244,7 @@ class AnimatedChartPainter extends CustomPainter {
         : null;
     final colorScale = _setupColorScale();
     final sizeScale = _setupSizeScale();
+    final gradientColorScale = _setupGradientColorScale();
 
     final hasPieChart = geometries.any((g) => g is PieGeometry);
     final hasHeatMapChart = geometries.any((g) => g is HeatMapGeometry);
@@ -277,6 +277,7 @@ class AnimatedChartPainter extends CustomPainter {
         colorScale,
         sizeScale,
         useY2,
+        gradientColorScale,
       );
     }
 
@@ -501,6 +502,58 @@ class AnimatedChartPainter extends CustomPainter {
     );
   }
 
+  GradientColorScale _setupGradientColorScale() {
+    // Find heat map geometry if present
+    HeatMapGeometry? heatMapGeom;
+    for (final geom in geometries) {
+      if (geom is HeatMapGeometry) {
+        heatMapGeom = geom;
+        break;
+      }
+    }
+
+    // If no heat map configured, return default scale without scanning data
+    if (heatMapGeom == null) {
+      return GradientColorScale.heatMap();
+    }
+
+    // Create gradient color scale based on heat map configuration
+    GradientColorScale scale;
+
+    if (heatMapGeom.colorGradient != null &&
+        heatMapGeom.colorGradient!.isNotEmpty) {
+      // Use custom gradient from geometry
+      scale = GradientColorScale(
+        colors: heatMapGeom.colorGradient!,
+        interpolate: heatMapGeom.interpolateColors,
+      );
+    } else {
+      // Use default heat map gradient
+      scale = GradientColorScale.heatMap();
+    }
+
+    // Validate heat map value column requirement
+    if (heatMapValueColumn == null) {
+      throw ArgumentError('Heat maps require a value column for color mapping. '
+          'Use .mappingHeatMap(x: "xCol", y: "yCol", value: "valueCol") '
+          'instead of .mapping() when creating heat maps.');
+    }
+
+    // Set domain using Scale's setBounds()
+    if (data.isNotEmpty) {
+      final values = data
+          .map((d) => getNumericValue(d[heatMapValueColumn]))
+          .where((v) => v != null && v.isFinite)
+          .cast<double>()
+          .toList();
+
+      scale.setBounds(
+          values, (heatMapGeom.minValue, heatMapGeom.maxValue), geometries);
+    }
+
+    return scale;
+  }
+
   SizeScale _setupSizeScale() {
     if (sizeColumn == null) return SizeScale();
     final values = data
@@ -597,6 +650,7 @@ class AnimatedChartPainter extends CustomPainter {
     ColorScale colorScale,
     SizeScale sizeScale,
     bool isSecondaryY,
+    GradientColorScale gradientColorScale,
   ) {
     if (geometry is PointGeometry) {
       _drawPointsAnimated(
@@ -651,7 +705,7 @@ class AnimatedChartPainter extends CustomPainter {
         canvas,
         plotArea,
         geometry,
-        colorScale,
+        gradientColorScale,
       );
     } else if (geometry is BubbleGeometry) {
       _drawBubblesAnimated(
@@ -2155,14 +2209,19 @@ class AnimatedChartPainter extends CustomPainter {
     Canvas canvas,
     Rect plotArea,
     HeatMapGeometry geometry,
-    ColorScale colorScale,
+    GradientColorScale gradientColorScale,
   ) {
     // Use heat map specific columns
     final xCol = heatMapXColumn ?? xColumn;
     final yCol = heatMapYColumn ?? yColumn;
-    final valueCol = heatMapValueColumn ?? colorColumn;
+    final valueCol = heatMapValueColumn;
 
-    if (xCol == null || yCol == null || valueCol == null || data.isEmpty) {
+    if (valueCol == null) {
+      throw ArgumentError('Heat maps require heatMapValueColumn. '
+          'Use .mappingHeatMap(x: "xCol", y: "yCol", value: "valueCol").');
+    }
+
+    if (xCol == null || yCol == null || data.isEmpty) {
       return;
     }
 
@@ -2195,21 +2254,6 @@ class AnimatedChartPainter extends CustomPainter {
         cellWidth = cellHeight * geometry.cellAspectRatio!;
       }
     }
-
-    // Get value range for color mapping
-    final values = data
-        .map((d) => getNumericValue(d[valueCol]))
-        .where((v) => v != null && v.isFinite)
-        .cast<double>()
-        .toList();
-
-    if (values.isEmpty) {
-      return;
-    }
-
-    final minValue = geometry.minValue ?? values.reduce(math.min);
-    final maxValue = geometry.maxValue ?? values.reduce(math.max);
-    final valueRange = maxValue - minValue;
 
     // Create a map for quick lookup
     final dataMap = <String, double>{};
@@ -2285,30 +2329,11 @@ class AnimatedChartPainter extends CustomPainter {
 
         if (cellProgress <= 0) continue;
 
-        // Calculate color based on value
-        Color cellColor;
-        // Calculate normalized value once for both color and text logic
-        final normalizedValue = valueRange > 0
-            ? ((value - minValue) / valueRange).clamp(0.0, 1.0)
-            : 0.5;
+        // Calculate color using GradientColorScale
+        final cellColor = gradientColorScale.scale(value);
 
-        if (geometry.colorGradient != null &&
-            geometry.colorGradient!.isNotEmpty) {
-          // Use provided color gradient
-          if (geometry.interpolateColors) {
-            cellColor = interpolateGradientColor(
-                normalizedValue, geometry.colorGradient!);
-          } else {
-            // Use discrete colors
-            final index =
-                (normalizedValue * (geometry.colorGradient!.length - 1))
-                    .round();
-            cellColor = geometry.colorGradient![index];
-          }
-        } else {
-          // Use default gradient with enhanced visibility
-          cellColor = defaultHeatMapColor(normalizedValue);
-        }
+        // Calculate normalized value for text color logic
+        final normalizedValue = gradientColorScale.normalize(value);
 
         // Animate cell
         Rect animatedRect = cellRect;
@@ -2395,9 +2420,14 @@ class AnimatedChartPainter extends CustomPainter {
     // Use heat map specific columns
     final xCol = heatMapXColumn ?? xColumn;
     final yCol = heatMapYColumn ?? yColumn;
-    final valueCol = heatMapValueColumn ?? colorColumn;
+    final valueCol = heatMapValueColumn;
 
-    if (xCol == null || yCol == null || valueCol == null || data.isEmpty) {
+    if (valueCol == null) {
+      throw ArgumentError('Heat maps require heatMapValueColumn. '
+          'Use .mappingHeatMap(x: "xCol", y: "yCol", value: "valueCol").');
+    }
+
+    if (xCol == null || yCol == null || data.isEmpty) {
       return;
     }
 

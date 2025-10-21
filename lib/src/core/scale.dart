@@ -455,17 +455,13 @@ class GradientColorScale extends Scale {
   }
 
   static GradientColorScale heatMap() {
+    // Default heat map gradient: dark blue → cyan → lime green → bright red
     return GradientColorScale(
       colors: [
-        const Color(0xFF000033), // Dark blue
-        const Color(0xFF000099), // Blue
-        const Color(0xFF0000FF), // Bright blue
-        const Color(0xFF00FFFF), // Cyan
-        const Color(0xFF00FF00), // Green
-        const Color(0xFFFFFF00), // Yellow
-        const Color(0xFFFF8800), // Orange
-        const Color(0xFFFF0000), // Red
-        const Color(0xFF880000), // Dark red
+        const Color(0xFF000080), // Dark blue
+        const Color(0xFF00FFFF), // Bright cyan
+        const Color(0xFF32FF32), // Lime green
+        const Color(0xFFFF0000), // Bright red
       ],
     );
   }
