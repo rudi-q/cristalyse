@@ -236,5 +236,17 @@ void main() {
       expect(ticks.first, greaterThanOrEqualTo(50.0));
       expect(ticks.last, lessThanOrEqualTo(51.0));
     });
+
+    test('Bigger numbers, replicate epoch ms', () {
+      final ticks = WilkinsonLabeling.extended(
+          1760530211058.0, 1760526611058.0, 852.4, 0.0164,
+          limits: (1760526611058.0, 1760530211058.0));
+
+      // All ticks must be within limits
+      expect(ticks.isNotEmpty, true);
+      expect(ticks.length, 4);
+      expect(ticks,
+          [1760527000000.0, 1760528000000.0, 1760529000000.0, 1760530000000.0]);
+    });
   });
 }

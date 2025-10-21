@@ -237,7 +237,7 @@ class WilkinsonLabeling {
   /// Clean up floating point artifacts
   static double _cleanNumber(double value) {
     // Round to 10 decimal places to eliminate floating point errors
-    final rounded = (value * 1e10).round() / 1e10;
+    final rounded = (value * 1e10).roundToDouble() / 1e10;
 
     // If very close to an integer, return the integer
     if ((rounded - rounded.round()).abs() < 1e-10) {
