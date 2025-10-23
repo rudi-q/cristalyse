@@ -455,9 +455,7 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
-    final hasSecondaryY = hasSecondaryYAxis(
-        y2Column: widget.y2Column, geometries: widget.geometries);
-    final rightPadding = hasSecondaryY ? 80.0 : widget.theme.padding.right;
+    final rightPadding = widget.theme.padding.right;
 
     final plotArea = Rect.fromLTWH(
       widget.theme.padding.left,
@@ -733,9 +731,7 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
-    final hasSecondaryY = hasSecondaryYAxis(
-        y2Column: tempWidget.y2Column, geometries: tempWidget.geometries);
-    final rightPadding = hasSecondaryY ? 80.0 : tempWidget.theme.padding.right;
+    final rightPadding = tempWidget.theme.padding.right;
 
     final plotArea = Rect.fromLTWH(
       tempWidget.theme.padding.left,
