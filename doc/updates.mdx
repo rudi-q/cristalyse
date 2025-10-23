@@ -12,10 +12,26 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="October 23, 2025" description="v1.10.3">
+  ### 🐛 Scale Padding Fix
+  
+  **Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+  
+  **Fixed chart shrinking when panning**
+  - Scale padding now initialized before painting charts
+  - Prevents setupYScale from changing padding during panning
+  - Chart maintains consistent size during all pan operations
+  - Smooth user experience without unintended resize behavior
+  
+  **Quality Assurance:**
+  - All existing tests continue to pass
+  - Zero breaking changes - fully backward compatible
+</Update>
+
 <Update label="October 21, 2025" description="v1.10.2">
   ### 🎨 Heat Map Unification & Bounds Validation
   
-  **Authored by [@davidlrichmond](https://github.com/davidlrichmond)**
+  **Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Thank you for this contribution!
   
   **Heat Map Color System Unification:**
   - Unified heat maps to use `GradientColorScale` for consistent color handling
