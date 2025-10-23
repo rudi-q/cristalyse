@@ -1,8 +1,32 @@
+## 1.10.3 - 2025-10-23
+
+#### 🐛 Scale Padding Fix
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Fixed Chart Shrinking During Pan Operations:**
+- Scale padding now initialized before painting charts
+- Prevents `setupYScale` from changing padding during panning
+- Chart maintains consistent size during all pan operations
+- Smooth user experience without unintended resize behavior
+
+**Technical Details:**
+- Added `_setupScales()` method to initialize X and Y scales before chart painting
+- Fixes bug where panning would call `setupYScale` and reduce chart dimensions
+- Applied to both animated chart render paths
+
+#### 🧪 Quality Assurance
+
+- All existing tests continue to pass
+- Zero breaking changes - fully backward compatible
+
+---
+
 ## 1.10.2 - 2025-10-21
 
 #### 🎨 Heat Map Unification & Bounds Fixes
 
-**Authored by [@davidlrichmond](https://github.com/davidlrichmond)**
+**Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Thank you for this contribution!
 
 **Heat Map Color System Unification:**
 - Unified heat maps to use `GradientColorScale` for consistent color handling

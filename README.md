@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.10.2** - Production ready with axis titles, bubble size guides, interactive floating legends, and intelligent axis bounds
+**Current Version: 1.10.3** - Production ready with axis titles, bubble size guides, interactive floating legends, and intelligent axis bounds
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
