@@ -295,6 +295,90 @@ CristalyseChart()
   .build()
 ```
 
+### Programmatic Pan Control
+
+Control chart panning programmatically with external UI controls:
+
+```dart
+class ProgrammaticPanChart extends StatefulWidget {
+  @override
+  _ProgrammaticPanChartState createState() => _ProgrammaticPanChartState();
+}
+
+class _ProgrammaticPanChartState extends State<ProgrammaticPanChart> {
+  final panController = PanController();
+  double visibleMinX = 500;
+  double visibleMaxX = 1500;
+  
+  @override
+  void dispose() {
+    panController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // External controls
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                panController.panTo(PanInfo(
+                  visibleMinX: visibleMinX,
+                  visibleMaxX: visibleMaxX,
+                  state: PanState.update,
+                ));
+              },
+              child: Text('Pan to Range'),
+            ),
+            ElevatedButton(
+              onPressed: () => panController.panReset(),
+              child: Text('Reset View'),
+            ),
+          ],
+        ),
+        
+        // Chart with controller
+        Expanded(
+          child: CristalyseChart()
+            .data(data)
+            .mapping(x: 'x', y: 'y')
+            .geomLine()
+            .interaction(
+              pan: PanConfig(
+                enabled: true,
+                controller: panController,  // Connect controller
+                onPanUpdate: (info) {
+                  setState(() {
+                    visibleMinX = info.visibleMinX ?? visibleMinX;
+                    visibleMaxX = info.visibleMaxX ?? visibleMaxX;
+                  });
+                },
+              ),
+            )
+            .build(),
+        ),
+      ],
+    );
+  }
+}
+```
+
+**Key Features:**
+- `panTo()`: Jump to specific data range programmatically
+- `panReset()`: Return to original chart view
+- Works alongside gesture-based panning
+- Full lifecycle management with dispose()
+
+**Use Cases:**
+- Zoom buttons for specific time ranges ("Last 7 days", "Last month")
+- Coordinated panning across multiple charts
+- Jump to bookmarked positions
+- Reset button after exploration
+- External slider controls for pan position
+
 ### Pan with Data Loading
 
 Implement infinite scrolling patterns:

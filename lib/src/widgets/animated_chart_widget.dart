@@ -114,6 +114,10 @@ class _AnimatedCristalyseChartWidgetState
     );
 
     _animationController.forward();
+    if (widget.interaction.pan?.controller != null) {
+      widget.interaction.pan!.controller!
+          .addListener(_handlePanControllerUpdate);
+    }
   }
 
   @override
@@ -129,6 +133,13 @@ class _AnimatedCristalyseChartWidgetState
 
     if (widget.animationDuration != oldWidget.animationDuration) {
       _animationController.duration = widget.animationDuration;
+    }
+
+    final oldController = oldWidget.interaction.pan?.controller;
+    final newController = widget.interaction.pan?.controller;
+    if (oldController != newController) {
+      oldController?.removeListener(_handlePanControllerUpdate);
+      newController?.addListener(_handlePanControllerUpdate);
     }
   }
 
@@ -149,6 +160,10 @@ class _AnimatedCristalyseChartWidgetState
   void dispose() {
     _cachedTooltipController?.hideTooltip();
     _animationController.dispose();
+    if (widget.interaction.pan?.controller != null) {
+      widget.interaction.pan!.controller!
+          .removeListener(_handlePanControllerUpdate);
+    }
     super.dispose();
   }
 
@@ -364,6 +379,79 @@ class _AnimatedCristalyseChartWidgetState
 
     if (widget.interaction.tooltip?.builder != null) {
       hideTooltip(panEndContext);
+    }
+  }
+
+  void _handlePanControllerUpdate() {
+    final panController = widget.interaction.pan?.controller;
+    if (panController == null) return;
+    final panInfo = panController.targetPan;
+    if (panInfo == null) {
+      final currentXDomain = List<double>.from(_panXDomain ?? []);
+      final currentYDomain = List<double>.from(_panYDomain ?? []);
+      setState(() {
+        _panXDomain =
+            _originalXDomain != null ? List.from(_originalXDomain!) : null;
+        _panYDomain =
+            _originalYDomain != null ? List.from(_originalYDomain!) : null;
+      });
+      bool listEquals(List<double>? a, List<double>? b) {
+        if (a == null) return b == null;
+        if (b == null || a.length != b.length) return false;
+        for (int i = 0; i < a.length; i++) {
+          if (a[i] != b[i]) return false;
+        }
+        return true;
+      }
+
+      if (widget.interaction.pan?.onPanEnd != null &&
+          (!listEquals(currentXDomain, _panXDomain) ||
+              !listEquals(currentYDomain, _panYDomain))) {
+        widget.interaction.pan!.onPanEnd!(PanInfo(
+          state: PanState.end,
+          visibleMinX: _panXDomain?[0],
+          visibleMaxX: _panXDomain?[1],
+          visibleMinY: _panYDomain?[0],
+          visibleMaxY: _panYDomain?[1],
+        ));
+      }
+    } else {
+      final xChanged = panInfo.visibleMaxX != null &&
+          panInfo.visibleMinX != null &&
+          panInfo.visibleMaxX! > panInfo.visibleMinX!;
+      if (xChanged) {
+        _panXDomain = [panInfo.visibleMinX!, panInfo.visibleMaxX!];
+      }
+      final yChanged = panInfo.visibleMaxY != null &&
+          panInfo.visibleMinY != null &&
+          panInfo.visibleMaxY! > panInfo.visibleMinY!;
+      if (yChanged) {
+        _panYDomain = [panInfo.visibleMinY!, panInfo.visibleMaxY!];
+      }
+      if (xChanged || yChanged) {
+        setState(() {});
+        final panConfig = widget.interaction.pan;
+        if (panConfig != null) {
+          final updated = PanInfo(
+            state: panInfo.state,
+            visibleMinX: _panXDomain?[0],
+            visibleMaxX: _panXDomain?[1],
+            visibleMinY: _panYDomain?[0],
+            visibleMaxY: _panYDomain?[1],
+          );
+          switch (panInfo.state) {
+            case PanState.start:
+              panConfig.onPanStart?.call(updated);
+              break;
+            case PanState.update:
+              panConfig.onPanUpdate?.call(updated);
+              break;
+            case PanState.end:
+              panConfig.onPanEnd?.call(updated);
+              break;
+          }
+        }
+      }
     }
   }
 
