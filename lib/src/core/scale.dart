@@ -105,8 +105,11 @@ class LinearScale extends Scale {
   List<double> _domain = [0, 1];
   List<double>? _ticks; // Cached ticks from Wilkinson algorithm
   List<double> _valuesBoundaries = [0, 1];
+  final TickConfig? _tickConfig;
 
-  LinearScale({super.limits, super.labelFormatter, super.title});
+  LinearScale(
+      {super.limits, super.labelFormatter, super.title, TickConfig? tickConfig})
+      : _tickConfig = tickConfig;
 
   @override
   List<double> get domain => _domain;
@@ -139,6 +142,12 @@ class LinearScale extends Scale {
     }
 
     if (bounds != const Bounds.ignored()) {
+      if (_tickConfig?.ticks != null) {
+        _ticks = _tickConfig!.ticks;
+        _domain = [bounds.min, bounds.max];
+        return;
+      }
+
       // Use Wilkinson algorithm to extend bounds to nice round numbers
       final screenLength = (range[1] - range[0]).abs();
 
@@ -158,7 +167,8 @@ class LinearScale extends Scale {
 
       final niceTicks = WilkinsonLabeling.extended(
           bounds.min, bounds.max, screenLength, targetDensity,
-          limits: effectiveLimits);
+          limits: effectiveLimits,
+          simpleLinear: _tickConfig?.simpleLinear ?? false);
 
       if (niceTicks.isNotEmpty) {
         // Cache ticks for getTicks() to avoid recomputing
@@ -507,4 +517,20 @@ class GradientColorScale extends Scale {
       ],
     );
   }
+}
+
+/// Configuration for tick marks on a scale
+class TickConfig {
+  /// Explicitly set the ticks to this list
+  final List<double>? ticks;
+
+  /// If true, use simple linear ticks instead of Wilkinson algorithm
+  final bool simpleLinear;
+
+  TickConfig({List<double>? ticks, this.simpleLinear = false})
+      : assert(ticks == null || ticks.isNotEmpty,
+            'When provided, ticks must be non-empty.'),
+        ticks = ticks != null
+            ? (ticks.toList()..sort((a, b) => a.compareTo(b)))
+            : null;
 }

@@ -29,7 +29,7 @@ class WilkinsonLabeling {
   /// Returns: List of nice tick values
   static List<double> extended(
       double dmin, double dmax, double screenLength, double targetDensity,
-      {(double?, double?)? limits}) {
+      {(double?, double?)? limits, bool simpleLinear = false}) {
     // Handle edge cases
     if (dmin == dmax) {
       return [dmin];
@@ -38,6 +38,17 @@ class WilkinsonLabeling {
       final temp = dmin;
       dmin = dmax;
       dmax = temp;
+    }
+
+    List<double> makeLinearTicks() {
+      // Estimate a reasonable count from screen length and target density
+      final estimatedCount =
+          (targetDensity * screenLength).round().clamp(2, 10);
+      return _fallbackTicks(dmin, dmax, estimatedCount, limits);
+    }
+
+    if (simpleLinear) {
+      return makeLinearTicks();
     }
 
     double bestScore = -2.0;
@@ -143,9 +154,7 @@ class WilkinsonLabeling {
     }
 
     // Fallback: if search failed, return simple linear ticks
-    // Estimate a reasonable count from screen length and target density
-    final estimatedCount = (targetDensity * screenLength).round().clamp(2, 10);
-    return _fallbackTicks(dmin, dmax, estimatedCount, limits);
+    return makeLinearTicks();
   }
 
   /// Calculate simplicity score
