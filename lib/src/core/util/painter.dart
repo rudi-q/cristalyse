@@ -46,6 +46,11 @@ AnimatedChartPainter chartPainterAnimated(
     required double animationProgress,
     List<double>? panXDomain,
     List<double>? panYDomain}) {
+  // Force panYDomain to null if updateYDomain is false
+  // otherwise the configured Y domain will be overridden by the original domain during set bounds
+  if (widget.interaction.pan?.updateYDomain == false) {
+    panYDomain = null;
+  }
   return AnimatedChartPainter(
     data: widget.data,
     xColumn: widget.xColumn,

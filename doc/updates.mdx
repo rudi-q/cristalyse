@@ -12,6 +12,21 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="October 24, 2025" description="v1.11.1">
+  ### 🐛 Y-axis Bounds Fix During Panning
+  
+  **Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+  
+  **Fixed Y-axis getting stuck during X-axis pan operations**
+  - Y-axis bounds now correctly update when configured with `updateYDomain: false`
+  - Previously remained locked to original `panYDomain` bounds during X-axis panning
+  - Enables proper dynamic Y-axis scaling while panning horizontally
+  
+  **Quality Assurance:**
+  - Zero breaking changes - fully backward compatible
+  - Patch bump release
+</Update>
+
 <Update label="October 24, 2025" description="v1.11.0">
   ### 🎯 Programmatic Pan Controller
   

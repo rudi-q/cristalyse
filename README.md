@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.11.0** - Production ready with programmatic pan controller, interactive floating legends, and intelligent axis bounds
+**Current Version: 1.11.1** - Production ready with programmatic pan controller, interactive floating legends, and intelligent axis bounds
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1125,7 +1125,7 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.8.0** - **Intelligent axis bounds & labeling** with Wilkinson Extended algorithm (by [@davidlrichmond](https://github.com/davidlrichmond)) - professional round-number ticks, geometry-aware defaults, comprehensive testing
 - ✅ **v1.9.0** - **Interactive & floating legends** with click-to-toggle visibility, custom positioning with offsets, color consistency preservation, and overflow rendering support
 - ✅ **v1.10.0** - **Axis titles & bubble size guide** with optional titles for all axes, visual bubble size legends, smart spacing calculations, and bubble legend validation fixes (by [@davidlrichmond](https://github.com/davidlrichmond))
-- ✅ **v1.11.0** - **Programmatic pan controller** for external chart panning control via PanController with panTo() and panReset() methods
+- ✅ **v1.11.0** - **Programmatic pan controller** for external chart panning control via PanController with panTo() and panReset() methods (by [@jbbjarnason](https://github.com/jbbjarnason))
 
 ## Support This Project
 

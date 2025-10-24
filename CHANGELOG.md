@@ -1,3 +1,22 @@
+## 1.11.1 - 2025-10-24
+
+#### 🐛 Bug Fixes
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Fixed Y-axis Bounds During X-axis Panning:**
+- Y-axis bounds now correctly update when panning X-axis
+- Previously, Y-axis would remain stuck with original `panYDomain` bounds during X-axis pan gestures
+- Added guard condition to reset `panYDomain` when `updateYDomain` is false
+- Enables expected behavior: Y-axis bounds remain dynamic and update based on visible data while panning horizontally
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Focused single-line fix with no API modifications
+
+---
+
 ## 1.11.0 - 2025-10-24
 
 #### 🎯 Major Feature: Programmatic Pan Controller
