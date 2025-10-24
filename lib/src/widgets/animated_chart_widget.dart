@@ -543,9 +543,8 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
-    final hasSecondaryY = hasSecondaryYAxis(
-        y2Column: widget.y2Column, geometries: widget.geometries);
-    final rightPadding = hasSecondaryY ? 80.0 : widget.theme.padding.right;
+    final y2AxisSpace = _calculateY2AxisSpace(widget);
+    final rightPadding = widget.theme.padding.right + y2AxisSpace;
 
     final plotArea = Rect.fromLTWH(
       widget.theme.padding.left,
@@ -823,9 +822,8 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
-    final hasSecondaryY = hasSecondaryYAxis(
-        y2Column: tempWidget.y2Column, geometries: tempWidget.geometries);
-    final rightPadding = hasSecondaryY ? 80.0 : tempWidget.theme.padding.right;
+    final y2AxisSpace = _calculateY2AxisSpace(tempWidget);
+    final rightPadding = tempWidget.theme.padding.right + y2AxisSpace;
 
     final plotArea = Rect.fromLTWH(
       tempWidget.theme.padding.left,
@@ -1063,6 +1061,43 @@ class _AnimatedCristalyseChartWidgetState
           ],
         );
     }
+  }
+
+  /// Calculate Y2-axis space for secondary Y-axis padding
+  /// Returns 0.0 if no secondary Y-axis exists or y2Scale is null
+  double _calculateY2AxisSpace(AnimatedCristalyseChartWidget chartWidget) {
+    final hasSecondaryY = hasSecondaryYAxis(
+      y2Column: chartWidget.y2Column,
+      geometries: chartWidget.geometries,
+    );
+
+    if (!hasSecondaryY || chartWidget.y2Scale == null) {
+      return 0.0;
+    }
+
+    final axisLabelStyle = chartWidget.theme.axisLabelStyle ??
+        const TextStyle(color: Colors.black, fontSize: 12);
+    final titleFontSize = (axisLabelStyle.fontSize ?? 12) + 1;
+
+    // Pre-calculate Y2 label dimensions
+    double maxY2LabelWidth = 0.0;
+    final y2Ticks = chartWidget.y2Scale!.getTicks();
+    for (final tick in y2Ticks) {
+      final label = chartWidget.y2Scale!.formatLabel(tick);
+      final textPainter = TextPainter(
+        text: TextSpan(text: label, style: axisLabelStyle),
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+      maxY2LabelWidth = math.max(maxY2LabelWidth, textPainter.width);
+    }
+
+    return chartWidget.theme.axisWidth * 2 +
+        4.0 + // tick-to-label spacing
+        maxY2LabelWidth +
+        (chartWidget.y2Scale?.title != null
+            ? 8.0 + titleFontSize // label-to-title spacing + title height
+            : 0.0);
   }
 
   void _setupScales(double width, double height) {
