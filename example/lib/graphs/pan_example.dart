@@ -22,11 +22,14 @@ class _PanExampleWidget extends StatefulWidget {
 
 class _PanExampleWidgetState extends State<_PanExampleWidget> {
   List<Map<String, dynamic>> currentData = [];
-  double? visibleMinX;
-  double? visibleMaxX;
+  double visibleMinX = 500;
+  double visibleMaxX = 1500;
+  double panToMinX = 500;
+  double panToMaxX = 1500;
   String panStatus = "Ready to pan";
   int totalPanEvents = 0;
   int activeDataPoints = 0;
+  PanController panController = PanController();
 
   @override
   void initState() {
@@ -34,9 +37,15 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
     _generateInitialData();
   }
 
+  @override
+  void dispose() {
+    panController.dispose();
+    super.dispose();
+  }
+
   void _generateInitialData() {
     // Generate initial dataset with 1000 points
-    currentData = List.generate(1000, (i) {
+    currentData = List.generate(2000, (i) {
       return {
         'x': i.toDouble(),
         'y': 50 +
@@ -50,8 +59,8 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
 
   void _handlePanUpdate(PanInfo info) {
     setState(() {
-      visibleMinX = info.visibleMinX;
-      visibleMaxX = info.visibleMaxX;
+      visibleMinX = info.visibleMinX ?? 500;
+      visibleMaxX = info.visibleMaxX ?? 1500;
       totalPanEvents++;
       panStatus =
           "Range: ${info.visibleMinX?.toStringAsFixed(1)} - ${info.visibleMaxX?.toStringAsFixed(1)}";
@@ -81,61 +90,136 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
     return Column(
       children: [
         // Visible Range Display Card - Compact Version
-        if (visibleMinX != null && visibleMaxX != null)
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).primaryColor.withValues(alpha: 0.15),
-                  Theme.of(context).primaryColor.withValues(alpha: 0.08),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Theme.of(context).primaryColor.withValues(alpha: 0.4),
-                width: 1.5,
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.visibility,
-                  color: Theme.of(context).primaryColor,
-                  size: 16,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Range: ${visibleMinX!.toStringAsFixed(1)} → ${visibleMaxX!.toStringAsFixed(1)}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'monospace',
-                          color: Theme.of(context).primaryColor,
-                        ),
-                      ),
-                      Text(
-                        'Width: ${(visibleMaxX! - visibleMinX!).toStringAsFixed(1)} • Events: $totalPanEvents',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[800],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Theme.of(context).primaryColor.withValues(alpha: 0.15),
+                Theme.of(context).primaryColor.withValues(alpha: 0.08),
               ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.4),
+              width: 1.5,
             ),
           ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.visibility,
+                color: Theme.of(context).primaryColor,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Range: ${visibleMinX.toStringAsFixed(1)} → ${visibleMaxX.toStringAsFixed(1)}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'monospace',
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    Text(
+                      'Width: ${(visibleMaxX - visibleMinX).toStringAsFixed(1)} • Events: $totalPanEvents',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[800],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: TextFormField(
+                  initialValue: panToMinX.toStringAsFixed(1),
+                  onChanged: (value) {
+                    final v = double.tryParse(value);
+                    setState(() {
+                      panToMinX =
+                          v ?? panToMinX; // Keep previous value if invalid
+                    });
+                  },
+                  decoration: InputDecoration(
+                      label: Text('Min X',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).primaryColor,
+                          )),
+                      isDense: true,
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Theme.of(context).primaryColor))),
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).primaryColor),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: TextFormField(
+                  initialValue: panToMaxX.toStringAsFixed(1),
+                  onChanged: (value) {
+                    final v = double.tryParse(value);
+                    setState(() {
+                      panToMaxX =
+                          v ?? panToMaxX; // Keep previous value if invalid
+                    });
+                  },
+                  decoration: InputDecoration(
+                      label: Text('Max X',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context).primaryColor,
+                          )),
+                      isDense: true,
+                      border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Theme.of(context).primaryColor))),
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).primaryColor),
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  final minX = math.min(panToMinX, panToMaxX);
+                  final maxX = math.max(panToMinX, panToMaxX);
+                  panController.panTo(PanInfo(
+                    visibleMinX: minX,
+                    visibleMaxX: maxX,
+                    state: PanState.update,
+                  ));
+                },
+                icon: Icon(Icons.refresh),
+                color: Theme.of(context).primaryColor,
+              ),
+              const SizedBox(width: 16),
+              IconButton(
+                onPressed: () {
+                  panController.panReset();
+                },
+                icon: Icon(Icons.undo),
+                color: Theme.of(context).primaryColor,
+              ),
+            ],
+          ),
+        ),
 
         // Chart Container - Expanded to fill remaining space
         Expanded(
@@ -165,7 +249,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                     size: 2.0 + widget.sliderValue * 4.0,
                     alpha: 0.7,
                   )
-                  .scaleXContinuous()
+                  .scaleXContinuous(min: visibleMinX, max: visibleMaxX)
                   .scaleYContinuous()
                   .interaction(
                     pan: PanConfig(
@@ -177,6 +261,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                       onPanUpdate: _handlePanUpdate,
                       onPanEnd: _handlePanEnd,
                       throttle: const Duration(milliseconds: 50),
+                      controller: panController,
                     ),
                   )
                   .legend(
