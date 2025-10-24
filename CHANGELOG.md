@@ -1,3 +1,67 @@
+## 1.11.0 - 2025-10-24
+
+#### 🎯 Major Feature: Programmatic Pan Controller
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+**New PanController Class:**
+- External control of chart panning via new `PanController` class
+- `panTo(PanInfo)` method for programmatic pan operations
+- `panReset()` method to restore original chart view
+- ChangeNotifier-based architecture for reactive updates
+- Optional `controller` parameter in `PanConfig`
+
+**Enhanced Pan Configuration:**
+- `PanConfig` now accepts optional `controller` parameter
+- Widget lifecycle management (initState, didUpdateWidget, dispose)
+- Automatic listener registration and cleanup
+- Full integration with existing pan callbacks
+
+**Use Cases:**
+- Programmatic zoom controls with buttons/sliders
+- Reset to original view functionality
+- Coordinated panning across multiple charts
+- External UI controls for chart navigation
+- Jump to specific data ranges programmatically
+
+**API Example:**
+```dart
+final panController = PanController();
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      controller: panController,
+    ),
+  )
+  .build();
+
+// Pan to specific range
+panController.panTo(PanInfo(
+  visibleMinX: 500,
+  visibleMaxX: 1500,
+  state: PanState.update,
+));
+
+// Reset to original view
+panController.panReset();
+```
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Optional controller parameter (defaults to null)
+- Proper lifecycle management with listener cleanup
+- Example integration in pan_example.dart
+
+---
+
 ## 1.10.3 - 2025-10-23
 
 #### 🐛 Scale Padding Fix

@@ -132,6 +132,10 @@ class PanConfig {
   final bool updateXDomain;
   final bool updateYDomain;
 
+  /// Optional external controller to drive programmatic panning.
+  /// The widget will listen/unlisten to this in its lifecycle.
+  final PanController? controller;
+
   const PanConfig({
     this.enabled = true,
     this.onPanUpdate,
@@ -140,6 +144,7 @@ class PanConfig {
     this.throttle = const Duration(milliseconds: 100),
     this.updateXDomain = false,
     this.updateYDomain = false,
+    this.controller,
   });
 }
 
@@ -178,6 +183,40 @@ class PanInfo {
   @override
   String toString() {
     return 'PanInfo(xRange: [$visibleMinX, $visibleMaxX], yRange: [$visibleMinY, $visibleMaxY], state: $state)';
+  }
+}
+
+/// Controller for programmatic chart panning.
+///
+/// Create an instance and pass it to [PanConfig.controller] to enable
+/// programmatic pan operations via [panTo] and [panReset].
+///
+/// The controller must be disposed when no longer needed:
+/// ```dart
+/// final controller = PanController();
+/// // ... use it
+/// controller.dispose(); // Clean up
+/// ```
+class PanController extends ChangeNotifier {
+  PanInfo? _targetPan;
+
+  PanInfo? get targetPan => _targetPan;
+
+  /// Programmatically pan the chart to the specified visible range.
+  ///
+  /// The [info] parameter should contain the desired visible X/Y ranges
+  /// and an appropriate [PanState] (typically [PanState.update] or [PanState.end]).
+  void panTo(PanInfo info) {
+    _targetPan = info;
+    notifyListeners();
+  }
+
+  /// Reset the pan to the original (unpanned) chart view.
+  ///
+  /// This restores the chart to its initial domain boundaries.
+  void panReset() {
+    _targetPan = null;
+    notifyListeners();
   }
 }
 

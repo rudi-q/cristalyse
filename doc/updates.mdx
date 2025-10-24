@@ -12,6 +12,63 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="October 24, 2025" description="v1.11.0">
+  ### 🎯 Programmatic Pan Controller
+  
+  **Code authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+  
+  **New PanController Class:**
+  - External control of chart panning via new `PanController` class
+  - `panTo(PanInfo)` method for programmatic pan operations
+  - `panReset()` method to restore original chart view
+  - ChangeNotifier-based architecture for reactive updates
+  - Optional `controller` parameter in `PanConfig`
+  
+  **Enhanced Pan Configuration:**
+  - Widget lifecycle management (initState, didUpdateWidget, dispose)
+  - Automatic listener registration and cleanup
+  - Full integration with existing pan callbacks
+  
+  ```dart
+  final panController = PanController();
+  
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'x', y: 'y')
+    .geomLine()
+    .interaction(
+      pan: PanConfig(
+        enabled: true,
+        controller: panController,
+      ),
+    )
+    .build();
+  
+  // Pan to specific range
+  panController.panTo(PanInfo(
+    visibleMinX: 500,
+    visibleMaxX: 1500,
+    state: PanState.update,
+  ));
+  
+  // Reset to original view
+  panController.panReset();
+  ```
+  
+  **Use Cases:**
+  - Programmatic zoom controls with buttons/sliders
+  - Reset to original view functionality
+  - Coordinated panning across multiple charts
+  - External UI controls for chart navigation
+  - Jump to specific data ranges programmatically
+  
+  **Quality Assurance:**
+  - Zero breaking changes - fully backward compatible
+  - Optional controller parameter (defaults to null)
+  - Proper lifecycle management with listener cleanup
+  - Example integration in pan_example.dart
+</Update>
+
 <Update label="October 23, 2025" description="v1.10.3">
   ### 🐛 Scale Padding Fix
   
