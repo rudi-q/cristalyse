@@ -543,7 +543,41 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
-    final rightPadding = widget.theme.padding.right;
+    // Calculate y2AxisSpace if secondary Y-axis exists
+    final hasSecondaryY = hasSecondaryYAxis(
+      y2Column: widget.y2Column,
+      geometries: widget.geometries,
+    );
+
+    final axisLabelStyle = widget.theme.axisLabelStyle ??
+        const TextStyle(color: Colors.black, fontSize: 12);
+    final titleFontSize = (axisLabelStyle.fontSize ?? 12) + 1;
+
+    // Pre-calculate Y2 label dimensions if needed
+    double maxY2LabelWidth = 0.0;
+    if (hasSecondaryY && widget.y2Scale != null) {
+      final y2Ticks = widget.y2Scale!.getTicks();
+      for (final tick in y2Ticks) {
+        final label = widget.y2Scale!.formatLabel(tick);
+        final textPainter = TextPainter(
+          text: TextSpan(text: label, style: axisLabelStyle),
+          textDirection: TextDirection.ltr,
+        );
+        textPainter.layout();
+        maxY2LabelWidth = math.max(maxY2LabelWidth, textPainter.width);
+      }
+    }
+
+    final y2AxisSpace = hasSecondaryY && widget.y2Scale != null
+        ? widget.theme.axisWidth * 2 +
+            4.0 + // tick-to-label spacing
+            maxY2LabelWidth +
+            (widget.y2Scale?.title != null
+                ? 8.0 + titleFontSize // label-to-title spacing + title height
+                : 0.0)
+        : 0.0;
+
+    final rightPadding = widget.theme.padding.right + y2AxisSpace;
 
     final plotArea = Rect.fromLTWH(
       widget.theme.padding.left,
@@ -821,7 +855,41 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
-    final rightPadding = tempWidget.theme.padding.right;
+    // Calculate y2AxisSpace if secondary Y-axis exists
+    final hasSecondaryY = hasSecondaryYAxis(
+      y2Column: tempWidget.y2Column,
+      geometries: tempWidget.geometries,
+    );
+
+    final axisLabelStyle = tempWidget.theme.axisLabelStyle ??
+        const TextStyle(color: Colors.black, fontSize: 12);
+    final titleFontSize = (axisLabelStyle.fontSize ?? 12) + 1;
+
+    // Pre-calculate Y2 label dimensions if needed
+    double maxY2LabelWidth = 0.0;
+    if (hasSecondaryY && tempWidget.y2Scale != null) {
+      final y2Ticks = tempWidget.y2Scale!.getTicks();
+      for (final tick in y2Ticks) {
+        final label = tempWidget.y2Scale!.formatLabel(tick);
+        final textPainter = TextPainter(
+          text: TextSpan(text: label, style: axisLabelStyle),
+          textDirection: TextDirection.ltr,
+        );
+        textPainter.layout();
+        maxY2LabelWidth = math.max(maxY2LabelWidth, textPainter.width);
+      }
+    }
+
+    final y2AxisSpace = hasSecondaryY && tempWidget.y2Scale != null
+        ? tempWidget.theme.axisWidth * 2 +
+            4.0 + // tick-to-label spacing
+            maxY2LabelWidth +
+            (tempWidget.y2Scale?.title != null
+                ? 8.0 + titleFontSize // label-to-title spacing + title height
+                : 0.0)
+        : 0.0;
+
+    final rightPadding = tempWidget.theme.padding.right + y2AxisSpace;
 
     final plotArea = Rect.fromLTWH(
       tempWidget.theme.padding.left,
