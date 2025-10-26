@@ -26,7 +26,14 @@ Widget buildDualAxisTab(ChartTheme currentTheme,
           height: 400,
           child: CristalyseChart()
               .data(data)
-              .mapping(x: 'month', y: 'revenue') // Primary Y-axis (left)
+              .legend(
+                  position: LegendPosition.right,
+                  interactive: true,
+                  showTitles: true)
+              .mapping(
+                  x: 'month',
+                  y: 'revenue',
+                  color: 'product') // Primary Y-axis (left)
               .mappingY2('conversion_rate') // Secondary Y-axis (right)
               .geomBar(
                   width: sliderValue.clamp(0.1, 1.0),

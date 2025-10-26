@@ -96,9 +96,11 @@ void main() {
     });
 
     test('LegendGenerator should generate correct legend items', () {
-      final items = LegendGenerator.generateFromData(
+      final (items, _) = LegendGenerator.generateFromData(
         data: testData,
         colorColumn: 'product',
+        yColumn: 'revenue',
+        y2Column: null,
         colorPalette: [Colors.blue, Colors.red, Colors.green],
         geometries: [BarGeometry(style: BarStyle.grouped)],
       );
@@ -115,9 +117,11 @@ void main() {
 
     test('LegendGenerator should return empty list for missing color column',
         () {
-      final items = LegendGenerator.generateFromData(
+      final (items, _) = LegendGenerator.generateFromData(
         data: testData,
         colorColumn: null,
+        yColumn: 'revenue',
+        y2Column: null,
         colorPalette: [Colors.blue, Colors.red],
         geometries: [BarGeometry()],
       );
@@ -127,31 +131,69 @@ void main() {
 
     test('LegendGenerator should determine correct symbol from geometry', () {
       // Test bar geometry
-      final barItems = LegendGenerator.generateFromData(
+      final (barItems, _) = LegendGenerator.generateFromData(
         data: testData,
         colorColumn: 'product',
+        yColumn: 'revenue',
+        y2Column: null,
         colorPalette: [Colors.blue, Colors.red],
         geometries: [BarGeometry()],
       );
       expect(barItems.first.symbol, LegendSymbol.square);
 
       // Test line geometry
-      final lineItems = LegendGenerator.generateFromData(
+      final (lineItems, _) = LegendGenerator.generateFromData(
         data: testData,
         colorColumn: 'product',
+        yColumn: 'revenue',
+        y2Column: null,
         colorPalette: [Colors.blue, Colors.red],
         geometries: [LineGeometry()],
       );
       expect(lineItems.first.symbol, LegendSymbol.line);
 
       // Test point geometry
-      final pointItems = LegendGenerator.generateFromData(
+      final (pointItems, _) = LegendGenerator.generateFromData(
         data: testData,
         colorColumn: 'product',
+        yColumn: 'revenue',
+        y2Column: null,
         colorPalette: [Colors.blue, Colors.red],
         geometries: [PointGeometry()],
       );
       expect(pointItems.first.symbol, LegendSymbol.circle);
+    });
+
+    test('LegendGenerator should generate correct legend items for dual y-axis',
+        () {
+      final testData = [
+        {'quarter': 'Q1', 'revenue': 1000, 'product': 'ProductA'},
+        {'quarter': 'Q2', 'loss': 10, 'product': 'LossA'},
+        {'quarter': 'Q1', 'revenue': 800, 'product': 'ProductA'},
+        {'quarter': 'Q2', 'loss': 10, 'product': 'LossA'},
+      ];
+
+      final (itemsY, itemsY2) = LegendGenerator.generateFromData(
+        data: testData,
+        colorColumn: 'product',
+        yColumn: 'revenue',
+        y2Column: 'loss',
+        colorPalette: [Colors.blue, Colors.red],
+        geometries: [
+          BarGeometry(style: BarStyle.grouped, yAxis: YAxis.primary),
+          BarGeometry(style: BarStyle.grouped, yAxis: YAxis.secondary)
+        ],
+      );
+
+      expect(itemsY.length, 1);
+      expect(itemsY[0].label, 'ProductA');
+      expect(itemsY[0].color, Colors.blue);
+      expect(itemsY[0].symbol, LegendSymbol.square);
+
+      expect(itemsY2.length, 1);
+      expect(itemsY2[0].label, 'LossA');
+      expect(itemsY2[0].color, Colors.red);
+      expect(itemsY2[0].symbol, LegendSymbol.square);
     });
 
     test('LegendItem equality should work correctly', () {

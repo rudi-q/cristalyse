@@ -828,6 +828,7 @@ class CristalyseChart {
   ///
   /// Automatically generates a legend based on the color mapping column.
   /// Only works when a `color` mapping is defined in `.mapping()`.
+  /// Show titles for y and y2 axes titles for the legend group if showTitles is true.
   ///
   /// Basic usage:
   /// ```dart
@@ -897,6 +898,7 @@ class CristalyseChart {
     bool? interactive,
     Set<String>? hiddenCategories,
     void Function(String category, bool visible)? onToggle,
+    bool? showTitles,
   }) {
     _legendConfig = LegendConfig(
       position: position ?? LegendPosition.topRight,
@@ -913,6 +915,7 @@ class CristalyseChart {
       interactive: interactive ?? false,
       hiddenCategories: hiddenCategories,
       onToggle: onToggle,
+      showTitles: showTitles ?? false,
     );
     return this;
   }
