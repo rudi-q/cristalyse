@@ -746,6 +746,7 @@ class CristalyseChart {
     HoverConfig? hover,
     ClickConfig? click,
     PanConfig? pan,
+    ZoomConfig? zoom,
     bool enabled = true,
   }) {
     _interaction = ChartInteraction(
@@ -753,6 +754,7 @@ class CristalyseChart {
       hover: hover,
       click: click,
       pan: pan,
+      zoom: zoom,
       enabled: enabled,
     );
     return this;

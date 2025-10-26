@@ -6,6 +6,7 @@ class ChartInteraction {
   final HoverConfig? hover;
   final ClickConfig? click;
   final PanConfig? pan;
+  final ZoomConfig? zoom;
   final bool enabled;
 
   const ChartInteraction({
@@ -13,6 +14,7 @@ class ChartInteraction {
     this.hover,
     this.click,
     this.pan,
+    this.zoom,
     this.enabled = true,
   });
 
@@ -218,6 +220,16 @@ class PanController extends ChangeNotifier {
     _targetPan = null;
     notifyListeners();
   }
+}
+
+class ZoomConfig {
+  final bool updateXDomain;
+  final bool updateYDomain;
+
+  const ZoomConfig({
+    this.updateXDomain = false,
+    this.updateYDomain = false,
+  });
 }
 
 /// Default tooltip builders for common use cases

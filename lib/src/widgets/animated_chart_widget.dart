@@ -92,6 +92,7 @@ class _AnimatedCristalyseChartWidgetState
   DateTime? _lastPanCallback;
   Offset? _panStartPosition;
   Offset? _panCurrentPosition;
+  double _lastScale = 1.0;
 
   /// Pan domain tracking
   List<double>? _panXDomain;
@@ -223,13 +224,21 @@ class _AnimatedCristalyseChartWidgetState
     }
   }
 
-  void _handlePanStart(
-    BuildContext panContext,
-    DragStartDetails details,
+  void _handleScroll(
+    BuildContext scrollContext,
+    PointerScrollEvent event,
+    Rect plotArea,
+  ) {}
+
+  void _handleScaleStart(
+    BuildContext scaleContext,
+    ScaleStartDetails details,
     Rect plotArea,
   ) {
-    _panStartPosition = details.localPosition;
-    _panCurrentPosition = details.localPosition;
+    // Track whether this is a pan or zoom
+    _lastScale = 1.0;
+    _panStartPosition = details.localFocalPoint;
+    _panCurrentPosition = details.localFocalPoint;
 
     // Store original domains for panning
     if (widget.interaction.pan?.enabled == true) {
@@ -263,15 +272,15 @@ class _AnimatedCristalyseChartWidgetState
       final panInfo = _calculatePanInfo(
         plotArea,
         PanState.start,
-        details.localPosition,
+        details.localFocalPoint,
       );
       widget.interaction.pan!.onPanStart!(panInfo);
     }
   }
 
-  void _handlePanUpdate(
-    BuildContext panContext,
-    DragUpdateDetails details,
+  void _handleScaleUpdate(
+    BuildContext scaleContext,
+    ScaleUpdateDetails details,
     Rect plotArea,
   ) {
     final panConfig = widget.interaction.pan;
@@ -282,12 +291,23 @@ class _AnimatedCristalyseChartWidgetState
       return;
     }
 
-    _panCurrentPosition = details.localPosition;
+    _panCurrentPosition = details.localFocalPoint;
 
-    // Handle pan update callback with throttling - ONLY if pan is enabled
-    if (panConfig?.enabled == true) {
+    // Determine if this is a pan or zoom based on scale value
+    final isZoom = (details.scale - _lastScale).abs() > 0.01;
+    _lastScale = details.scale;
+
+    // Handle pan/zoom based on scale
+    if (isZoom && details.scale != 1.0) {
+      // This is a zoom/pinch gesture
+      _handleZoom(scaleContext, details, plotArea);
+    } else if (panConfig?.enabled == true) {
+      // This is a pan gesture (scale is close to 1.0)
+
+      final delta = details.focalPointDelta;
+
       // Update pan domains based on delta
-      _updatePanDomains(plotArea, details.delta);
+      _updatePanDomains(plotArea, delta);
 
       // Fire callbacks with throttling
       if (panConfig?.onPanUpdate != null) {
@@ -298,8 +318,8 @@ class _AnimatedCristalyseChartWidgetState
           final panInfo = _calculatePanInfo(
             plotArea,
             PanState.update,
-            details.localPosition,
-            details.delta,
+            details.localFocalPoint,
+            delta,
           );
           panConfig!.onPanUpdate!(panInfo);
         }
@@ -325,14 +345,14 @@ class _AnimatedCristalyseChartWidgetState
       );
 
       final point = _interactionDetector!.detectPoint(
-        details.localPosition,
+        details.localFocalPoint,
         maxDistance: hitRadius,
       );
 
       // Convert local position to global for tooltip positioning
-      final RenderBox renderBox = panContext.findRenderObject() as RenderBox;
+      final RenderBox renderBox = scaleContext.findRenderObject() as RenderBox;
       final Offset globalPosition = renderBox.localToGlobal(
-        details.localPosition,
+        details.localFocalPoint,
       );
 
       // Handle hover callbacks
@@ -341,17 +361,17 @@ class _AnimatedCristalyseChartWidgetState
       // Handle tooltips
       if (widget.interaction.tooltip?.builder != null) {
         if (point != null && widget.interaction.tooltip!.followPointer) {
-          showTooltip(panContext, point, globalPosition);
+          showTooltip(scaleContext, point, globalPosition);
         } else if (point == null) {
-          hideTooltip(panContext);
+          hideTooltip(scaleContext);
         }
       }
     }
   }
 
-  void _handlePanEnd(
-    BuildContext panEndContext,
-    DragEndDetails details,
+  void _handleScaleEnd(
+    BuildContext scaleEndContext,
+    ScaleEndDetails details,
     Rect plotArea,
   ) {
     if (!widget.interaction.enabled) return;
@@ -371,6 +391,7 @@ class _AnimatedCristalyseChartWidgetState
     _panStartPosition = null;
     _panCurrentPosition = null;
     _lastPanCallback = null;
+    _lastScale = 1.0;
 
     // Keep pan domains to maintain the panned view
     // Don't reset them so the chart stays in the panned position
@@ -378,7 +399,34 @@ class _AnimatedCristalyseChartWidgetState
     widget.interaction.hover?.onExit?.call(null);
 
     if (widget.interaction.tooltip?.builder != null) {
-      hideTooltip(panEndContext);
+      hideTooltip(scaleEndContext);
+    }
+  }
+
+  void _handleZoom(
+    BuildContext scaleContext,
+    ScaleUpdateDetails details,
+    Rect plotArea,
+  ) {
+    if (!widget.interaction.enabled) return;
+    if (widget.interaction.zoom?.updateXDomain == true) {
+      final plotAreaWidth = plotArea.width;
+      final focalPointX = details.localFocalPoint.dx - plotArea.left;
+      final zoomFractionLeft =
+          math.max(0.0, math.min(focalPointX / plotAreaWidth, 1.0));
+
+      final currentRange = _panXDomain![1] - _panXDomain![0];
+      final newRange = currentRange / details.scale;
+      final rangeChange = currentRange - newRange;
+
+      final shiftFromMin = rangeChange * zoomFractionLeft;
+      final shiftFromMax = rangeChange * (1 - zoomFractionLeft);
+
+      final newXMin = _panXDomain![0] + shiftFromMin;
+      final newXMax = _panXDomain![1] - shiftFromMax;
+
+      _panXDomain = [newXMin, newXMax];
+      setState(() {});
     }
   }
 
@@ -571,13 +619,22 @@ class _AnimatedCristalyseChartWidgetState
       chart = MouseRegion(
         onHover: (event) => _handleMouseHover(context, event, plotArea),
         onExit: (event) => _handleMouseExit(context, event),
-        child: GestureDetector(
-          onPanStart: (details) => _handlePanStart(context, details, plotArea),
-          onPanUpdate: (details) =>
-              _handlePanUpdate(context, details, plotArea),
-          onPanEnd: (details) => _handlePanEnd(context, details, plotArea),
-          onTapUp: (details) => _handleTap(context, details, plotArea),
-          child: chart,
+        child: Listener(
+          onPointerSignal: (event) {
+            if (event is PointerScrollEvent && widget.interaction.enabled) {
+              _handleScroll(context, event, plotArea);
+            }
+          },
+          child: GestureDetector(
+            onScaleStart: (details) =>
+                _handleScaleStart(context, details, plotArea),
+            onScaleUpdate: (details) =>
+                _handleScaleUpdate(context, details, plotArea),
+            onScaleEnd: (details) =>
+                _handleScaleEnd(context, details, plotArea),
+            onTapUp: (details) => _handleTap(context, details, plotArea),
+            child: chart,
+          ),
         ),
       );
     }
@@ -851,13 +908,22 @@ class _AnimatedCristalyseChartWidgetState
       chart = MouseRegion(
         onHover: (event) => _handleMouseHover(context, event, plotArea),
         onExit: (event) => _handleMouseExit(context, event),
-        child: GestureDetector(
-          onPanStart: (details) => _handlePanStart(context, details, plotArea),
-          onPanUpdate: (details) =>
-              _handlePanUpdate(context, details, plotArea),
-          onPanEnd: (details) => _handlePanEnd(context, details, plotArea),
-          onTapUp: (details) => _handleTap(context, details, plotArea),
-          child: chart,
+        child: Listener(
+          onPointerSignal: (event) {
+            if (event is PointerScrollEvent && tempWidget.interaction.enabled) {
+              _handleScroll(context, event, plotArea);
+            }
+          },
+          child: GestureDetector(
+            onScaleStart: (details) =>
+                _handleScaleStart(context, details, plotArea),
+            onScaleUpdate: (details) =>
+                _handleScaleUpdate(context, details, plotArea),
+            onScaleEnd: (details) =>
+                _handleScaleEnd(context, details, plotArea),
+            onTapUp: (details) => _handleTap(context, details, plotArea),
+            child: chart,
+          ),
         ),
       );
     }
