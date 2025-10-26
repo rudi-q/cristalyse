@@ -25,6 +25,7 @@ import '../graphs/pie_chart.dart';
 import '../graphs/progress_bars.dart';
 import '../graphs/scatter_plot.dart';
 import '../graphs/stacked_bar_chart.dart';
+import '../graphs/time_based_line_chart.dart';
 import '../router/app_router.dart';
 import '../utils/chart_feature_list.dart';
 
@@ -324,6 +325,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Gradient Bar Charts',
       'Advanced Gradient Effects',
       'Legend Examples',
+      'Time-Based Line Chart',
     ];
   }
 
@@ -349,6 +351,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Beautiful gradient fills for enhanced visual appeal • Linear gradients from light to dark',
       'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
       'Comprehensive legend showcase • 9 positioning options including new floating legends',
+      'Line chart with time-based data on x-axis • ',
     ];
   }
 
@@ -571,6 +574,9 @@ class _ChartScreenState extends State<ChartScreen>
       case 19:
         return buildLegendExampleTab(
             currentTheme, _groupedBarData, _sliderValue);
+      case 20:
+        return buildTimeBasedLineChartTab(
+            currentTheme, _lineChartData, _sliderValue);
       default:
         return Container();
     }
