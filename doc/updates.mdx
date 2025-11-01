@@ -12,6 +12,53 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 1, 2025" description="v1.12.0">
+  ### 🏔️ Boundary Clamping for Pan Operations
+  
+  **Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+  
+  **Control infinite panning with boundary clamping!**
+  
+  **Boundary Clamping:**
+  - New `boundaryClampingX` and `boundaryClampingY` options in `PanConfig`
+  - Prevents panning beyond data boundaries when enabled
+  - Maintains intuitive pan behavior within configured domain limits
+  - Perfect for constrained data exploration and guided navigation
+  
+  **Use Cases:**
+  - Prevent users from panning too far from relevant data
+  - Create bounded exploration areas for large datasets
+  - Maintain data context during navigation
+  - Improve UX for time-series and scientific visualizations
+  
+  ```dart
+  CristalyseChart()
+    .data(timeSeriesData)
+    .mapping(x: 'time', y: 'value')
+    .geomLine()
+    .interaction(
+      pan: PanConfig(
+        enabled: true,
+        boundaryClampingX: true,  // Clamp X-axis panning
+        boundaryClampingY: true,  // Clamp Y-axis panning
+      ),
+    )
+    .build()
+  ```
+  
+  **Technical Implementation:**
+  - Scale boundaries tracked via `valuesBoundaries` in `LinearScale`
+  - Pan domain clamping applied during interaction handling
+  - Seamless integration with existing pan callbacks and pan controller
+  - No changes to default behavior - opt-in feature
+  
+  **Quality Assurance:**
+  - Zero breaking changes - fully backward compatible
+  - Default clamping disabled (infinite panning by default)
+  - Tested with pan controller and manual pan interactions
+  - Production ready
+</Update>
+
 <Update label="October 24, 2025" description="v1.11.1">
   ### 🐛 Y-axis Bounds Fix During Panning
   

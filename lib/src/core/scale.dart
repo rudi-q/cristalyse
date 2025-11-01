@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import 'geometry.dart';
@@ -87,12 +88,15 @@ abstract class Scale {
 class LinearScale extends Scale {
   List<double> _domain = [0, 1];
   List<double>? _ticks; // Cached ticks from Wilkinson algorithm
+  List<double> _valuesBoundaries = [0, 1];
 
   LinearScale({super.limits, super.labelFormatter, super.title});
 
   @override
   List<double> get domain => _domain;
   set domain(List<double> value) => _domain = List.from(value);
+
+  List<double> get valuesBoundaries => _valuesBoundaries;
 
   @override
   double scale(dynamic value) {
@@ -113,6 +117,10 @@ class LinearScale extends Scale {
     final bounds = BoundsCalculator.calculateBounds(
         values, effectiveLimits, geometries,
         applyPadding: true);
+
+    if (values.isNotEmpty) {
+      _valuesBoundaries = [values.reduce(math.min), values.reduce(math.max)];
+    }
 
     if (bounds != const Bounds.ignored()) {
       // Use Wilkinson algorithm to extend bounds to nice round numbers
