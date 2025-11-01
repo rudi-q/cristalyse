@@ -1252,6 +1252,23 @@ class _AnimatedCristalyseChartWidgetState
     return sizeScale;
   }
 
+  void _updatePanDomain(
+      List<double> domain, double delta, bool clamp, Scale? scale) {
+    final newMin = domain[0] + delta;
+    final newMax = domain[1] + delta;
+    if (clamp && scale != null && scale is LinearScale) {
+      final clampMin = math.min(scale.valuesBoundaries[0], scale.domain[0]);
+      final clampMax = math.max(scale.valuesBoundaries[1], scale.domain[1]);
+      final shouldClamp = newMax > clampMax || newMin < clampMin;
+      if (shouldClamp) {
+        return;
+      }
+    }
+
+    domain[0] = newMin;
+    domain[1] = newMax;
+  }
+
   /// Update pan domains based on delta movement
   void _updatePanDomains(Rect plotArea, Offset delta) {
     if (_panXDomain == null) return;
@@ -1266,13 +1283,8 @@ class _AnimatedCristalyseChartWidgetState
 
     // Update the pan domain progressively - allow infinite panning
     if (widget.interaction.pan?.updateXDomain != false) {
-      // Default to true if not specified
-      final newXMin = _panXDomain![0] + xDataDelta;
-      final newXMax = _panXDomain![1] + xDataDelta;
-
-      // Always allow panning - no blocking, visual clipping will handle boundaries
-      _panXDomain![0] = newXMin;
-      _panXDomain![1] = newXMax;
+      _updatePanDomain(_panXDomain!, xDataDelta,
+          widget.interaction.pan?.boundaryClampingX == true, widget.xScale);
     }
 
     // Optionally handle Y panning too - allow infinite panning
@@ -1282,12 +1294,8 @@ class _AnimatedCristalyseChartWidgetState
       final yDataDelta =
           delta.dy / pixelsPerYUnit; // Positive for natural pan direction
 
-      final newYMin = _panYDomain![0] + yDataDelta;
-      final newYMax = _panYDomain![1] + yDataDelta;
-
-      // Always allow panning - visual clipping will handle boundaries
-      _panYDomain![0] = newYMin;
-      _panYDomain![1] = newYMax;
+      _updatePanDomain(_panYDomain!, yDataDelta,
+          widget.interaction.pan?.boundaryClampingY == true, widget.yScale);
     }
   }
 

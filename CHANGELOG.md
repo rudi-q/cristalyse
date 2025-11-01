@@ -1,3 +1,47 @@
+## 1.12.0 - 2025-11-01
+
+#### 🏔️ Boundary Clamping for Pan Operations
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**New Features:**
+- **Boundary Clamping**: Prevent infinite panning beyond data boundaries
+  - New `boundaryClampingX` and `boundaryClampingY` options in `PanConfig`
+  - Clamps pan domain within calculated scale boundaries
+  - Perfect for constrained data exploration and guided navigation
+
+**Technical Implementation:**
+- Scale boundaries tracked via `valuesBoundaries` in `LinearScale`
+- Computed in `LinearScale.computeDomain()` from data values
+- Pan domain clamping applied in `_updatePanDomain()` during interaction
+- Seamless integration with existing pan callbacks and pan controller
+- No changes to default behavior - opt-in feature
+
+**API Example:**
+```dart
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'time', y: 'value')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      boundaryClampingX: true,  // Clamp X-axis panning
+      boundaryClampingY: true,  // Clamp Y-axis panning
+    ),
+  )
+  .build()
+```
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Default clamping disabled (infinite panning by default)
+- Tested with pan controller and manual pan interactions
+- Production ready
+
+---
+
 ## 1.11.1 - 2025-10-24
 
 #### 🐛 Bug Fixes
