@@ -30,6 +30,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
   int totalPanEvents = 0;
   int activeDataPoints = 0;
   PanController panController = PanController();
+  bool boundaryClamping = false;
 
   @override
   void initState() {
@@ -207,7 +208,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                   ));
                 },
                 icon: Icon(Icons.refresh),
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
               const SizedBox(width: 16),
               IconButton(
@@ -215,8 +216,24 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                   panController.panReset();
                 },
                 icon: Icon(Icons.undo),
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).colorScheme.onPrimary,
               ),
+              Expanded(
+                child: SwitchListTile(
+                    title: Text(
+                      'Boundary Clamping',
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context).colorScheme.onPrimary),
+                      textAlign: TextAlign.right,
+                    ),
+                    value: boundaryClamping,
+                    onChanged: (value) {
+                      setState(() {
+                        boundaryClamping = value;
+                      });
+                    }),
+              )
             ],
           ),
         ),
@@ -262,6 +279,8 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                       onPanEnd: _handlePanEnd,
                       throttle: const Duration(milliseconds: 50),
                       controller: panController,
+                      boundaryClampingX: boundaryClamping,
+                      boundaryClampingY: boundaryClamping,
                     ),
                   )
                   .legend(

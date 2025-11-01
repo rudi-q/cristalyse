@@ -136,6 +136,10 @@ class PanConfig {
   /// The widget will listen/unlisten to this in its lifecycle.
   final PanController? controller;
 
+  /// Whether to clamp the pan to the boundaries of the chart.
+  final bool boundaryClampingX;
+  final bool boundaryClampingY;
+
   const PanConfig({
     this.enabled = true,
     this.onPanUpdate,
@@ -145,6 +149,8 @@ class PanConfig {
     this.updateXDomain = false,
     this.updateYDomain = false,
     this.controller,
+    this.boundaryClampingX = false,
+    this.boundaryClampingY = false,
   });
 }
 
