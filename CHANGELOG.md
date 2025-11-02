@@ -1,3 +1,30 @@
+## 1.12.1 - 2025-11-02
+
+#### 🐛 Bug Fixes
+
+**Right Padding & Secondary Y-Axis Alignment:**
+- Removed excessive hardcoded 80px right padding applied unconditionally for secondary y-axis
+- Widget layout now uses conservative 80px estimate only when y2Scale exists
+- Painter performs precise y2-axis space calculation at paint time with full scale information
+- Eliminates divergence between layout calculation and rendering, ensuring hit-testing alignment
+- Honors theme padding settings: `rightPadding = theme.padding.right + y2AxisSpace`
+- Added null check for `y2Scale` to prevent unnecessary padding when secondary axis is absent
+
+**Impact:**
+- Charts without secondary y-axis now use only theme padding (no waste)
+- Charts with secondary y-axis get proper space allocation based on actual label widths
+- Consistent plot area between widget layout and painter rendering phases
+- Correct hit-testing alignment for interactions (hover, click, pan)
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Maintains consistent plot area between layout and render phases
+- Proper hit-testing alignment for secondary y-axis interactions
+- Fixes excessive padding issues on charts without secondary y-axis
+
+---
+
 ## 1.12.0 - 2025-11-01
 
 #### 🏔️ Boundary Clamping for Pan Operations

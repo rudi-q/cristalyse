@@ -87,7 +87,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.11.1"
+    version: "1.12.1"
   crypto:
     dependency: transitive
     description:

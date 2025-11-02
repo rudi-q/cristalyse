@@ -12,6 +12,29 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 2, 2025" description="v1.12.1">
+  ### 🐛 Right Padding & Secondary Y-Axis Fixes
+  
+  **Fixed excessive right padding and layout misalignment**
+  - Removed hardcoded 80px padding applied unconditionally for secondary y-axis
+  - Charts without secondary y-axis now use only theme padding (no waste)
+  - Widget layout uses conservative estimate only when y2Scale exists
+  - Painter performs precise calculation at paint time with full scale information
+  - Eliminates divergence between layout and rendering phases
+  - Added proper null checking for `y2Scale` to prevent unnecessary padding
+  
+  **Benefits:**
+  - Better space utilization on single-axis charts
+  - Proper secondary y-axis spacing based on actual label widths
+  - Ensures hit-testing alignment for interactions (hover, click, pan)
+  - Consistent plot area between layout and render phases
+  
+  **Quality Assurance:**
+  - Zero breaking changes - fully backward compatible
+  - Improved interaction reliability with secondary y-axis charts
+  - Maintains consistent dimensions during pan/zoom operations
+</Update>
+
 <Update label="November 1, 2025" description="v1.12.0">
   ### 🏔️ Boundary Clamping for Pan Operations
   

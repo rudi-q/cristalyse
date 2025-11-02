@@ -201,8 +201,7 @@ class AnimatedChartPainter extends CustomPainter {
                 ? _labelToTitleSpacing + titleFontSize // gap + title height
                 : 0.0)
         : 0.0;
-    final rightPadding =
-        (hasSecondaryY ? 80.0 : theme.padding.right) + y2AxisSpace;
+    final rightPadding = theme.padding.right + y2AxisSpace;
 
     // Space for X-axis labels + optional title (not rotated, height is vertical)
     final xAxisSpace = this.xScale != null

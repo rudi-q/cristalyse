@@ -543,9 +543,8 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
-    final hasSecondaryY = hasSecondaryYAxis(
-        y2Column: widget.y2Column, geometries: widget.geometries);
-    final rightPadding = hasSecondaryY ? 80.0 : widget.theme.padding.right;
+    final y2AxisSpace = _estimateY2AxisSpace(widget);
+    final rightPadding = widget.theme.padding.right + y2AxisSpace;
 
     final plotArea = Rect.fromLTWH(
       widget.theme.padding.left,
@@ -823,9 +822,8 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
-    final hasSecondaryY = hasSecondaryYAxis(
-        y2Column: tempWidget.y2Column, geometries: tempWidget.geometries);
-    final rightPadding = hasSecondaryY ? 80.0 : tempWidget.theme.padding.right;
+    final y2AxisSpace = _estimateY2AxisSpace(tempWidget);
+    final rightPadding = tempWidget.theme.padding.right + y2AxisSpace;
 
     final plotArea = Rect.fromLTWH(
       tempWidget.theme.padding.left,
@@ -1063,6 +1061,20 @@ class _AnimatedCristalyseChartWidgetState
           ],
         );
     }
+  }
+
+  /// Estimate Y2-axis space for layout purposes (conservative upper bound)
+  /// The painter will calculate the precise value at paint time.
+  /// This is only used for layout calculations where scales may not be fully set up.
+  double _estimateY2AxisSpace(AnimatedCristalyseChartWidget chartWidget) {
+    final hasSecondaryY = hasSecondaryYAxis(
+      y2Column: chartWidget.y2Column,
+      geometries: chartWidget.geometries,
+    );
+
+    // Use conservative estimate: 80px is a reasonable upper bound for most y2-axis labels
+    // The painter will refine this with actual label measurements at paint time
+    return (hasSecondaryY && chartWidget.y2Scale != null) ? 80.0 : 0.0;
   }
 
   void _setupScales(double width, double height) {
