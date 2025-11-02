@@ -1074,7 +1074,7 @@ class _AnimatedCristalyseChartWidgetState
 
     // Use conservative estimate: 80px is a reasonable upper bound for most y2-axis labels
     // The painter will refine this with actual label measurements at paint time
-    return hasSecondaryY ? 80.0 : 0.0;
+    return (hasSecondaryY && chartWidget.y2Scale != null) ? 80.0 : 0.0;
   }
 
   void _setupScales(double width, double height) {
