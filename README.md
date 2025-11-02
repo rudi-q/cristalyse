@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.12.1** - Production ready with boundary clamping for pan operations, programmatic pan controller, interactive floating legends, and intelligent axis bounds
+**Current Version: 1.13.0** - Production ready with optional Y-axis titles in legends, boundary clamping for pan operations, programmatic pan controller, interactive floating legends, and intelligent axis bounds
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1127,6 +1127,7 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.10.0** - **Axis titles & bubble size guide** with optional titles for all axes, visual bubble size legends, smart spacing calculations, and bubble legend validation fixes (by [@davidlrichmond](https://github.com/davidlrichmond))
 - ✅ **v1.11.0** - **Programmatic pan controller** for external chart panning control via PanController with panTo() and panReset() methods (by [@jbbjarnason](https://github.com/jbbjarnason))
 - ✅ **v1.12.0** - **Boundary clamping for pan operations** with optional boundaryClampingX and boundaryClampingY to prevent infinite panning beyond data boundaries (by [@jbbjarnason](https://github.com/jbbjarnason))
+- ✅ **v1.13.0** - **Optional Y-axis titles in legends** for improved multi-axis chart readability (by [@jbbjarnason](https://github.com/jbbjarnason))
 
 ## Support This Project
 

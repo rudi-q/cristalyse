@@ -1,3 +1,32 @@
+## 1.13.0 - 2025-11-02
+
+#### 🎨 Legend Enhancements
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+**New Features:**
+- **Optional Y-Axis Titles in Legends**: Add `showTitles` option to display Y-axis titles alongside legend entries
+  - Improves chart legend readability when multiple Y-axes are present
+  - Optional feature - legends work as before by default
+  - Seamless integration with existing legend styling and layout
+
+**Technical Implementation:**
+- Extended `LegendWidget` to support optional Y-axis title rendering
+- Enhanced `legend.dart` core logic to handle title display
+- Updated chart configuration to expose new option
+- Includes comprehensive test coverage
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- New feature is opt-in
+- All tests passing including new legend test cases
+- Production ready
+
+---
+
 ## 1.12.1 - 2025-11-02
 
 #### 🐛 Bug Fixes

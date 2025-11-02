@@ -210,14 +210,21 @@ class _ChartScreenState extends State<ChartScreen>
           seasonalConversion +
           (math.Random().nextDouble() - 0.5) * 2;
 
-      final dataPoint = {
+      final revenuePoint = {
         'month': month,
         'revenue': math.max(80.0, revenue), // Ensure positive revenue
-        'conversion_rate': math.max(10.0,
-            math.min(30.0, conversionRate)), // Keep conversion rate reasonable
+        'product': 'Product Sales',
       };
 
-      _dualAxisData.add(dataPoint);
+      final conversionPoint = {
+        'month': month,
+        'conversion_rate': math.max(10.0,
+            math.min(30.0, conversionRate)), // Keep conversion rate reasonable
+        'product': 'Conversion Rate',
+      };
+
+      _dualAxisData.add(revenuePoint);
+      _dualAxisData.add(conversionPoint);
     }
   }
 

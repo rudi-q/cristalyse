@@ -75,6 +75,9 @@ class LegendConfig {
   final void Function(String category, bool visible)?
       onToggle; // Callback when legend item is toggled
 
+  /// Whether to show y and y2 axes titles for the legend group
+  final bool showTitles;
+
   const LegendConfig({
     this.position = LegendPosition.topRight,
     this.orientation = LegendOrientation.auto,
@@ -90,6 +93,7 @@ class LegendConfig {
     this.interactive = false,
     this.hiddenCategories,
     this.onToggle,
+    this.showTitles = false,
   });
 
   /// Get the effective orientation based on position
@@ -156,7 +160,8 @@ class LegendConfig {
           borderRadius == other.borderRadius &&
           floatingOffset == other.floatingOffset &&
           floatingDraggable == other.floatingDraggable &&
-          interactive == other.interactive;
+          interactive == other.interactive &&
+          showTitles == other.showTitles;
   // Note: hiddenCategories and onToggle intentionally excluded from equality
 
   @override
@@ -190,6 +195,7 @@ class LegendConfig {
     bool? interactive,
     Set<String>? hiddenCategories,
     void Function(String, bool)? onToggle,
+    bool? showTitles,
   }) {
     return LegendConfig(
       position: position ?? this.position,
@@ -206,6 +212,7 @@ class LegendConfig {
       interactive: interactive ?? this.interactive,
       hiddenCategories: hiddenCategories ?? this.hiddenCategories,
       onToggle: onToggle ?? this.onToggle,
+      showTitles: showTitles ?? this.showTitles,
     );
   }
 }

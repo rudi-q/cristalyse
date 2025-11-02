@@ -644,9 +644,11 @@ class _AnimatedCristalyseChartWidgetState
     final config = widget.legendConfig!;
 
     // Generate legend items from chart data
-    final legendItems = LegendGenerator.generateFromData(
+    final (legendItemsY, legendItemsY2) = LegendGenerator.generateFromData(
       data: widget.data,
       colorColumn: widget.colorColumn,
+      yColumn: widget.yColumn,
+      y2Column: widget.y2Column,
       colorPalette: widget.theme.colorPalette,
       geometries: widget.geometries,
     );
@@ -659,7 +661,9 @@ class _AnimatedCristalyseChartWidgetState
     );
 
     // If no legend items and no bubble guide, return chart as-is
-    if (legendItems.isEmpty && bubbleGuide == null) return chart;
+    if (legendItemsY.isEmpty && legendItemsY2.isEmpty && bubbleGuide == null) {
+      return chart;
+    }
 
     // Use StatefulBuilder to manage interactive legend state
     if (config.interactive && config.hiddenCategories == null) {
@@ -686,7 +690,10 @@ class _AnimatedCristalyseChartWidgetState
       final filteredChart = _buildChartWidget(context, filteredData);
 
       final legend = LegendWidget(
-        items: legendItems,
+        yTitle: widget.yScale?.title,
+        itemsY: legendItemsY,
+        y2Title: widget.y2Scale?.title,
+        itemsY2: legendItemsY2,
         config: enhancedConfig,
         theme: widget.theme,
         bubbleGuide: bubbleGuide,
@@ -699,7 +706,10 @@ class _AnimatedCristalyseChartWidgetState
       final filteredChart = _buildChartWidget(context, filteredData);
 
       final legend = LegendWidget(
-        items: legendItems,
+        yTitle: widget.yScale?.title,
+        itemsY: legendItemsY,
+        y2Title: widget.y2Scale?.title,
+        itemsY2: legendItemsY2,
         config: config,
         theme: widget.theme,
         bubbleGuide: bubbleGuide,
@@ -709,7 +719,10 @@ class _AnimatedCristalyseChartWidgetState
     } else {
       // Non-interactive legend
       final legend = LegendWidget(
-        items: legendItems,
+        yTitle: widget.yScale?.title,
+        itemsY: legendItemsY,
+        y2Title: widget.y2Scale?.title,
+        itemsY2: legendItemsY2,
         config: config,
         theme: widget.theme,
         bubbleGuide: bubbleGuide,

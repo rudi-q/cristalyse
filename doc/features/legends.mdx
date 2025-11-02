@@ -642,6 +642,46 @@ If you were manually creating legends, you can now use the built-in functionalit
   </Accordion>
 </AccordionGroup>
 
+## Y-Axis Titles in Legends
+
+<Info>
+**New in v1.13.0**: Display Y-axis titles alongside legend entries for multi-axis charts!
+</Info>
+
+For dual-axis charts, show axis titles in the legend to clarify which data series maps to which Y-axis:
+
+```dart
+CristalyseChart()
+  .data(dualAxisData)
+  .mapping(x: 'month', y: 'revenue')
+  .mappingY2('conversion_rate')
+  .geomBar(yAxis: YAxis.primary)
+  .geomLine(yAxis: YAxis.secondary)
+  .scaleYContinuous(title: 'Revenue ($K)')
+  .scaleY2Continuous(title: 'Conversion Rate (%)')
+  .legend(
+    position: LegendPosition.bottom,
+    showTitles: true,  // Show axis titles in legend
+  )
+  .build();
+```
+
+**Features**:
+- Displays Y-axis titles alongside respective data series
+- Improves legend readability for multi-axis charts
+- Helps users understand which metric uses which axis
+- Works with all legend positioning options
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `showTitles` | `bool` | `false` | Display Y-axis titles in legend entries |
+
+<Tip>
+**Pro Tip**: Combine `showYAxisTitles` with descriptive axis titles for maximum clarity in multi-axis charts.
+</Tip>
+
 ## What's Next?
 
 - Learn about [Custom Themes](/advanced/custom-themes) to create branded chart experiences

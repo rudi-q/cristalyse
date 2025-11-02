@@ -12,6 +12,37 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 2, 2025" description="v1.13.0">
+  ### 🎨 Legend Enhancements
+  
+  **Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+  
+  **Optional Y-Axis Titles in Legends!**
+  
+  **Legend Enhancements:**
+  - New `showTitles` option to display Y-axis titles alongside legend entries
+  - Improves chart legend readability when multiple Y-axes are present
+  - Optional feature - legends work as before by default
+  - Seamless integration with existing legend styling and layout
+  
+  **Use Cases:**
+  - Multi-axis charts with clearer data context
+  - Better legend readability for complex visualizations
+  - Maintain visual hierarchy with optional titles
+  
+  **Technical Implementation:**
+  - Extended `LegendWidget` to support optional Y-axis title rendering
+  - Enhanced `legend.dart` core logic to handle title display
+  - Updated chart configuration to expose new option
+  - Comprehensive test coverage included
+  
+  **Quality Assurance:**
+  - All existing tests continue to pass
+  - Zero breaking changes - fully backward compatible
+  - New feature is opt-in
+  - Production ready
+</Update>
+
 <Update label="November 2, 2025" description="v1.12.1">
   ### 🐛 Right Padding & Secondary Y-Axis Fixes
   
