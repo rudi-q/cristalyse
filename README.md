@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.12.0** - Production ready with boundary clamping for pan operations, programmatic pan controller, interactive floating legends, and intelligent axis bounds
+**Current Version: 1.12.1** - Production ready with boundary clamping for pan operations, programmatic pan controller, interactive floating legends, and intelligent axis bounds
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
