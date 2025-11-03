@@ -1,3 +1,35 @@
+## 1.13.1 - 2025-11-03
+
+#### 🐛 Bug Fixes
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Fixed Label Size Calculation:**
+- Label size now deduced based on formatter with default font size
+- Calculates actual text width including padding for more accurate layout
+- Ensures consistent label spacing in both linear and ordinal scales
+- Improves chart readability with properly-sized axis labels
+
+**Technical Details:**
+- Added `_calculatePixelsPerLabel()` method to measure text dimensions
+- Uses TextPainter with default TextStyle (fontSize: 12) for accurate width calculation
+- Includes 10px padding (theme-deferred in future)
+- Applies calculated pixels per label to both LinearScale and OrdinalScale
+- Made `optimalPixelsPerLabel` private as implementation detail
+
+**Impact:**
+- More accurate label sizing across all chart types
+- Better space utilization for axis labels
+- Consistent behavior regardless of label content length
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Single file changed with focused bug fix
+- Maintains existing API surface
+
+---
+
 ## 1.13.0 - 2025-11-02
 
 #### 🎨 Legend Enhancements

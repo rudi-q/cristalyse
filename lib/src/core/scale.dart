@@ -21,7 +21,7 @@ abstract class Scale {
 
   /// Optimal pixels per axis label for readability
   /// Could be threaded as a parameter into API if users demand it
-  static const double optimalPixelsPerLabel = 60.0;
+  static const double _optimalPixelsPerLabel = 60.0;
 
   Scale({LabelCallback? labelFormatter, this.limits, this.title})
       : _formatter = LabelFormatter(labelFormatter);
@@ -82,6 +82,22 @@ abstract class Scale {
   /// Internal bounds setting - each scale implements its own logic.
   void setBoundsInternal(List<double> values,
       (double?, double?)? effectiveLimits, List<Geometry> geometries);
+
+  double _calculatePixelsPerLabel(dynamic min, dynamic max) {
+    // todo get the actual text style from the theme
+    const TextStyle textStyle = TextStyle(fontSize: 12);
+    const double padding = 10; // todo defer from theme
+
+    final textMin = TextPainter(
+      text: TextSpan(text: formatLabel(min), style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final textMax = TextPainter(
+      text: TextSpan(text: formatLabel(max), style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return math.max(textMin.width, textMax.width) + padding;
+  }
 }
 
 /// Linear scale for continuous data
@@ -133,8 +149,11 @@ class LinearScale extends Scale {
         return;
       }
 
-      final targetLabelCount =
-          (screenLength / Scale.optimalPixelsPerLabel).round();
+      final pixelsPerLabel = math.max(
+          _calculatePixelsPerLabel(bounds.min, bounds.max),
+          Scale._optimalPixelsPerLabel);
+
+      final targetLabelCount = (screenLength / pixelsPerLabel).round();
       final targetDensity = targetLabelCount / screenLength; // labels per pixel
 
       final niceTicks = WilkinsonLabeling.extended(
@@ -225,9 +244,12 @@ class OrdinalScale extends Scale {
     // Handle edge case: zero-size screen (e.g., during initialization)
     if (screenLength == 0) return List.from(_domain);
 
-    final targetLabelCount = (screenLength / Scale.optimalPixelsPerLabel)
-        .round()
-        .clamp(1, _domain.length);
+    final pixelsPerLabel = math.max(
+        _calculatePixelsPerLabel(_domain.first, _domain.last),
+        Scale._optimalPixelsPerLabel);
+
+    final targetLabelCount =
+        (screenLength / pixelsPerLabel).round().clamp(1, _domain.length);
 
     // If we have fewer categories than target, show all
     if (_domain.length <= targetLabelCount) {

@@ -12,6 +12,34 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 3, 2025" description="v1.13.1">
+  ### 🐛 Label Size Calculation Fix
+  
+  **Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+  
+  **Fixed label size deduction based on formatter**
+  - Label size now calculated based on actual text width with default font size
+  - Ensures consistent and accurate label spacing in charts
+  - Improves readability with properly-sized axis labels
+  
+  **Technical Improvements:**
+  - Added `_calculatePixelsPerLabel()` method to measure text dimensions
+  - Uses TextPainter with default TextStyle (fontSize: 12) for accurate measurement
+  - Includes proper padding calculation (10px)
+  - Applied to both LinearScale and OrdinalScale
+  - Made `optimalPixelsPerLabel` private
+  
+  **Benefits:**
+  - More accurate label sizing across all chart types
+  - Better space utilization for axis labels
+  - Consistent behavior regardless of label content
+  
+  **Quality Assurance:**
+  - Zero breaking changes - fully backward compatible
+  - Focused single-file bug fix
+  - Production ready
+</Update>
+
 <Update label="November 2, 2025" description="v1.13.0">
   ### 🎨 Legend Enhancements
   
