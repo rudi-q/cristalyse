@@ -538,9 +538,13 @@ class CristalyseChart {
     double? max,
     LabelCallback? labels,
     String? title,
+    TickConfig? tickConfig,
   }) {
-    _xScale =
-        LinearScale(limits: (min, max), labelFormatter: labels, title: title);
+    _xScale = LinearScale(
+        limits: (min, max),
+        labelFormatter: labels,
+        title: title,
+        tickConfig: tickConfig);
     return this;
   }
 
@@ -550,9 +554,13 @@ class CristalyseChart {
     double? max,
     LabelCallback? labels,
     String? title,
+    TickConfig? tickConfig,
   }) {
-    _yScale =
-        LinearScale(limits: (min, max), labelFormatter: labels, title: title);
+    _yScale = LinearScale(
+        limits: (min, max),
+        labelFormatter: labels,
+        title: title,
+        tickConfig: tickConfig);
     return this;
   }
 
@@ -560,16 +568,21 @@ class CristalyseChart {
   ///
   /// Example:
   /// ```dart
-  /// chart.scaleY2Continuous(min: 0, max: 100, title: 'Conversion Rate (%)') // For percentage data
+  /// chart.scaleY2Continuous(min: 0, max: 100, title: 'Conversion Rate (%)', tickConfig: TickConfig(simpleLinear: true)) // For percentage data
+  /// chart.scaleY2Continuous(min: 0, max: 100, title: 'Conversion Rate (%)', tickConfig: TickConfig(ticks: [0, 25, 50, 75, 100])) // For percentage data
   /// ```
   CristalyseChart scaleY2Continuous({
     double? min,
     double? max,
     LabelCallback? labels,
     String? title,
+    TickConfig? tickConfig,
   }) {
-    _y2Scale =
-        LinearScale(limits: (min, max), labelFormatter: labels, title: title);
+    _y2Scale = LinearScale(
+        limits: (min, max),
+        labelFormatter: labels,
+        title: title,
+        tickConfig: tickConfig);
     return this;
   }
 

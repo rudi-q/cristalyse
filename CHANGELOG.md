@@ -1,3 +1,58 @@
+## 1.14.0 - 2025-11-09
+
+#### 🎯 Tick Configuration for Scales
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+**New Features:**
+- **TickConfig Class**: Control tick generation on continuous scales
+  - `ticks: List<double>?` - Specify explicit tick positions
+  - `simpleLinear: bool` - Use uniform linear spacing instead of Wilkinson's algorithm
+  - Optional parameters - scales work as before by default
+
+- **Explicit Tick Specification**: Pass custom tick positions for precise control
+  - Industry-standard reference points (freezing point, percentiles, etc.)
+  - Domain-specific intervals for specialized charts
+  - Consistent tick positions across multiple related charts
+
+- **Simple Linear Ticking**: Generate evenly-spaced ticks
+  - Predictable, uniform tick intervals
+  - Ideal for time-series and scientific/technical charts
+  - Alternative to default Wilkinson's algorithm
+
+**Technical Implementation:**
+- Added `TickConfig` class with `ticks` and `simpleLinear` properties
+- Extended `LinearScale` to accept and store `TickConfig`
+- `scaleXContinuous`, `scaleYContinuous`, `scaleY2Continuous` now accept optional `tickConfig` parameter
+- Enhanced Wilkinson labeling algorithm with simple linear fallback
+- New example: TimeBasedLineChartWidget demonstrating TickConfig usage
+
+**API Example:**
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'value')
+  .scaleXContinuous(
+    tickConfig: TickConfig(simpleLinear: true),
+  )
+  .scaleYContinuous(
+    tickConfig: TickConfig(ticks: [0, 25, 50, 75, 100]),
+  )
+  .geomLine()
+  .build()
+```
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- New feature is opt-in with sensible defaults
+- Backward compatible API - all parameters optional
+- Production ready
+
+---
+
 ## 1.13.1 - 2025-11-03
 
 #### 🐛 Bug Fixes

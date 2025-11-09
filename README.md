@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.13.1** - Production ready with optional Y-axis titles in legends, boundary clamping for pan operations, programmatic pan controller, interactive floating legends, and intelligent axis bounds
+**Current Version: 1.14.0** - Production ready with tick configuration for continuous scales, optional Y-axis titles in legends, boundary clamping for pan operations, programmatic pan controller, interactive floating legends, and intelligent axis bounds
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1128,8 +1128,9 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.11.0** - **Programmatic pan controller** for external chart panning control via PanController with panTo() and panReset() methods (by [@jbbjarnason](https://github.com/jbbjarnason))
 - ✅ **v1.12.0** - **Boundary clamping for pan operations** with optional boundaryClampingX and boundaryClampingY to prevent infinite panning beyond data boundaries (by [@jbbjarnason](https://github.com/jbbjarnason))
 - ✅ **v1.13.0** - **Optional Y-axis titles in legends** for improved multi-axis chart readability (by [@jbbjarnason](https://github.com/jbbjarnason))
+- ✅ **v1.14.0** - **Tick configuration for scales** with explicit tick positions and simple linear spacing options (by [@jbbjarnason](https://github.com/jbbjarnason))
 
-## Support This Project
+|## Support This Project
 
 **Love Cristalyse?** Your support helps me dedicate more time to building the Flutter charting library you deserve!
 

@@ -12,6 +12,58 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 9, 2025" description="v1.14.0">
+  ### 🎯 Tick Configuration for Scales
+  
+  **Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+  
+  **Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+  
+  **Control Tick Generation:**
+  - New `TickConfig` class for customizing tick marks and labels
+  - `ticks` parameter: Specify explicit tick positions for precise control
+  - `simpleLinear` flag: Generate uniform linear spacing instead of Wilkinson's algorithm
+  
+  **Use Cases:**
+  - Industry-standard reference points (freezing point, percentiles, etc.)
+  - Time-series charts with consistent intervals
+  - Scientific/technical charts requiring uniform spacing
+  - Matching ticks across multiple related charts
+  
+  **Example:**
+  ```dart
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'time', y: 'value')
+    .scaleXContinuous(
+      tickConfig: TickConfig(simpleLinear: true),  // Uniform spacing
+    )
+    .scaleYContinuous(
+      tickConfig: TickConfig(ticks: [0, 25, 50, 75, 100]),  // Custom ticks
+    )
+    .geomLine()
+    .build()
+  ```
+  
+  **New Example:**
+  - TimeBasedLineChartWidget demonstrating TickConfig usage
+  - Toggle between simple linear and Wilkinson's algorithm
+  - Practical reference for common use cases
+  
+  **Technical Implementation:**
+  - Added `TickConfig` class with `ticks` and `simpleLinear` properties
+  - Extended `LinearScale` to accept and store `TickConfig`
+  - Enhanced Wilkinson labeling algorithm with simple linear fallback
+  - All three scale methods (`scaleXContinuous`, `scaleYContinuous`, `scaleY2Continuous`) now support `tickConfig`
+  
+  **Quality Assurance:**
+  - Zero breaking changes - fully backward compatible
+  - New feature is opt-in with sensible defaults
+  - Production ready
+  
+  [View tick configuration documentation](/advanced/scales)
+</Update>
+
 <Update label="November 3, 2025" description="v1.13.1">
   ### 🐛 Label Size Calculation Fix
   
