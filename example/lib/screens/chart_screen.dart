@@ -26,6 +26,7 @@ import '../graphs/progress_bars.dart';
 import '../graphs/scatter_plot.dart';
 import '../graphs/stacked_bar_chart.dart';
 import '../graphs/time_based_line_chart.dart';
+import '../graphs/zoom_example.dart';
 import '../router/app_router.dart';
 import '../utils/chart_feature_list.dart';
 
@@ -326,6 +327,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Advanced Gradient Effects',
       'Legend Examples',
       'Time-Based Line Chart',
+      'Zoom & Navigation Demo',
     ];
   }
 
@@ -352,6 +354,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
       'Comprehensive legend showcase • 9 positioning options including new floating legends',
       'Line chart with time-based data on x-axis • ',
+      'Pinch, scroll, and button-based zoom controls with live callbacks',
     ];
   }
 
@@ -577,6 +580,8 @@ class _ChartScreenState extends State<ChartScreen>
       case 20:
         return buildTimeBasedLineChartTab(
             currentTheme, _lineChartData, _sliderValue);
+      case 21:
+        return buildZoomExampleTab(currentTheme, _sliderValue);
       default:
         return Container();
     }
@@ -710,6 +715,20 @@ class _ChartScreenState extends State<ChartScreen>
           _buildStatsCard('Positions', '9', 'Including Floating', Colors.blue),
           _buildStatsCard('Auto-Orient', 'Yes', 'Smart Layout', Colors.green),
           _buildStatsCard('Themes', 'All', 'Dark Mode Ready', Colors.purple),
+        ];
+      case 20:
+        return [
+          _buildStatsCard('Time Range', '12 mo', 'Daily cadence', Colors.blue),
+          _buildStatsCard('Seasonality', 'High', 'Wave patterns', Colors.green),
+          _buildStatsCard('Noise Level', 'Low', 'Smoothed', Colors.orange),
+        ];
+      case 21:
+        return [
+          _buildStatsCard('Zoom Modes', '3', 'X, Y or both', Colors.blue),
+          _buildStatsCard(
+              'Scroll Sens.', '0.0005-0.0035', 'Wheel control', Colors.orange),
+          _buildStatsCard(
+              'Floating UI', 'Buttons', '+/- helpers', Colors.purple),
         ];
       default:
         return [];
@@ -856,6 +875,8 @@ class _ChartScreenState extends State<ChartScreen>
       chartHeight = 600; // Larger height for bubble charts to prevent cutoff
     } else if (title.contains('Heatmap') || title.contains('Contributions')) {
       chartHeight = 450; // Slightly larger for heatmaps
+    } else if (widget.chartIndex == 21 || title.contains('Zoom & Navigation')) {
+      chartHeight = 640; // Extra room for zoom demo controls + chart
     }
 
     return Scaffold(

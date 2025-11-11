@@ -139,6 +139,13 @@ List<String> getChartFeatures(int tabIndex) {
         'Custom gradient directions and color stops',
         'Performance optimized with gradient caching and reuse'
       ];
+    case 21: // Zoom demo
+      return [
+        'Pinch, scroll, and button zoom build on the shared ZoomConfig API',
+        'Live ZoomInfo callbacks expose visible ranges and scale factors',
+        'Axis picker toggles X, Y, or dual-axis zooming at runtime',
+        'Wheel sensitivity and button steps are fully configurable',
+      ];
     default:
       return [];
   }

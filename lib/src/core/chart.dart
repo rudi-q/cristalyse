@@ -759,6 +759,7 @@ class CristalyseChart {
     HoverConfig? hover,
     ClickConfig? click,
     PanConfig? pan,
+    ZoomConfig? zoom,
     bool enabled = true,
   }) {
     _interaction = ChartInteraction(
@@ -766,6 +767,7 @@ class CristalyseChart {
       hover: hover,
       click: click,
       pan: pan,
+      zoom: zoom,
       enabled: enabled,
     );
     return this;
@@ -817,6 +819,29 @@ class CristalyseChart {
         enabled: true,
         onPanUpdate: callback,
         throttle: throttle ?? const Duration(milliseconds: 100),
+      ),
+      enabled: true,
+    );
+    return this;
+  }
+
+  /// Quick zoom setup (defaults to X-axis zooming)
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.onZoom((info) {
+  ///   print('Zoom scale: ${info.scaleX}');
+  /// });
+  /// ```
+  CristalyseChart onZoom(
+    ZoomCallback callback, {
+    ZoomAxis axis = ZoomAxis.x,
+  }) {
+    _interaction = ChartInteraction(
+      zoom: ZoomConfig(
+        enabled: true,
+        axes: axis,
+        onZoomUpdate: callback,
       ),
       enabled: true,
     );

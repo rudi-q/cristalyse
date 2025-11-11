@@ -6,6 +6,7 @@ class ChartInteraction {
   final HoverConfig? hover;
   final ClickConfig? click;
   final PanConfig? pan;
+  final ZoomConfig? zoom;
   final bool enabled;
 
   const ChartInteraction({
@@ -13,6 +14,7 @@ class ChartInteraction {
     this.hover,
     this.click,
     this.pan,
+    this.zoom,
     this.enabled = true,
   });
 
@@ -121,6 +123,7 @@ typedef TooltipBuilder = Widget Function(DataPointInfo point);
 typedef HoverCallback = void Function(DataPointInfo? point);
 typedef ClickCallback = void Function(DataPointInfo point);
 typedef PanCallback = void Function(PanInfo info);
+typedef ZoomCallback = void Function(ZoomInfo info);
 
 /// Configuration for pan interactions
 class PanConfig {
@@ -156,6 +159,9 @@ class PanConfig {
 
 /// Pan state information
 enum PanState { start, update, end }
+
+/// Zoom interaction lifecycle states
+enum ZoomState { start, update, end }
 
 /// Information about the current pan operation
 class PanInfo {
@@ -304,5 +310,70 @@ class DefaultTooltips {
         ],
       );
     };
+  }
+}
+
+/// Axes that can respond to zooming
+enum ZoomAxis { x, y, both }
+
+/// Configuration for zoom interactions
+class ZoomConfig {
+  final bool enabled;
+  final ZoomAxis axes;
+  final double maxScale;
+  final double minScale;
+  final double wheelSensitivity;
+  final double buttonStep;
+  final bool showButtons;
+  final Alignment buttonAlignment;
+  final EdgeInsets buttonPadding;
+  final bool enableDoubleTap;
+  final ZoomCallback? onZoomStart;
+  final ZoomCallback? onZoomUpdate;
+  final ZoomCallback? onZoomEnd;
+
+  const ZoomConfig({
+    this.enabled = true,
+    this.axes = ZoomAxis.x,
+    this.maxScale = 16.0,
+    this.minScale = 1.0,
+    this.wheelSensitivity = 0.0015,
+    this.buttonStep = 1.4,
+    this.showButtons = true,
+    this.buttonAlignment = Alignment.bottomRight,
+    this.buttonPadding = const EdgeInsets.all(12),
+    this.enableDoubleTap = true,
+    this.onZoomStart,
+    this.onZoomUpdate,
+    this.onZoomEnd,
+  }) : assert(maxScale >= minScale && maxScale > 0 && minScale > 0,
+            'Zoom scales must be positive and max >= min');
+}
+
+/// Information emitted during zoom interactions
+class ZoomInfo {
+  final double? visibleMinX;
+  final double? visibleMaxX;
+  final double? visibleMinY;
+  final double? visibleMaxY;
+  final double? scaleX;
+  final double? scaleY;
+  final ZoomState state;
+
+  const ZoomInfo({
+    this.visibleMinX,
+    this.visibleMaxX,
+    this.visibleMinY,
+    this.visibleMaxY,
+    this.scaleX,
+    this.scaleY,
+    required this.state,
+  });
+
+  @override
+  String toString() {
+    return 'ZoomInfo(xRange: [$visibleMinX, $visibleMaxX], '
+        'yRange: [$visibleMinY, $visibleMaxY], '
+        'scaleX: $scaleX, scaleY: $scaleY, state: $state)';
   }
 }

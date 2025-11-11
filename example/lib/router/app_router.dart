@@ -133,6 +133,12 @@ class AppRouter {
           return const ChartScreen(chartIndex: 20);
         },
       ),
+      GoRoute(
+        path: '/zoom-interactions',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ChartScreen(chartIndex: 21);
+        },
+      ),
     ],
   );
 
@@ -295,6 +301,14 @@ class AppRouter {
       icon: Icons.timeline,
       description: 'Line charts with time-based data',
       docsUrl: 'https://docs.cristalyse.com/charts/line-charts',
+    ),
+    RouteInfo(
+      path: '/zoom-interactions',
+      title: 'Zoom & Pan',
+      icon: Icons.zoom_in,
+      description: 'Pinch, scroll, and floating buttons for zooming',
+      isNew: true,
+      docsUrl: 'https://docs.cristalyse.com/features/interactions',
     ),
   ];
 }
