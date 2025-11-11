@@ -865,7 +865,7 @@ class _KeyboardNavigableChartState extends State<KeyboardNavigableChart> {
   <Accordion title="Performance">
     - Debounce rapid interactions to prevent performance issues
     - Use throttling for pan operations (16-32ms intervals)
-    - Use throttling for zoom updates to prevent jank
+    - Zoom updates are throttled internally and cannot be configured
     - Optimize tooltip rendering for large datasets
     - Consider disabling interactions during animations
   </Accordion>

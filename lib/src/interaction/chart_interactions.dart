@@ -327,7 +327,6 @@ class ZoomConfig {
   final bool showButtons;
   final Alignment buttonAlignment;
   final EdgeInsets buttonPadding;
-  final bool enableDoubleTap;
   final ZoomCallback? onZoomStart;
   final ZoomCallback? onZoomUpdate;
   final ZoomCallback? onZoomEnd;
@@ -342,12 +341,15 @@ class ZoomConfig {
     this.showButtons = true,
     this.buttonAlignment = Alignment.bottomRight,
     this.buttonPadding = const EdgeInsets.all(12),
-    this.enableDoubleTap = true,
     this.onZoomStart,
     this.onZoomUpdate,
     this.onZoomEnd,
-  }) : assert(maxScale >= minScale && maxScale > 0 && minScale > 0,
-            'Zoom scales must be positive and max >= min');
+  })  : assert(maxScale >= minScale && maxScale > 0 && minScale > 0,
+            'Zoom scales must be positive and max >= min'),
+        assert(
+            wheelSensitivity >= 0.0005 && wheelSensitivity <= 0.0035,
+            'wheelSensitivity must be between 0.0005 and 0.0035 (inclusive); '
+            'received $wheelSensitivity');
 }
 
 /// Information emitted during zoom interactions

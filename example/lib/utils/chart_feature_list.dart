@@ -139,6 +139,22 @@ List<String> getChartFeatures(int tabIndex) {
         'Custom gradient directions and color stops',
         'Performance optimized with gradient caching and reuse'
       ];
+    case 19: // Legend examples
+      return [
+        'Auto-generated legends from color mappings',
+        'Click-to-toggle legend entries to show/hide series',
+        'Flexible positioning: top, bottom, left, right, or floating',
+        'Custom styling with colors, fonts, and spacing control',
+        'Optional Y-axis titles in legends for multi-axis clarity'
+      ];
+    case 20: // Time-based line chart
+      return [
+        'Time-series data with intelligent axis formatting',
+        'Gap handling for missing or irregular time intervals',
+        'Custom tick configuration for date-based axes',
+        'Smooth animations revealing data over time',
+        'Perfect for stock prices, weather, and metrics tracking'
+      ];
     case 21: // Zoom demo
       return [
         'Pinch, scroll, and button zoom build on the shared ZoomConfig API',

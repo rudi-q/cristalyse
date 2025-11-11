@@ -1,3 +1,5 @@
+# Changelog
+
 ## 1.15.0 - 2025-11-11
 
 #### 🔍 Zoom & Pan Interactions

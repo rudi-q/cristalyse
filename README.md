@@ -1131,7 +1131,7 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.14.0** - **Tick configuration for scales** with explicit tick positions and simple linear spacing options (by [@jbbjarnason](https://github.com/jbbjarnason))
 - ✅ **v1.15.0** - **Zoom & pan interactions** with pinch gestures, scroll wheel support, and floating zoom buttons for multi-touch and desktop platforms
 
-|## Support This Project
+## Support This Project
 
 **Love Cristalyse?** Your support helps me dedicate more time to building the Flutter charting library you deserve!
 
