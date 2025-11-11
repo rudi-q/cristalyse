@@ -12,6 +12,94 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 11, 2025" description="v1.15.0">
+  ### 🔍 Zoom & Pan Interactions
+  
+  **Pinch, scroll wheel, and button-based zooming!**
+  
+  **Zoom Interaction Modes:**
+  - Pinch gestures for multi-touch zooming
+  - Scroll wheel support for precise zoom control
+  - Floating +/- buttons for touch-friendly interfaces
+  - Independent X-axis, Y-axis, or dual-axis zooming
+  
+  **Zoom Configuration:**
+  - New `ZoomConfig` class with extensive customization
+  - `axes` parameter: Choose `ZoomAxis.x`, `ZoomAxis.y`, or `ZoomAxis.both`
+  - `wheelSensitivity`: Fine-tune scroll wheel responsiveness (0.0005-0.0035)
+  - `buttonStep`: Control zoom increment for +/- buttons (default 1.4x)
+  - `maxScale` / `minScale`: Set zoom boundaries (default 16x / 1x)
+  - `showButtons`: Toggle floating control buttons
+  - `buttonAlignment` & `buttonPadding`: Customize button placement
+  
+  **Zoom Event Callbacks:**
+  - `onZoomStart`, `onZoomUpdate`, `onZoomEnd` for lifecycle events
+  - `ZoomInfo` provides real-time zoom metrics:
+    - Current visible range: `visibleMinX`, `visibleMaxX`, `visibleMinY`, `visibleMaxY`
+    - Scale factors: `scaleX`, `scaleY` (e.g., 4.0 = 4x zoom)
+    - State: `ZoomState.start` / `update` / `end`
+  
+  **Quick Setup:**
+  ```dart
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'day', y: 'revenue')
+    .geomLine()
+    .onZoom((info) {
+      print('Zoom scale: ${info.scaleX}x');
+    })
+    .build()
+  ```
+  
+  **Advanced Configuration:**
+  ```dart
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'time', y: 'value')
+    .geomLine()
+    .interaction(
+      zoom: ZoomConfig(
+        enabled: true,
+        axes: ZoomAxis.both,                    // Zoom both axes
+        maxScale: 16.0,                         // Up to 16x zoom
+        wheelSensitivity: 0.0015,               // Scroll sensitivity
+        buttonStep: 1.4,                        // 40% step per button press
+        showButtons: true,                      // Show +/- buttons
+        onZoomUpdate: (info) {
+          setState(() {
+            zoomLevel = '${info.scaleX?.toStringAsFixed(1)}x';
+          });
+        },
+      ),
+    )
+    .build()
+  ```
+  
+  **New Example:**
+  - Full zoom demo in example app showing all interaction methods
+  - Live zoom state display with visible ranges and scale factors
+  - Interactive controls to adjust sensitivity and zoom modes
+  - Demonstrates combined zoom + pan workflows
+  
+  **Use Cases:**
+  - Time-series exploration: Zoom into specific date ranges
+  - Scientific visualizations: Independent X/Y axis zoom control
+  - Mobile dashboards: Touch-friendly zoom buttons for accessibility
+  - Financial charts: Precise zoom with scroll wheel support
+  
+  **Seamless Integration:**
+  - Works alongside existing pan interactions
+  - Respects domain boundaries and scale configuration
+  - Responsive gesture handling (pinch, scroll, single-touch pan)
+  - Full touch and mouse support across all platforms
+  
+  **Quality Assurance:**
+  - Zero breaking changes - fully backward compatible
+  - All new parameters optional with sensible defaults
+  
+  [View zoom documentation](/features/interactions)
+</Update>
+
 <Update label="November 9, 2025" description="v1.14.0">
   ### 🎯 Tick Configuration for Scales
   
