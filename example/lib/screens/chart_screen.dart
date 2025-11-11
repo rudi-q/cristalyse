@@ -353,7 +353,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Beautiful gradient fills for enhanced visual appeal • Linear gradients from light to dark',
       'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
       'Comprehensive legend showcase • 9 positioning options including new floating legends',
-      'Line chart with time-based data on x-axis • ',
+      'Line chart with time-based data on x-axis',
       'Pinch, scroll, and button-based zoom controls with live callbacks',
     ];
   }
