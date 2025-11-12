@@ -344,12 +344,15 @@ class ZoomConfig {
     this.onZoomStart,
     this.onZoomUpdate,
     this.onZoomEnd,
-  })  : assert(maxScale >= minScale && maxScale > 0 && minScale > 0,
-            'Zoom scales must be positive and max >= min'),
+  })  : assert(
+          maxScale >= minScale && maxScale > 0 && minScale > 0,
+          'Zoom scales must be positive and max >= min',
+        ),
         assert(
-            wheelSensitivity >= 0.0005 && wheelSensitivity <= 0.0035,
-            'wheelSensitivity must be between 0.0005 and 0.0035 (inclusive); '
-            'received $wheelSensitivity');
+          wheelSensitivity >= 0.0005 && wheelSensitivity <= 0.0035,
+          'wheelSensitivity must be between 0.0005 and 0.0035 (inclusive); '
+          'received $wheelSensitivity',
+        );
 }
 
 /// Information emitted during zoom interactions

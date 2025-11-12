@@ -131,8 +131,9 @@ class _AnimatedCristalyseChartWidgetState
 
     _animationController.forward();
     if (widget.interaction.pan?.controller != null) {
-      widget.interaction.pan!.controller!
-          .addListener(_handlePanControllerUpdate);
+      widget.interaction.pan!.controller!.addListener(
+        _handlePanControllerUpdate,
+      );
     }
   }
 
@@ -179,8 +180,9 @@ class _AnimatedCristalyseChartWidgetState
     _cachedTooltipController?.hideTooltip();
     _animationController.dispose();
     if (widget.interaction.pan?.controller != null) {
-      widget.interaction.pan!.controller!
-          .removeListener(_handlePanControllerUpdate);
+      widget.interaction.pan!.controller!.removeListener(
+        _handlePanControllerUpdate,
+      );
     }
     super.dispose();
   }
@@ -396,9 +398,7 @@ class _AnimatedCristalyseChartWidgetState
 
       // Convert local position to global for tooltip positioning
       final RenderBox renderBox = panContext.findRenderObject() as RenderBox;
-      final Offset globalPosition = renderBox.localToGlobal(
-        localPosition,
-      );
+      final Offset globalPosition = renderBox.localToGlobal(localPosition);
 
       // Handle hover callbacks
       widget.interaction.hover?.onHover?.call(point);
@@ -414,10 +414,7 @@ class _AnimatedCristalyseChartWidgetState
     }
   }
 
-  void _handlePanEnd(
-    BuildContext panEndContext,
-    Rect plotArea,
-  ) {
+  void _handlePanEnd(BuildContext panEndContext, Rect plotArea) {
     if (!widget.interaction.enabled) return;
 
     // Handle pan end callback
@@ -529,11 +526,7 @@ class _AnimatedCristalyseChartWidgetState
     final scaleDelta = math.exp(-deltaY * sensitivity);
     if (!scaleDelta.isFinite || scaleDelta == 0) return;
 
-    final changed = _applyZoom(
-      scaleDelta,
-      localPosition,
-      plotArea,
-    );
+    final changed = _applyZoom(scaleDelta, localPosition, plotArea);
 
     if (changed) {
       _emitZoomEvent(plotArea, ZoomState.start);
@@ -567,13 +560,15 @@ class _AnimatedCristalyseChartWidgetState
       if (widget.interaction.pan?.onPanEnd != null &&
           (!listEquals(currentXDomain, _panXDomain) ||
               !listEquals(currentYDomain, _panYDomain))) {
-        widget.interaction.pan!.onPanEnd!(PanInfo(
-          state: PanState.end,
-          visibleMinX: _panXDomain?[0],
-          visibleMaxX: _panXDomain?[1],
-          visibleMinY: _panYDomain?[0],
-          visibleMaxY: _panYDomain?[1],
-        ));
+        widget.interaction.pan!.onPanEnd!(
+          PanInfo(
+            state: PanState.end,
+            visibleMinX: _panXDomain?[0],
+            visibleMaxX: _panXDomain?[1],
+            visibleMinY: _panYDomain?[0],
+            visibleMaxY: _panYDomain?[1],
+          ),
+        );
       }
     } else {
       final xChanged = panInfo.visibleMaxX != null &&
@@ -659,7 +654,9 @@ class _AnimatedCristalyseChartWidgetState
       YAxis.primary,
     );
     final y2Scale = hasSecondaryYAxis(
-            y2Column: widget.y2Column, geometries: widget.geometries)
+      y2Column: widget.y2Column,
+      geometries: widget.geometries,
+    )
         ? _setupYScale(
             plotArea.height,
             widget.geometries.any((g) => g is BarGeometry),
@@ -692,12 +689,13 @@ class _AnimatedCristalyseChartWidgetState
         ),
         child: CustomPaint(
           painter: chartPainterAnimated(
-              widget: widget,
-              context: context,
-              size: size,
-              animationProgress: 1.0,
-              panXDomain: _panXDomain,
-              panYDomain: _panYDomain),
+            widget: widget,
+            context: context,
+            size: size,
+            animationProgress: 1.0,
+            panXDomain: _panXDomain,
+            panYDomain: _panYDomain,
+          ),
           child: Container(),
         ),
       );
@@ -718,12 +716,13 @@ class _AnimatedCristalyseChartWidgetState
     _ensureViewDomainsInitialized(plotArea);
 
     final chartPainter = chartPainterAnimated(
-        widget: widget,
-        context: context,
-        size: size,
-        animationProgress: math.max(0.0, math.min(1.0, animationValue)),
-        panXDomain: _panXDomain,
-        panYDomain: _panYDomain);
+      widget: widget,
+      context: context,
+      size: size,
+      animationProgress: math.max(0.0, math.min(1.0, animationValue)),
+      panXDomain: _panXDomain,
+      panYDomain: _panYDomain,
+    );
 
     Widget chart = CustomPaint(painter: chartPainter, child: Container());
 
@@ -914,7 +913,9 @@ class _AnimatedCristalyseChartWidgetState
 
   /// Build the actual chart widget with filtered data
   Widget _buildChartWidget(
-      BuildContext context, List<Map<String, dynamic>> data) {
+    BuildContext context,
+    List<Map<String, dynamic>> data,
+  ) {
     // IMPORTANT: Create a ColorScale based on the ORIGINAL (unfiltered) data
     // to preserve color-to-category mapping when filtering
     ColorScale? preservedColorScale;
@@ -928,9 +929,10 @@ class _AnimatedCristalyseChartWidgetState
         gradients: widget.theme.categoryGradients != null
             ? {
                 for (final value in originalValues)
-                  if (widget.theme.categoryGradients!
-                      .containsKey(value.toString()))
-                    value: widget.theme.categoryGradients![value.toString()]!
+                  if (widget.theme.categoryGradients!.containsKey(
+                    value.toString(),
+                  ))
+                    value: widget.theme.categoryGradients![value.toString()]!,
               }
             : null,
       );
@@ -973,7 +975,10 @@ class _AnimatedCristalyseChartWidgetState
             );
 
             return _buildInteractiveChartForData(
-                context, constraints.biggest, tempWidget);
+              context,
+              constraints.biggest,
+              tempWidget,
+            );
           },
         );
       },
@@ -981,8 +986,11 @@ class _AnimatedCristalyseChartWidgetState
   }
 
   /// Build interactive chart with custom data
-  Widget _buildInteractiveChartForData(BuildContext context, Size size,
-      AnimatedCristalyseChartWidget tempWidget) {
+  Widget _buildInteractiveChartForData(
+    BuildContext context,
+    Size size,
+    AnimatedCristalyseChartWidget tempWidget,
+  ) {
     final animationValue = _animation.value;
 
     // For very small sizes, return placeholder
@@ -1004,12 +1012,13 @@ class _AnimatedCristalyseChartWidgetState
         ),
         child: CustomPaint(
           painter: chartPainterAnimated(
-              widget: tempWidget,
-              context: context,
-              size: size,
-              animationProgress: 1.0,
-              panXDomain: _panXDomain,
-              panYDomain: _panYDomain),
+            widget: tempWidget,
+            context: context,
+            size: size,
+            animationProgress: 1.0,
+            panXDomain: _panXDomain,
+            panYDomain: _panYDomain,
+          ),
           child: Container(),
         ),
       );
@@ -1030,12 +1039,13 @@ class _AnimatedCristalyseChartWidgetState
     _ensureViewDomainsInitialized(plotArea);
 
     final chartPainter = chartPainterAnimated(
-        widget: tempWidget,
-        context: context,
-        size: size,
-        animationProgress: math.max(0.0, math.min(1.0, animationValue)),
-        panXDomain: _panXDomain,
-        panYDomain: _panYDomain);
+      widget: tempWidget,
+      context: context,
+      size: size,
+      animationProgress: math.max(0.0, math.min(1.0, animationValue)),
+      panXDomain: _panXDomain,
+      panYDomain: _panYDomain,
+    );
 
     Widget chart = CustomPaint(painter: chartPainter, child: Container());
 
@@ -1146,8 +1156,10 @@ class _AnimatedCristalyseChartWidgetState
         break;
       case LegendPosition.bottomRight:
         alignment = Alignment.bottomRight;
-        padding =
-            EdgeInsets.only(bottom: config.spacing, right: config.spacing);
+        padding = EdgeInsets.only(
+          bottom: config.spacing,
+          right: config.spacing,
+        );
         break;
       case LegendPosition.floating:
         // This should not be reached, but provide a fallback
@@ -1162,10 +1174,7 @@ class _AnimatedCristalyseChartWidgetState
         chart,
         Align(
           alignment: alignment,
-          child: Padding(
-            padding: padding,
-            child: legend,
-          ),
+          child: Padding(padding: padding, child: legend),
         ),
       ],
     );
@@ -1173,7 +1182,10 @@ class _AnimatedCristalyseChartWidgetState
 
   /// Build floating legend with absolute positioning
   Widget _buildFloatingLegend(
-      Widget chart, Widget legend, LegendConfig config) {
+    Widget chart,
+    Widget legend,
+    LegendConfig config,
+  ) {
     // Default to top-left with 16px offset if not specified
     final offset = config.floatingOffset ?? const Offset(16, 16);
 
@@ -1181,45 +1193,35 @@ class _AnimatedCristalyseChartWidgetState
       clipBehavior: Clip.none,
       children: [
         chart,
-        Positioned(
-          left: offset.dx,
-          top: offset.dy,
-          child: legend,
-        ),
+        Positioned(left: offset.dx, top: offset.dy, child: legend),
       ],
     );
   }
 
   /// Build legend using Flex layout for bounded constraints
   Widget _buildFlexLegend(
-      Widget chart, Widget legend, LegendConfig config, Widget spacing) {
+    Widget chart,
+    Widget legend,
+    LegendConfig config,
+    Widget spacing,
+  ) {
     switch (config.position) {
       case LegendPosition.top:
-        return Column(
-          children: [legend, spacing, Flexible(child: chart)],
-        );
+        return Column(children: [legend, spacing, Flexible(child: chart)]);
 
       case LegendPosition.bottom:
-        return Column(
-          children: [Flexible(child: chart), spacing, legend],
-        );
+        return Column(children: [Flexible(child: chart), spacing, legend]);
 
       case LegendPosition.left:
-        return Row(
-          children: [legend, spacing, Flexible(child: chart)],
-        );
+        return Row(children: [legend, spacing, Flexible(child: chart)]);
 
       case LegendPosition.right:
-        return Row(
-          children: [Flexible(child: chart), spacing, legend],
-        );
+        return Row(children: [Flexible(child: chart), spacing, legend]);
 
       case LegendPosition.topLeft:
         return Column(
           children: [
-            Row(
-              children: [legend, Flexible(child: Container())],
-            ),
+            Row(children: [legend, Flexible(child: Container())]),
             spacing,
             Flexible(child: chart),
           ],
@@ -1228,9 +1230,7 @@ class _AnimatedCristalyseChartWidgetState
       case LegendPosition.topRight:
         return Column(
           children: [
-            Row(
-              children: [Flexible(child: Container()), legend],
-            ),
+            Row(children: [Flexible(child: Container()), legend]),
             spacing,
             Flexible(child: chart),
           ],
@@ -1241,9 +1241,7 @@ class _AnimatedCristalyseChartWidgetState
           children: [
             Flexible(child: chart),
             spacing,
-            Row(
-              children: [legend, Flexible(child: Container())],
-            ),
+            Row(children: [legend, Flexible(child: Container())]),
           ],
         );
 
@@ -1252,9 +1250,7 @@ class _AnimatedCristalyseChartWidgetState
           children: [
             Flexible(child: chart),
             spacing,
-            Row(
-              children: [Flexible(child: Container()), legend],
-            ),
+            Row(children: [Flexible(child: Container()), legend]),
           ],
         );
 
@@ -1293,9 +1289,15 @@ class _AnimatedCristalyseChartWidgetState
   void _setupScales(double width, double height) {
     _setupXScale(width, widget.geometries.any((g) => g is BarGeometry));
     _setupYScale(
-        height, widget.geometries.any((g) => g is BarGeometry), YAxis.primary);
-    _setupYScale(height, widget.geometries.any((g) => g is BarGeometry),
-        YAxis.secondary);
+      height,
+      widget.geometries.any((g) => g is BarGeometry),
+      YAxis.primary,
+    );
+    _setupYScale(
+      height,
+      widget.geometries.any((g) => g is BarGeometry),
+      YAxis.secondary,
+    );
   }
 
   Scale _setupXScale(double width, bool hasBarGeometry) {
@@ -1470,7 +1472,8 @@ class _AnimatedCristalyseChartWidgetState
         ? bubbleGeometries.first.createSizeScale()
         : (widget.sizeScale ??
             SizeScale(
-                range: [widget.theme.pointSizeMin, widget.theme.pointSizeMax]));
+              range: [widget.theme.pointSizeMin, widget.theme.pointSizeMax],
+            ));
 
     // Set domain from data - limits are already in the scale
     sizeScale.setBounds(values, null, widget.geometries);
@@ -1478,7 +1481,11 @@ class _AnimatedCristalyseChartWidgetState
   }
 
   void _updatePanDomain(
-      List<double> domain, double delta, bool clamp, Scale? scale) {
+    List<double> domain,
+    double delta,
+    bool clamp,
+    Scale? scale,
+  ) {
     final newMin = domain[0] + delta;
     final newMax = domain[1] + delta;
     if (clamp && scale != null && scale is LinearScale) {
@@ -1508,8 +1515,12 @@ class _AnimatedCristalyseChartWidgetState
 
     // Update the pan domain progressively - allow infinite panning
     if (widget.interaction.pan?.updateXDomain != false) {
-      _updatePanDomain(_panXDomain!, xDataDelta,
-          widget.interaction.pan?.boundaryClampingX == true, widget.xScale);
+      _updatePanDomain(
+        _panXDomain!,
+        xDataDelta,
+        widget.interaction.pan?.boundaryClampingX == true,
+        widget.xScale,
+      );
     }
 
     // Optionally handle Y panning too - allow infinite panning
@@ -1519,8 +1530,12 @@ class _AnimatedCristalyseChartWidgetState
       final yDataDelta =
           delta.dy / pixelsPerYUnit; // Positive for natural pan direction
 
-      _updatePanDomain(_panYDomain!, yDataDelta,
-          widget.interaction.pan?.boundaryClampingY == true, widget.yScale);
+      _updatePanDomain(
+        _panYDomain!,
+        yDataDelta,
+        widget.interaction.pan?.boundaryClampingY == true,
+        widget.yScale,
+      );
     }
   }
 
@@ -1859,11 +1874,7 @@ class _ZoomButton extends StatelessWidget {
         child: SizedBox(
           width: 36,
           height: 36,
-          child: Icon(
-            icon,
-            size: 18,
-            color: theme.axisColor,
-          ),
+          child: Icon(icon, size: 18, color: theme.axisColor),
         ),
       ),
     );

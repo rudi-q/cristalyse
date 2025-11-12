@@ -41,19 +41,25 @@ void main() {
     });
 
     testWidgets(
-        'LinearScale falls back to internal limits when setBounds limits null',
-        (tester) async {
-      // Test internal limits used when setBounds limits null
-      final scale = LinearScale(limits: (5.0, 95.0));
-      scale.setBounds([10.0, 20.0, 30.0], null, [BarGeometry()]);
+      'LinearScale falls back to internal limits when setBounds limits null',
+      (tester) async {
+        // Test internal limits used when setBounds limits null
+        final scale = LinearScale(limits: (5.0, 95.0));
+        scale.setBounds([10.0, 20.0, 30.0], null, [BarGeometry()]);
 
-      // Wilkinson will nice-ify within internal limits
-      expect(scale.domain[0], lessThanOrEqualTo(10.0)); // Covers data
-      expect(scale.domain[1], greaterThanOrEqualTo(30.0)); // Covers data
-      expect(
-          scale.domain[0], greaterThanOrEqualTo(5.0)); // Respects internal min
-      expect(scale.domain[1], lessThanOrEqualTo(95.0)); // Respects internal max
-    });
+        // Wilkinson will nice-ify within internal limits
+        expect(scale.domain[0], lessThanOrEqualTo(10.0)); // Covers data
+        expect(scale.domain[1], greaterThanOrEqualTo(30.0)); // Covers data
+        expect(
+          scale.domain[0],
+          greaterThanOrEqualTo(5.0),
+        ); // Respects internal min
+        expect(
+          scale.domain[1],
+          lessThanOrEqualTo(95.0),
+        ); // Respects internal max
+      },
+    );
 
     group('Real-world bounds behavior', () {
       test('Stock price chart uses tight data-driven bounds', () {
@@ -162,7 +168,9 @@ void main() {
         expect(scale.domain[0], lessThanOrEqualTo(10.0)); // Covers data
         expect(scale.domain[1], greaterThanOrEqualTo(30.0)); // Covers data
         expect(
-            scale.domain[0], greaterThanOrEqualTo(5.0)); // Respects min limit
+          scale.domain[0],
+          greaterThanOrEqualTo(5.0),
+        ); // Respects min limit
         expect(scale.domain[1], lessThanOrEqualTo(50.0)); // Respects max limit
       });
 
@@ -175,8 +183,10 @@ void main() {
         scale.setBounds(values, (40.0, null), [lineGeometry]);
 
         // Wilkinson will nice-ify respecting partial limit
-        expect(scale.domain[0],
-            greaterThanOrEqualTo(40.0)); // Respects explicit min
+        expect(
+          scale.domain[0],
+          greaterThanOrEqualTo(40.0),
+        ); // Respects explicit min
         expect(scale.domain[0], lessThanOrEqualTo(45.2)); // Covers data
         expect(scale.domain[1], greaterThanOrEqualTo(48.9)); // Covers data
       });
@@ -192,7 +202,9 @@ void main() {
         // Wilkinson will nice-ify respecting partial limit
         expect(scale.domain[0], lessThanOrEqualTo(45.2)); // Covers data
         expect(
-            scale.domain[1], lessThanOrEqualTo(50.0)); // Respects explicit max
+          scale.domain[1],
+          lessThanOrEqualTo(50.0),
+        ); // Respects explicit max
         expect(scale.domain[1], greaterThanOrEqualTo(48.9)); // Covers data
       });
     });
@@ -222,7 +234,9 @@ void main() {
 
       test('heat map geometry uses data-driven behavior', () {
         expect(
-            HeatMapGeometry().getBoundsBehavior(), BoundsBehavior.dataDriven);
+          HeatMapGeometry().getBoundsBehavior(),
+          BoundsBehavior.dataDriven,
+        );
       });
 
       test('pie geometry uses not applicable behavior', () {
@@ -230,8 +244,10 @@ void main() {
       });
 
       test('progress bar geometry uses not applicable behavior', () {
-        expect(ProgressGeometry().getBoundsBehavior(),
-            BoundsBehavior.notApplicable);
+        expect(
+          ProgressGeometry().getBoundsBehavior(),
+          BoundsBehavior.notApplicable,
+        );
       });
     });
   });

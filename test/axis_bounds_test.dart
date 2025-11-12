@@ -48,15 +48,21 @@ void main() {
 
         // Test explicit min, auto max
         const (double?, double?) limitsMinOnly = (5.0, null);
-        var bounds =
-            BoundsCalculator.calculateBounds(values, limitsMinOnly, geometries);
+        var bounds = BoundsCalculator.calculateBounds(
+          values,
+          limitsMinOnly,
+          geometries,
+        );
         expect(bounds.min, equals(5.0));
         expect(bounds.max, greaterThan(30.0)); // Should include padding
 
         // Test auto min, explicit max
         const (double?, double?) limitsMaxOnly = (null, 35.0);
-        bounds =
-            BoundsCalculator.calculateBounds(values, limitsMaxOnly, geometries);
+        bounds = BoundsCalculator.calculateBounds(
+          values,
+          limitsMaxOnly,
+          geometries,
+        );
         expect(bounds.min, lessThan(10.0)); // Should include padding
         expect(bounds.max, equals(35.0));
       });
@@ -67,8 +73,11 @@ void main() {
         final values = [10.0, 20.0, 30.0];
         final geometries = [TestZeroBaselineGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         expect(bounds.min, equals(0)); // Zero baseline
         expect(bounds.max, equals(30.0 * 1.1)); // 10% padding above max
@@ -78,8 +87,11 @@ void main() {
         final values = [-30.0, -20.0, -10.0];
         final geometries = [TestZeroBaselineGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         expect(bounds.min, equals(-30.0 * 1.1)); // 10% padding below min
         expect(bounds.max, equals(0)); // Zero baseline
@@ -89,11 +101,16 @@ void main() {
         final values = [-10.0, 5.0, 20.0];
         final geometries = [TestZeroBaselineGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         expect(
-            bounds.min, equals(-10.0 * 1.1)); // Include zero, extend negative
+          bounds.min,
+          equals(-10.0 * 1.1),
+        ); // Include zero, extend negative
         expect(bounds.max, equals(20.0 * 1.1)); // Include zero, extend positive
       });
 
@@ -101,8 +118,11 @@ void main() {
         final values = [45.0, 47.0, 50.0];
         final geometries = [TestDataDrivenGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         // Should use 5% padding on data range
         final expectedPadding = (50.0 - 45.0) * 0.05; // 0.25
@@ -114,8 +134,11 @@ void main() {
         final values = [25.0, 35.0, 40.0];
         final geometries = [TestNotApplicableGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         // Should return ignored bounds since these charts don't use continuous X/Y axes
         expect(bounds.min, equals(0.0));
@@ -126,11 +149,14 @@ void main() {
         final values = [10.0, 20.0, 30.0];
         final geometries = [
           TestZeroBaselineGeometry(),
-          TestDataDrivenGeometry()
+          TestDataDrivenGeometry(),
         ];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         // Should prioritize zero baseline behavior over data-driven behavior
         expect(bounds.min, equals(0)); // Zero baseline wins
@@ -141,8 +167,11 @@ void main() {
         final values = [5.0, 15.0, 25.0];
         final geometries = <Geometry>[]; // No known geometries
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         // Should default to data-driven bounds
         final expectedPadding = (25.0 - 5.0) * 0.05; // 1.0
@@ -156,8 +185,11 @@ void main() {
         final values = [0.0];
         final geometries = [TestDataDrivenGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         expect(bounds.min, equals(-0.5));
         expect(bounds.max, equals(0.5));
@@ -167,8 +199,11 @@ void main() {
         final values = [10.0];
         final geometries = [TestDataDrivenGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         // Should use 10% padding for single values
         expect(bounds.min, equals(9.0));
@@ -179,8 +214,11 @@ void main() {
         final values = [15.0, 15.0, 15.0];
         final geometries = [TestDataDrivenGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         // Should use 10% padding for identical values
         expect(bounds.min, equals(13.5));
@@ -191,8 +229,11 @@ void main() {
         final values = [0.001, 0.002, 0.003];
         final geometries = [TestDataDrivenGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         // Should maintain precision for small values
         final expectedPadding = (0.003 - 0.001) * 0.05; // 0.0001
@@ -204,8 +245,11 @@ void main() {
         final values = [1000000.0, 2000000.0, 3000000.0];
         final geometries = [TestZeroBaselineGeometry()];
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, null, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          null,
+          geometries,
+        );
 
         // Should handle large numbers correctly
         expect(bounds.min, equals(0)); // Zero baseline
@@ -219,8 +263,11 @@ void main() {
         final geometries = [TestZeroBaselineGeometry()];
         final limits = (5.0, 35.0);
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, limits, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          limits,
+          geometries,
+        );
 
         // Should use explicit limits instead of zero baseline geometry defaults
         expect(bounds.min, equals(5.0));
@@ -232,8 +279,11 @@ void main() {
         final geometries = [TestZeroBaselineGeometry()];
         final limits = (null, 50.0); // Only explicit max
 
-        final bounds =
-            BoundsCalculator.calculateBounds(values, limits, geometries);
+        final bounds = BoundsCalculator.calculateBounds(
+          values,
+          limits,
+          geometries,
+        );
 
         // Should use geometry default for min, explicit limit for max
         expect(bounds.min, equals(0)); // Zero baseline
@@ -247,11 +297,14 @@ void main() {
       final values = [10.0, 20.0, 30.0];
       final mixedGeometries = [
         TestDataDrivenGeometry(),
-        TestZeroBaselineGeometry()
+        TestZeroBaselineGeometry(),
       ];
 
-      final bounds =
-          BoundsCalculator.calculateBounds(values, null, mixedGeometries);
+      final bounds = BoundsCalculator.calculateBounds(
+        values,
+        null,
+        mixedGeometries,
+      );
 
       // Should use zero baseline behavior despite having data-driven geometries
       expect(bounds.min, equals(0));
@@ -262,11 +315,14 @@ void main() {
       final values = [15.0, 18.0, 25.0];
       final dataDrivenGeometries = [
         TestDataDrivenGeometry(),
-        TestDataDrivenGeometry()
+        TestDataDrivenGeometry(),
       ];
 
-      final bounds =
-          BoundsCalculator.calculateBounds(values, null, dataDrivenGeometries);
+      final bounds = BoundsCalculator.calculateBounds(
+        values,
+        null,
+        dataDrivenGeometries,
+      );
 
       final expectedPadding = (25.0 - 15.0) * 0.05;
       expect(bounds.min, closeTo(15.0 - expectedPadding, 0.01));
@@ -278,7 +334,10 @@ void main() {
       final notApplicableGeometries = [TestNotApplicableGeometry()];
 
       final bounds = BoundsCalculator.calculateBounds(
-          values, null, notApplicableGeometries);
+        values,
+        null,
+        notApplicableGeometries,
+      );
 
       // Should return ignored bounds since these charts don't use continuous axes
       expect(bounds.min, equals(0.0));
@@ -289,8 +348,11 @@ void main() {
       final values = [5.0, 15.0, 25.0];
       final emptyGeometries = <Geometry>[];
 
-      final bounds =
-          BoundsCalculator.calculateBounds(values, null, emptyGeometries);
+      final bounds = BoundsCalculator.calculateBounds(
+        values,
+        null,
+        emptyGeometries,
+      );
 
       final expectedPadding = (25.0 - 5.0) * 0.05;
       expect(bounds.min, closeTo(5.0 - expectedPadding, 0.01));
@@ -303,7 +365,10 @@ void main() {
       final explicitLimits = (10.0, 50.0); // User tries to set explicit limits
 
       final bounds = BoundsCalculator.calculateBounds(
-          values, explicitLimits, notApplicableGeometries);
+        values,
+        explicitLimits,
+        notApplicableGeometries,
+      );
 
       // Should ignore explicit limits and return ignored bounds
       expect(bounds.min, equals(0.0));
@@ -315,7 +380,10 @@ void main() {
       final notApplicableGeometries = [TestNotApplicableGeometry()];
 
       final bounds = BoundsCalculator.calculateBounds(
-          emptyValues, null, notApplicableGeometries);
+        emptyValues,
+        null,
+        notApplicableGeometries,
+      );
 
       // Should ignore empty values fallback and return ignored bounds
       expect(bounds.min, equals(0.0));
@@ -329,8 +397,11 @@ void main() {
       final limits = (15.0, 15.0); // Equal limits
       final geometries = [TestDataDrivenGeometry()];
 
-      final bounds =
-          BoundsCalculator.calculateBounds(values, limits, geometries);
+      final bounds = BoundsCalculator.calculateBounds(
+        values,
+        limits,
+        geometries,
+      );
 
       // Should return valid bounds with min and max both equal to specified value
       expect(bounds.min, equals(15.0));
@@ -350,7 +421,8 @@ void main() {
             (e) => e.message,
             'message',
             equals(
-                'Specified limits were inverted: min (50.0) > max (20.0). Min must be less than or equal to max.'),
+              'Specified limits were inverted: min (50.0) > max (20.0). Min must be less than or equal to max.',
+            ),
           ),
         ),
       );

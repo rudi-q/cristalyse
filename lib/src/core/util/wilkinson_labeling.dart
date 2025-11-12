@@ -28,8 +28,13 @@ class WilkinsonLabeling {
   ///
   /// Returns: List of nice tick values
   static List<double> extended(
-      double dmin, double dmax, double screenLength, double targetDensity,
-      {(double?, double?)? limits, bool simpleLinear = false}) {
+    double dmin,
+    double dmax,
+    double screenLength,
+    double targetDensity, {
+    (double?, double?)? limits,
+    bool simpleLinear = false,
+  }) {
     // Handle edge cases
     if (dmin == dmax) {
       return [dmin];
@@ -42,8 +47,10 @@ class WilkinsonLabeling {
 
     List<double> makeLinearTicks() {
       // Estimate a reasonable count from screen length and target density
-      final estimatedCount =
-          (targetDensity * screenLength).round().clamp(2, 10);
+      final estimatedCount = (targetDensity * screenLength).round().clamp(
+            2,
+            10,
+          );
       return _fallbackTicks(dmin, dmax, estimatedCount, limits);
     }
 
@@ -160,7 +167,13 @@ class WilkinsonLabeling {
   /// Calculate simplicity score
   /// Prefers earlier elements in Q, lower skip amounts, and including zero
   static double _simplicity(
-      int qIndex, int j, double lmin, double lmax, double dmin, double dmax) {
+    int qIndex,
+    int j,
+    double lmin,
+    double lmax,
+    double dmin,
+    double dmax,
+  ) {
     final v = (lmin <= 0 && lmax >= 0) ? 1.0 : 0.0; // Bonus for including 0
     final i = qIndex + 1; // 1-indexed
     return 1.0 - (i - 1) / (Q.length - 1) - j + v;
@@ -234,8 +247,10 @@ class WilkinsonLabeling {
 
   /// Calculate weighted score from component scores
   static double _score(List<double> scores) {
-    assert(scores.length == weights.length,
-        'scores.length must match weights.length (${weights.length})');
+    assert(
+      scores.length == weights.length,
+      'scores.length must match weights.length (${weights.length})',
+    );
     double total = 0.0;
     for (int i = 0; i < scores.length; i++) {
       total += weights[i] * scores[i];
@@ -258,7 +273,11 @@ class WilkinsonLabeling {
 
   /// Fallback tick generation if search fails
   static List<double> _fallbackTicks(
-      double dmin, double dmax, int count, (double?, double?)? limits) {
+    double dmin,
+    double dmax,
+    int count,
+    (double?, double?)? limits,
+  ) {
     // Constrain to limits, if provided
     final constrainedMin =
         limits?.$1 != null && limits!.$1! > dmin ? limits.$1! : dmin;

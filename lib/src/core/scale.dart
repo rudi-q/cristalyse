@@ -74,15 +74,21 @@ abstract class Scale {
 
   /// Set bounds for this scale given data values, limits, and geometry context.
   /// Uses passed limits, or falls back to scale's own limits, or geometry behavior.
-  void setBounds(List<double> values, (double?, double?)? passedLimits,
-      List<Geometry> geometries) {
+  void setBounds(
+    List<double> values,
+    (double?, double?)? passedLimits,
+    List<Geometry> geometries,
+  ) {
     final effectiveLimits = passedLimits ?? limits;
     setBoundsInternal(values, effectiveLimits, geometries);
   }
 
   /// Internal bounds setting - each scale implements its own logic.
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries);
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  );
 
   double _calculatePixelsPerLabel(dynamic min, dynamic max) {
     // todo get the actual text style from the theme
@@ -108,9 +114,12 @@ class LinearScale extends Scale {
   List<double> _valuesBoundaries = [0, 1];
   final TickConfig? _tickConfig;
 
-  LinearScale(
-      {super.limits, super.labelFormatter, super.title, TickConfig? tickConfig})
-      : _tickConfig = tickConfig;
+  LinearScale({
+    super.limits,
+    super.labelFormatter,
+    super.title,
+    TickConfig? tickConfig,
+  }) : _tickConfig = tickConfig;
 
   @override
   List<double> get domain => _domain;
@@ -132,11 +141,17 @@ class LinearScale extends Scale {
   }
 
   @override
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
     final bounds = BoundsCalculator.calculateBounds(
-        values, effectiveLimits, geometries,
-        applyPadding: true);
+      values,
+      effectiveLimits,
+      geometries,
+      applyPadding: true,
+    );
 
     if (values.isNotEmpty) {
       _valuesBoundaries = [values.reduce(math.min), values.reduce(math.max)];
@@ -160,16 +175,21 @@ class LinearScale extends Scale {
       }
 
       final pixelsPerLabel = math.max(
-          _calculatePixelsPerLabel(bounds.min, bounds.max),
-          Scale._optimalPixelsPerLabel);
+        _calculatePixelsPerLabel(bounds.min, bounds.max),
+        Scale._optimalPixelsPerLabel,
+      );
 
       final targetLabelCount = (screenLength / pixelsPerLabel).round();
       final targetDensity = targetLabelCount / screenLength; // labels per pixel
 
       final niceTicks = WilkinsonLabeling.extended(
-          bounds.min, bounds.max, screenLength, targetDensity,
-          limits: effectiveLimits,
-          simpleLinear: _tickConfig?.simpleLinear ?? false);
+        bounds.min,
+        bounds.max,
+        screenLength,
+        targetDensity,
+        limits: effectiveLimits,
+        simpleLinear: _tickConfig?.simpleLinear ?? false,
+      );
 
       if (niceTicks.isNotEmpty) {
         // Cache ticks for getTicks() to avoid recomputing
@@ -256,11 +276,14 @@ class OrdinalScale extends Scale {
     if (screenLength == 0) return List.from(_domain);
 
     final pixelsPerLabel = math.max(
-        _calculatePixelsPerLabel(_domain.first, _domain.last),
-        Scale._optimalPixelsPerLabel);
+      _calculatePixelsPerLabel(_domain.first, _domain.last),
+      Scale._optimalPixelsPerLabel,
+    );
 
-    final targetLabelCount =
-        (screenLength / pixelsPerLabel).round().clamp(1, _domain.length);
+    final targetLabelCount = (screenLength / pixelsPerLabel).round().clamp(
+          1,
+          _domain.length,
+        );
 
     // If we have fewer categories than target, show all
     if (_domain.length <= targetLabelCount) {
@@ -299,8 +322,11 @@ class OrdinalScale extends Scale {
   }
 
   @override
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
     // Ordinal scales don't use continuous bounds - so this is a no-op
   }
 }
@@ -311,11 +337,7 @@ class ColorScale {
   final List<Color> colors;
   final Map<dynamic, Gradient>? gradients;
 
-  ColorScale({
-    this.values = const [],
-    this.colors = const [],
-    this.gradients,
-  });
+  ColorScale({this.values = const [], this.colors = const [], this.gradients});
 
   /// Returns either a Color or Gradient for the given value
   dynamic scale(dynamic value) {
@@ -379,8 +401,11 @@ class SizeScale extends Scale {
   }
 
   @override
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
     if (values.isEmpty) {
       _domain = [0, 1];
       return;
@@ -388,8 +413,11 @@ class SizeScale extends Scale {
 
     // For size scales, we want exact data bounds without padding
     final bounds = BoundsCalculator.calculateBounds(
-        values, effectiveLimits, geometries,
-        applyPadding: false);
+      values,
+      effectiveLimits,
+      geometries,
+      applyPadding: false,
+    );
 
     if (bounds != const Bounds.ignored()) {
       _domain = [bounds.min, bounds.max];
@@ -460,10 +488,16 @@ class GradientColorScale extends Scale {
   }
 
   @override
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
-    final bounds =
-        BoundsCalculator.calculateBounds(values, effectiveLimits, geometries);
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
+    final bounds = BoundsCalculator.calculateBounds(
+      values,
+      effectiveLimits,
+      geometries,
+    );
 
     if (bounds != const Bounds.ignored()) {
       _domain = [bounds.min, bounds.max];
@@ -529,8 +563,10 @@ class TickConfig {
   final bool simpleLinear;
 
   TickConfig({List<double>? ticks, this.simpleLinear = false})
-      : assert(ticks == null || ticks.isNotEmpty,
-            'When provided, ticks must be non-empty.'),
+      : assert(
+          ticks == null || ticks.isNotEmpty,
+          'When provided, ticks must be non-empty.',
+        ),
         ticks = ticks != null
             ? (ticks.toList()..sort((a, b) => a.compareTo(b)))
             : null;

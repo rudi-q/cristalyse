@@ -13,19 +13,33 @@ void main() {
       sizeScale.setBounds([5.0, 35.0], null, []);
 
       // Test exact mappings
-      expect(sizeScale.scale(5.0), equals(8.0),
-          reason: 'Min value (5%) should map to min size (8px)');
-      expect(sizeScale.scale(35.0), equals(25.0),
-          reason: 'Max value (35%) should map to max size (25px)');
+      expect(
+        sizeScale.scale(5.0),
+        equals(8.0),
+        reason: 'Min value (5%) should map to min size (8px)',
+      );
+      expect(
+        sizeScale.scale(35.0),
+        equals(25.0),
+        reason: 'Max value (35%) should map to max size (25px)',
+      );
 
       // Test intermediate values - should be linear
-      expect(sizeScale.scale(20.0), closeTo(16.5, 0.1),
-          reason:
-              '20% is halfway between 5% and 35%, so should map to ~16.5px');
-      expect(sizeScale.scale(10.0), closeTo(10.83, 0.1),
-          reason: '10% should map to about 10.83px');
-      expect(sizeScale.scale(30.0), closeTo(22.17, 0.1),
-          reason: '30% should map to about 22.17px');
+      expect(
+        sizeScale.scale(20.0),
+        closeTo(16.5, 0.1),
+        reason: '20% is halfway between 5% and 35%, so should map to ~16.5px',
+      );
+      expect(
+        sizeScale.scale(10.0),
+        closeTo(10.83, 0.1),
+        reason: '10% should map to about 10.83px',
+      );
+      expect(
+        sizeScale.scale(30.0),
+        closeTo(22.17, 0.1),
+        reason: '30% should map to about 22.17px',
+      );
 
       // Verify relative sizes are correct
       final size5 = sizeScale.scale(5.0);
@@ -44,11 +58,16 @@ void main() {
       final diff2 = size20 - size10; // 10% to 20% = 10% difference
       final diff3 = size30 - size20; // 20% to 30% = 10% difference
 
-      expect(diff2, closeTo(diff3, 0.1),
-          reason:
-              'Equal data differences should produce equal size differences');
-      expect(diff2, closeTo(diff1 * 2, 0.2),
-          reason: '10% difference should be about 2x a 5% difference');
+      expect(
+        diff2,
+        closeTo(diff3, 0.1),
+        reason: 'Equal data differences should produce equal size differences',
+      );
+      expect(
+        diff2,
+        closeTo(diff1 * 2, 0.2),
+        reason: '10% difference should be about 2x a 5% difference',
+      );
     });
 
     test('Bubble chart data should produce correct size scale setup', () {
@@ -58,25 +77,25 @@ void main() {
           'company': 'Small Co',
           'revenue': 50.0,
           'customers': 100.0,
-          'marketShare': 8.0
+          'marketShare': 8.0,
         },
         {
           'company': 'Med Co',
           'revenue': 100.0,
           'customers': 150.0,
-          'marketShare': 15.0
+          'marketShare': 15.0,
         },
         {
           'company': 'Large Co',
           'revenue': 200.0,
           'customers': 120.0,
-          'marketShare': 35.0
+          'marketShare': 35.0,
         },
         {
           'company': 'Tiny Co',
           'revenue': 30.0,
           'customers': 80.0,
-          'marketShare': 5.0
+          'marketShare': 5.0,
         },
       ];
 
@@ -93,20 +112,30 @@ void main() {
       final bubbleMinSize = 8.0; // Minimum radius in pixels
       final bubbleMaxSize = 25.0; // Maximum radius in pixels
 
-      final sizeScale = SizeScale(
-        range: [bubbleMinSize, bubbleMaxSize],
-      );
+      final sizeScale = SizeScale(range: [bubbleMinSize, bubbleMaxSize]);
       sizeScale.setBounds([minShare, maxShare], null, []);
 
       // Verify each company gets appropriate size
-      expect(sizeScale.scale(5.0), equals(8.0),
-          reason: 'Tiny Co (5%) should get minimum size');
-      expect(sizeScale.scale(35.0), equals(25.0),
-          reason: 'Large Co (35%) should get maximum size');
-      expect(sizeScale.scale(15.0), closeTo(13.67, 0.1),
-          reason: 'Med Co (15%) should get proportional size');
-      expect(sizeScale.scale(8.0), closeTo(9.7, 0.1),
-          reason: 'Small Co (8%) should be slightly bigger than minimum');
+      expect(
+        sizeScale.scale(5.0),
+        equals(8.0),
+        reason: 'Tiny Co (5%) should get minimum size',
+      );
+      expect(
+        sizeScale.scale(35.0),
+        equals(25.0),
+        reason: 'Large Co (35%) should get maximum size',
+      );
+      expect(
+        sizeScale.scale(15.0),
+        closeTo(13.67, 0.1),
+        reason: 'Med Co (15%) should get proportional size',
+      );
+      expect(
+        sizeScale.scale(8.0),
+        closeTo(9.7, 0.1),
+        reason: 'Small Co (8%) should be slightly bigger than minimum',
+      );
     });
   });
 
@@ -119,84 +148,84 @@ void main() {
           'revenue': 120.0,
           'customers': 150.0,
           'marketShare': 15.0,
-          'category': 'Technology'
+          'category': 'Technology',
         },
         {
           'company': 'FinanceInc',
           'revenue': 200.0,
           'customers': 120.0,
           'marketShare': 25.0,
-          'category': 'Finance'
+          'category': 'Finance',
         },
         {
           'company': 'HealthPlus',
           'revenue': 80.0,
           'customers': 200.0,
           'marketShare': 10.0,
-          'category': 'Healthcare'
+          'category': 'Healthcare',
         },
         {
           'company': 'EduLearn',
           'revenue': 60.0,
           'customers': 180.0,
           'marketShare': 8.0,
-          'category': 'Education'
+          'category': 'Education',
         },
         {
           'company': 'RetailMax',
           'revenue': 150.0,
           'customers': 220.0,
           'marketShare': 30.0,
-          'category': 'Retail'
+          'category': 'Retail',
         },
         {
           'company': 'FoodChain',
           'revenue': 100.0,
           'customers': 250.0,
           'marketShare': 12.0,
-          'category': 'Food'
+          'category': 'Food',
         },
         {
           'company': 'AutoDrive',
           'revenue': 180.0,
           'customers': 100.0,
           'marketShare': 20.0,
-          'category': 'Automotive'
+          'category': 'Automotive',
         },
         {
           'company': 'EnergyCo',
           'revenue': 250.0,
           'customers': 80.0,
           'marketShare': 35.0,
-          'category': 'Energy'
+          'category': 'Energy',
         },
         {
           'company': 'MediaHub',
           'revenue': 90.0,
           'customers': 160.0,
           'marketShare': 18.0,
-          'category': 'Media'
+          'category': 'Media',
         },
         {
           'company': 'TravelGo',
           'revenue': 110.0,
           'customers': 140.0,
           'marketShare': 22.0,
-          'category': 'Travel'
+          'category': 'Travel',
         },
         {
           'company': 'RealEstate',
           'revenue': 220.0,
           'customers': 90.0,
           'marketShare': 28.0,
-          'category': 'Real Estate'
+          'category': 'Real Estate',
         },
         {
           'company': 'SportsFit',
           'revenue': 70.0,
           'customers': 170.0,
           'marketShare': 5.0,
-          'category': 'Sports'
+          'category': 'Sports',
         },
       ];
 
@@ -213,9 +242,7 @@ void main() {
       final defaultMin = 5.0;
       final defaultMax = 30.0;
 
-      final sizeScale = SizeScale(
-        range: [defaultMin, defaultMax],
-      );
+      final sizeScale = SizeScale(range: [defaultMin, defaultMax]);
       sizeScale.setBounds([minShare, maxShare], null, []);
 
       // Verify specific companies get correct sizes
@@ -224,28 +251,52 @@ void main() {
       final techCorpSize = sizeScale.scale(15.0);
       final retailMaxSize = sizeScale.scale(30.0);
 
-      expect(sportsFitSize, equals(5.0),
-          reason: 'Smallest company gets min size');
-      expect(energyCoSize, equals(30.0),
-          reason: 'Largest company gets max size');
-      expect(techCorpSize, closeTo(13.33, 0.1),
-          reason: 'TechCorp (15%) gets proportional size');
-      expect(retailMaxSize, closeTo(25.83, 0.1),
-          reason: 'RetailMax (30%) near max');
+      expect(
+        sportsFitSize,
+        equals(5.0),
+        reason: 'Smallest company gets min size',
+      );
+      expect(
+        energyCoSize,
+        equals(30.0),
+        reason: 'Largest company gets max size',
+      );
+      expect(
+        techCorpSize,
+        closeTo(13.33, 0.1),
+        reason: 'TechCorp (15%) gets proportional size',
+      );
+      expect(
+        retailMaxSize,
+        closeTo(25.83, 0.1),
+        reason: 'RetailMax (30%) near max',
+      );
 
       // CRITICAL: Verify visual hierarchy
-      expect(energyCoSize / sportsFitSize, equals(6.0),
-          reason: 'Largest should be 6x the smallest (30/5)');
-      expect(retailMaxSize > techCorpSize, isTrue,
-          reason: '30% market share must be visually larger than 15%');
+      expect(
+        energyCoSize / sportsFitSize,
+        equals(6.0),
+        reason: 'Largest should be 6x the smallest (30/5)',
+      );
+      expect(
+        retailMaxSize > techCorpSize,
+        isTrue,
+        reason: '30% market share must be visually larger than 15%',
+      );
 
       // Verify no bubble is too large for viewport
       for (final company in exampleData) {
         final size = sizeScale.scale(company['marketShare'] as double);
-        expect(size, lessThanOrEqualTo(30.0),
-            reason: 'No bubble should exceed max size of 30px');
-        expect(size, greaterThanOrEqualTo(5.0),
-            reason: 'No bubble should be smaller than min size of 5px');
+        expect(
+          size,
+          lessThanOrEqualTo(30.0),
+          reason: 'No bubble should exceed max size of 30px',
+        );
+        expect(
+          size,
+          greaterThanOrEqualTo(5.0),
+          reason: 'No bubble should be smaller than min size of 5px',
+        );
       }
     });
   });
@@ -320,10 +371,7 @@ void main() {
             {'x': 2.0, 'y': 3.0, 'category': 'B'},
           ])
           .mapping(x: 'x', y: 'y', color: 'category')
-          .geomBubble(
-            minSize: 8.0,
-            maxSize: 40.0,
-          );
+          .geomBubble(minSize: 8.0, maxSize: 40.0);
 
       // Build the chart to trigger geometry creation
       final widget = chart.build();
@@ -351,7 +399,7 @@ void main() {
       final shapes = [
         PointShape.circle,
         PointShape.square,
-        PointShape.triangle
+        PointShape.triangle,
       ];
 
       for (final shape in shapes) {
@@ -382,8 +430,9 @@ void main() {
   });
 
   group('Bubble Chart Integration', () {
-    testWidgets('should render bubble chart widget',
-        (WidgetTester tester) async {
+    testWidgets('should render bubble chart widget', (
+      WidgetTester tester,
+    ) async {
       final chart = CristalyseChart()
           .data([
             {'x': 1.0, 'y': 2.0, 'size': 10.0, 'category': 'A'},
@@ -391,11 +440,7 @@ void main() {
             {'x': 3.0, 'y': 1.0, 'size': 8.0, 'category': 'A'},
           ])
           .mapping(x: 'x', y: 'y', size: 'size', color: 'category')
-          .geomBubble(
-            minSize: 10.0,
-            maxSize: 30.0,
-            alpha: 0.7,
-          )
+          .geomBubble(minSize: 10.0, maxSize: 30.0, alpha: 0.7)
           .scaleXContinuous()
           .scaleYContinuous()
           .theme(ChartTheme.defaultTheme());
@@ -403,11 +448,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 300,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 300, child: chart.build()),
           ),
         ),
       );
@@ -419,8 +460,9 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('should handle empty data gracefully',
-        (WidgetTester tester) async {
+    testWidgets('should handle empty data gracefully', (
+      WidgetTester tester,
+    ) async {
       final chart = CristalyseChart()
           .data([])
           .mapping(x: 'x', y: 'y', size: 'size', color: 'category')
@@ -431,11 +473,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 300,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 300, child: chart.build()),
           ),
         ),
       );
@@ -449,27 +487,27 @@ void main() {
 
   group('Bubble Size Edge Cases - Validation', () {
     test(
-        'SizeScale with zero domain span should not produce negative/zero sizes',
-        () {
-      final sizeScale = SizeScale(
-        range: [5.0, 30.0],
-      );
+      'SizeScale with zero domain span should not produce negative/zero sizes',
+      () {
+        final sizeScale = SizeScale(range: [5.0, 30.0]);
 
-      // Single value dataset - domain span = 0
-      sizeScale.setBounds([10.0, 10.0], null, []);
+        // Single value dataset - domain span = 0
+        sizeScale.setBounds([10.0, 10.0], null, []);
 
-      final size = sizeScale.scale(10.0);
+        final size = sizeScale.scale(10.0);
 
-      // The scale may return 0 due to zero domain span
-      // Legend widget should handle this gracefully
-      expect(size.isFinite, isTrue,
-          reason: 'Size should be finite even with zero domain span');
-    });
+        // The scale may return 0 due to zero domain span
+        // Legend widget should handle this gracefully
+        expect(
+          size.isFinite,
+          isTrue,
+          reason: 'Size should be finite even with zero domain span',
+        );
+      },
+    );
 
     test('SizeScale with values outside domain should not crash', () {
-      final sizeScale = SizeScale(
-        range: [5.0, 30.0],
-      );
+      final sizeScale = SizeScale(range: [5.0, 30.0]);
       sizeScale.setBounds([10.0, 50.0], null, []);
 
       // Test values outside the domain (unclamped)
@@ -477,10 +515,16 @@ void main() {
       final aboveMax = sizeScale.scale(100.0); // Above domain
 
       // These may be negative or very large, but should be finite
-      expect(belowMin.isFinite, isTrue,
-          reason: 'Below-domain values should produce finite output');
-      expect(aboveMax.isFinite, isTrue,
-          reason: 'Above-domain values should produce finite output');
+      expect(
+        belowMin.isFinite,
+        isTrue,
+        reason: 'Below-domain values should produce finite output',
+      );
+      expect(
+        aboveMax.isFinite,
+        isTrue,
+        reason: 'Above-domain values should produce finite output',
+      );
     });
 
     test('SizeScale with inverted range should not break legend', () {
@@ -496,21 +540,25 @@ void main() {
       expect(maxSize.isFinite, isTrue);
 
       // With inverted range, min value should map to larger size
-      expect(minSize, greaterThan(maxSize),
-          reason: 'Inverted range should produce inverted sizes');
+      expect(
+        minSize,
+        greaterThan(maxSize),
+        reason: 'Inverted range should produce inverted sizes',
+      );
     });
 
     test('SizeScale with range starting at zero', () {
-      final sizeScale = SizeScale(
-        range: [0.0, 30.0],
-      );
+      final sizeScale = SizeScale(range: [0.0, 30.0]);
       sizeScale.setBounds([5.0, 35.0], null, []);
 
       final minSize = sizeScale.scale(5.0);
 
       // Min value maps to 0, which should be handled by legend validation
-      expect(minSize, equals(0.0),
-          reason: 'Min domain value should map to min range (0)');
+      expect(
+        minSize,
+        equals(0.0),
+        reason: 'Min domain value should map to min range (0)',
+      );
     });
 
     test('SizeScale with very small positive range', () {
@@ -563,8 +611,9 @@ void main() {
       );
     });
 
-    testWidgets('Legend should render with zero domain span bubble guide',
-        (WidgetTester tester) async {
+    testWidgets('Legend should render with zero domain span bubble guide', (
+      WidgetTester tester,
+    ) async {
       // Create chart with single size value (zero domain span)
       final chart = CristalyseChart()
           .data([
@@ -572,11 +621,7 @@ void main() {
             {'x': 2.0, 'y': 3.0, 'size': 10.0, 'category': 'B'}, // Same size
           ])
           .mapping(x: 'x', y: 'y', size: 'size', color: 'category')
-          .geomBubble(
-            minSize: 5.0,
-            maxSize: 30.0,
-            title: 'Size Guide',
-          )
+          .geomBubble(minSize: 5.0, maxSize: 30.0, title: 'Size Guide')
           .scaleXContinuous()
           .scaleYContinuous()
           .theme(ChartTheme.defaultTheme())
@@ -585,11 +630,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 500,
-              height: 300,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 500, height: 300, child: chart.build()),
           ),
         ),
       );
@@ -600,8 +641,9 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('Legend should render with range starting at zero',
-        (WidgetTester tester) async {
+    testWidgets('Legend should render with range starting at zero', (
+      WidgetTester tester,
+    ) async {
       final chart = CristalyseChart()
           .data([
             {'x': 1.0, 'y': 2.0, 'size': 5.0, 'category': 'A'},
@@ -621,11 +663,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 500,
-              height: 300,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 500, height: 300, child: chart.build()),
           ),
         ),
       );

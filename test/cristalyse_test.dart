@@ -321,11 +321,7 @@ void main() {
         final chart = CristalyseChart()
             .data(pieData)
             .mappingPie(value: 'users', category: 'category')
-            .geomPie(
-              innerRadius: 40.0,
-              outerRadius: 120.0,
-              strokeWidth: 2.0,
-            );
+            .geomPie(innerRadius: 40.0, outerRadius: 120.0, strokeWidth: 2.0);
 
         expect(chart, isNotNull);
         final widget = chart.build();
@@ -550,9 +546,7 @@ void main() {
     });
 
     test('should handle edge cases', () {
-      final scale = SizeScale(
-        range: [10, 20],
-      );
+      final scale = SizeScale(range: [10, 20]);
       scale.setBounds([5, 5], null, []); // Same min and max
 
       expect(scale.scale(5), equals(10)); // Should not crash

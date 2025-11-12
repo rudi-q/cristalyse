@@ -5,8 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('CristalyseExampleApp Tests', () {
-    testWidgets('App should start and display logo',
-        (WidgetTester tester) async {
+    testWidgets('App should start and display logo', (
+      WidgetTester tester,
+    ) async {
       // Build our app and trigger a frame.
       await tester.pumpWidget(const CristalyseExampleApp());
       await tester.pumpAndSettle();
@@ -15,8 +16,9 @@ void main() {
       expect(find.byType(SvgPicture), findsOneWidget);
     });
 
-    testWidgets('Drawer should contain navigation routes',
-        (WidgetTester tester) async {
+    testWidgets('Drawer should contain navigation routes', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const CristalyseExampleApp());
       await tester.pumpAndSettle();
 
@@ -36,8 +38,9 @@ void main() {
       expect(find.text('Bar Chart'), findsOneWidget);
     });
 
-    testWidgets('Theme switching FAB should be present',
-        (WidgetTester tester) async {
+    testWidgets('Theme switching FAB should be present', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const CristalyseExampleApp());
       await tester.pumpAndSettle();
 

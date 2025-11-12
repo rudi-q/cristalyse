@@ -11,10 +11,7 @@ class _PanExampleWidget extends StatefulWidget {
   final ChartTheme theme;
   final double sliderValue;
 
-  const _PanExampleWidget({
-    required this.theme,
-    required this.sliderValue,
-  });
+  const _PanExampleWidget({required this.theme, required this.sliderValue});
 
   @override
   State<_PanExampleWidget> createState() => _PanExampleWidgetState();
@@ -49,7 +46,8 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
     currentData = List.generate(2000, (i) {
       return {
         'x': i.toDouble(),
-        'y': 50 +
+        'y':
+            50 +
             math.sin(i * 0.02) * 30 +
             (math.Random().nextDouble() - 0.5) * 20,
         'category': 'Series${i % 3 + 1}',
@@ -153,20 +151,26 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                     });
                   },
                   decoration: InputDecoration(
-                      label: Text('Min X',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).primaryColor,
-                          )),
-                      isDense: true,
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Theme.of(context).primaryColor))),
+                    label: Text(
+                      'Min X',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    isDense: true,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
                   style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).primaryColor),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -181,31 +185,39 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                     });
                   },
                   decoration: InputDecoration(
-                      label: Text('Max X',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context).primaryColor,
-                          )),
-                      isDense: true,
-                      border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Theme.of(context).primaryColor))),
+                    label: Text(
+                      'Max X',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    isDense: true,
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
                   style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: Theme.of(context).primaryColor),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: Theme.of(context).primaryColor,
+                  ),
                 ),
               ),
               IconButton(
                 onPressed: () {
                   final minX = math.min(panToMinX, panToMaxX);
                   final maxX = math.max(panToMinX, panToMaxX);
-                  panController.panTo(PanInfo(
-                    visibleMinX: minX,
-                    visibleMaxX: maxX,
-                    state: PanState.update,
-                  ));
+                  panController.panTo(
+                    PanInfo(
+                      visibleMinX: minX,
+                      visibleMaxX: maxX,
+                      state: PanState.update,
+                    ),
+                  );
                 },
                 icon: Icon(Icons.refresh),
                 color: Theme.of(context).colorScheme.onPrimary,
@@ -220,20 +232,22 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
               ),
               Expanded(
                 child: SwitchListTile(
-                    title: Text(
-                      'Boundary Clamping',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Theme.of(context).colorScheme.onPrimary),
-                      textAlign: TextAlign.right,
+                  title: Text(
+                    'Boundary Clamping',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.onPrimary,
                     ),
-                    value: boundaryClamping,
-                    onChanged: (value) {
-                      setState(() {
-                        boundaryClamping = value;
-                      });
-                    }),
-              )
+                    textAlign: TextAlign.right,
+                  ),
+                  value: boundaryClamping,
+                  onChanged: (value) {
+                    setState(() {
+                      boundaryClamping = value;
+                    });
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -255,40 +269,42 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child: CristalyseChart()
-                  .data(currentData)
-                  .mapping(x: 'x', y: 'y', color: 'category')
-                  .geomLine(
-                    strokeWidth: 1.0 + widget.sliderValue * 4.0,
-                    alpha: 0.8,
-                  )
-                  .geomPoint(
-                    size: 2.0 + widget.sliderValue * 4.0,
-                    alpha: 0.7,
-                  )
-                  .scaleXContinuous(min: visibleMinX, max: visibleMaxX)
-                  .scaleYContinuous()
-                  .interaction(
-                    pan: PanConfig(
-                      enabled: true,
-                      updateXDomain: true, // Enable X-axis panning
-                      updateYDomain:
-                          false, // Disable Y-axis panning for this example
-                      onPanStart: _handlePanStart,
-                      onPanUpdate: _handlePanUpdate,
-                      onPanEnd: _handlePanEnd,
-                      throttle: const Duration(milliseconds: 50),
-                      controller: panController,
-                      boundaryClampingX: boundaryClamping,
-                      boundaryClampingY: boundaryClamping,
-                    ),
-                  )
-                  .legend(
-                      position: LegendPosition.topRight,
-                      orientation: LegendOrientation.horizontal)
-                  .theme(widget.theme)
-                  .animate(duration: const Duration(milliseconds: 0))
-                  .build(),
+              child:
+                  CristalyseChart()
+                      .data(currentData)
+                      .mapping(x: 'x', y: 'y', color: 'category')
+                      .geomLine(
+                        strokeWidth: 1.0 + widget.sliderValue * 4.0,
+                        alpha: 0.8,
+                      )
+                      .geomPoint(
+                        size: 2.0 + widget.sliderValue * 4.0,
+                        alpha: 0.7,
+                      )
+                      .scaleXContinuous(min: visibleMinX, max: visibleMaxX)
+                      .scaleYContinuous()
+                      .interaction(
+                        pan: PanConfig(
+                          enabled: true,
+                          updateXDomain: true, // Enable X-axis panning
+                          updateYDomain:
+                              false, // Disable Y-axis panning for this example
+                          onPanStart: _handlePanStart,
+                          onPanUpdate: _handlePanUpdate,
+                          onPanEnd: _handlePanEnd,
+                          throttle: const Duration(milliseconds: 50),
+                          controller: panController,
+                          boundaryClampingX: boundaryClamping,
+                          boundaryClampingY: boundaryClamping,
+                        ),
+                      )
+                      .legend(
+                        position: LegendPosition.topRight,
+                        orientation: LegendOrientation.horizontal,
+                      )
+                      .theme(widget.theme)
+                      .animate(duration: const Duration(milliseconds: 0))
+                      .build(),
             ),
           ),
         ),

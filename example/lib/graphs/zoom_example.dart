@@ -8,10 +8,7 @@ Widget buildZoomExampleTab(ChartTheme theme, double sliderValue) {
 }
 
 class _ZoomExampleWidget extends StatefulWidget {
-  const _ZoomExampleWidget({
-    required this.theme,
-    required this.sliderValue,
-  });
+  const _ZoomExampleWidget({required this.theme, required this.sliderValue});
 
   final ChartTheme theme;
   final double sliderValue;
@@ -22,8 +19,9 @@ class _ZoomExampleWidget extends StatefulWidget {
 
 class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
   late final List<Map<String, dynamic>> _data;
-  final ValueNotifier<_ZoomUiState> _zoomUiNotifier =
-      ValueNotifier(const _ZoomUiState());
+  final ValueNotifier<_ZoomUiState> _zoomUiNotifier = ValueNotifier(
+    const _ZoomUiState(),
+  );
   ZoomAxis _axis = ZoomAxis.x;
   bool _showButtons = true;
   double _wheelSensitivity = 0.0015;
@@ -77,7 +75,10 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
         break;
     }
     _zoomUiNotifier.value = previous.copyWith(
-        info: info, status: status, events: previous.events + 1);
+      info: info,
+      status: status,
+      events: previous.events + 1,
+    );
   }
 
   String _formatRange(double? min, double? max) {
@@ -172,10 +173,7 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
                       value: ZoomAxis.x,
                       child: Text('X axis (default)'),
                     ),
-                    DropdownMenuItem(
-                      value: ZoomAxis.y,
-                      child: Text('Y axis'),
-                    ),
+                    DropdownMenuItem(value: ZoomAxis.y, child: Text('Y axis')),
                     DropdownMenuItem(
                       value: ZoomAxis.both,
                       child: Text('Both axes'),
@@ -233,10 +231,7 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
             spacing: 8,
             runSpacing: 8,
             children: const [
-              _InstructionChip(
-                icon: Icons.touch_app,
-                label: 'Pinch to zoom',
-              ),
+              _InstructionChip(icon: Icons.touch_app, label: 'Pinch to zoom'),
               _InstructionChip(
                 icon: Icons.mouse,
                 label: 'Scroll wheel supported',
@@ -268,7 +263,8 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
               flex: 2,
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(
-                    parent: ClampingScrollPhysics()),
+                  parent: ClampingScrollPhysics(),
+                ),
                 padding: EdgeInsets.only(bottom: spacing),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,10 +276,7 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
                 ),
               ),
             ),
-            Expanded(
-              flex: 3,
-              child: _buildChart(),
-            ),
+            Expanded(flex: 3, child: _buildChart()),
           ],
         );
       },
@@ -306,56 +299,53 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: CristalyseChart()
-            .data(_data)
-            .mapping(x: 'day', y: 'revenue', color: 'region')
-            .geomLine(
-              strokeWidth: 1.5 + widget.sliderValue * 3,
-              alpha: 0.9,
-            )
-            .geomPoint(
-              size: 2.0 + widget.sliderValue * 3,
-              alpha: 0.6,
-            )
-            .scaleXContinuous()
-            .scaleYContinuous()
-            .legend(
-              position: LegendPosition.bottom,
-              orientation: LegendOrientation.horizontal,
-            )
-            .interaction(
-              tooltip: TooltipConfig(
-                builder: DefaultTooltips.multi({
-                  'day': 'Day',
-                  'region': 'Region',
-                  'revenue': 'Revenue',
-                }),
-              ),
-              hover: HoverConfig(hitTestRadius: 18),
-              zoom: ZoomConfig(
-                enabled: true,
-                axes: _axis,
-                maxScale: 16,
-                minScale: 1,
-                wheelSensitivity: _wheelSensitivity,
-                buttonStep: _buttonStep,
-                showButtons: _showButtons,
-                buttonPadding: const EdgeInsets.all(20),
-                buttonAlignment: Alignment.bottomRight,
-                onZoomStart: _handleZoomEvent,
-                onZoomUpdate: _handleZoomEvent,
-                onZoomEnd: _handleZoomEvent,
-              ),
-              pan: PanConfig(
-                enabled: true,
-                updateXDomain: _axis == ZoomAxis.x || _axis == ZoomAxis.both,
-                updateYDomain: _axis == ZoomAxis.y || _axis == ZoomAxis.both,
-                throttle: const Duration(milliseconds: 32),
-              ),
-            )
-            .theme(widget.theme)
-            .animate(duration: const Duration(milliseconds: 450))
-            .build(),
+        child:
+            CristalyseChart()
+                .data(_data)
+                .mapping(x: 'day', y: 'revenue', color: 'region')
+                .geomLine(strokeWidth: 1.5 + widget.sliderValue * 3, alpha: 0.9)
+                .geomPoint(size: 2.0 + widget.sliderValue * 3, alpha: 0.6)
+                .scaleXContinuous()
+                .scaleYContinuous()
+                .legend(
+                  position: LegendPosition.bottom,
+                  orientation: LegendOrientation.horizontal,
+                )
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: DefaultTooltips.multi({
+                      'day': 'Day',
+                      'region': 'Region',
+                      'revenue': 'Revenue',
+                    }),
+                  ),
+                  hover: HoverConfig(hitTestRadius: 18),
+                  zoom: ZoomConfig(
+                    enabled: true,
+                    axes: _axis,
+                    maxScale: 16,
+                    minScale: 1,
+                    wheelSensitivity: _wheelSensitivity,
+                    buttonStep: _buttonStep,
+                    showButtons: _showButtons,
+                    buttonPadding: const EdgeInsets.all(20),
+                    buttonAlignment: Alignment.bottomRight,
+                    onZoomStart: _handleZoomEvent,
+                    onZoomUpdate: _handleZoomEvent,
+                    onZoomEnd: _handleZoomEvent,
+                  ),
+                  pan: PanConfig(
+                    enabled: true,
+                    updateXDomain:
+                        _axis == ZoomAxis.x || _axis == ZoomAxis.both,
+                    updateYDomain:
+                        _axis == ZoomAxis.y || _axis == ZoomAxis.both,
+                    throttle: const Duration(milliseconds: 32),
+                  ),
+                )
+                .theme(widget.theme)
+                .animate(duration: const Duration(milliseconds: 450))
+                .build(),
       ),
     );
   }
@@ -421,10 +411,7 @@ class _InfoTile extends StatelessWidget {
 }
 
 class _InstructionChip extends StatelessWidget {
-  const _InstructionChip({
-    required this.icon,
-    required this.label,
-  });
+  const _InstructionChip({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
@@ -450,11 +437,7 @@ class _ZoomUiState {
     this.events = 0,
   });
 
-  _ZoomUiState copyWith({
-    ZoomInfo? info,
-    String? status,
-    int? events,
-  }) {
+  _ZoomUiState copyWith({ZoomInfo? info, String? status, int? events}) {
     return _ZoomUiState(
       info: info ?? this.info,
       status: status ?? this.status,
