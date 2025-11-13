@@ -1785,7 +1785,7 @@ class _AnimatedCristalyseChartWidgetState
     final zoomConfig = _zoomConfig;
     if (plotArea == null || zoomConfig == null) return;
 
-    final step = zoomConfig.buttonStep <= 0 ? 1.2 : zoomConfig.buttonStep;
+    final step = zoomConfig.buttonStep < 1.0 ? 1.2 : zoomConfig.buttonStep;
     final scaleDelta = zoomIn ? step : (1 / step);
     final changed = _applyZoom(scaleDelta, plotArea.center, plotArea);
     if (changed) {
