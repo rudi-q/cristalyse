@@ -3,8 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../core/geometry.dart';
-import '../core/geometry_calculator.dart';
-import '../core/render_models.dart';
 import '../core/scale.dart';
 import '../core/util/helper.dart';
 import '../themes/chart_theme.dart';
@@ -799,31 +797,14 @@ class AnimatedChartPainter extends CustomPainter {
     ColorScale colorScale,
     String? yCol,
   ) {
-    // Use GeometryCalculator to get all bar geometries
-    final calculator = GeometryCalculator(
-      data: data,
-      xColumn: xColumn,
-      yColumn: yColumn,
-      colorColumn: colorColumn,
-      sizeColumn: sizeColumn,
-      theme: theme,
-      coordFlipped: coordFlipped,
-    );
+    for (int i = 0; i < data.length; i++) {
+      final point = data[i];
+      final x = point[xColumn];
+      final y = getNumericValue(point[yCol]);
 
-    final bars = calculator.calculateSimpleBars(
-      geometry,
-      xScale,
-      yScale,
-      colorScale,
-      plotArea,
-      yCol,
-    );
+      if (y == null || !y.isFinite) continue;
 
-    // Apply animation and render each bar
-    for (int i = 0; i < bars.length; i++) {
-      final bar = bars[i];
-
-      final barDelay = bars.isNotEmpty ? i / bars.length * 0.2 : 0.0;
+      final barDelay = data.isNotEmpty ? i / data.length * 0.2 : 0.0;
       final barProgress = math.max(
         0.0,
         math.min(
@@ -834,11 +815,18 @@ class AnimatedChartPainter extends CustomPainter {
 
       if (barProgress <= 0) continue;
 
-      // Apply animation to bar height/width
-      final animatedBar = _applyBarAnimation(bar, barProgress);
-
-      // Render the bar
-      _renderBar(canvas, animatedBar);
+      _drawSingleBar(
+        canvas,
+        plotArea,
+        geometry,
+        x,
+        y,
+        xScale,
+        yScale,
+        colorScale,
+        barProgress,
+        point,
+      );
     }
   }
 
@@ -851,37 +839,27 @@ class AnimatedChartPainter extends CustomPainter {
     ColorScale colorScale,
     String? yCol,
   ) {
-    // Use GeometryCalculator to get all bar geometries
-    final calculator = GeometryCalculator(
-      data: data,
-      xColumn: xColumn,
-      yColumn: yColumn,
-      colorColumn: colorColumn,
-      sizeColumn: sizeColumn,
-      theme: theme,
-      coordFlipped: coordFlipped,
-    );
+    final groups = <dynamic, Map<dynamic, double>>{};
+    for (final point in data) {
+      final x = point[xColumn];
+      final y = getNumericValue(point[yCol]);
+      final color = point[colorColumn];
 
-    final bars = calculator.calculateGroupedBars(
-      geometry,
-      xScale,
-      yScale,
-      colorScale,
-      plotArea,
-      yCol,
-    );
+      if (y == null || !y.isFinite) continue;
 
-    // Group bars by X value to calculate group-based animation delays
-    final barsByX = <dynamic, List<BarRenderData>>{};
-    for (final bar in bars) {
-      final x = bar.dataPoint[xColumn];
-      barsByX.putIfAbsent(x, () => []).add(bar);
+      groups.putIfAbsent(x, () => {})[color] = y;
     }
 
+    final allColors = data.map((d) => d[colorColumn]).toSet().toList();
+    final colorCount = allColors.length;
+
     int groupIndex = 0;
-    for (final groupBars in barsByX.values) {
+    for (final groupEntry in groups.entries) {
+      final x = groupEntry.key;
+      final colorValues = groupEntry.value;
+
       final groupDelay =
-          barsByX.isNotEmpty ? groupIndex / barsByX.length * 0.2 : 0.0;
+          groups.isNotEmpty ? groupIndex / groups.length * 0.2 : 0.0;
       final groupProgress = math.max(
         0.0,
         math.min(
@@ -895,10 +873,47 @@ class AnimatedChartPainter extends CustomPainter {
         continue;
       }
 
-      // Render all bars in this group with the same animation progress
-      for (final bar in groupBars) {
-        final animatedBar = _applyBarAnimation(bar, groupProgress);
-        _renderBar(canvas, animatedBar);
+      double basePosition;
+      double totalGroupWidth;
+
+      if (xScale is OrdinalScale) {
+        // Use bandCenter to center the bars, then adjust for group width
+        final centerPos = plotArea.left + xScale.bandCenter(x);
+        totalGroupWidth = xScale.bandWidth * geometry.width;
+        basePosition = centerPos - (totalGroupWidth / 2);
+      } else {
+        basePosition = plotArea.left + xScale.scale(x) - 20;
+        totalGroupWidth = 40 * geometry.width;
+      }
+
+      final barWidth = totalGroupWidth / colorCount;
+
+      int colorIndex = 0;
+      for (final color in allColors) {
+        final value = colorValues[color];
+        if (value == null) {
+          colorIndex++;
+          continue;
+        }
+
+        final barX = basePosition + colorIndex * barWidth;
+
+        _drawSingleBar(
+          canvas,
+          plotArea,
+          geometry,
+          x,
+          value,
+          xScale,
+          yScale,
+          colorScale,
+          groupProgress,
+          {colorColumn!: color},
+          customX: barX,
+          customWidth: barWidth,
+        );
+
+        colorIndex++;
       }
 
       groupIndex++;
@@ -914,20 +929,6 @@ class AnimatedChartPainter extends CustomPainter {
     ColorScale colorScale,
     String? yCol,
   ) {
-    // For stacked bars, animation is more complex - we need to animate
-    // each segment's VALUE (not just the final rect), so we can't use
-    // the calculator for the full stack. Instead, we calculate and render
-    // each segment with its animated value.
-    final calculator = GeometryCalculator(
-      data: data,
-      xColumn: xColumn,
-      yColumn: yColumn,
-      colorColumn: colorColumn,
-      sizeColumn: sizeColumn,
-      theme: theme,
-      coordFlipped: coordFlipped,
-    );
-
     final groups = <dynamic, List<Map<String, dynamic>>>{};
     for (final point in data) {
       final x = point[xColumn];
@@ -978,22 +979,19 @@ class AnimatedChartPainter extends CustomPainter {
 
         if (segmentProgress <= 0) continue;
 
-        // Calculate bar with animated Y value
-        final bar = calculator.calculateSingleBar(
+        _drawSingleBar(
+          canvas,
+          plotArea,
+          geometry,
           x,
           y * segmentProgress,
           xScale,
           yScale,
           colorScale,
-          geometry,
+          1.0,
           point,
-          plotArea,
           yStackOffset: cumulativeValue,
         );
-
-        if (bar != null) {
-          _renderBar(canvas, bar); // No additional animation - it's in the Y value
-        }
 
         cumulativeValue += y * segmentProgress;
       }
@@ -1121,211 +1119,6 @@ class AnimatedChartPainter extends CustomPainter {
     }
   }
 
-  /// Applies animation to a bar by scaling its height/width.
-  ///
-  /// For vertical bars: animates height from bottom up
-  /// For horizontal bars: animates width from left to right
-  BarRenderData _applyBarAnimation(BarRenderData bar, double progress) {
-    if (coordFlipped) {
-      // Horizontal bar: animate width from left
-      final animatedWidth = bar.rect.width * progress;
-      return bar.copyWith(
-        rect: Rect.fromLTWH(
-          bar.rect.left,
-          bar.rect.top,
-          animatedWidth,
-          bar.rect.height,
-        ),
-      );
-    } else {
-      // Vertical bar: animate height from bottom
-      final animatedHeight = bar.rect.height * progress;
-      final yOffset = bar.rect.height * (1 - progress);
-      return bar.copyWith(
-        rect: Rect.fromLTWH(
-          bar.rect.left,
-          bar.rect.top + yOffset,
-          bar.rect.width,
-          animatedHeight,
-        ),
-      );
-    }
-  }
-
-  /// Renders a bar to the canvas using its RenderData.
-  ///
-  /// Handles gradients, solid colors, borders, and border radius.
-  void _renderBar(Canvas canvas, BarRenderData bar) {
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    // Apply gradient or solid color based on what we received
-    if (bar.colorOrGradient is Gradient) {
-      final alphaGradient = _applyAlphaToGradient(
-        bar.colorOrGradient,
-        bar.alpha,
-      );
-      paint.shader = alphaGradient.createShader(bar.rect);
-    } else {
-      final color = bar.colorOrGradient as Color;
-      paint.color = color.withAlpha((bar.alpha * 255).round());
-    }
-
-    if (bar.borderRadius != null && bar.borderRadius != BorderRadius.zero) {
-      canvas.drawRRect(bar.borderRadius!.toRRect(bar.rect), paint);
-    } else {
-      canvas.drawRect(bar.rect, paint);
-    }
-
-    if (bar.borderWidth > 0 && bar.borderColor != null) {
-      final borderPaint = Paint()
-        ..color = bar.borderColor!.withAlpha((bar.alpha * 255).round())
-        ..strokeWidth = bar.borderWidth
-        ..style = PaintingStyle.stroke;
-
-      if (bar.borderRadius != null && bar.borderRadius != BorderRadius.zero) {
-        canvas.drawRRect(bar.borderRadius!.toRRect(bar.rect), borderPaint);
-      } else {
-        canvas.drawRect(bar.rect, borderPaint);
-      }
-    }
-  }
-
-  /// Renders a line to the canvas using its RenderData.
-  ///
-  /// Handles progressive animation (drawing segment by segment).
-  void _renderLine(Canvas canvas, LineRenderData line) {
-    final lineProgress = math.max(0.0, math.min(1.0, animationProgress));
-    if (lineProgress <= 0.001 || line.points.length < 2) {
-      return;
-    }
-
-    final paint = Paint()
-      ..color = line.color.withAlpha((line.alpha * 255).round())
-      ..strokeWidth = line.strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final path = Path();
-    final int numSegments = line.points.length - 1;
-
-    final double totalProgressiveSegments = numSegments * lineProgress;
-    final int fullyDrawnSegments = totalProgressiveSegments.floor();
-    final double partialSegmentProgress =
-        totalProgressiveSegments - fullyDrawnSegments;
-
-    path.moveTo(line.points[0].dx, line.points[0].dy);
-
-    for (int i = 0; i < fullyDrawnSegments; i++) {
-      path.lineTo(line.points[i + 1].dx, line.points[i + 1].dy);
-    }
-
-    if (partialSegmentProgress > 0.001 && fullyDrawnSegments < numSegments) {
-      final Offset lastFullPoint = line.points[fullyDrawnSegments];
-      final Offset nextPoint = line.points[fullyDrawnSegments + 1];
-
-      final double dx = lastFullPoint.dx +
-          (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
-      final double dy = lastFullPoint.dy +
-          (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
-      path.lineTo(dx, dy);
-    }
-
-    if (fullyDrawnSegments > 0 ||
-        (partialSegmentProgress > 0.001 && fullyDrawnSegments < numSegments)) {
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  /// Renders a point to the canvas using its RenderData.
-  ///
-  /// Handles different point shapes (circle, square, triangle) and borders.
-  void _renderPoint(Canvas canvas, PointRenderData point, double progress) {
-    final animatedSize = point.size * progress;
-    final animatedAlpha = point.alpha * progress;
-
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    // Apply gradient or solid color based on what we received
-    if (point.colorOrGradient is Gradient) {
-      // For points, create a square shader area around the point
-      final shaderRect = Rect.fromCenter(
-        center: point.position,
-        width: point.size * 2,
-        height: point.size * 2,
-      );
-      final alphaGradient = _applyAlphaToGradient(
-        point.colorOrGradient,
-        animatedAlpha,
-      );
-      paint.shader = alphaGradient.createShader(shaderRect);
-    } else {
-      final color = point.colorOrGradient as Color;
-      paint.color = color.withAlpha((animatedAlpha * 255).round());
-    }
-
-    // Draw the point shape
-    if (point.shape == PointShape.circle) {
-      canvas.drawCircle(point.position, animatedSize, paint);
-    } else if (point.shape == PointShape.square) {
-      canvas.drawRect(
-        Rect.fromCenter(
-          center: point.position,
-          width: animatedSize,
-          height: animatedSize,
-        ),
-        paint,
-      );
-    } else if (point.shape == PointShape.triangle) {
-      final path = Path();
-      path.moveTo(point.position.dx, point.position.dy - animatedSize);
-      path.lineTo(
-        point.position.dx - animatedSize,
-        point.position.dy + animatedSize,
-      );
-      path.lineTo(
-        point.position.dx + animatedSize,
-        point.position.dy + animatedSize,
-      );
-      path.close();
-      canvas.drawPath(path, paint);
-    }
-
-    // Draw border if needed
-    if (point.borderWidth > 0 && point.borderColor != null) {
-      final borderPaint = Paint()
-        ..color = point.borderColor!.withAlpha((animatedAlpha * 255).round())
-        ..strokeWidth = point.borderWidth
-        ..style = PaintingStyle.stroke;
-
-      if (point.shape == PointShape.circle) {
-        canvas.drawCircle(point.position, animatedSize, borderPaint);
-      } else if (point.shape == PointShape.square) {
-        canvas.drawRect(
-          Rect.fromCenter(
-            center: point.position,
-            width: animatedSize,
-            height: animatedSize,
-          ),
-          borderPaint,
-        );
-      } else if (point.shape == PointShape.triangle) {
-        final path = Path();
-        path.moveTo(point.position.dx, point.position.dy - animatedSize);
-        path.lineTo(
-          point.position.dx - animatedSize,
-          point.position.dy + animatedSize,
-        );
-        path.lineTo(
-          point.position.dx + animatedSize,
-          point.position.dy + animatedSize,
-        );
-        path.close();
-        canvas.drawPath(path, borderPaint);
-      }
-    }
-  }
-
   void _drawPointsAnimated(
     Canvas canvas,
     Rect plotArea,
@@ -1338,32 +1131,27 @@ class AnimatedChartPainter extends CustomPainter {
   ) {
     final yCol = isSecondaryY ? y2Column : yColumn;
 
-    // Use GeometryCalculator to get all point geometries
-    final calculator = GeometryCalculator(
-      data: data,
-      xColumn: xColumn,
-      yColumn: yColumn,
-      colorColumn: colorColumn,
-      sizeColumn: sizeColumn,
-      theme: theme,
-      coordFlipped: coordFlipped,
-    );
+    for (int i = 0; i < data.length; i++) {
+      final point = data[i];
+      final xRawValue = point[xColumn];
+      final y = getNumericValue(point[yCol]);
 
-    final points = calculator.calculatePoints(
-      geometry,
-      xScale,
-      yScale,
-      colorScale,
-      sizeScale,
-      plotArea,
-      yCol,
-    );
+      if (xRawValue == null || y == null) continue;
 
-    // Apply animation and render each point
-    for (int i = 0; i < points.length; i++) {
-      final point = points[i];
+      // Handle both ordinal and continuous X-scales
+      double pointX;
+      if (xScale is OrdinalScale) {
+        // For ordinal scales, use the raw string value with bandCenter
+        final ordinalScale = xScale;
+        pointX = plotArea.left + ordinalScale.bandCenter(xRawValue);
+      } else {
+        // For continuous scales, convert to number first
+        final x = getNumericValue(xRawValue);
+        if (x == null) continue;
+        pointX = plotArea.left + xScale.scale(x);
+      }
 
-      final pointDelay = points.isNotEmpty ? i / points.length * 0.2 : 0.0;
+      final pointDelay = data.isNotEmpty ? i / data.length * 0.2 : 0.0;
       final pointProgress = math.max(
         0.0,
         math.min(
@@ -1374,8 +1162,115 @@ class AnimatedChartPainter extends CustomPainter {
 
       if (pointProgress <= 0) continue;
 
-      // Render the point with animation
-      _renderPoint(canvas, point, pointProgress);
+      // Priority: geometry.color > colorScale > theme fallback
+      final dynamic colorOrGradient;
+      if (geometry.color != null) {
+        colorOrGradient = geometry.color!;
+      } else if (colorColumn != null) {
+        colorOrGradient = colorScale.scale(point[colorColumn]);
+      } else {
+        colorOrGradient = theme.colorPalette.isNotEmpty
+            ? theme.colorPalette.first
+            : theme.primaryColor;
+      }
+
+      final size = sizeColumn != null
+          ? sizeScale.scale(point[sizeColumn])
+          : theme.pointSizeDefault;
+
+      final pointY = plotArea.top + yScale.scale(y);
+
+      final paint = Paint()..style = PaintingStyle.fill;
+
+      // Apply gradient or solid color based on what we received
+      if (colorOrGradient is Gradient) {
+        // For points, create a square shader area around the point
+        final shaderRect = Rect.fromCenter(
+          center: Offset(pointX, pointY),
+          width: size * 2,
+          height: size * 2,
+        );
+        final combinedAlpha = geometry.alpha * pointProgress;
+        final alphaGradient = _applyAlphaToGradient(
+          colorOrGradient,
+          combinedAlpha,
+        );
+        paint.shader = alphaGradient.createShader(shaderRect);
+      } else {
+        final color = colorOrGradient as Color;
+        paint.color = color.withAlpha(
+          (geometry.alpha * pointProgress * 255).round(),
+        );
+      }
+
+      if (!pointX.isFinite || !pointY.isFinite) {
+        continue;
+      }
+
+      if (geometry.shape == PointShape.circle) {
+        canvas.drawCircle(Offset(pointX, pointY), size * pointProgress, paint);
+      } else if (geometry.shape == PointShape.square) {
+        canvas.drawRect(
+          Rect.fromCenter(
+            center: Offset(pointX, pointY),
+            width: size * pointProgress,
+            height: size * pointProgress,
+          ),
+          paint,
+        );
+      } else if (geometry.shape == PointShape.triangle) {
+        final path = Path();
+        path.moveTo(pointX, pointY - size * pointProgress);
+        path.lineTo(
+          pointX - size * pointProgress,
+          pointY + size * pointProgress,
+        );
+        path.lineTo(
+          pointX + size * pointProgress,
+          pointY + size * pointProgress,
+        );
+        path.close();
+        canvas.drawPath(path, paint);
+      }
+
+      if (geometry.borderWidth > 0) {
+        final borderPaint = Paint()
+          ..color = theme.borderColor.withAlpha(
+            (geometry.alpha * pointProgress * 255).round(),
+          )
+          ..strokeWidth = geometry.borderWidth
+          ..style = PaintingStyle.stroke;
+
+        if (geometry.shape == PointShape.circle) {
+          canvas.drawCircle(
+            Offset(pointX, pointY),
+            size * pointProgress,
+            borderPaint,
+          );
+        } else if (geometry.shape == PointShape.square) {
+          canvas.drawRect(
+            Rect.fromCenter(
+              center: Offset(pointX, pointY),
+              width: size * pointProgress,
+              height: size * pointProgress,
+            ),
+            borderPaint,
+          );
+        } else if (geometry.shape == PointShape.triangle) {
+          final path = Path();
+          path.moveTo(pointX, pointY - size * pointProgress);
+          path.lineTo(
+            pointX - size * pointProgress,
+            pointY + size * pointProgress,
+          );
+          path.lineTo(
+            pointX + size * pointProgress,
+            pointY + size * pointProgress,
+          );
+          path.close();
+          canvas.drawPath(path, borderPaint);
+        }
+      }
     }
   }
 
@@ -1565,29 +1460,45 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     }
 
-    // Use GeometryCalculator to get all line geometries
-    final calculator = GeometryCalculator(
-      data: data,
-      xColumn: xColumn,
-      yColumn: yColumn,
-      colorColumn: colorColumn,
-      sizeColumn: sizeColumn,
-      theme: theme,
-      coordFlipped: coordFlipped,
-    );
+    if (colorColumn != null) {
+      // Group by color and draw separate lines
+      final groupedData = <dynamic, List<Map<String, dynamic>>>{};
+      for (final point in data) {
+        final colorValue = point[colorColumn];
+        groupedData.putIfAbsent(colorValue, () => []).add(point);
+      }
 
-    final lines = calculator.calculateLines(
-      geometry,
-      xScale,
-      yScale,
-      colorScale,
-      plotArea,
-      yCol,
-    );
-
-    // Render each line with animation
-    for (final line in lines) {
-      _renderLine(canvas, line);
+      for (final entry in groupedData.entries) {
+        final colorValue = entry.key;
+        final groupData = entry.value;
+        final lineColor = geometry.color ?? colorScale.scale(colorValue);
+        _drawSingleLineAnimated(
+          canvas,
+          plotArea,
+          groupData,
+          xScale,
+          yScale,
+          lineColor,
+          geometry,
+          yCol,
+        );
+      }
+    } else {
+      // Draw single line for all data
+      final lineColor = geometry.color ??
+          (theme.colorPalette.isNotEmpty
+              ? theme.colorPalette.first
+              : theme.primaryColor);
+      _drawSingleLineAnimated(
+        canvas,
+        plotArea,
+        data,
+        xScale,
+        yScale,
+        lineColor,
+        geometry,
+        yCol,
+      );
     }
   }
 
