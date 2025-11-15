@@ -1,0 +1,9 @@
+# Test configuration for cristalyse
+# This file defines tags used by the test suite
+
+tags:
+  # Golden tests use Alchemist for visual regression testing
+  # Run with: flutter test --tags golden
+  # Skip with: flutter test --exclude-tags golden
+  golden:
+    description: Visual regression tests using golden file screenshots
