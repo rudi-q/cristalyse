@@ -6,6 +6,7 @@ class ChartInteraction {
   final HoverConfig? hover;
   final ClickConfig? click;
   final PanConfig? pan;
+  final ZoomConfig? zoom;
   final bool enabled;
 
   const ChartInteraction({
@@ -13,6 +14,7 @@ class ChartInteraction {
     this.hover,
     this.click,
     this.pan,
+    this.zoom,
     this.enabled = true,
   });
 
@@ -121,6 +123,7 @@ typedef TooltipBuilder = Widget Function(DataPointInfo point);
 typedef HoverCallback = void Function(DataPointInfo? point);
 typedef ClickCallback = void Function(DataPointInfo point);
 typedef PanCallback = void Function(PanInfo info);
+typedef ZoomCallback = void Function(ZoomInfo info);
 
 /// Configuration for pan interactions
 class PanConfig {
@@ -132,6 +135,14 @@ class PanConfig {
   final bool updateXDomain;
   final bool updateYDomain;
 
+  /// Optional external controller to drive programmatic panning.
+  /// The widget will listen/unlisten to this in its lifecycle.
+  final PanController? controller;
+
+  /// Whether to clamp the pan to the boundaries of the chart.
+  final bool boundaryClampingX;
+  final bool boundaryClampingY;
+
   const PanConfig({
     this.enabled = true,
     this.onPanUpdate,
@@ -140,11 +151,17 @@ class PanConfig {
     this.throttle = const Duration(milliseconds: 100),
     this.updateXDomain = false,
     this.updateYDomain = false,
+    this.controller,
+    this.boundaryClampingX = false,
+    this.boundaryClampingY = false,
   });
 }
 
 /// Pan state information
 enum PanState { start, update, end }
+
+/// Zoom interaction lifecycle states
+enum ZoomState { start, update, end }
 
 /// Information about the current pan operation
 class PanInfo {
@@ -178,6 +195,40 @@ class PanInfo {
   @override
   String toString() {
     return 'PanInfo(xRange: [$visibleMinX, $visibleMaxX], yRange: [$visibleMinY, $visibleMaxY], state: $state)';
+  }
+}
+
+/// Controller for programmatic chart panning.
+///
+/// Create an instance and pass it to [PanConfig.controller] to enable
+/// programmatic pan operations via [panTo] and [panReset].
+///
+/// The controller must be disposed when no longer needed:
+/// ```dart
+/// final controller = PanController();
+/// // ... use it
+/// controller.dispose(); // Clean up
+/// ```
+class PanController extends ChangeNotifier {
+  PanInfo? _targetPan;
+
+  PanInfo? get targetPan => _targetPan;
+
+  /// Programmatically pan the chart to the specified visible range.
+  ///
+  /// The [info] parameter should contain the desired visible X/Y ranges
+  /// and an appropriate [PanState] (typically [PanState.update] or [PanState.end]).
+  void panTo(PanInfo info) {
+    _targetPan = info;
+    notifyListeners();
+  }
+
+  /// Reset the pan to the original (unpanned) chart view.
+  ///
+  /// This restores the chart to its initial domain boundaries.
+  void panReset() {
+    _targetPan = null;
+    notifyListeners();
   }
 }
 
@@ -259,5 +310,75 @@ class DefaultTooltips {
         ],
       );
     };
+  }
+}
+
+/// Axes that can respond to zooming
+enum ZoomAxis { x, y, both }
+
+/// Configuration for zoom interactions
+class ZoomConfig {
+  final bool enabled;
+  final ZoomAxis axes;
+  final double maxScale;
+  final double minScale;
+  final double wheelSensitivity;
+  final double buttonStep;
+  final bool showButtons;
+  final Alignment buttonAlignment;
+  final EdgeInsets buttonPadding;
+  final ZoomCallback? onZoomStart;
+  final ZoomCallback? onZoomUpdate;
+  final ZoomCallback? onZoomEnd;
+
+  const ZoomConfig({
+    this.enabled = true,
+    this.axes = ZoomAxis.x,
+    this.maxScale = 16.0,
+    this.minScale = 1.0,
+    this.wheelSensitivity = 0.0015,
+    this.buttonStep = 1.4,
+    this.showButtons = true,
+    this.buttonAlignment = Alignment.bottomRight,
+    this.buttonPadding = const EdgeInsets.all(12),
+    this.onZoomStart,
+    this.onZoomUpdate,
+    this.onZoomEnd,
+  })  : assert(
+          maxScale >= minScale && maxScale > 0 && minScale > 0,
+          'Zoom scales must be positive and max >= min',
+        ),
+        assert(
+          wheelSensitivity >= 0.0005 && wheelSensitivity <= 0.0035,
+          'wheelSensitivity must be between 0.0005 and 0.0035 (inclusive); '
+          'received $wheelSensitivity',
+        );
+}
+
+/// Information emitted during zoom interactions
+class ZoomInfo {
+  final double? visibleMinX;
+  final double? visibleMaxX;
+  final double? visibleMinY;
+  final double? visibleMaxY;
+  final double? scaleX;
+  final double? scaleY;
+  final ZoomState state;
+
+  const ZoomInfo({
+    this.visibleMinX,
+    this.visibleMaxX,
+    this.visibleMinY,
+    this.visibleMaxY,
+    this.scaleX,
+    this.scaleY,
+    required this.state,
+  });
+
+  @override
+  String toString() {
+    return 'ZoomInfo(xRange: [$visibleMinX, $visibleMaxX], '
+        'yRange: [$visibleMinY, $visibleMaxY], '
+        'scaleX: $scaleX, scaleY: $scaleY, state: $state)';
   }
 }

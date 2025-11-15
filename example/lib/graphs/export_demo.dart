@@ -32,26 +32,29 @@ class _ExportDemoState extends State<ExportDemo> {
 
   void _generateSampleData() {
     _chartData = List.generate(12, (i) {
-      final month = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ][i];
+      final month =
+          [
+            'Jan',
+            'Feb',
+            'Mar',
+            'Apr',
+            'May',
+            'Jun',
+            'Jul',
+            'Aug',
+            'Sep',
+            'Oct',
+            'Nov',
+            'Dec',
+          ][i];
 
-      final revenue = 50 +
+      final revenue =
+          50 +
           i * 8 +
           math.sin(i * 0.5) * 15 +
           (math.Random().nextDouble() - 0.5) * 10;
-      final users = 1000 +
+      final users =
+          1000 +
           i * 120 +
           math.cos(i * 0.4) * 200 +
           (math.Random().nextDouble() - 0.5) * 100;
@@ -91,34 +94,35 @@ class _ExportDemoState extends State<ExportDemo> {
         .animate(duration: const Duration(milliseconds: 1200))
         .interaction(
           tooltip: TooltipConfig(
-            builder: (point) => Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.black.withAlpha(204),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    point.getDisplayValue('month'),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+            builder:
+                (point) => Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withAlpha(204),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  Text(
-                    'Revenue: \$${point.getDisplayValue('revenue')}k',
-                    style: const TextStyle(color: Colors.white),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        point.getDisplayValue('month'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        'Revenue: \$${point.getDisplayValue('revenue')}k',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        'Users: ${point.getDisplayValue('users')}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ],
                   ),
-                  Text(
-                    'Users: ${point.getDisplayValue('users')}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
+                ),
           ),
         );
   }
@@ -146,7 +150,8 @@ class _ExportDemoState extends State<ExportDemo> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-                'Chart exported successfully!\nSaved to: ${result.filePath}'),
+              'Chart exported successfully!\nSaved to: ${result.filePath}',
+            ),
             backgroundColor: Colors.green,
             duration: const Duration(seconds: 4),
           ),
@@ -229,9 +234,13 @@ class _ExportDemoState extends State<ExportDemo> {
                         backgroundColor: widget.colorPalette[1],
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
                         textStyle: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -269,11 +278,14 @@ class _ExportDemoState extends State<ExportDemo> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                              'Format: ${_lastExportResult!.format.name.toUpperCase()}'),
+                            'Format: ${_lastExportResult!.format.name.toUpperCase()}',
+                          ),
                           Text(
-                              'Dimensions: ${_lastExportResult!.dimensions.width.toInt()} × ${_lastExportResult!.dimensions.height.toInt()}'),
+                            'Dimensions: ${_lastExportResult!.dimensions.width.toInt()} × ${_lastExportResult!.dimensions.height.toInt()}',
+                          ),
                           Text(
-                              'File Size: ${(_lastExportResult!.fileSizeBytes / 1024).toStringAsFixed(1)} KB'),
+                            'File Size: ${(_lastExportResult!.fileSizeBytes / 1024).toStringAsFixed(1)} KB',
+                          ),
                           Text(
                             'Path: ${_lastExportResult!.filePath}',
                             style: const TextStyle(fontSize: 12),
@@ -323,8 +335,10 @@ class _ExportDemoState extends State<ExportDemo> {
                           '  height: 800,\\n'
                           '  filename: "my_chart",\\n'
                           ');',
-                          style:
-                              TextStyle(fontFamily: 'monospace', fontSize: 12),
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 12,
+                          ),
                         ),
                         SizedBox(height: 16),
                         Text(

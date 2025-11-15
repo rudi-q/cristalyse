@@ -2,7 +2,9 @@ import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
 Widget buildMultiSeriesLineChartTab(
-    ChartTheme currentTheme, double sliderValue) {
+  ChartTheme currentTheme,
+  double sliderValue,
+) {
   // Multi-series data exactly like the documentation example that was broken
   final data = [
     {'month': 'Jan', 'platform': 'iOS', 'users': 1200},
@@ -36,26 +38,24 @@ Widget buildMultiSeriesLineChartTab(
         const SizedBox(height: 8),
         Text(
           'Using the exact code from the documentation that was previously broken',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
         ),
         const SizedBox(height: 16),
 
         SizedBox(
           height: 400,
-          child: CristalyseChart()
-              .data(data)
-              .mapping(x: 'month', y: 'users', color: 'platform')
-              .geomLine(strokeWidth: 2.0 + sliderValue * 3.0)
-              .geomPoint(size: 4.0 + sliderValue * 4.0)
-              .scaleXOrdinal()
-              .scaleYContinuous(min: 0)
-              .theme(currentTheme)
-              .animate(duration: const Duration(milliseconds: 1500))
-              .legend(position: LegendPosition.right)
-              .build(),
+          child:
+              CristalyseChart()
+                  .data(data)
+                  .mapping(x: 'month', y: 'users', color: 'platform')
+                  .geomLine(strokeWidth: 2.0 + sliderValue * 3.0)
+                  .geomPoint(size: 4.0 + sliderValue * 4.0)
+                  .scaleXOrdinal()
+                  .scaleYContinuous(min: 0)
+                  .theme(currentTheme)
+                  .animate(duration: const Duration(milliseconds: 1500))
+                  .legend(position: LegendPosition.right)
+                  .build(),
         ),
 
         const SizedBox(height: 24),
@@ -72,28 +72,26 @@ Widget buildMultiSeriesLineChartTab(
         const SizedBox(height: 8),
         Text(
           'Demonstrates clean line separation without points',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
         ),
         const SizedBox(height: 16),
 
         SizedBox(
           height: 350,
-          child: CristalyseChart()
-              .data(data)
-              .mapping(x: 'month', y: 'users', color: 'platform')
-              .geomLine(
-                strokeWidth: 3.0 + sliderValue * 2.0,
-                alpha: 0.8 + sliderValue * 0.2,
-              )
-              .scaleXOrdinal()
-              .scaleYContinuous(min: 0)
-              .theme(currentTheme)
-              .animate(duration: const Duration(milliseconds: 1200))
-              .legend(position: LegendPosition.bottom)
-              .build(),
+          child:
+              CristalyseChart()
+                  .data(data)
+                  .mapping(x: 'month', y: 'users', color: 'platform')
+                  .geomLine(
+                    strokeWidth: 3.0 + sliderValue * 2.0,
+                    alpha: 0.8 + sliderValue * 0.2,
+                  )
+                  .scaleXOrdinal()
+                  .scaleYContinuous(min: 0)
+                  .theme(currentTheme)
+                  .animate(duration: const Duration(milliseconds: 1200))
+                  .legend(position: LegendPosition.bottom)
+                  .build(),
         ),
 
         const SizedBox(height: 24),
@@ -110,10 +108,7 @@ Widget buildMultiSeriesLineChartTab(
         const SizedBox(height: 8),
         Text(
           'iOS vs Android vs Web platforms - each with separate lines',
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
-          ),
+          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
         ),
         const SizedBox(height: 16),
 
@@ -160,8 +155,9 @@ Widget buildMultiSeriesLineChartTab(
                 .customPalette(categoryColors: categoryColors)
                 .animate(duration: const Duration(milliseconds: 1800))
                 .legend(
-                    position: LegendPosition.topRight,
-                    orientation: LegendOrientation.horizontal)
+                  position: LegendPosition.topRight,
+                  orientation: LegendOrientation.horizontal,
+                )
                 .build();
           }(),
         ),

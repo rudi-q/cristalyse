@@ -8,19 +8,14 @@ void main() {
   group('ProgressGeometry Validation Tests', () {
     test('should validate minValue < maxValue', () {
       expect(
-        () => ProgressGeometry(
-          minValue: 100.0,
-          maxValue: 50.0,
-        ),
+        () => ProgressGeometry(minValue: 100.0, maxValue: 50.0),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('should validate positive animationDuration', () {
       expect(
-        () => ProgressGeometry(
-          animationDuration: Duration.zero,
-        ),
+        () => ProgressGeometry(animationDuration: Duration.zero),
         throwsA(isA<AssertionError>()),
       );
 
@@ -34,100 +29,76 @@ void main() {
 
     test('should validate non-negative thickness', () {
       expect(
-        () => ProgressGeometry(
-          thickness: -5.0,
-        ),
+        () => ProgressGeometry(thickness: -5.0),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('should validate non-negative cornerRadius', () {
       expect(
-        () => ProgressGeometry(
-          cornerRadius: -2.0,
-        ),
+        () => ProgressGeometry(cornerRadius: -2.0),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('should validate non-negative strokeWidth', () {
       expect(
-        () => ProgressGeometry(
-          strokeWidth: -1.0,
-        ),
+        () => ProgressGeometry(strokeWidth: -1.0),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('should validate non-negative labelOffset', () {
       expect(
-        () => ProgressGeometry(
-          labelOffset: -3.0,
-        ),
+        () => ProgressGeometry(labelOffset: -3.0),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('should validate positive groupCount', () {
       expect(
-        () => ProgressGeometry(
-          groupCount: 0,
-        ),
+        () => ProgressGeometry(groupCount: 0),
         throwsA(isA<AssertionError>()),
       );
 
       expect(
-        () => ProgressGeometry(
-          groupCount: -2,
-        ),
+        () => ProgressGeometry(groupCount: -2),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('should validate positive tickCount', () {
       expect(
-        () => ProgressGeometry(
-          tickCount: 0,
-        ),
+        () => ProgressGeometry(tickCount: 0),
         throwsA(isA<AssertionError>()),
       );
 
       expect(
-        () => ProgressGeometry(
-          tickCount: -5,
-        ),
+        () => ProgressGeometry(tickCount: -5),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('should validate positive gaugeRadius', () {
       expect(
-        () => ProgressGeometry(
-          gaugeRadius: 0.0,
-        ),
+        () => ProgressGeometry(gaugeRadius: 0.0),
         throwsA(isA<AssertionError>()),
       );
 
       expect(
-        () => ProgressGeometry(
-          gaugeRadius: -10.0,
-        ),
+        () => ProgressGeometry(gaugeRadius: -10.0),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('should validate sweepAngle range', () {
       expect(
-        () => ProgressGeometry(
-          sweepAngle: 0.0,
-        ),
+        () => ProgressGeometry(sweepAngle: 0.0),
         throwsA(isA<AssertionError>()),
       );
 
       expect(
-        () => ProgressGeometry(
-          sweepAngle: -math.pi / 2,
-        ),
+        () => ProgressGeometry(sweepAngle: -math.pi / 2),
         throwsA(isA<AssertionError>()),
       );
 
@@ -139,12 +110,7 @@ void main() {
       );
 
       // Should pass for valid range
-      expect(
-        () => ProgressGeometry(
-          sweepAngle: math.pi,
-        ),
-        returnsNormally,
-      );
+      expect(() => ProgressGeometry(sweepAngle: math.pi), returnsNormally);
 
       expect(
         () => ProgressGeometry(
@@ -174,43 +140,42 @@ void main() {
 
       // Should pass when one is null
       expect(
-        () => ProgressGeometry(
-          segments: [10.0, 20.0, 30.0],
-          segmentColors: null,
-        ),
+        () =>
+            ProgressGeometry(segments: [10.0, 20.0, 30.0], segmentColors: null),
         returnsNormally,
       );
     });
 
     test(
-        'should validate concentricRadii and concentricThicknesses length matching',
-        () {
-      expect(
-        () => ProgressGeometry(
-          concentricRadii: [10.0, 20.0, 30.0],
-          concentricThicknesses: [2.0, 4.0], // Mismatched length
-        ),
-        throwsA(isA<AssertionError>()),
-      );
+      'should validate concentricRadii and concentricThicknesses length matching',
+      () {
+        expect(
+          () => ProgressGeometry(
+            concentricRadii: [10.0, 20.0, 30.0],
+            concentricThicknesses: [2.0, 4.0], // Mismatched length
+          ),
+          throwsA(isA<AssertionError>()),
+        );
 
-      // Should pass when lengths match
-      expect(
-        () => ProgressGeometry(
-          concentricRadii: [10.0, 20.0, 30.0],
-          concentricThicknesses: [2.0, 4.0, 6.0],
-        ),
-        returnsNormally,
-      );
+        // Should pass when lengths match
+        expect(
+          () => ProgressGeometry(
+            concentricRadii: [10.0, 20.0, 30.0],
+            concentricThicknesses: [2.0, 4.0, 6.0],
+          ),
+          returnsNormally,
+        );
 
-      // Should pass when both are null
-      expect(
-        () => ProgressGeometry(
-          concentricRadii: null,
-          concentricThicknesses: null,
-        ),
-        returnsNormally,
-      );
-    });
+        // Should pass when both are null
+        expect(
+          () => ProgressGeometry(
+            concentricRadii: null,
+            concentricThicknesses: null,
+          ),
+          returnsNormally,
+        );
+      },
+    );
 
     test('should validate non-negative segment values', () {
       expect(
@@ -295,54 +260,52 @@ void main() {
 
       // Should pass with gaugeRadius provided
       expect(
-        () => ProgressGeometry(
-          style: ProgressStyle.gauge,
-          gaugeRadius: 50.0,
-        ),
+        () => ProgressGeometry(style: ProgressStyle.gauge, gaugeRadius: 50.0),
         returnsNormally,
       );
     });
 
     test(
-        'should validate concentric style requires both concentricRadii and concentricThicknesses',
-        () {
-      expect(
-        () => ProgressGeometry(
-          style: ProgressStyle.concentric,
-          concentricRadii: null,
-          concentricThicknesses: null, // Both required
-        ),
-        throwsA(isA<AssertionError>()),
-      );
+      'should validate concentric style requires both concentricRadii and concentricThicknesses',
+      () {
+        expect(
+          () => ProgressGeometry(
+            style: ProgressStyle.concentric,
+            concentricRadii: null,
+            concentricThicknesses: null, // Both required
+          ),
+          throwsA(isA<AssertionError>()),
+        );
 
-      expect(
-        () => ProgressGeometry(
-          style: ProgressStyle.concentric,
-          concentricRadii: [10.0, 20.0],
-          concentricThicknesses: null, // Missing thicknesses
-        ),
-        throwsA(isA<AssertionError>()),
-      );
+        expect(
+          () => ProgressGeometry(
+            style: ProgressStyle.concentric,
+            concentricRadii: [10.0, 20.0],
+            concentricThicknesses: null, // Missing thicknesses
+          ),
+          throwsA(isA<AssertionError>()),
+        );
 
-      expect(
-        () => ProgressGeometry(
-          style: ProgressStyle.concentric,
-          concentricRadii: null,
-          concentricThicknesses: [2.0, 4.0], // Missing radii
-        ),
-        throwsA(isA<AssertionError>()),
-      );
+        expect(
+          () => ProgressGeometry(
+            style: ProgressStyle.concentric,
+            concentricRadii: null,
+            concentricThicknesses: [2.0, 4.0], // Missing radii
+          ),
+          throwsA(isA<AssertionError>()),
+        );
 
-      // Should pass with both provided
-      expect(
-        () => ProgressGeometry(
-          style: ProgressStyle.concentric,
-          concentricRadii: [10.0, 20.0],
-          concentricThicknesses: [2.0, 4.0],
-        ),
-        returnsNormally,
-      );
-    });
+        // Should pass with both provided
+        expect(
+          () => ProgressGeometry(
+            style: ProgressStyle.concentric,
+            concentricRadii: [10.0, 20.0],
+            concentricThicknesses: [2.0, 4.0],
+          ),
+          returnsNormally,
+        );
+      },
+    );
 
     test('should allow valid constructor parameters', () {
       // Basic valid constructor

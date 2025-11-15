@@ -306,6 +306,89 @@ CristalyseChart()
   .build()
 ```
 
+## Tick Configuration
+
+<Info>
+**New in v1.14.0:** Control how tick marks and labels are generated on your axes!
+</Info>
+
+TickConfig allows you to customize tick generation on continuous scales:
+
+```dart
+TickConfig(
+  ticks: [0, 25, 50, 75, 100],  // Optional: specify explicit tick positions
+  simpleLinear: true,            // Optional: use simple linear ticks instead of Wilkinson's algorithm
+)
+```
+
+### Explicit Tick Specification
+
+Provide your own tick positions for precise control:
+
+```dart
+CristalyseChart()
+  .data(temperatureData)
+  .mapping(x: 'hour', y: 'temp')
+  .scaleYContinuous(
+    tickConfig: TickConfig(
+      ticks: [-10, 0, 10, 20, 30],  // Custom tick positions
+    ),
+  )
+  .geomLine()
+  .build()
+```
+
+**Use cases:**
+- Industry-standard reference points (e.g., freezing point at 0°C)
+- Domain-specific intervals (e.g., percentiles at 25, 50, 75)
+- Matching ticks across multiple related charts
+
+### Simple Linear Ticking
+
+Generate evenly-spaced ticks instead of using Wilkinson's algorithm:
+
+```dart
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'timestamp', y: 'value')
+  .scaleXContinuous(
+    tickConfig: TickConfig(simpleLinear: true),
+  )
+  .scaleYContinuous(
+    tickConfig: TickConfig(simpleLinear: true),
+  )
+  .geomLine()
+  .build()
+```
+
+**Differences:**
+- **Wilkinson's Algorithm** (default): Intelligently chooses "nice" numbers for human-readable labels. Tick intervals vary based on data range (e.g., 10, 25, 50, 100).
+- **Simple Linear**: Always generates evenly-spaced ticks. Tick interval is constant based on the scale range divided by number of ticks.
+
+**When to use Simple Linear:**
+- Time-based charts where consistent intervals matter (e.g., hourly or daily splits)
+- Scientific/technical charts where precision is preferred over "niceness"
+- When you need predictable, uniform spacing
+
+### Dual-Axis Example
+
+```dart
+CristalyseChart()
+  .data(businessData)
+  .mapping(x: 'month', y: 'revenue')
+  .mappingY2('conversion')
+  .scaleXOrdinal()
+  .scaleYContinuous(
+    tickConfig: TickConfig(ticks: [0, 50000, 100000, 150000]),
+  )
+  .scaleY2Continuous(
+    tickConfig: TickConfig(simpleLinear: true),
+  )
+  .geomBar(yAxis: YAxis.primary)
+  .geomLine(yAxis: YAxis.secondary)
+  .build()
+```
+
 ## Scale Customization
 
 Customize scales to fit your data representation needs:

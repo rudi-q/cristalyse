@@ -4,8 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Chart Rendering Smoke Tests (with titles)', () {
-    testWidgets('X-axis title renders when provided',
-        (WidgetTester tester) async {
+    testWidgets('X-axis title renders when provided', (
+      WidgetTester tester,
+    ) async {
       final data = [
         {'x': 1, 'y': 10},
         {'x': 2, 'y': 20},
@@ -36,8 +37,9 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('Y-axis title renders when provided',
-        (WidgetTester tester) async {
+    testWidgets('Y-axis title renders when provided', (
+      WidgetTester tester,
+    ) async {
       final data = [
         {'x': 1, 'y': 10},
         {'x': 2, 'y': 20},
@@ -102,8 +104,9 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('Chart renders without titles when not provided',
-        (WidgetTester tester) async {
+    testWidgets('Chart renders without titles when not provided', (
+      WidgetTester tester,
+    ) async {
       final data = [
         {'x': 1, 'y': 10},
         {'x': 2, 'y': 20},
@@ -134,8 +137,9 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('Bubble chart size title appears in legend',
-        (WidgetTester tester) async {
+    testWidgets('Bubble chart size title appears in legend', (
+      WidgetTester tester,
+    ) async {
       final data = [
         {'x': 1, 'y': 10, 'size': 50, 'category': 'A'},
         {'x': 2, 'y': 20, 'size': 100, 'category': 'B'},

@@ -14,35 +14,23 @@ class DebugGradientExample extends StatelessWidget {
     ];
 
     final Map<String, Gradient> quarterlyGradients = {
-      'Q1': const LinearGradient(
-        colors: [Colors.red, Colors.blue],
-      ),
-      'Q2': const LinearGradient(
-        colors: [Colors.green, Colors.yellow],
-      ),
-      'Q3': const LinearGradient(
-        colors: [Colors.orange, Colors.purple],
-      ),
-      'Q4': const LinearGradient(
-        colors: [Colors.cyan, Colors.pink],
-      ),
+      'Q1': const LinearGradient(colors: [Colors.red, Colors.blue]),
+      'Q2': const LinearGradient(colors: [Colors.green, Colors.yellow]),
+      'Q3': const LinearGradient(colors: [Colors.orange, Colors.purple]),
+      'Q4': const LinearGradient(colors: [Colors.cyan, Colors.pink]),
     };
 
-    final builtWidget = CristalyseChart()
-        .data(data)
-        .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
-        .geomBar()
-        .customPalette(categoryGradients: quarterlyGradients)
-        .build();
+    final builtWidget =
+        CristalyseChart()
+            .data(data)
+            .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
+            .geomBar()
+            .customPalette(categoryGradients: quarterlyGradients)
+            .build();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Debug Gradient')),
-      body: Center(
-        child: SizedBox(
-          height: 400,
-          child: builtWidget,
-        ),
-      ),
+      body: Center(child: SizedBox(height: 400, child: builtWidget)),
     );
   }
 }

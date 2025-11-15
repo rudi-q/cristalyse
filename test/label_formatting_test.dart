@@ -8,8 +8,10 @@ void main() {
       final scale = LinearScale(); // No custom formatter
       expect(scale.formatLabel(42), equals('42')); // Integer
       expect(scale.formatLabel(42.0), equals('42')); // Rounds to integer
-      expect(scale.formatLabel(42.05),
-          equals('42.0')); // Rounds but still displays double
+      expect(
+        scale.formatLabel(42.05),
+        equals('42.0'),
+      ); // Rounds but still displays double
       expect(scale.formatLabel(42.5), equals('42.5')); // Decimal
       expect(scale.formatLabel('text'), equals('text')); // String fallback
     });
@@ -61,8 +63,9 @@ void main() {
     test('factory pattern example from docs works', () {
       // Test the createCurrencyFormatter pattern we document - exact match to docs
       String Function(num) createCurrencyFormatter({String locale = 'en_US'}) {
-        final formatter =
-            NumberFormat.simpleCurrency(locale: locale); // Created once
+        final formatter = NumberFormat.simpleCurrency(
+          locale: locale,
+        ); // Created once
         return (num value) => formatter.format(value); // Reused callback
       }
 

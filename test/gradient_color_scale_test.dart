@@ -1,6 +1,6 @@
+import 'package:cristalyse/src/core/scale.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:cristalyse/src/core/scale.dart';
 
 void main() {
   group('GradientColorScale', () {

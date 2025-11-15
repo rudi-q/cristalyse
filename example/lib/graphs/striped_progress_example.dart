@@ -35,22 +35,27 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
         const SizedBox(height: 8),
         SizedBox(
           height: 300,
-          child: CristalyseChart()
-              .data(_generateProgressData())
-              .mappingProgress(
-                  value: 'completion', label: 'task', category: 'department')
-              .geomProgress(
-                orientation: ProgressOrientation.horizontal,
-                style: ProgressStyle.striped,
-                thickness: 25.0,
-                cornerRadius: 8.0,
-                showLabel: true,
-              )
-              .theme(currentTheme)
-              .animate(
-                  duration: const Duration(milliseconds: 1200),
-                  curve: Curves.easeOutCubic)
-              .build(),
+          child:
+              CristalyseChart()
+                  .data(_generateProgressData())
+                  .mappingProgress(
+                    value: 'completion',
+                    label: 'task',
+                    category: 'department',
+                  )
+                  .geomProgress(
+                    orientation: ProgressOrientation.horizontal,
+                    style: ProgressStyle.striped,
+                    thickness: 25.0,
+                    cornerRadius: 8.0,
+                    showLabel: true,
+                  )
+                  .theme(currentTheme)
+                  .animate(
+                    duration: const Duration(milliseconds: 1200),
+                    curve: Curves.easeOutCubic,
+                  )
+                  .build(),
         ),
         const SizedBox(height: 24),
 
@@ -66,31 +71,37 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
         const SizedBox(height: 8),
         SizedBox(
           height: 300,
-          child: CristalyseChart()
-              .data(_generateProgressData())
-              .mappingProgress(
-                  value: 'completion', label: 'task', category: 'department')
-              .geomProgress(
-                orientation: ProgressOrientation.vertical,
-                style: ProgressStyle.striped,
-                thickness: 30.0,
-                cornerRadius: 6.0,
-                showLabel: true,
-              )
-              .theme(currentTheme)
-              .animate(
-                  duration: const Duration(milliseconds: 1000),
-                  curve: Curves.easeOutCubic)
-              .build(),
+          child:
+              CristalyseChart()
+                  .data(_generateProgressData())
+                  .mappingProgress(
+                    value: 'completion',
+                    label: 'task',
+                    category: 'department',
+                  )
+                  .geomProgress(
+                    orientation: ProgressOrientation.vertical,
+                    style: ProgressStyle.striped,
+                    thickness: 30.0,
+                    cornerRadius: 6.0,
+                    showLabel: true,
+                  )
+                  .theme(currentTheme)
+                  .animate(
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOutCubic,
+                  )
+                  .build(),
         ),
         const SizedBox(height: 16),
 
         const Text(
-            '• Striped pattern creates visual distinction from solid fills\\n'
-            '• Diagonal stripes at 45-degree angle\\n'
-            '• Works with both horizontal and vertical orientations\\n'
-            '• Maintains rounded corners and smooth animations\\n'
-            '• Great for showing active/in-progress states'),
+          '• Striped pattern creates visual distinction from solid fills\\n'
+          '• Diagonal stripes at 45-degree angle\\n'
+          '• Works with both horizontal and vertical orientations\\n'
+          '• Maintains rounded corners and smooth animations\\n'
+          '• Great for showing active/in-progress states',
+        ),
       ],
     ),
   );
@@ -106,7 +117,7 @@ List<Map<String, dynamic>> _generateProgressData() {
     {
       'task': 'Marketing Campaign',
       'completion': 90.0,
-      'department': 'Marketing'
+      'department': 'Marketing',
     },
   ];
 }

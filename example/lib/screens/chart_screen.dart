@@ -25,16 +25,15 @@ import '../graphs/pie_chart.dart';
 import '../graphs/progress_bars.dart';
 import '../graphs/scatter_plot.dart';
 import '../graphs/stacked_bar_chart.dart';
+import '../graphs/time_based_line_chart.dart';
+import '../graphs/zoom_example.dart';
 import '../router/app_router.dart';
 import '../utils/chart_feature_list.dart';
 
 class ChartScreen extends StatefulWidget {
   final int chartIndex;
 
-  const ChartScreen({
-    super.key,
-    required this.chartIndex,
-  });
+  const ChartScreen({super.key, required this.chartIndex});
 
   @override
   State<ChartScreen> createState() => _ChartScreenState();
@@ -62,19 +61,19 @@ class _ChartScreenState extends State<ChartScreen>
       Color(0xfff44336),
       Color(0xffe91e63),
       Color(0xff9c27b0),
-      Color(0xff673ab7)
+      Color(0xff673ab7),
     ],
     const [
       Color(0xff2196f3),
       Color(0xff00bcd4),
       Color(0xff009688),
-      Color(0xff4caf50)
+      Color(0xff4caf50),
     ],
     const [
       Color(0xffffb74d),
       Color(0xffff8a65),
       Color(0xffdce775),
-      Color(0xffaed581)
+      Color(0xffaed581),
     ],
   ];
 
@@ -100,7 +99,9 @@ class _ChartScreenState extends State<ChartScreen>
     );
     _fabAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
-          parent: _fabAnimationController, curve: Curves.elasticOut),
+        parent: _fabAnimationController,
+        curve: Curves.elasticOut,
+      ),
     );
 
     _generateSampleData();
@@ -133,10 +134,12 @@ class _ChartScreenState extends State<ChartScreen>
 
     // Realistic bar chart - Quarterly Revenue
     final quarters = ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024'];
-    _barChartData = quarters.asMap().entries.map((entry) {
-      final revenue = 120 + entry.key * 25 + math.Random().nextDouble() * 20;
-      return {'quarter': entry.value, 'revenue': revenue};
-    }).toList();
+    _barChartData =
+        quarters.asMap().entries.map((entry) {
+          final revenue =
+              120 + entry.key * 25 + math.Random().nextDouble() * 20;
+          return {'quarter': entry.value, 'revenue': revenue};
+        }).toList();
 
     // Realistic grouped bar data - Product Performance
     final products = ['Mobile App', 'Web Platform', 'API Services'];
@@ -162,16 +165,18 @@ class _ChartScreenState extends State<ChartScreen>
       'Product',
       'Sales',
       'Marketing',
-      'Customer Success'
+      'Customer Success',
     ];
-    _horizontalBarData = departments.asMap().entries.map((entry) {
-      final multipliers = [1.0, 0.8, 0.9, 0.7, 0.6];
-      final headcount = 25 + (entry.key * 8) + math.Random().nextDouble() * 12;
-      return {
-        'department': entry.value,
-        'headcount': headcount * multipliers[entry.key]
-      };
-    }).toList();
+    _horizontalBarData =
+        departments.asMap().entries.map((entry) {
+          final multipliers = [1.0, 0.8, 0.9, 0.7, 0.6];
+          final headcount =
+              25 + (entry.key * 8) + math.Random().nextDouble() * 12;
+          return {
+            'department': entry.value,
+            'headcount': headcount * multipliers[entry.key],
+          };
+        }).toList();
   }
 
   void _generateDualAxisData() {
@@ -188,7 +193,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Sep',
       'Oct',
       'Nov',
-      'Dec'
+      'Dec',
     ];
     _dualAxisData = <Map<String, dynamic>>[];
 
@@ -198,7 +203,8 @@ class _ChartScreenState extends State<ChartScreen>
       // Revenue data (left Y-axis) - ranges from ~100k to ~200k
       final baseRevenue = 120 + i * 5; // Growing trend
       final seasonalRevenue = math.sin(i * 0.5) * 20; // Seasonal variation
-      final revenue = baseRevenue +
+      final revenue =
+          baseRevenue +
           seasonalRevenue +
           (math.Random().nextDouble() - 0.5) * 15;
 
@@ -206,18 +212,28 @@ class _ChartScreenState extends State<ChartScreen>
       final baseConversion = 18 + i * 0.3; // Slow improvement over time
       final seasonalConversion =
           math.cos(i * 0.4) * 3; // Different seasonal pattern
-      final conversionRate = baseConversion +
+      final conversionRate =
+          baseConversion +
           seasonalConversion +
           (math.Random().nextDouble() - 0.5) * 2;
 
-      final dataPoint = {
+      final revenuePoint = {
         'month': month,
         'revenue': math.max(80.0, revenue), // Ensure positive revenue
-        'conversion_rate': math.max(10.0,
-            math.min(30.0, conversionRate)), // Keep conversion rate reasonable
+        'product': 'Product Sales',
       };
 
-      _dualAxisData.add(dataPoint);
+      final conversionPoint = {
+        'month': month,
+        'conversion_rate': math.max(
+          10.0,
+          math.min(30.0, conversionRate),
+        ), // Keep conversion rate reasonable
+        'product': 'Conversion Rate',
+      };
+
+      _dualAxisData.add(revenuePoint);
+      _dualAxisData.add(conversionPoint);
     }
   }
 
@@ -234,14 +250,15 @@ class _ChartScreenState extends State<ChartScreen>
         final baseValues = [
           40.0,
           25.0,
-          30.0
+          30.0,
         ]; // Product Sales highest, Services middle, Subscriptions lowest
         final quarterMultiplier =
             quarters.indexOf(quarter) * 0.2 + 1.0; // Growth over quarters
         final categoryMultiplier =
             [1.0, 0.8, 1.2][i]; // Different growth rates per category
 
-        final revenue = baseValues[i] * quarterMultiplier * categoryMultiplier +
+        final revenue =
+            baseValues[i] * quarterMultiplier * categoryMultiplier +
             (math.Random().nextDouble() - 0.5) * 10; // Add some variance
 
         _stackedBarData.add({
@@ -317,6 +334,8 @@ class _ChartScreenState extends State<ChartScreen>
       'Gradient Bar Charts',
       'Advanced Gradient Effects',
       'Legend Examples',
+      'Time-Based Line Chart',
+      'Zoom & Navigation Demo',
     ];
   }
 
@@ -342,11 +361,17 @@ class _ChartScreenState extends State<ChartScreen>
       'Beautiful gradient fills for enhanced visual appeal • Linear gradients from light to dark',
       'Multiple gradient types: Linear, Radial, Sweep • Works with bars and points',
       'Comprehensive legend showcase • 9 positioning options including new floating legends',
+      'Line chart with time-based data on x-axis',
+      'Pinch, scroll, and button-based zoom controls with live callbacks',
     ];
   }
 
   Widget _buildStatsCard(
-      String title, String value, String change, Color color) {
+    String title,
+    String value,
+    String change,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -391,123 +416,134 @@ class _ChartScreenState extends State<ChartScreen>
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       height: _showControls ? null : 0,
-      child: _showControls
-          ? Container(
-              margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(26),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.tune,
-                          color: Theme.of(context).primaryColor, size: 18),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Chart Controls',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+      child:
+          _showControls
+              ? Container(
+                margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(26),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.tune,
                           color: Theme.of(context).primaryColor,
+                          size: 18,
                         ),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: () => setState(() => _showControls = false),
-                        icon: const Icon(Icons.keyboard_arrow_up),
-                        iconSize: 18,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
+                        const SizedBox(width: 8),
+                        Text(
+                          'Chart Controls',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed:
+                              () => setState(() => _showControls = false),
+                          icon: const Icon(Icons.keyboard_arrow_up),
+                          iconSize: 18,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _getDisplayedValue(),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                              SliderTheme(
+                                data: const SliderThemeData(
+                                  trackHeight: 3,
+                                  thumbShape: RoundSliderThumbShape(
+                                    enabledThumbRadius: 6,
+                                  ),
+                                  overlayShape: RoundSliderOverlayShape(
+                                    overlayRadius: 12,
+                                  ),
+                                ),
+                                child: Slider(
+                                  value: _sliderValue,
+                                  min: 0.0,
+                                  max: 1.0,
+                                  divisions: 20,
+                                  onChanged:
+                                      (value) =>
+                                          setState(() => _sliderValue = value),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _getDisplayedValue(),
+                              '${_themeNames[_currentThemeIndex]} • ${_paletteNames[_currentPaletteIndex]}',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.grey[700],
                               ),
                             ),
-                            SliderTheme(
-                              data: const SliderThemeData(
-                                trackHeight: 3,
-                                thumbShape: RoundSliderThumbShape(
-                                  enabledThumbRadius: 6,
-                                ),
-                                overlayShape: RoundSliderOverlayShape(
-                                  overlayRadius: 12,
-                                ),
-                              ),
-                              child: Slider(
-                                value: _sliderValue,
-                                min: 0.0,
-                                max: 1.0,
-                                divisions: 20,
-                                onChanged: (value) =>
-                                    setState(() => _sliderValue = value),
-                              ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children:
+                                  _colorPalettes[_currentPaletteIndex]
+                                      .take(4)
+                                      .map(
+                                        (color) => Container(
+                                          width: 16,
+                                          height: 16,
+                                          margin: const EdgeInsets.only(
+                                            right: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: color,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: Colors.white,
+                                              width: 1.5,
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                      .toList(),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(width: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '${_themeNames[_currentThemeIndex]} • ${_paletteNames[_currentPaletteIndex]}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: _colorPalettes[_currentPaletteIndex]
-                                .take(4)
-                                .map((color) => Container(
-                                      width: 16,
-                                      height: 16,
-                                      margin: const EdgeInsets.only(right: 4),
-                                      decoration: BoxDecoration(
-                                        color: color,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 1.5,
-                                        ),
-                                      ),
-                                    ))
-                                .toList(),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            )
-          : const SizedBox.shrink(),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+              : const SizedBox.shrink(),
     );
   }
 
@@ -515,10 +551,16 @@ class _ChartScreenState extends State<ChartScreen>
     switch (widget.chartIndex) {
       case 0:
         return buildScatterPlotTab(
-            currentTheme, _scatterPlotData, _sliderValue);
+          currentTheme,
+          _scatterPlotData,
+          _sliderValue,
+        );
       case 1:
         return buildInteractiveScatterTab(
-            currentTheme, _scatterPlotData, _sliderValue);
+          currentTheme,
+          _scatterPlotData,
+          _sliderValue,
+        );
       case 2:
         return buildPanExampleTab(currentTheme, _sliderValue);
       case 3:
@@ -536,7 +578,10 @@ class _ChartScreenState extends State<ChartScreen>
         return buildGroupedBarTab(currentTheme, _groupedBarData, _sliderValue);
       case 8:
         return buildHorizontalBarTab(
-            currentTheme, _horizontalBarData, _sliderValue);
+          currentTheme,
+          _horizontalBarData,
+          _sliderValue,
+        );
       case 9:
         return buildStackedBarTab(currentTheme, _stackedBarData, _sliderValue);
       case 10:
@@ -545,7 +590,9 @@ class _ChartScreenState extends State<ChartScreen>
         return buildDualAxisTab(currentTheme, _dualAxisData, _sliderValue);
       case 12:
         return buildHeatMapTab(
-            currentTheme, _colorPalettes[_currentPaletteIndex]);
+          currentTheme,
+          _colorPalettes[_currentPaletteIndex],
+        );
       case 13:
         return buildContributionHeatMapTab(currentTheme);
       case 14:
@@ -563,7 +610,18 @@ class _ChartScreenState extends State<ChartScreen>
         return const AdvancedGradientExample();
       case 19:
         return buildLegendExampleTab(
-            currentTheme, _groupedBarData, _sliderValue);
+          currentTheme,
+          _groupedBarData,
+          _sliderValue,
+        );
+      case 20:
+        return buildTimeBasedLineChartTab(
+          currentTheme,
+          _lineChartData,
+          _sliderValue,
+        );
+      case 21:
+        return buildZoomExampleTab(currentTheme, _sliderValue);
       default:
         return Container();
     }
@@ -657,26 +715,54 @@ class _ChartScreenState extends State<ChartScreen>
         ];
       case 14:
         return [
-          _buildStatsCard('Orientations', '3', 'Horizontal, Vertical, Circular',
-              Colors.blue),
           _buildStatsCard(
-              'Styles', '4', 'Filled, Striped, Gradient, Custom', Colors.green),
+            'Orientations',
+            '3',
+            'Horizontal, Vertical, Circular',
+            Colors.blue,
+          ),
           _buildStatsCard(
-              'Animations', 'Smooth', 'Customizable Duration', Colors.purple),
+            'Styles',
+            '4',
+            'Filled, Striped, Gradient, Custom',
+            Colors.green,
+          ),
+          _buildStatsCard(
+            'Animations',
+            'Smooth',
+            'Customizable Duration',
+            Colors.purple,
+          ),
         ];
       case 15:
         return [
           _buildStatsCard(
-              'iOS Growth', '1,890', '+19.2%', const Color(0xFF007ACC)),
+            'iOS Growth',
+            '1,890',
+            '+19.2%',
+            const Color(0xFF007ACC),
+          ),
           _buildStatsCard(
-              'Android Users', '1,580', '+15.8%', const Color(0xFF3DDC84)),
+            'Android Users',
+            '1,580',
+            '+15.8%',
+            const Color(0xFF3DDC84),
+          ),
           _buildStatsCard(
-              'Web Platform', '1,280', '+25.6%', const Color(0xFFFF6B35)),
+            'Web Platform',
+            '1,280',
+            '+25.6%',
+            const Color(0xFFFF6B35),
+          ),
         ];
       case 16:
         return [
           _buildStatsCard(
-              'Export Format', 'SVG', 'Vector Graphics', Colors.blue),
+            'Export Format',
+            'SVG',
+            'Vector Graphics',
+            Colors.blue,
+          ),
           _buildStatsCard('Scalability', '∞', 'Infinite Zoom', Colors.green),
           _buildStatsCard('File Size', 'Small', 'Compact', Colors.purple),
         ];
@@ -698,6 +784,28 @@ class _ChartScreenState extends State<ChartScreen>
           _buildStatsCard('Auto-Orient', 'Yes', 'Smart Layout', Colors.green),
           _buildStatsCard('Themes', 'All', 'Dark Mode Ready', Colors.purple),
         ];
+      case 20:
+        return [
+          _buildStatsCard('Time Range', '12 mo', 'Daily cadence', Colors.blue),
+          _buildStatsCard('Seasonality', 'High', 'Wave patterns', Colors.green),
+          _buildStatsCard('Noise Level', 'Low', 'Smoothed', Colors.orange),
+        ];
+      case 21:
+        return [
+          _buildStatsCard('Zoom Modes', '3', 'X, Y or both', Colors.blue),
+          _buildStatsCard(
+            'Scroll Sens.',
+            '0.0005-0.0035',
+            'Wheel control',
+            Colors.orange,
+          ),
+          _buildStatsCard(
+            'Floating UI',
+            'Buttons',
+            '+/- helpers',
+            Colors.purple,
+          ),
+        ];
       default:
         return [];
     }
@@ -709,9 +817,7 @@ class _ChartScreenState extends State<ChartScreen>
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-            ),
+            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -739,16 +845,17 @@ class _ChartScreenState extends State<ChartScreen>
           ...AppRouter.routes.map((route) {
             final isSelected = GoRouterState.of(context).fullPath == route.path;
             return Container(
-              decoration: isSelected
-                  ? BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: Theme.of(context).primaryColor,
-                          width: 4,
+              decoration:
+                  isSelected
+                      ? BoxDecoration(
+                        border: Border(
+                          left: BorderSide(
+                            color: Theme.of(context).primaryColor,
+                            width: 4,
+                          ),
                         ),
-                      ),
-                    )
-                  : null,
+                      )
+                      : null,
               child: ListTile(
                 leading: Icon(
                   route.icon,
@@ -771,7 +878,9 @@ class _ChartScreenState extends State<ChartScreen>
                       const SizedBox(width: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 1),
+                          horizontal: 4,
+                          vertical: 1,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(6),
@@ -790,7 +899,9 @@ class _ChartScreenState extends State<ChartScreen>
                       const SizedBox(width: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 4, vertical: 1),
+                          horizontal: 4,
+                          vertical: 1,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.orange,
                           borderRadius: BorderRadius.circular(6),
@@ -843,6 +954,8 @@ class _ChartScreenState extends State<ChartScreen>
       chartHeight = 600; // Larger height for bubble charts to prevent cutoff
     } else if (title.contains('Heatmap') || title.contains('Contributions')) {
       chartHeight = 450; // Slightly larger for heatmaps
+    } else if (widget.chartIndex == 21 || title.contains('Zoom & Navigation')) {
+      chartHeight = 640; // Extra room for zoom demo controls + chart
     }
 
     return Scaffold(
@@ -852,11 +965,7 @@ class _ChartScreenState extends State<ChartScreen>
         backgroundColor: Colors.transparent,
         title: Row(
           children: [
-            SvgPicture.asset(
-              'assets/images/logo.svg',
-              height: 32,
-              width: 160,
-            ),
+            SvgPicture.asset('assets/images/logo.svg', height: 32, width: 160),
           ],
         ),
         actions: [
@@ -866,26 +975,39 @@ class _ChartScreenState extends State<ChartScreen>
             onSelected: (route) {
               context.go(route);
             },
-            itemBuilder: (context) => AppRouter.routes
-                .map((route) => PopupMenuItem(
-                      value: route.path,
-                      child: ListTile(
-                        leading: Icon(route.icon, size: 20),
-                        title: Text(route.title),
-                        subtitle: route.isNew
-                            ? const Text('New!',
-                                style: TextStyle(
-                                    color: Colors.green, fontSize: 10))
-                            : route.isExperimental
-                                ? const Text('Experimental',
-                                    style: TextStyle(
-                                        color: Colors.orange, fontSize: 10))
-                                : null,
-                        dense: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ))
-                .toList(),
+            itemBuilder:
+                (context) =>
+                    AppRouter.routes
+                        .map(
+                          (route) => PopupMenuItem(
+                            value: route.path,
+                            child: ListTile(
+                              leading: Icon(route.icon, size: 20),
+                              title: Text(route.title),
+                              subtitle:
+                                  route.isNew
+                                      ? const Text(
+                                        'New!',
+                                        style: TextStyle(
+                                          color: Colors.green,
+                                          fontSize: 10,
+                                        ),
+                                      )
+                                      : route.isExperimental
+                                      ? const Text(
+                                        'Experimental',
+                                        style: TextStyle(
+                                          color: Colors.orange,
+                                          fontSize: 10,
+                                        ),
+                                      )
+                                      : null,
+                              dense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                        )
+                        .toList(),
           ),
           IconButton(
             onPressed: () => setState(() => _showControls = !_showControls),
@@ -941,14 +1063,17 @@ class _ChartScreenState extends State<ChartScreen>
 
                   // Stats Row
                   Row(
-                    children: _getStatsCards()
-                        .map((stat) => Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: stat,
+                    children:
+                        _getStatsCards()
+                            .map(
+                              (stat) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 8),
+                                  child: stat,
+                                ),
                               ),
-                            ))
-                        .toList(),
+                            )
+                            .toList(),
                   ),
 
                   const SizedBox(height: 16),
@@ -1063,34 +1188,37 @@ class _ChartScreenState extends State<ChartScreen>
   Widget _buildFeatureList() {
     final features = getChartFeatures(widget.chartIndex);
     return Column(
-      children: features
-          .map((feature) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 2),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        feature,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey[700],
-                          height: 1.3,
+      children:
+          features
+              .map(
+                (feature) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          shape: BoxShape.circle,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          feature,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey[700],
+                            height: 1.3,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ))
-          .toList(),
+              )
+              .toList(),
     );
   }
 
@@ -1105,22 +1233,14 @@ class _ChartScreenState extends State<ChartScreen>
         icon: const Icon(Icons.menu_book, size: 18),
         label: const Text(
           'View Docs',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
         ),
         style: OutlinedButton.styleFrom(
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
-          side: BorderSide(
-            color: Theme.of(context).primaryColor,
-            width: 2.0,
-          ),
+          side: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     );

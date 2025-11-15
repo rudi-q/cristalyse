@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import 'geometry.dart';
@@ -20,7 +22,7 @@ abstract class Scale {
 
   /// Optimal pixels per axis label for readability
   /// Could be threaded as a parameter into API if users demand it
-  static const double optimalPixelsPerLabel = 60.0;
+  static const double _optimalPixelsPerLabel = 60.0;
 
   Scale({LabelCallback? labelFormatter, this.limits, this.title})
       : _formatter = LabelFormatter(labelFormatter);
@@ -72,27 +74,58 @@ abstract class Scale {
 
   /// Set bounds for this scale given data values, limits, and geometry context.
   /// Uses passed limits, or falls back to scale's own limits, or geometry behavior.
-  void setBounds(List<double> values, (double?, double?)? passedLimits,
-      List<Geometry> geometries) {
+  void setBounds(
+    List<double> values,
+    (double?, double?)? passedLimits,
+    List<Geometry> geometries,
+  ) {
     final effectiveLimits = passedLimits ?? limits;
     setBoundsInternal(values, effectiveLimits, geometries);
   }
 
   /// Internal bounds setting - each scale implements its own logic.
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries);
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  );
+
+  double _calculatePixelsPerLabel(dynamic min, dynamic max) {
+    // todo get the actual text style from the theme
+    const TextStyle textStyle = TextStyle(fontSize: 12);
+    const double padding = 10; // todo defer from theme
+
+    final textMin = TextPainter(
+      text: TextSpan(text: formatLabel(min), style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final textMax = TextPainter(
+      text: TextSpan(text: formatLabel(max), style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return math.max(textMin.width, textMax.width) + padding;
+  }
 }
 
 /// Linear scale for continuous data
 class LinearScale extends Scale {
   List<double> _domain = [0, 1];
   List<double>? _ticks; // Cached ticks from Wilkinson algorithm
+  List<double> _valuesBoundaries = [0, 1];
+  final TickConfig? _tickConfig;
 
-  LinearScale({super.limits, super.labelFormatter, super.title});
+  LinearScale({
+    super.limits,
+    super.labelFormatter,
+    super.title,
+    TickConfig? tickConfig,
+  }) : _tickConfig = tickConfig;
 
   @override
   List<double> get domain => _domain;
   set domain(List<double> value) => _domain = List.from(value);
+
+  List<double> get valuesBoundaries => _valuesBoundaries;
 
   @override
   double scale(dynamic value) {
@@ -108,13 +141,29 @@ class LinearScale extends Scale {
   }
 
   @override
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
     final bounds = BoundsCalculator.calculateBounds(
-        values, effectiveLimits, geometries,
-        applyPadding: true);
+      values,
+      effectiveLimits,
+      geometries,
+      applyPadding: true,
+    );
+
+    if (values.isNotEmpty) {
+      _valuesBoundaries = [values.reduce(math.min), values.reduce(math.max)];
+    }
 
     if (bounds != const Bounds.ignored()) {
+      if (_tickConfig?.ticks != null) {
+        _ticks = _tickConfig!.ticks;
+        _domain = [bounds.min, bounds.max];
+        return;
+      }
+
       // Use Wilkinson algorithm to extend bounds to nice round numbers
       final screenLength = (range[1] - range[0]).abs();
 
@@ -125,13 +174,22 @@ class LinearScale extends Scale {
         return;
       }
 
-      final targetLabelCount =
-          (screenLength / Scale.optimalPixelsPerLabel).round();
+      final pixelsPerLabel = math.max(
+        _calculatePixelsPerLabel(bounds.min, bounds.max),
+        Scale._optimalPixelsPerLabel,
+      );
+
+      final targetLabelCount = (screenLength / pixelsPerLabel).round();
       final targetDensity = targetLabelCount / screenLength; // labels per pixel
 
       final niceTicks = WilkinsonLabeling.extended(
-          bounds.min, bounds.max, screenLength, targetDensity,
-          limits: effectiveLimits);
+        bounds.min,
+        bounds.max,
+        screenLength,
+        targetDensity,
+        limits: effectiveLimits,
+        simpleLinear: _tickConfig?.simpleLinear ?? false,
+      );
 
       if (niceTicks.isNotEmpty) {
         // Cache ticks for getTicks() to avoid recomputing
@@ -217,9 +275,15 @@ class OrdinalScale extends Scale {
     // Handle edge case: zero-size screen (e.g., during initialization)
     if (screenLength == 0) return List.from(_domain);
 
-    final targetLabelCount = (screenLength / Scale.optimalPixelsPerLabel)
-        .round()
-        .clamp(1, _domain.length);
+    final pixelsPerLabel = math.max(
+      _calculatePixelsPerLabel(_domain.first, _domain.last),
+      Scale._optimalPixelsPerLabel,
+    );
+
+    final targetLabelCount = (screenLength / pixelsPerLabel).round().clamp(
+          1,
+          _domain.length,
+        );
 
     // If we have fewer categories than target, show all
     if (_domain.length <= targetLabelCount) {
@@ -258,8 +322,11 @@ class OrdinalScale extends Scale {
   }
 
   @override
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
     // Ordinal scales don't use continuous bounds - so this is a no-op
   }
 }
@@ -270,11 +337,7 @@ class ColorScale {
   final List<Color> colors;
   final Map<dynamic, Gradient>? gradients;
 
-  ColorScale({
-    this.values = const [],
-    this.colors = const [],
-    this.gradients,
-  });
+  ColorScale({this.values = const [], this.colors = const [], this.gradients});
 
   /// Returns either a Color or Gradient for the given value
   dynamic scale(dynamic value) {
@@ -338,8 +401,11 @@ class SizeScale extends Scale {
   }
 
   @override
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
     if (values.isEmpty) {
       _domain = [0, 1];
       return;
@@ -347,8 +413,11 @@ class SizeScale extends Scale {
 
     // For size scales, we want exact data bounds without padding
     final bounds = BoundsCalculator.calculateBounds(
-        values, effectiveLimits, geometries,
-        applyPadding: false);
+      values,
+      effectiveLimits,
+      geometries,
+      applyPadding: false,
+    );
 
     if (bounds != const Bounds.ignored()) {
       _domain = [bounds.min, bounds.max];
@@ -419,10 +488,16 @@ class GradientColorScale extends Scale {
   }
 
   @override
-  void setBoundsInternal(List<double> values,
-      (double?, double?)? effectiveLimits, List<Geometry> geometries) {
-    final bounds =
-        BoundsCalculator.calculateBounds(values, effectiveLimits, geometries);
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
+    final bounds = BoundsCalculator.calculateBounds(
+      values,
+      effectiveLimits,
+      geometries,
+    );
 
     if (bounds != const Bounds.ignored()) {
       _domain = [bounds.min, bounds.max];
@@ -477,4 +552,22 @@ class GradientColorScale extends Scale {
       ],
     );
   }
+}
+
+/// Configuration for tick marks on a scale
+class TickConfig {
+  /// Explicitly set the ticks to this list
+  final List<double>? ticks;
+
+  /// If true, use simple linear ticks instead of Wilkinson algorithm
+  final bool simpleLinear;
+
+  TickConfig({List<double>? ticks, this.simpleLinear = false})
+      : assert(
+          ticks == null || ticks.isNotEmpty,
+          'When provided, ticks must be non-empty.',
+        ),
+        ticks = ticks != null
+            ? (ticks.toList()..sort((a, b) => a.compareTo(b)))
+            : null;
 }

@@ -1,8 +1,408 @@
+# Changelog
+
+## 1.15.0 - 2025-11-11
+
+#### 🔍 Zoom & Pan Interactions
+
+**New Features:**
+- **Zoom Interactions**: Pinch, scroll wheel, and button-based zooming on continuous scales
+  - `ZoomConfig` class for comprehensive zoom configuration
+  - Three zoom modes: X-axis only, Y-axis only, or both axes simultaneously
+  - Multiple input methods: Pinch gestures, scroll wheel, floating +/- buttons
+  - Real-time zoom state callbacks (start, update, end)
+
+- **Scroll Wheel Zoom**: Native support for mouse wheel zooming
+  - Configurable sensitivity with `wheelSensitivity` parameter
+  - Zoom focused at cursor position for intuitive interaction
+  - Works seamlessly with existing pan operations
+
+- **Pinch Gesture Zoom**: Full multi-touch support
+  - Zoom centered at pinch focal point
+  - Smooth integration with single-finger pan gestures
+  - Respects zoom axis configuration
+
+- **Floating Zoom Controls**: Optional UI buttons for touch-friendly zooming
+  - Configurable button placement with `buttonAlignment`
+  - Adjustable zoom step size with `buttonStep` parameter
+  - Theme-aware styling
+  - Can be disabled for minimalist interfaces
+
+- **Zoom State Information**: Live callbacks expose detailed zoom metrics
+  - `visibleMinX`, `visibleMaxX` - Current visible X-axis range
+  - `visibleMinY`, `visibleMaxY` - Current visible Y-axis range
+  - `scaleX`, `scaleY` - Zoom scale factors
+  - `state` - Zoom lifecycle (start, update, end)
+
+**Technical Implementation:**
+- New `ZoomConfig` class with comprehensive configuration options
+- New `ZoomInfo` class for zoom event information
+- New `ZoomAxis` enum: `x`, `y`, `both`
+- New `ZoomState` enum: `start`, `update`, `end`
+- New `ZoomCallback` typedef for zoom event handlers
+- Enhanced `ChartInteraction` to include optional `zoom` parameter
+- Quick-setup `onZoom()` method on `CristalyseChart` API
+- Full integration with existing pan interactions and domain management
+- Zoom domain clamping respects original scale boundaries
+
+**API Examples:**
+
+```dart
+// Quick zoom setup (X-axis only)
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'day', y: 'revenue')
+  .geomLine()
+  .onZoom((info) {
+    print('Zoom scale: ${info.scaleX}x');
+  })
+  .build()
+
+// Advanced zoom configuration
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'value')
+  .geomLine()
+  .interaction(
+    zoom: ZoomConfig(
+      enabled: true,
+      axes: ZoomAxis.both,           // Zoom on both axes
+      maxScale: 16.0,                // Maximum 16x zoom
+      minScale: 1.0,                 // Minimum 1x (no zoom out)
+      wheelSensitivity: 0.0015,      // Scroll wheel sensitivity
+      buttonStep: 1.4,               // 40% zoom step for buttons
+      showButtons: true,             // Show +/- buttons
+      buttonAlignment: Alignment.bottomRight,
+      onZoomStart: (info) => print('Zoom started'),
+      onZoomUpdate: (info) => print('Scale: ${info.scaleX}x'),
+      onZoomEnd: (info) => print('Zoom ended'),
+    ),
+  )
+  .build()
+```
+
+**New Example:**
+- Full zoom interaction demo in example app (21st chart example)
+- Interactive controls for zoom mode, sensitivity, and button steps
+- Live zoom information display with visible ranges and scale factors
+- Touch, mouse scroll, and button interaction showcase
+
+**Use Cases:**
+- Time-series data exploration with precise zoom control
+- Scatter plots requiring X/Y axis independent zooming
+- Touch-friendly interfaces on mobile devices
+- Desktop applications with mouse wheel support
+- Accessibility: Zoom buttons for users with limited touch capability
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- New `zoom` parameter in `.interaction()` is optional
+- New `onZoom()` method is additive, doesn't affect existing code
+- Zoom respects existing domain boundaries and pan configuration
+- Comprehensive gesture handling (pinch, scroll, single-touch pan)
+- Example app demonstrates all zoom modes and configuration options
+
+---
+
+## 1.14.0 - 2025-11-09
+
+#### 🎯 Tick Configuration for Scales
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+**New Features:**
+- **TickConfig Class**: Control tick generation on continuous scales
+  - `ticks: List<double>?` - Specify explicit tick positions
+  - `simpleLinear: bool` - Use uniform linear spacing instead of Wilkinson's algorithm
+  - Optional parameters - scales work as before by default
+
+- **Explicit Tick Specification**: Pass custom tick positions for precise control
+  - Industry-standard reference points (freezing point, percentiles, etc.)
+  - Domain-specific intervals for specialized charts
+  - Consistent tick positions across multiple related charts
+
+- **Simple Linear Ticking**: Generate evenly-spaced ticks
+  - Predictable, uniform tick intervals
+  - Ideal for time-series and scientific/technical charts
+  - Alternative to default Wilkinson's algorithm
+
+**Technical Implementation:**
+- Added `TickConfig` class with `ticks` and `simpleLinear` properties
+- Extended `LinearScale` to accept and store `TickConfig`
+- `scaleXContinuous`, `scaleYContinuous`, `scaleY2Continuous` now accept optional `tickConfig` parameter
+- Enhanced Wilkinson labeling algorithm with simple linear fallback
+- New example: TimeBasedLineChartWidget demonstrating TickConfig usage
+
+**API Example:**
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'value')
+  .scaleXContinuous(
+    tickConfig: TickConfig(simpleLinear: true),
+  )
+  .scaleYContinuous(
+    tickConfig: TickConfig(ticks: [0, 25, 50, 75, 100]),
+  )
+  .geomLine()
+  .build()
+```
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- New feature is opt-in with sensible defaults
+- Backward compatible API - all parameters optional
+- Production ready
+
+---
+
+## 1.13.1 - 2025-11-03
+
+#### 🐛 Bug Fixes
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Fixed Label Size Calculation:**
+- Label size now deduced based on formatter with default font size
+- Calculates actual text width including padding for more accurate layout
+- Ensures consistent label spacing in both linear and ordinal scales
+- Improves chart readability with properly-sized axis labels
+
+**Technical Details:**
+- Added `_calculatePixelsPerLabel()` method to measure text dimensions
+- Uses TextPainter with default TextStyle (fontSize: 12) for accurate width calculation
+- Includes 10px padding (theme-deferred in future)
+- Applies calculated pixels per label to both LinearScale and OrdinalScale
+- Made `optimalPixelsPerLabel` private as implementation detail
+
+**Impact:**
+- More accurate label sizing across all chart types
+- Better space utilization for axis labels
+- Consistent behavior regardless of label content length
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Single file changed with focused bug fix
+- Maintains existing API surface
+
+---
+
+## 1.13.0 - 2025-11-02
+
+#### 🎨 Legend Enhancements
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+**New Features:**
+- **Optional Y-Axis Titles in Legends**: Add `showTitles` option to display Y-axis titles alongside legend entries
+  - Improves chart legend readability when multiple Y-axes are present
+  - Optional feature - legends work as before by default
+  - Seamless integration with existing legend styling and layout
+
+**Technical Implementation:**
+- Extended `LegendWidget` to support optional Y-axis title rendering
+- Enhanced `legend.dart` core logic to handle title display
+- Updated chart configuration to expose new option
+- Includes comprehensive test coverage
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- New feature is opt-in
+- All tests passing including new legend test cases
+- Production ready
+
+---
+
+## 1.12.1 - 2025-11-02
+
+#### 🐛 Bug Fixes
+
+**Right Padding & Secondary Y-Axis Alignment:**
+- Removed excessive hardcoded 80px right padding applied unconditionally for secondary y-axis
+- Widget layout now uses conservative 80px estimate only when y2Scale exists
+- Painter performs precise y2-axis space calculation at paint time with full scale information
+- Eliminates divergence between layout calculation and rendering, ensuring hit-testing alignment
+- Honors theme padding settings: `rightPadding = theme.padding.right + y2AxisSpace`
+- Added null check for `y2Scale` to prevent unnecessary padding when secondary axis is absent
+
+**Impact:**
+- Charts without secondary y-axis now use only theme padding (no waste)
+- Charts with secondary y-axis get proper space allocation based on actual label widths
+- Consistent plot area between widget layout and painter rendering phases
+- Correct hit-testing alignment for interactions (hover, click, pan)
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Maintains consistent plot area between layout and render phases
+- Proper hit-testing alignment for secondary y-axis interactions
+- Fixes excessive padding issues on charts without secondary y-axis
+
+---
+
+## 1.12.0 - 2025-11-01
+
+#### 🏔️ Boundary Clamping for Pan Operations
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**New Features:**
+- **Boundary Clamping**: Prevent infinite panning beyond data boundaries
+  - New `boundaryClampingX` and `boundaryClampingY` options in `PanConfig`
+  - Clamps pan domain within calculated scale boundaries
+  - Perfect for constrained data exploration and guided navigation
+
+**Technical Implementation:**
+- Scale boundaries tracked via `valuesBoundaries` in `LinearScale`
+- Computed in `LinearScale.computeDomain()` from data values
+- Pan domain clamping applied in `_updatePanDomain()` during interaction
+- Seamless integration with existing pan callbacks and pan controller
+- No changes to default behavior - opt-in feature
+
+**API Example:**
+```dart
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'time', y: 'value')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      boundaryClampingX: true,  // Clamp X-axis panning
+      boundaryClampingY: true,  // Clamp Y-axis panning
+    ),
+  )
+  .build()
+```
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Default clamping disabled (infinite panning by default)
+- Tested with pan controller and manual pan interactions
+- Production ready
+
+---
+
+## 1.11.1 - 2025-10-24
+
+#### 🐛 Bug Fixes
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Fixed Y-axis Bounds During X-axis Panning:**
+- Y-axis bounds now correctly update when panning X-axis
+- Previously, Y-axis would remain stuck with original `panYDomain` bounds during X-axis pan gestures
+- Added guard condition to reset `panYDomain` when `updateYDomain` is false
+- Enables expected behavior: Y-axis bounds remain dynamic and update based on visible data while panning horizontally
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Focused single-line fix with no API modifications
+
+---
+
+## 1.11.0 - 2025-10-24
+
+#### 🎯 Major Feature: Programmatic Pan Controller
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+**New PanController Class:**
+- External control of chart panning via new `PanController` class
+- `panTo(PanInfo)` method for programmatic pan operations
+- `panReset()` method to restore original chart view
+- ChangeNotifier-based architecture for reactive updates
+- Optional `controller` parameter in `PanConfig`
+
+**Enhanced Pan Configuration:**
+- `PanConfig` now accepts optional `controller` parameter
+- Widget lifecycle management (initState, didUpdateWidget, dispose)
+- Automatic listener registration and cleanup
+- Full integration with existing pan callbacks
+
+**Use Cases:**
+- Programmatic zoom controls with buttons/sliders
+- Reset to original view functionality
+- Coordinated panning across multiple charts
+- External UI controls for chart navigation
+- Jump to specific data ranges programmatically
+
+**API Example:**
+```dart
+final panController = PanController();
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      controller: panController,
+    ),
+  )
+  .build();
+
+// Pan to specific range
+panController.panTo(PanInfo(
+  visibleMinX: 500,
+  visibleMaxX: 1500,
+  state: PanState.update,
+));
+
+// Reset to original view
+panController.panReset();
+```
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Optional controller parameter (defaults to null)
+- Proper lifecycle management with listener cleanup
+- Example integration in pan_example.dart
+
+---
+
+## 1.10.3 - 2025-10-23
+
+#### 🐛 Scale Padding Fix
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Fixed Chart Shrinking During Pan Operations:**
+- Scale padding now initialized before painting charts
+- Prevents `setupYScale` from changing padding during panning
+- Chart maintains consistent size during all pan operations
+- Smooth user experience without unintended resize behavior
+
+**Technical Details:**
+- Added `_setupScales()` method to initialize X and Y scales before chart painting
+- Fixes bug where panning would call `setupYScale` and reduce chart dimensions
+- Applied to both animated chart render paths
+
+#### 🧪 Quality Assurance
+
+- All existing tests continue to pass
+- Zero breaking changes - fully backward compatible
+
+---
+
 ## 1.10.2 - 2025-10-21
 
 #### 🎨 Heat Map Unification & Bounds Fixes
 
-**Authored by [@davidlrichmond](https://github.com/davidlrichmond)**
+**Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Thank you for this contribution!
 
 **Heat Map Color System Unification:**
 - Unified heat maps to use `GradientColorScale` for consistent color handling

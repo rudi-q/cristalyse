@@ -60,7 +60,10 @@ void main() {
             {'task': 'Task 2', 'completion': 50.0, 'department': 'Product'},
           ])
           .mappingProgress(
-              value: 'completion', label: 'task', category: 'department')
+            value: 'completion',
+            label: 'task',
+            category: 'department',
+          )
           .geomProgress(
             orientation: ProgressOrientation.horizontal,
             thickness: 25.0,
@@ -83,21 +86,21 @@ void main() {
     test('should create progress chart with different orientations', () {
       // Horizontal
       final horizontalChart = CristalyseChart().data([
-        {'completion': 50.0}
+        {'completion': 50.0},
       ]).geomProgress(orientation: ProgressOrientation.horizontal);
 
       expect(horizontalChart, isA<CristalyseChart>());
 
       // Vertical
       final verticalChart = CristalyseChart().data([
-        {'completion': 75.0}
+        {'completion': 75.0},
       ]).geomProgress(orientation: ProgressOrientation.vertical);
 
       expect(verticalChart, isA<CristalyseChart>());
 
       // Circular
       final circularChart = CristalyseChart().data([
-        {'completion': 90.0}
+        {'completion': 90.0},
       ]).geomProgress(orientation: ProgressOrientation.circular);
 
       expect(circularChart, isA<CristalyseChart>());
@@ -106,28 +109,29 @@ void main() {
     test('should create progress chart with different styles', () {
       // Filled
       final filledChart = CristalyseChart().data([
-        {'completion': 50.0}
+        {'completion': 50.0},
       ]).geomProgress(style: ProgressStyle.filled);
 
       expect(filledChart, isA<CristalyseChart>());
 
       // Gradient
       final gradientChart = CristalyseChart().data([
-        {'completion': 75.0}
+        {'completion': 75.0},
       ]).geomProgress(style: ProgressStyle.gradient);
 
       expect(gradientChart, isA<CristalyseChart>());
 
       // Striped
       final stripedChart = CristalyseChart().data([
-        {'completion': 90.0}
+        {'completion': 90.0},
       ]).geomProgress(style: ProgressStyle.striped);
 
       expect(stripedChart, isA<CristalyseChart>());
     });
 
-    testWidgets('should render striped progress bars',
-        (WidgetTester tester) async {
+    testWidgets('should render striped progress bars', (
+      WidgetTester tester,
+    ) async {
       final testData = [
         {'task': 'Development', 'completion': 75.0},
         {'task': 'Testing', 'completion': 60.0},
@@ -145,11 +149,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 200,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 200, child: chart.build()),
           ),
         ),
       );
@@ -163,11 +163,17 @@ void main() {
     test('should have correct ProgressOrientation values', () {
       expect(ProgressOrientation.values.length, 3);
       expect(
-          ProgressOrientation.values, contains(ProgressOrientation.horizontal));
+        ProgressOrientation.values,
+        contains(ProgressOrientation.horizontal),
+      );
       expect(
-          ProgressOrientation.values, contains(ProgressOrientation.vertical));
+        ProgressOrientation.values,
+        contains(ProgressOrientation.vertical),
+      );
       expect(
-          ProgressOrientation.values, contains(ProgressOrientation.circular));
+        ProgressOrientation.values,
+        contains(ProgressOrientation.circular),
+      );
     });
 
     test('should have correct ProgressStyle values', () {
@@ -183,20 +189,24 @@ void main() {
   });
 
   group('Progress Chart Widget Tests', () {
-    testWidgets('should build progress chart widget without errors',
-        (WidgetTester tester) async {
+    testWidgets('should build progress chart widget without errors', (
+      WidgetTester tester,
+    ) async {
       final chart = CristalyseChart()
           .data([
             {
               'task': 'Development',
               'progress': 75.0,
-              'category': 'Engineering'
+              'category': 'Engineering',
             },
             {'task': 'Design', 'progress': 60.0, 'category': 'Product'},
             {'task': 'Testing', 'progress': 40.0, 'category': 'QA'},
           ])
           .mappingProgress(
-              value: 'progress', label: 'task', category: 'category')
+            value: 'progress',
+            label: 'task',
+            category: 'category',
+          )
           .geomProgress(
             orientation: ProgressOrientation.horizontal,
             thickness: 20.0,
@@ -213,11 +223,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 300,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 300, child: chart.build()),
           ),
         ),
       );
@@ -227,8 +233,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('should handle empty data gracefully',
-        (WidgetTester tester) async {
+    testWidgets('should handle empty data gracefully', (
+      WidgetTester tester,
+    ) async {
       final chart = CristalyseChart().data([]) // Empty data
           .geomProgress(
         orientation: ProgressOrientation.horizontal,
@@ -238,11 +245,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 300,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 300, child: chart.build()),
           ),
         ),
       );
@@ -252,8 +255,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('should handle different data types in progress values',
-        (WidgetTester tester) async {
+    testWidgets('should handle different data types in progress values', (
+      WidgetTester tester,
+    ) async {
       final chart = CristalyseChart().data([
         {'progress': 50}, // int
         {'progress': 75.5}, // double
@@ -267,11 +271,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 300,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 300, child: chart.build()),
           ),
         ),
       );
@@ -283,8 +283,9 @@ void main() {
   });
 
   group('Progress Chart Animation Tests', () {
-    testWidgets('should animate progress bars over time',
-        (WidgetTester tester) async {
+    testWidgets('should animate progress bars over time', (
+      WidgetTester tester,
+    ) async {
       final chart = CristalyseChart()
           .data([
             {'task': 'Task 1', 'completion': 80.0},
@@ -302,11 +303,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 200,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 200, child: chart.build()),
           ),
         ),
       );
@@ -326,8 +323,9 @@ void main() {
   });
 
   group('Progress Chart Theme Integration Tests', () {
-    testWidgets('should apply theme colors to progress bars',
-        (WidgetTester tester) async {
+    testWidgets('should apply theme colors to progress bars', (
+      WidgetTester tester,
+    ) async {
       final customTheme = ChartTheme.defaultTheme().copyWith(
         primaryColor: Colors.red,
         colorPalette: [Colors.red, Colors.green, Colors.blue],
@@ -348,11 +346,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 200,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 200, child: chart.build()),
           ),
         ),
       );
@@ -375,8 +369,10 @@ void main() {
 
       expect(geometry.style, equals(ProgressStyle.stacked));
       expect(geometry.segments, equals([30.0, 45.0, 25.0]));
-      expect(geometry.segmentColors,
-          equals([Colors.red, Colors.orange, Colors.green]));
+      expect(
+        geometry.segmentColors,
+        equals([Colors.red, Colors.orange, Colors.green]),
+      );
       expect(geometry.thickness, equals(25.0));
       expect(geometry.showLabel, equals(true));
     });
@@ -433,8 +429,9 @@ void main() {
       expect(geometry.orientation, equals(ProgressOrientation.circular));
     });
 
-    testWidgets('should render stacked progress bars',
-        (WidgetTester tester) async {
+    testWidgets('should render stacked progress bars', (
+      WidgetTester tester,
+    ) async {
       final testData = [
         {'project': 'Mobile App', 'completion': 75.0, 'phase': 'Development'},
         {'project': 'Web Platform', 'completion': 60.0, 'phase': 'Testing'},
@@ -458,11 +455,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 200,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 200, child: chart.build()),
           ),
         ),
       );
@@ -471,8 +464,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('should render grouped progress bars',
-        (WidgetTester tester) async {
+    testWidgets('should render grouped progress bars', (
+      WidgetTester tester,
+    ) async {
       final testData = [
         {'task': 'Frontend', 'completion': 80.0, 'team': 'UI'},
         {'task': 'Backend', 'completion': 65.0, 'team': 'API'},
@@ -480,11 +474,7 @@ void main() {
 
       final chart = CristalyseChart()
           .data(testData)
-          .mappingProgress(
-            value: 'completion',
-            label: 'task',
-            category: 'team',
-          )
+          .mappingProgress(value: 'completion', label: 'task', category: 'team')
           .geomProgress(
             style: ProgressStyle.grouped,
             orientation: ProgressOrientation.vertical,
@@ -496,11 +486,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 300,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 300, child: chart.build()),
           ),
         ),
       );
@@ -509,8 +495,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('should render gauge progress bars with ticks',
-        (WidgetTester tester) async {
+    testWidgets('should render gauge progress bars with ticks', (
+      WidgetTester tester,
+    ) async {
       final testData = [
         {'metric': 'CPU Usage', 'completion': 65.0, 'type': 'System'},
         {'metric': 'Memory', 'completion': 42.0, 'type': 'System'},
@@ -536,11 +523,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 400,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 400, child: chart.build()),
           ),
         ),
       );
@@ -549,8 +532,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('should render concentric progress rings',
-        (WidgetTester tester) async {
+    testWidgets('should render concentric progress rings', (
+      WidgetTester tester,
+    ) async {
       final testData = [
         {'system': 'Database', 'completion': 88.0, 'priority': 'High'},
         {'system': 'Cache', 'completion': 95.0, 'priority': 'High'},
@@ -574,11 +558,7 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 400,
-              height: 400,
-              child: chart.build(),
-            ),
+            body: SizedBox(width: 400, height: 400, child: chart.build()),
           ),
         ),
       );
@@ -603,76 +583,91 @@ void main() {
     test('should reject invalid minValue/maxValue combinations', () {
       expect(
         () => ProgressGeometry(minValue: 100.0, maxValue: 50.0),
-        throwsA(isA<AssertionError>().having(
-          (e) => e.message,
-          'message',
-          contains('minValue must be less than maxValue'),
-        )),
+        throwsA(
+          isA<AssertionError>().having(
+            (e) => e.message,
+            'message',
+            contains('minValue must be less than maxValue'),
+          ),
+        ),
       );
     });
 
     test('should reject negative thickness', () {
       expect(
         () => ProgressGeometry(thickness: -5.0),
-        throwsA(isA<AssertionError>().having(
-          (e) => e.message,
-          'message',
-          contains('thickness must be >= 0'),
-        )),
+        throwsA(
+          isA<AssertionError>().having(
+            (e) => e.message,
+            'message',
+            contains('thickness must be >= 0'),
+          ),
+        ),
       );
     });
 
     test('should reject negative cornerRadius', () {
       expect(
         () => ProgressGeometry(cornerRadius: -2.0),
-        throwsA(isA<AssertionError>().having(
-          (e) => e.message,
-          'message',
-          contains('cornerRadius must be >= 0'),
-        )),
+        throwsA(
+          isA<AssertionError>().having(
+            (e) => e.message,
+            'message',
+            contains('cornerRadius must be >= 0'),
+          ),
+        ),
       );
     });
 
     test('should reject zero or negative animationDuration', () {
       expect(
         () => ProgressGeometry(animationDuration: Duration.zero),
-        throwsA(isA<AssertionError>().having(
-          (e) => e.message,
-          'message',
-          contains('animationDuration must be positive'),
-        )),
+        throwsA(
+          isA<AssertionError>().having(
+            (e) => e.message,
+            'message',
+            contains('animationDuration must be positive'),
+          ),
+        ),
       );
 
       expect(
         () => ProgressGeometry(
-            animationDuration: const Duration(milliseconds: -100)),
-        throwsA(isA<AssertionError>().having(
-          (e) => e.message,
-          'message',
-          contains('animationDuration must be positive'),
-        )),
+          animationDuration: const Duration(milliseconds: -100),
+        ),
+        throwsA(
+          isA<AssertionError>().having(
+            (e) => e.message,
+            'message',
+            contains('animationDuration must be positive'),
+          ),
+        ),
       );
     });
 
     test('should reject invalid segment values', () {
       expect(
         () => ProgressGeometry(segments: [10.0, -5.0, 15.0]),
-        throwsA(isA<AssertionError>().having(
-          (e) => e.message,
-          'message',
-          contains('all segments must be >= 0'),
-        )),
+        throwsA(
+          isA<AssertionError>().having(
+            (e) => e.message,
+            'message',
+            contains('all segments must be >= 0'),
+          ),
+        ),
       );
     });
 
     test('should reject invalid concentric radii', () {
       expect(
         () => ProgressGeometry(concentricRadii: [10.0, 0.0, 15.0]),
-        throwsA(isA<AssertionError>().having(
-          (e) => e.message,
-          'message',
-          contains('all concentricRadii must be > 0'),
-        )),
+        throwsA(
+          isA<AssertionError>().having(
+            (e) => e.message,
+            'message',
+            contains('all concentricRadii must be > 0'),
+          ),
+        ),
       );
     });
 
@@ -701,16 +696,19 @@ void main() {
       // This should be caught by validation during geometry construction
       expect(
         () => ProgressGeometry(minValue: 50.0, maxValue: 50.0),
-        throwsA(isA<AssertionError>().having(
-          (e) => e.message,
-          'message',
-          contains('minValue must be less than maxValue'),
-        )),
+        throwsA(
+          isA<AssertionError>().having(
+            (e) => e.message,
+            'message',
+            contains('minValue must be less than maxValue'),
+          ),
+        ),
       );
     });
 
-    testWidgets('should handle invalid numeric values gracefully',
-        (WidgetTester tester) async {
+    testWidgets('should handle invalid numeric values gracefully', (
+      WidgetTester tester,
+    ) async {
       final testData = [
         {'task': 'Test', 'completion': double.nan},
         {'task': 'Test2', 'completion': double.infinity},
@@ -722,9 +720,7 @@ void main() {
           body: CristalyseChart()
               .data(testData)
               .mappingProgress(value: 'completion')
-              .geomProgress(
-                thickness: 20.0,
-              )
+              .geomProgress(thickness: 20.0)
               .build(),
         ),
       );
@@ -737,42 +733,43 @@ void main() {
     });
 
     testWidgets(
-        'should handle out-of-range and invalid progress values without crashing',
-        (WidgetTester tester) async {
-      final testData = [
-        {'task': 'Negative', 'progress': -25.0},
-        {'task': 'Above Max', 'progress': 150.0},
-        {'task': 'Null Value', 'progress': null},
-        {'task': 'String', 'progress': 'invalid'},
-        {'task': 'Zero', 'progress': 0.0},
-        {'task': 'Max', 'progress': 100.0},
-        {'task': 'Valid', 'progress': 75.0},
-      ];
+      'should handle out-of-range and invalid progress values without crashing',
+      (WidgetTester tester) async {
+        final testData = [
+          {'task': 'Negative', 'progress': -25.0},
+          {'task': 'Above Max', 'progress': 150.0},
+          {'task': 'Null Value', 'progress': null},
+          {'task': 'String', 'progress': 'invalid'},
+          {'task': 'Zero', 'progress': 0.0},
+          {'task': 'Max', 'progress': 100.0},
+          {'task': 'Valid', 'progress': 75.0},
+        ];
 
-      final widget = MaterialApp(
-        home: Scaffold(
-          body: SizedBox(
-            width: 400,
-            height: 300,
-            child: CristalyseChart()
-                .data(testData)
-                .mappingProgress(value: 'progress', label: 'task')
-                .geomProgress(
-                  minValue: 0.0,
-                  maxValue: 100.0,
-                  orientation: ProgressOrientation.horizontal,
-                  thickness: 20.0,
-                )
-                .build(),
+        final widget = MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 400,
+              height: 300,
+              child: CristalyseChart()
+                  .data(testData)
+                  .mappingProgress(value: 'progress', label: 'task')
+                  .geomProgress(
+                    minValue: 0.0,
+                    maxValue: 100.0,
+                    orientation: ProgressOrientation.horizontal,
+                    thickness: 20.0,
+                  )
+                  .build(),
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpWidget(widget);
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(widget);
+        await tester.pumpAndSettle();
 
-      // Should not crash and should render the widget
-      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
-    });
+        // Should not crash and should render the widget
+        expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+      },
+    );
   });
 }
