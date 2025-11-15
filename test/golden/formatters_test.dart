@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 
-import 'helpers/chart_builders.dart';
-
 void main() {
   group('Formatter Tests - Currency', () {
     goldenTest(

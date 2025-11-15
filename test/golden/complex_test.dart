@@ -19,7 +19,8 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'area_line_points_dark',
-            child: buildComplexMultiGeometryChart(theme: ChartTheme.darkTheme()),
+            child:
+                buildComplexMultiGeometryChart(theme: ChartTheme.darkTheme()),
           ),
         ],
       ),
@@ -38,7 +39,8 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'dark_theme',
-            child: buildComplexDualAxisWithLegend(theme: ChartTheme.darkTheme()),
+            child:
+                buildComplexDualAxisWithLegend(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_light',
