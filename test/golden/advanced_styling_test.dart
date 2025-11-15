@@ -15,7 +15,7 @@ void main() {
           GoldenTestScenario(
             name: 'custom_background',
             child: _buildLegendStyledChart(
-              backgroundColor: Colors.blue.withOpacity(0.1),
+              backgroundColor: Colors.blue.withValues(alpha: 0.1),
             ),
           ),
           GoldenTestScenario(
@@ -366,15 +366,14 @@ Widget _buildStackedProgressWithColors() {
         .data(progressData)
         .mappingProgress(label: 'label', value: 'value')
         .geomProgress(
-          style: ProgressStyle.stacked,
-          segments: [30.0, 40.0, 30.0],
-          segmentColors: [
-            Colors.blue,
-            Colors.green,
-            Colors.orange,
-          ],
-        )
-        .build(),
+      style: ProgressStyle.stacked,
+      segments: [30.0, 40.0, 30.0],
+      segmentColors: [
+        Colors.blue,
+        Colors.green,
+        Colors.orange,
+      ],
+    ).build(),
   );
 }
 

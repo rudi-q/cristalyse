@@ -331,7 +331,8 @@ void main() {
         children: [
           GoldenTestScenario(
             name: 'horizontal',
-            child: buildProgressBar(orientation: ProgressOrientation.horizontal),
+            child:
+                buildProgressBar(orientation: ProgressOrientation.horizontal),
           ),
           GoldenTestScenario(
             name: 'vertical',
