@@ -15,11 +15,11 @@ These tests are designed to:
 The test suite is organized logically into separate files:
 
 ### `helpers/chart_builders.dart`
-Contains reusable helper functions for building charts. **Note:** This file needs to be updated to match the correct API:
-- Use `geomPoint()`, `geomLine()`, `geomBar()`, etc. instead of `.geom()`
-- Use `scaleXContinuous()`, `scaleYContinuous()`, `scaleXOrdinal()` instead of `.scale()`
-- Use `limits` parameter for custom bounds
-- Import `BorderRadius` and `Radius` from `package:flutter/material.dart`
+Contains reusable helper functions for building charts with sample data. All helpers use the correct cristalyse API:
+- Specific geometry methods: `geomPoint()`, `geomLine()`, `geomBar()`, etc.
+- Specific scale methods: `scaleXContinuous()`, `scaleYContinuous()`, `scaleXOrdinal()`, etc.
+- Named parameters for legends: `.legend(position: ..., orientation: ...)`
+- Conditional method chaining extension for optional features
 
 ### `chart_types_test.dart`
 Tests for all chart types and their variations:
@@ -69,19 +69,19 @@ Tests for complex combinations:
 
 ### Correct Cristalyse API Usage
 
-Based on the codebase analysis, here's the correct API:
+Based on the codebase, here's the correct API pattern:
 
 ```dart
 // Basic chart construction
 CristalyseChart()
     .data(data)
     .mapping(x: 'column_x', y: 'column_y', color: 'series')
-    .geomPoint()  // Not .geom(PointGeometry())
-    .scaleXContinuous(title: 'X Axis', limits: (0, 100))  // Not .scale(x: LinearScale())
+    .geomPoint()  // Use specific geometry methods, not .geom(PointGeometry())
+    .scaleXContinuous(title: 'X Axis')  // Use specific scale methods
     .scaleYContinuous(title: 'Y Axis')
-    .theme(ChartTheme.dark())
-    .legend(LegendConfig(position: LegendPosition.topRight))
-    .coordFlip(true)
+    .theme(ChartTheme.darkTheme())  // Note: darkTheme(), not dark()
+    .legend(position: LegendPosition.topRight)  // Named parameters, not LegendConfig
+    .coordFlip()  // No boolean parameter needed
     .build();
 ```
 
@@ -104,9 +104,9 @@ CristalyseChart()
 
 ### Theme Methods
 - `ChartTheme.defaultTheme()`
-- `ChartTheme.dark()`
-- `ChartTheme.solarizedLight()`
-- `ChartTheme.solarizedDark()`
+- `ChartTheme.darkTheme()`
+- `ChartTheme.solarizedLightTheme()`
+- `ChartTheme.solarizedDarkTheme()`
 
 ### Gradient Color Scales
 - `GradientColorScale.viridis()`
@@ -195,42 +195,177 @@ CristalyseChart()
 
 ## Running the Tests
 
-### Generate Golden Files
+### Understanding Visual Regression Testing
+
+Visual regression tests work by comparing screenshots (called "golden files") of your charts against a baseline. When you render a chart, Alchemist takes a screenshot and compares it pixel-by-pixel with the saved golden file. Any difference causes the test to fail.
+
+**The golden files are the "source of truth"** - they represent what the charts should look like.
+
+### Basic Commands
 
 ```bash
-# Generate all golden files
-flutter test test/golden/ --update-goldens
-
-# Generate for specific test file
-flutter test test/golden/chart_types_test.dart --update-goldens
-```
-
-### Run Tests (Compare Against Goldens)
-
-```bash
-# Run all visual regression tests
+# Run tests - compares current rendering against golden files
 flutter test test/golden/
+
+# Update golden files - saves new screenshots as the baseline
+flutter test test/golden/ --update-goldens
 
 # Run specific test file
 flutter test test/golden/chart_types_test.dart
+
+# Update specific test file's goldens
+flutter test test/golden/chart_types_test.dart --update-goldens
 ```
+
+### Workflow for Making Changes
+
+Here's the typical workflow when working with visual regression tests:
+
+#### 1. **Make Code Changes**
+Edit your chart rendering code (e.g., AnimatedChartPainter, geometries, themes, etc.)
+
+#### 2. **Run Tests to Detect Visual Changes**
+```bash
+flutter test test/golden/
+```
+
+If tests fail, Alchemist will show you which screenshots don't match:
+```
+✗ Progress bar styles (variant: Linux)
+  Expected: test/golden/goldens/linux/progress_styles.png
+  Actual rendering differs from golden file
+```
+
+#### 3. **Review the Changes**
+
+**IMPORTANT:** Don't blindly update goldens! First understand WHY tests failed:
+
+- **Expected changes**: You intentionally changed how charts render
+  - ✅ Example: "I updated the default bar color from blue to teal"
+  - ✅ Example: "I fixed the legend spacing bug"
+  - → These are safe to accept by updating goldens
+
+- **Unexpected changes**: Tests caught a regression
+  - ❌ Example: "Why did the pie chart change? I only modified bar charts"
+  - ❌ Example: "The alignment looks wrong now"
+  - → These are bugs! Fix the code, don't update goldens
+
+**Tips for reviewing:**
+- Look at the test names to see which features broke
+- If you're unsure, manually inspect the chart in your app
+- Run only the affected tests to isolate the issue
+- Consider whether the change affects one chart type or all charts
+
+#### 4. **Update Goldens (Only If Changes Are Correct)**
+
+Once you've confirmed the visual changes are intentional:
+
+```bash
+# Update all golden files
+flutter test test/golden/ --update-goldens
+
+# Or update just the affected tests
+flutter test test/golden/themes_test.dart --update-goldens
+```
+
+This overwrites the golden files with the new screenshots.
+
+#### 5. **Verify Tests Pass**
+```bash
+flutter test test/golden/
+```
+
+All tests should now pass since goldens match the current rendering.
+
+#### 6. **Commit Updated Goldens with Your Code**
+
+**Always commit updated golden files together with the code changes that caused them:**
+
+```bash
+git add test/golden/goldens/ lib/src/your_changes.dart
+git commit -m "feat: update bar chart colors and regenerate goldens"
+```
+
+This keeps the goldens in sync with the codebase.
+
+### Common Scenarios
+
+#### Scenario: You're Refactoring (No Visual Changes Expected)
+
+```bash
+# Run tests frequently during refactoring
+flutter test test/golden/
+```
+
+**All tests should pass.** If any fail, you've accidentally changed the visual output - this is a regression!
+
+#### Scenario: You're Adding a New Feature
+
+```bash
+# 1. Add new test cases for the feature
+# 2. Generate goldens for the new tests
+flutter test test/golden/features_test.dart --update-goldens
+
+# 3. Verify all tests pass
+flutter test test/golden/
+```
+
+#### Scenario: You're Changing Visual Style Intentionally
+
+```bash
+# 1. Make your style changes
+# 2. Run tests to see what changed
+flutter test test/golden/
+
+# 3. Review the failures carefully
+# 4. Update goldens if changes look correct
+flutter test test/golden/ --update-goldens
+
+# 5. Commit both code and goldens together
+git add -A
+git commit -m "feat: redesign chart themes"
+```
+
+#### Scenario: Tests Fail in CI but Pass Locally
+
+This can happen due to platform differences (fonts, rendering). The test config handles this:
+- Local: Uses `test/golden/goldens/linux/` (or mac/windows)
+- CI: Uses separate CI goldens when `CI=true` environment variable is set
+
+You may need to generate CI-specific goldens in your CI environment.
+
+### What NOT to Do
+
+❌ **Don't update goldens without understanding why tests failed**
+- You might be masking a real bug
+
+❌ **Don't commit code changes without updated goldens**
+- Tests will fail for everyone else
+
+❌ **Don't commit updated goldens without code changes**
+- Goldens should only change when code changes
+
+❌ **Don't ignore test failures**
+- They exist to catch regressions!
 
 ### CI Integration
 
 The tests are configured to work in CI environments through `flutter_test_config.dart`:
-- Platform goldens enabled for local development
+- Platform goldens enabled for local development (`test/golden/goldens/linux/`, etc.)
 - CI goldens enabled when `CI` environment variable is set
+- Use the same `--update-goldens` flag in CI if you need to regenerate CI-specific baselines
 
-## Next Steps
+## Test Suite Status
 
-The helper functions in `helpers/chart_builders.dart` need to be updated to use the correct API as documented above. The test files themselves are structured correctly but will fail until the helpers are fixed.
+✅ **All 39 tests passing**
 
-Key changes needed:
-1. Replace `.scale()` with `scaleXContinuous()`, `scaleYContinuous()`, etc.
-2. Replace `.geom(Geometry())` with specific `geomPoint()`, `geomLine()`, etc.
-3. Add missing Flutter imports (`BorderRadius`, `Radius`, `ThemeData`)
-4. Fix parameter names (e.g., `limits` instead of `min`/`max`)
-5. Update legend config parameters
+The test suite is fully functional with:
+- Helper functions using the correct cristalyse API
+- All chart types tested with multiple variations
+- All themes, legends, and features covered
+- 39 golden files generated for visual regression
+
+You can run the tests immediately with `flutter test test/golden/`
 
 ## Benefits for AnimatedChartPainter Refactoring
 
@@ -243,11 +378,11 @@ This test suite will:
 
 ## Test Coverage Statistics
 
-Once implemented correctly, this suite will provide:
-- **9 chart types** with multiple variations each
-- **4 themes** tested across all chart types
-- **8 legend positions** + 3 orientations + 4 symbol shapes
+This test suite provides:
+- **9 chart types** with multiple variations each (39 test scenarios)
+- **4 themes** tested across 6 different chart types
+- **8 legend positions** + 3 orientations tested
 - **15+ special features** tested in isolation and combination
-- **Estimated 150+ golden file screenshots** covering the entire library
+- **39 golden file screenshots** covering all major features
 
-This represents comprehensive visual coverage to support the AnimatedChartPainter refactoring.
+This represents comprehensive visual coverage to support safe refactoring of the AnimatedChartPainter (3,861 lines).
