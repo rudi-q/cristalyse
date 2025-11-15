@@ -1,5 +1,6 @@
 import 'package:alchemist/alchemist.dart';
 import 'package:cristalyse/cristalyse.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'helpers/chart_builders.dart';
@@ -18,7 +19,7 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'area_line_points_dark',
-            child: buildComplexMultiGeometryChart(theme: ChartTheme.dark()),
+            child: buildComplexMultiGeometryChart(theme: ChartTheme.darkTheme()),
           ),
         ],
       ),
@@ -37,12 +38,12 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'dark_theme',
-            child: buildComplexDualAxisWithLegend(theme: ChartTheme.dark()),
+            child: buildComplexDualAxisWithLegend(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_light',
             child: buildComplexDualAxisWithLegend(
-              theme: ChartTheme.solarizedLight(),
+              theme: ChartTheme.solarizedLightTheme(),
             ),
           ),
         ],
@@ -83,7 +84,7 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'scatter_dark',
-            child: buildMultiSeriesScatterPlot(theme: ChartTheme.dark()),
+            child: buildMultiSeriesScatterPlot(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'line_default',
@@ -92,7 +93,7 @@ void main() {
           GoldenTestScenario(
             name: 'line_solarized',
             child: buildMultiSeriesLineChart(
-              theme: ChartTheme.solarizedLight(),
+              theme: ChartTheme.solarizedLightTheme(),
             ),
           ),
           GoldenTestScenario(
@@ -122,7 +123,7 @@ void main() {
               alpha: 0.8,
               xAxisTitle: 'Category',
               yAxisTitle: 'Value',
-              theme: ChartTheme.dark(),
+              theme: ChartTheme.darkTheme(),
             ),
           ),
           GoldenTestScenario(
@@ -134,7 +135,7 @@ void main() {
               size: 8.0,
               xAxisTitle: 'X Axis',
               yAxisTitle: 'Y Axis',
-              theme: ChartTheme.solarizedDark(),
+              theme: ChartTheme.solarizedDarkTheme(),
             ),
           ),
           GoldenTestScenario(
@@ -143,7 +144,7 @@ void main() {
               colorScale: GradientColorScale.coolWarm(),
               cellBorderRadius: const BorderRadius.all(Radius.circular(4)),
               showValues: true,
-              theme: ChartTheme.dark(),
+              theme: ChartTheme.darkTheme(),
             ),
           ),
         ],

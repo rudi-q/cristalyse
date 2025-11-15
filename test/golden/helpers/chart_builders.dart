@@ -103,22 +103,26 @@ Widget buildScatterPlot({
     child: CristalyseChart()
         .data(basicNumericData)
         .mapping(x: 'x', y: 'y')
-        .scale(
-          x: LinearScale(title: xAxisTitle),
-          y: LinearScale(min: yMin, max: yMax, title: yAxisTitle),
+        .geomPoint(
+          shape: shape,
+          alpha: alpha,
+          borderWidth: borderWidth,
+          size: size,
         )
-        .geom(
-          PointGeometry(
-            shape: shape,
-            alpha: alpha,
-            borderWidth: borderWidth,
-            size: size,
-          ),
-        )
+        .scaleXContinuous(title: xAxisTitle)
+        .scaleYContinuous(min: yMin, max: yMax, title: yAxisTitle)
         .theme(theme ?? ChartTheme.defaultTheme())
-        .coordFlip(coordFlipped)
+        .conditional(coordFlipped, (chart) => chart.coordFlip())
         .build(),
   );
+}
+
+// Helper for conditional method chaining
+extension ChartConditional on CristalyseChart {
+  CristalyseChart conditional(
+      bool condition, CristalyseChart Function(CristalyseChart) apply) {
+    return condition ? apply(this) : this;
+  }
 }
 
 Widget buildLineChart({
@@ -133,10 +137,11 @@ Widget buildLineChart({
     child: CristalyseChart()
         .data(basicNumericData)
         .mapping(x: 'x', y: 'y')
-        .scale(x: LinearScale(), y: LinearScale())
-        .geom(LineGeometry(style: style, strokeWidth: strokeWidth))
+        .geomLine(style: style, strokeWidth: strokeWidth)
+        .scaleXContinuous()
+        .scaleYContinuous()
         .theme(theme ?? ChartTheme.defaultTheme())
-        .coordFlip(coordFlipped)
+        .conditional(coordFlipped, (chart) => chart.coordFlip())
         .build(),
   );
 }
@@ -148,8 +153,9 @@ Widget buildMultiSeriesLineChart({ChartTheme? theme}) {
     child: CristalyseChart()
         .data(multiSeriesNumericData)
         .mapping(x: 'x', y: 'y', color: 'series')
-        .scale(x: LinearScale(), y: LinearScale())
-        .geom(LineGeometry())
+        .geomLine()
+        .scaleXContinuous()
+        .scaleYContinuous()
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );
@@ -173,19 +179,15 @@ Widget buildBarChart({
     child: CristalyseChart()
         .data(categoricalData)
         .mapping(x: 'category', y: 'value')
-        .scale(
-          x: OrdinalScale(title: xAxisTitle),
-          y: LinearScale(min: yMin, max: yMax, title: yAxisTitle),
+        .geomBar(
+          orientation: orientation,
+          style: style,
+          borderRadius: borderRadius,
+          alpha: alpha,
+          borderWidth: borderWidth,
         )
-        .geom(
-          BarGeometry(
-            orientation: orientation,
-            style: style,
-            borderRadius: borderRadius,
-            alpha: alpha,
-            borderWidth: borderWidth,
-          ),
-        )
+        .scaleXOrdinal(title: xAxisTitle)
+        .scaleYContinuous(min: yMin, max: yMax, title: yAxisTitle)
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );
@@ -201,8 +203,9 @@ Widget buildMultiSeriesBarChart({
     child: CristalyseChart()
         .data(multiSeriesCategoricalData)
         .mapping(x: 'category', y: 'value', color: 'series')
-        .scale(x: OrdinalScale(), y: LinearScale())
-        .geom(BarGeometry(style: style))
+        .geomBar(style: style)
+        .scaleXOrdinal()
+        .scaleYContinuous()
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );
@@ -219,8 +222,9 @@ Widget buildAreaChart({
     child: CristalyseChart()
         .data(basicNumericData)
         .mapping(x: 'x', y: 'y')
-        .scale(x: LinearScale(), y: LinearScale())
-        .geom(AreaGeometry(fillArea: fillArea, alpha: alpha))
+        .geomArea(fillArea: fillArea, alpha: alpha)
+        .scaleXContinuous()
+        .scaleYContinuous()
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );
@@ -233,8 +237,9 @@ Widget buildMultiSeriesAreaChart({ChartTheme? theme}) {
     child: CristalyseChart()
         .data(multiSeriesNumericData)
         .mapping(x: 'x', y: 'y', color: 'series')
-        .scale(x: LinearScale(), y: LinearScale())
-        .geom(AreaGeometry())
+        .geomArea()
+        .scaleXContinuous()
+        .scaleYContinuous()
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );
@@ -253,13 +258,11 @@ Widget buildPieChart({
     child: CristalyseChart()
         .data(pieData)
         .mappingPie(category: 'category', value: 'value')
-        .geom(
-          PieGeometry(
-            innerRadius: innerRadius,
-            showLabels: showLabels,
-            showPercentages: showPercentages,
-            explodeSlices: explodeSlices,
-          ),
+        .geomPie(
+          innerRadius: innerRadius,
+          showLabels: showLabels,
+          showPercentages: showPercentages,
+          explodeSlices: explodeSlices,
         )
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
@@ -278,12 +281,10 @@ Widget buildHeatMap({
     child: CristalyseChart()
         .data(heatMapData)
         .mappingHeatMap(x: 'x', y: 'y', value: 'value')
-        .scaleColor(colorScale ?? GradientColorScale.viridis())
-        .geom(
-          HeatMapGeometry(
-            cellBorderRadius: cellBorderRadius,
-            showValues: showValues,
-          ),
+        .geomHeatMap(
+          cellBorderRadius: cellBorderRadius,
+          showValues: showValues,
+          colorGradient: colorScale?.colors,
         )
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
@@ -301,14 +302,14 @@ Widget buildBubbleChart({
     child: CristalyseChart()
         .data(bubbleData)
         .mapping(x: 'x', y: 'y', size: 'size')
-        .scale(x: LinearScale(), y: LinearScale())
-        .scaleSize(SizeScale(range: [10.0, 40.0]))
-        .geom(
-          BubbleGeometry(
-            showSizeGuide: showSizeGuide,
-            showLabels: showLabels,
-          ),
+        .geomBubble(
+          minSize: 10.0,
+          maxSize: 40.0,
+          title: showSizeGuide ? 'Size' : null,
+          showLabels: showLabels,
         )
+        .scaleXContinuous()
+        .scaleYContinuous()
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );
@@ -318,6 +319,12 @@ Widget buildProgressBar({
   ProgressOrientation orientation = ProgressOrientation.horizontal,
   ProgressStyle style = ProgressStyle.filled,
   ChartTheme? theme,
+  List<double>? segments,
+  List<Color>? segmentColors,
+  double? gaugeRadius,
+  bool? showTicks,
+  List<double>? concentricRadii,
+  List<double>? concentricThicknesses,
 }) {
   return SizedBox(
     width: 400,
@@ -325,11 +332,15 @@ Widget buildProgressBar({
     child: CristalyseChart()
         .data(progressData)
         .mappingProgress(label: 'label', value: 'value')
-        .geom(
-          ProgressGeometry(
-            orientation: orientation,
-            style: style,
-          ),
+        .geomProgress(
+          orientation: orientation,
+          style: style,
+          segments: segments,
+          segmentColors: segmentColors,
+          gaugeRadius: gaugeRadius,
+          showTicks: showTicks,
+          concentricRadii: concentricRadii,
+          concentricThicknesses: concentricThicknesses,
         )
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
@@ -344,13 +355,11 @@ Widget buildDualYAxisChart({ChartTheme? theme}) {
         .data(dualAxisData)
         .mapping(x: 'category', y: 'sales')
         .mappingY2('conversion')
-        .scale(
-          x: OrdinalScale(title: 'Category'),
-          y: LinearScale(title: 'Sales'),
-          y2: LinearScale(title: 'Conversion Rate'),
-        )
-        .geom(BarGeometry(yAxis: YAxis.primary))
-        .geom(LineGeometry(yAxis: YAxis.secondary, strokeWidth: 3.0))
+        .geomBar(yAxis: YAxis.primary)
+        .geomLine(yAxis: YAxis.secondary, strokeWidth: 3.0)
+        .scaleXOrdinal(title: 'Category')
+        .scaleYContinuous(title: 'Sales')
+        .scaleY2Continuous(title: 'Conversion Rate')
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );
@@ -363,7 +372,6 @@ Widget buildDualYAxisChart({ChartTheme? theme}) {
 Widget buildChartWithLegend({
   LegendPosition position = LegendPosition.topRight,
   LegendOrientation? orientation,
-  LegendSymbol? symbolShape,
   ChartTheme? theme,
 }) {
   return SizedBox(
@@ -372,14 +380,12 @@ Widget buildChartWithLegend({
     child: CristalyseChart()
         .data(multiSeriesNumericData)
         .mapping(x: 'x', y: 'y', color: 'series')
-        .scale(x: LinearScale(), y: LinearScale())
-        .geom(LineGeometry())
+        .geomLine()
+        .scaleXContinuous()
+        .scaleYContinuous()
         .legend(
-          LegendConfig(
-            position: position,
-            orientation: orientation,
-            symbolShape: symbolShape,
-          ),
+          position: position,
+          orientation: orientation ?? LegendOrientation.auto,
         )
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
@@ -404,10 +410,11 @@ Widget buildComplexMultiGeometryChart({ChartTheme? theme}) {
     child: CristalyseChart()
         .data(data)
         .mapping(x: 'x', y: 'y')
-        .scale(x: LinearScale(), y: LinearScale())
-        .geom(AreaGeometry(alpha: 0.3))
-        .geom(LineGeometry(strokeWidth: 2.0))
-        .geom(PointGeometry(size: 6.0))
+        .geomArea(alpha: 0.3)
+        .geomLine(strokeWidth: 2.0)
+        .geomPoint(size: 6.0)
+        .scaleXContinuous()
+        .scaleYContinuous()
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );
@@ -421,14 +428,12 @@ Widget buildComplexDualAxisWithLegend({ChartTheme? theme}) {
         .data(dualAxisData)
         .mapping(x: 'category', y: 'sales')
         .mappingY2('conversion')
-        .scale(
-          x: OrdinalScale(title: 'Category'),
-          y: LinearScale(title: 'Sales'),
-          y2: LinearScale(title: 'Conversion Rate'),
-        )
-        .geom(BarGeometry(yAxis: YAxis.primary))
-        .geom(LineGeometry(yAxis: YAxis.secondary, strokeWidth: 3.0))
-        .legend(LegendConfig(position: LegendPosition.topRight))
+        .geomBar(yAxis: YAxis.primary)
+        .geomLine(yAxis: YAxis.secondary, strokeWidth: 3.0)
+        .scaleXOrdinal(title: 'Category')
+        .scaleYContinuous(title: 'Sales')
+        .scaleY2Continuous(title: 'Conversion Rate')
+        .legend(position: LegendPosition.topRight)
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );
@@ -441,16 +446,12 @@ Widget buildComplexThemedWithCustomizations({ChartTheme? theme}) {
     child: CristalyseChart()
         .data(categoricalData)
         .mapping(x: 'category', y: 'value')
-        .scale(
-          x: OrdinalScale(title: 'Product'),
-          y: LinearScale(title: 'Revenue'),
+        .geomBar(
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
         )
-        .geom(
-          BarGeometry(
-            borderRadius: const BorderRadius.all(Radius.circular(8)),
-          ),
-        )
-        .theme(theme ?? ChartTheme.dark())
+        .scaleXOrdinal(title: 'Product')
+        .scaleYContinuous(title: 'Revenue')
+        .theme(theme ?? ChartTheme.darkTheme())
         .build(),
   );
 }
@@ -462,8 +463,9 @@ Widget buildMultiSeriesScatterPlot({ChartTheme? theme}) {
     child: CristalyseChart()
         .data(multiSeriesNumericData)
         .mapping(x: 'x', y: 'y', color: 'series')
-        .scale(x: LinearScale(), y: LinearScale())
-        .geom(PointGeometry())
+        .geomPoint()
+        .scaleXContinuous()
+        .scaleYContinuous()
         .theme(theme ?? ChartTheme.defaultTheme())
         .build(),
   );

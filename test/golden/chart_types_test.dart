@@ -1,5 +1,6 @@
 import 'package:alchemist/alchemist.dart';
 import 'package:cristalyse/cristalyse.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'helpers/chart_builders.dart';
@@ -363,7 +364,10 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'stacked',
-            child: buildProgressBar(style: ProgressStyle.stacked),
+            child: buildProgressBar(
+              style: ProgressStyle.stacked,
+              segments: [25.0, 30.0, 20.0],
+            ),
           ),
           GoldenTestScenario(
             name: 'grouped',
@@ -371,11 +375,19 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'gauge',
-            child: buildProgressBar(style: ProgressStyle.gauge),
+            child: buildProgressBar(
+              style: ProgressStyle.gauge,
+              gaugeRadius: 80.0,
+              showTicks: true,
+            ),
           ),
           GoldenTestScenario(
             name: 'concentric',
-            child: buildProgressBar(style: ProgressStyle.concentric),
+            child: buildProgressBar(
+              style: ProgressStyle.concentric,
+              concentricRadii: [40.0, 60.0, 80.0],
+              concentricThicknesses: [10.0, 10.0, 10.0],
+            ),
           ),
         ],
       ),

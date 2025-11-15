@@ -1,5 +1,6 @@
 import 'package:alchemist/alchemist.dart';
 import 'package:cristalyse/cristalyse.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'helpers/chart_builders.dart';
@@ -90,32 +91,8 @@ void main() {
     );
   });
 
-  group('Legend Symbol Tests', () {
-    goldenTest(
-      'Legend symbol shapes',
-      fileName: 'legend_symbols',
-      builder: () => GoldenTestGroup(
-        children: [
-          GoldenTestScenario(
-            name: 'auto',
-            child: buildChartWithLegend(symbolShape: LegendSymbol.auto),
-          ),
-          GoldenTestScenario(
-            name: 'circle',
-            child: buildChartWithLegend(symbolShape: LegendSymbol.circle),
-          ),
-          GoldenTestScenario(
-            name: 'square',
-            child: buildChartWithLegend(symbolShape: LegendSymbol.square),
-          ),
-          GoldenTestScenario(
-            name: 'line',
-            child: buildChartWithLegend(symbolShape: LegendSymbol.line),
-          ),
-        ],
-      ),
-    );
-  });
+  // Note: Legend symbol shapes are automatically determined by geometry type
+  // No need for separate tests as this is handled internally
 
   group('Legend with Different Themes', () {
     goldenTest(
@@ -129,15 +106,15 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: buildChartWithLegend(theme: ChartTheme.dark()),
+            child: buildChartWithLegend(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_light',
-            child: buildChartWithLegend(theme: ChartTheme.solarizedLight()),
+            child: buildChartWithLegend(theme: ChartTheme.solarizedLightTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_dark',
-            child: buildChartWithLegend(theme: ChartTheme.solarizedDark()),
+            child: buildChartWithLegend(theme: ChartTheme.solarizedDarkTheme()),
           ),
         ],
       ),

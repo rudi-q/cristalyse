@@ -1,5 +1,6 @@
 import 'package:alchemist/alchemist.dart';
 import 'package:cristalyse/cristalyse.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'helpers/chart_builders.dart';
@@ -18,15 +19,15 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: buildScatterPlot(theme: ChartTheme.dark()),
+            child: buildScatterPlot(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_light',
-            child: buildScatterPlot(theme: ChartTheme.solarizedLight()),
+            child: buildScatterPlot(theme: ChartTheme.solarizedLightTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_dark',
-            child: buildScatterPlot(theme: ChartTheme.solarizedDark()),
+            child: buildScatterPlot(theme: ChartTheme.solarizedDarkTheme()),
           ),
         ],
       ),
@@ -45,15 +46,15 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: buildBarChart(theme: ChartTheme.dark()),
+            child: buildBarChart(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_light',
-            child: buildBarChart(theme: ChartTheme.solarizedLight()),
+            child: buildBarChart(theme: ChartTheme.solarizedLightTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_dark',
-            child: buildBarChart(theme: ChartTheme.solarizedDark()),
+            child: buildBarChart(theme: ChartTheme.solarizedDarkTheme()),
           ),
         ],
       ),
@@ -72,15 +73,15 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: buildLineChart(theme: ChartTheme.dark()),
+            child: buildLineChart(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_light',
-            child: buildLineChart(theme: ChartTheme.solarizedLight()),
+            child: buildLineChart(theme: ChartTheme.solarizedLightTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_dark',
-            child: buildLineChart(theme: ChartTheme.solarizedDark()),
+            child: buildLineChart(theme: ChartTheme.solarizedDarkTheme()),
           ),
         ],
       ),
@@ -99,15 +100,15 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: buildPieChart(theme: ChartTheme.dark()),
+            child: buildPieChart(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_light',
-            child: buildPieChart(theme: ChartTheme.solarizedLight()),
+            child: buildPieChart(theme: ChartTheme.solarizedLightTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_dark',
-            child: buildPieChart(theme: ChartTheme.solarizedDark()),
+            child: buildPieChart(theme: ChartTheme.solarizedDarkTheme()),
           ),
         ],
       ),
@@ -126,15 +127,15 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: buildHeatMap(theme: ChartTheme.dark()),
+            child: buildHeatMap(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_light',
-            child: buildHeatMap(theme: ChartTheme.solarizedLight()),
+            child: buildHeatMap(theme: ChartTheme.solarizedLightTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_dark',
-            child: buildHeatMap(theme: ChartTheme.solarizedDark()),
+            child: buildHeatMap(theme: ChartTheme.solarizedDarkTheme()),
           ),
         ],
       ),
@@ -153,15 +154,15 @@ void main() {
           ),
           GoldenTestScenario(
             name: 'dark',
-            child: buildMultiSeriesLineChart(theme: ChartTheme.dark()),
+            child: buildMultiSeriesLineChart(theme: ChartTheme.darkTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_light',
-            child: buildMultiSeriesLineChart(theme: ChartTheme.solarizedLight()),
+            child: buildMultiSeriesLineChart(theme: ChartTheme.solarizedLightTheme()),
           ),
           GoldenTestScenario(
             name: 'solarized_dark',
-            child: buildMultiSeriesLineChart(theme: ChartTheme.solarizedDark()),
+            child: buildMultiSeriesLineChart(theme: ChartTheme.solarizedDarkTheme()),
           ),
         ],
       ),
