@@ -5,8 +5,9 @@ This directory contains comprehensive visual regression tests for the Cristalyse
 ## Purpose
 
 These tests are designed to:
+
 1. Provide 100% feature coverage of the charting library
-2. Serve as a safety net before refactoring AnimatedChartPainter (3,861 lines)
+2. Serve as a safety net before any refactoring of visual logic
 3. Catch visual regressions when making changes to the rendering engine
 4. Document all supported chart types and features through executable tests
 
@@ -15,14 +16,18 @@ These tests are designed to:
 The test suite is organized logically into separate files:
 
 ### `helpers/chart_builders.dart`
+
 Contains reusable helper functions for building charts with sample data. All helpers use the correct cristalyse API:
+
 - Specific geometry methods: `geomPoint()`, `geomLine()`, `geomBar()`, etc.
 - Specific scale methods: `scaleXContinuous()`, `scaleYContinuous()`, `scaleXOrdinal()`, etc.
 - Named parameters for legends: `.legend(position: ..., orientation: ...)`
 - Conditional method chaining extension for optional features
 
 ### `chart_types_test.dart`
+
 Tests for all chart types and their variations:
+
 - **Scatter plots**: Different point shapes (circle, square, triangle), sizes, borders
 - **Line charts**: Line styles (solid, dashed, dotted), stroke widths, multi-series
 - **Bar charts**: Vertical/horizontal, grouped/stacked, rounded corners, borders
@@ -34,6 +39,7 @@ Tests for all chart types and their variations:
 - **Dual Y-axis**: Combined bar and line charts
 
 ### `themes_test.dart`
+
 Tests for all built-in themes across different chart types:
 - Default theme
 - Dark theme
@@ -43,14 +49,18 @@ Tests for all built-in themes across different chart types:
 Tested on: scatter plots, bar charts, line charts, pie charts, heat maps, multi-series charts
 
 ### `legends_test.dart`
+
 Tests for legend functionality:
+
 - **Positions**: topLeft, topRight, bottomLeft, bottomRight, top, bottom, left, right
 - **Orientations**: horizontal, vertical, auto
 - **Symbol shapes**: auto, circle, square, line
 - **Theme integration**: Legends with different themes
 
 ### `features_test.dart`
+
 Tests for special chart features:
+
 - **Axis titles**: Custom X and Y axis labels
 - **Custom bounds**: Non-zero baselines, negative to positive ranges
 - **Transparency**: Various alpha values
@@ -59,7 +69,9 @@ Tests for special chart features:
 - **Border radius**: Rounded corners on bars and cells
 
 ### `complex_test.dart`
+
 Tests for complex combinations:
+
 - **Multi-geometry**: Charts with multiple geometry types (area + line + points)
 - **Dual axis with legends**: Combined features
 - **Themed customizations**: Multiple features with themes
@@ -86,6 +98,7 @@ CristalyseChart()
 ```
 
 ### Geometry Methods
+
 - `geomPoint({size, color, alpha, shape, borderWidth, yAxis})`
 - `geomLine({strokeWidth, color, alpha, style, yAxis})`
 - `geomBar({width, color, alpha, orientation, style, borderRadius, borderWidth, yAxis})`
@@ -96,6 +109,7 @@ CristalyseChart()
 - `geomProgress({orientation, style, thickness, ...})`
 
 ### Scale Methods
+
 - `scaleXContinuous({limits, labels, title})`
 - `scaleYContinuous({limits, labels, title})`
 - `scaleY2Continuous({limits, labels, title})`
@@ -103,12 +117,14 @@ CristalyseChart()
 - `scaleYOrdinal({labels, title})`
 
 ### Theme Methods
+
 - `ChartTheme.defaultTheme()`
 - `ChartTheme.darkTheme()`
 - `ChartTheme.solarizedLightTheme()`
 - `ChartTheme.solarizedDarkTheme()`
 
 ### Gradient Color Scales
+
 - `GradientColorScale.viridis()`
 - `GradientColorScale.coolWarm()`
 - `GradientColorScale.heatMap()`
@@ -117,6 +133,7 @@ CristalyseChart()
 ## Feature Coverage Checklist
 
 ### Chart Types
+
 - [x] Scatter Plot
   - [x] Circle points
   - [x] Square points
@@ -172,18 +189,21 @@ CristalyseChart()
 - [x] Dual Y-Axis Charts
 
 ### Themes
+
 - [x] Default theme (all chart types)
 - [x] Dark theme (all chart types)
 - [x] Solarized Light theme (all chart types)
 - [x] Solarized Dark theme (all chart types)
 
 ### Legends
+
 - [x] All 8 positions (topLeft, topRight, bottomLeft, bottomRight, top, bottom, left, right)
 - [x] Orientations (horizontal, vertical, auto)
 - [x] Symbol shapes (auto, circle, square, line)
 - [x] Theme integration
 
 ### Special Features
+
 - [x] Axis titles
 - [x] Custom bounds (min/max)
 - [x] Transparency (alpha)
@@ -222,15 +242,18 @@ flutter test test/golden/chart_types_test.dart --update-goldens
 Here's the typical workflow when working with visual regression tests:
 
 #### 1. **Make Code Changes**
+
 Edit your chart rendering code (e.g., AnimatedChartPainter, geometries, themes, etc.)
 
 #### 2. **Run Tests to Detect Visual Changes**
+
 ```bash
 flutter test test/golden/
 ```
 
 If tests fail, Alchemist will show you which screenshots don't match:
-```
+
+```bash
 ✗ Progress bar styles (variant: Linux)
   Expected: test/golden/goldens/linux/progress_styles.png
   Actual rendering differs from golden file
@@ -251,8 +274,9 @@ If tests fail, Alchemist will show you which screenshots don't match:
   - → These are bugs! Fix the code, don't update goldens
 
 **Tips for reviewing:**
+
 - Look at the test names to see which features broke
-- If you're unsure, manually inspect the chart in your app
+- If you're unsure, manually inspect the chart in an app context
 - Run only the affected tests to isolate the issue
 - Consider whether the change affects one chart type or all charts
 
@@ -271,6 +295,7 @@ flutter test test/golden/themes_test.dart --update-goldens
 This overwrites the golden files with the new screenshots.
 
 #### 5. **Verify Tests Pass**
+
 ```bash
 flutter test test/golden/
 ```
@@ -329,6 +354,7 @@ git commit -m "feat: redesign chart themes"
 #### Scenario: Tests Fail in CI but Pass Locally
 
 This can happen due to platform differences (fonts, rendering). The test config handles this:
+
 - Local: Uses `test/golden/goldens/linux/` (or mac/windows)
 - CI: Uses separate CI goldens when `CI=true` environment variable is set
 
@@ -337,20 +363,25 @@ You may need to generate CI-specific goldens in your CI environment.
 ### What NOT to Do
 
 ❌ **Don't update goldens without understanding why tests failed**
+
 - You might be masking a real bug
 
 ❌ **Don't commit code changes without updated goldens**
+
 - Tests will fail for everyone else
 
 ❌ **Don't commit updated goldens without code changes**
+
 - Goldens should only change when code changes
 
 ❌ **Don't ignore test failures**
+
 - They exist to catch regressions!
 
 ### CI Integration
 
 The tests are configured to work in CI environments through `flutter_test_config.dart`:
+
 - Platform goldens enabled for local development (`test/golden/goldens/linux/`, etc.)
 - CI goldens enabled when `CI` environment variable is set
 - Use the same `--update-goldens` flag in CI if you need to regenerate CI-specific baselines
@@ -360,12 +391,14 @@ The tests are configured to work in CI environments through `flutter_test_config
 ✅ **All 82 tests passing - 100% visual coverage achieved**
 
 The test suite provides comprehensive coverage with:
+
 - **9 test files** organized by feature area
 - **82 golden file screenshots** for visual regression
 - **100% coverage** of visually-testable API features
 - Helper functions using the correct cristalyse API
 
 ### Test Files
+
 - `chart_types_test.dart` (18 tests) - All chart types with variations
 - `themes_test.dart` (6 tests) - All 4 built-in themes
 - `legends_test.dart` (4 tests) - Positions and orientations
@@ -381,6 +414,7 @@ You can run the tests immediately with `flutter test test/golden/`
 ## Benefits for AnimatedChartPainter Refactoring
 
 This test suite will:
+
 1. **Catch regressions**: Any visual changes will be immediately detected
 2. **Document behavior**: Tests serve as executable documentation
 3. **Enable confident refactoring**: Make changes knowing tests will catch breaks
@@ -392,9 +426,11 @@ This test suite will:
 This test suite provides **100% coverage of visually-testable features**:
 
 ### Chart Types (100%)
+
 - **9/9 chart types** with multiple variations (scatter, line, bar, area, pie, heat map, bubble, progress, dual-axis)
 
 ### Visual Features (100%)
+
 - **4/4 themes** tested across all chart types
 - **Gradients** - Linear, radial, sweep on bars and points
 - **Formatters** - Currency, compact, percentage, custom units
@@ -405,7 +441,8 @@ This test suite provides **100% coverage of visually-testable features**:
 - **Complex combinations** - Multi-geometry, dual-axis
 
 ### Total
+
 - **82 test scenarios** generating **82 golden files**
 - **~100% of documented API features** that can be tested visually
 
-This represents comprehensive visual coverage to support safe refactoring of the AnimatedChartPainter (3,861 lines).
+This represents comprehensive visual coverage to support safe refactoring.
