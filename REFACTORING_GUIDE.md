@@ -1,6 +1,6 @@
 # AnimatedChartPainter Refactoring Guide
 
-## Status: Phase 1 - Foundation Complete ✅
+## Status: Phase 1 - COMPLETE ✅
 
 This guide documents the comprehensive refactoring of `AnimatedChartPainter` (3,831 lines) to extract reusable geometry calculation logic that can be shared between Canvas rendering and SVG export.
 
@@ -8,8 +8,9 @@ This guide documents the comprehensive refactoring of `AnimatedChartPainter` (3,
 
 ## Completed Work
 
-### ✅ render_models.dart
-Created all render data model classes:
+### ✅ Phase 1: Core Geometries (COMPLETE)
+
+**render_models.dart** - Created all render data model classes:
 - `BarRenderData` - Pre-calculated bar geometry
 - `LineRenderData` - Line points and styling
 - `PointRenderData` - Scatter point geometry
@@ -20,6 +21,28 @@ Created all render data model classes:
 - `ProgressBarRenderData` - Progress bar geometry
 
 These models contain **calculation results only** - no rendering logic.
+
+**geometry_calculator.dart** - Extracted calculation methods:
+- `calculateSingleBar()` - From AnimatedChartPainter lines 1003-1120
+- `calculateSimpleBars()` - From lines 791-831
+- `calculateGroupedBars()` - From lines 833-921
+- `calculateStackedBars()` - From lines 923-1001
+- `calculateLine()` - From lines 1505-1577
+- `calculateLines()` - From lines 1458-1503 (with color grouping)
+- `calculatePoints()` - From lines 1122-1269
+
+**AnimatedChartPainter integration** - Refactored to use GeometryCalculator:
+- Updated `_drawSimpleBars()` to use calculator
+- Updated `_drawGroupedBars()` to use calculator
+- Updated `_drawStackedBars()` to use calculator (with value-based animation)
+- Updated `_drawLinesAnimated()` to use calculator
+- Updated `_drawPointsAnimated()` to use calculator
+- Added `_applyBarAnimation()` - applies animation to bar height/width
+- Added `_renderBar()` - renders BarRenderData to canvas
+- Added `_renderLine()` - renders LineRenderData with progressive animation
+- Added `_renderPoint()` - renders PointRenderData with shapes and borders
+
+**Next: Run golden tests to verify no visual regressions.**
 
 ---
 
