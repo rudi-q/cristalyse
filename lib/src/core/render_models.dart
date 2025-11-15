@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'geometry.dart';
+
 /// Base class for all render data
 /// These classes contain pre-calculated geometry and styling information,
 /// ready to be rendered by any backend (Canvas, SVG, etc.)
@@ -91,13 +93,6 @@ class LineRenderData extends RenderData {
   });
 }
 
-/// Enum for line styles
-enum LineStyle {
-  solid,
-  dashed,
-  dotted,
-}
-
 /// Represents a point (scatter plot point) ready to be rendered
 class PointRenderData extends RenderData {
   /// The center position of the point
@@ -156,13 +151,6 @@ class PointRenderData extends RenderData {
       dataPoint: dataPoint ?? this.dataPoint,
     );
   }
-}
-
-/// Enum for point shapes
-enum PointShape {
-  circle,
-  square,
-  triangle,
 }
 
 /// Represents a bubble (sized point) ready to be rendered

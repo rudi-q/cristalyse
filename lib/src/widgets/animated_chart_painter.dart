@@ -1271,8 +1271,8 @@ class AnimatedChartPainter extends CustomPainter {
       canvas.drawRect(
         Rect.fromCenter(
           center: point.position,
-          width: animatedSize * 2,
-          height: animatedSize * 2,
+          width: animatedSize,
+          height: animatedSize,
         ),
         paint,
       );
@@ -1304,8 +1304,8 @@ class AnimatedChartPainter extends CustomPainter {
         canvas.drawRect(
           Rect.fromCenter(
             center: point.position,
-            width: animatedSize * 2,
-            height: animatedSize * 2,
+            width: animatedSize,
+            height: animatedSize,
           ),
           borderPaint,
         );
@@ -1376,8 +1376,6 @@ class AnimatedChartPainter extends CustomPainter {
 
       // Render the point with animation
       _renderPoint(canvas, point, pointProgress);
-        }
-      }
     }
   }
 
