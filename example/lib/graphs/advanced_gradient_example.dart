@@ -66,10 +66,7 @@ class AdvancedGradientExample extends StatelessWidget {
           children: [
             const Text(
               'Regional Sales with Advanced Gradients',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -81,66 +78,66 @@ class AdvancedGradientExample extends StatelessWidget {
             // Bar chart with mixed gradients
             SizedBox(
               height: 300,
-              child: CristalyseChart()
-                  .data(salesData)
-                  .mapping(x: 'region', y: 'sales', color: 'region')
-                  .geomBar(
-                    width: 0.6,
-                    borderRadius: BorderRadius.circular(12),
-                    borderWidth: 2.0,
-                  )
-                  .scaleXOrdinal()
-                  .scaleYContinuous(
-                    min: 0,
-                    labels: (value) => '${value.round()}k',
-                  )
-                  .theme(ChartTheme.defaultTheme().copyWith(
-                    borderColor: Colors.white,
-                  ))
-                  .customPalette(categoryGradients: advancedGradients)
-                  .animate(
-                    duration: const Duration(milliseconds: 1500),
-                    curve: Curves.elasticOut,
-                  )
-                  .build(),
+              child:
+                  CristalyseChart()
+                      .data(salesData)
+                      .mapping(x: 'region', y: 'sales', color: 'region')
+                      .geomBar(
+                        width: 0.6,
+                        borderRadius: BorderRadius.circular(12),
+                        borderWidth: 2.0,
+                      )
+                      .scaleXOrdinal()
+                      .scaleYContinuous(
+                        min: 0,
+                        labels: (value) => '${value.round()}k',
+                      )
+                      .theme(
+                        ChartTheme.defaultTheme().copyWith(
+                          borderColor: Colors.white,
+                        ),
+                      )
+                      .customPalette(categoryGradients: advancedGradients)
+                      .animate(
+                        duration: const Duration(milliseconds: 1500),
+                        curve: Curves.elasticOut,
+                      )
+                      .build(),
             ),
 
             const SizedBox(height: 32),
 
             const Text(
               'Customer Satisfaction Points',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
 
             // Point chart with gradients
             SizedBox(
               height: 250,
-              child: CristalyseChart()
-                  .data(salesData)
-                  .mapping(x: 'region', y: 'satisfaction', color: 'region')
-                  .geomPoint(
-                    size: 15.0,
-                    borderWidth: 3.0,
-                  )
-                  .scaleXOrdinal()
-                  .scaleYContinuous(
-                    min: 3.0,
-                    max: 5.0,
-                    labels: (value) => '${value.toStringAsFixed(1)} ★',
-                  )
-                  .theme(ChartTheme.defaultTheme().copyWith(
-                    borderColor: Colors.grey[800]!,
-                  ))
-                  .customPalette(categoryGradients: advancedGradients)
-                  .animate(
-                    duration: const Duration(milliseconds: 800),
-                    curve: Curves.bounceOut,
-                  )
-                  .build(),
+              child:
+                  CristalyseChart()
+                      .data(salesData)
+                      .mapping(x: 'region', y: 'satisfaction', color: 'region')
+                      .geomPoint(size: 15.0, borderWidth: 3.0)
+                      .scaleXOrdinal()
+                      .scaleYContinuous(
+                        min: 3.0,
+                        max: 5.0,
+                        labels: (value) => '${value.toStringAsFixed(1)} ★',
+                      )
+                      .theme(
+                        ChartTheme.defaultTheme().copyWith(
+                          borderColor: Colors.grey[800]!,
+                        ),
+                      )
+                      .customPalette(categoryGradients: advancedGradients)
+                      .animate(
+                        duration: const Duration(milliseconds: 800),
+                        curve: Curves.bounceOut,
+                      )
+                      .build(),
             ),
 
             const SizedBox(height: 24),

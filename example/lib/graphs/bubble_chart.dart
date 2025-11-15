@@ -3,10 +3,7 @@ import 'dart:math' as math;
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildBubbleChartTab(
-  ChartTheme theme,
-  double sliderValue,
-) {
+Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
   // Use proper bubble data generation without random values on each render
   final bubbleData = _generateBubbleData();
 
@@ -60,10 +57,7 @@ Widget buildBubbleChartTab(
             const SizedBox(height: 8),
             Text(
               'Company performance metrics: Revenue vs Customer base',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
           ],
         ),
@@ -82,169 +76,178 @@ Widget buildBubbleChartTab(
               ],
             ),
             padding: const EdgeInsets.all(16),
-            child: CristalyseChart()
-                .data(bubbleData)
-                .mapping(
-                  x: 'revenue',
-                  y: 'customers',
-                  size: 'marketShare',
-                  color: 'category',
-                )
-                .geomBubble(
-                  minSize: minSize,
-                  maxSize: maxSize,
-                  title: 'Market Share (%)',
-                  alpha: 0.75, // Slightly transparent for overlapping bubbles
-                  borderWidth: 2.0,
-                  borderColor: Colors.white, // White border for better contrast
-                  shape: PointShape.circle,
-                  showLabels: false, // Clean look with tooltips
-                )
-                .scaleXContinuous(
-                  labels: (value) => '\$${value.toStringAsFixed(0)}M',
-                )
-                .scaleYContinuous(
-                  labels: (value) => '${value.toStringAsFixed(0)}K',
-                )
-                .theme(enhancedTheme)
-                .legend(
-                  position: LegendPosition.right,
-                  interactive: true,
-                  backgroundColor: Colors.white.withValues(alpha: 0.95),
-                  borderRadius: 8.0,
-                  symbolSize: 14.0,
-                  itemSpacing: 10.0,
-                  textStyle: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                )
-                .animate(
-                  duration: const Duration(milliseconds: 1000),
-                  curve: Curves.easeOutCubic,
-                )
-                .interaction(
-              tooltip: TooltipConfig(
-                builder: (point) {
-                  final name = point.getDisplayValue('name');
-                  final revenue = point.getDisplayValue('revenue');
-                  final customers = point.getDisplayValue('customers');
-                  final marketShare = point.getDisplayValue('marketShare');
-                  final category = point.getDisplayValue('category');
-                  final categoryColor = enhancedTheme.colorPalette[
-                      categories.indexOf(category) %
-                          enhancedTheme.colorPalette.length];
-
-                  return Container(
-                    constraints: const BoxConstraints(maxWidth: 280),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.grey[900]!,
-                          Colors.grey[850]!,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+            child:
+                CristalyseChart()
+                    .data(bubbleData)
+                    .mapping(
+                      x: 'revenue',
+                      y: 'customers',
+                      size: 'marketShare',
+                      color: 'category',
+                    )
+                    .geomBubble(
+                      minSize: minSize,
+                      maxSize: maxSize,
+                      title: 'Market Share (%)',
+                      alpha:
+                          0.75, // Slightly transparent for overlapping bubbles
+                      borderWidth: 2.0,
+                      borderColor:
+                          Colors.white, // White border for better contrast
+                      shape: PointShape.circle,
+                      showLabels: false, // Clean look with tooltips
+                    )
+                    .scaleXContinuous(
+                      labels: (value) => '\$${value.toStringAsFixed(0)}M',
+                    )
+                    .scaleYContinuous(
+                      labels: (value) => '${value.toStringAsFixed(0)}K',
+                    )
+                    .theme(enhancedTheme)
+                    .legend(
+                      position: LegendPosition.right,
+                      interactive: true,
+                      backgroundColor: Colors.white.withValues(alpha: 0.95),
+                      borderRadius: 8.0,
+                      symbolSize: 14.0,
+                      itemSpacing: 10.0,
+                      textStyle: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: categoryColor.withValues(alpha: 0.2),
-                            borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(12),
+                    )
+                    .animate(
+                      duration: const Duration(milliseconds: 1000),
+                      curve: Curves.easeOutCubic,
+                    )
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder: (point) {
+                          final name = point.getDisplayValue('name');
+                          final revenue = point.getDisplayValue('revenue');
+                          final customers = point.getDisplayValue('customers');
+                          final marketShare = point.getDisplayValue(
+                            'marketShare',
+                          );
+                          final category = point.getDisplayValue('category');
+                          final categoryColor =
+                              enhancedTheme.colorPalette[categories.indexOf(
+                                    category,
+                                  ) %
+                                  enhancedTheme.colorPalette.length];
+
+                          return Container(
+                            constraints: const BoxConstraints(maxWidth: 280),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.grey[900]!, Colors.grey[850]!],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: categoryColor,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  name,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: categoryColor.withValues(alpha: 0.2),
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(12),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: BoxDecoration(
+                                          color: categoryColor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          name,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: categoryColor.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          category,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: categoryColor.withValues(alpha: 0.3),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  category,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
+                                Padding(
+                                  padding: const EdgeInsets.all(14),
+                                  child: Column(
+                                    children: [
+                                      _buildMetricRow(
+                                        Icons.attach_money,
+                                        'Revenue',
+                                        '\$${revenue}M',
+                                        Colors.green[400]!,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _buildMetricRow(
+                                        Icons.people,
+                                        'Customers',
+                                        '${customers}K',
+                                        Colors.blue[400]!,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      _buildMetricRow(
+                                        Icons.pie_chart,
+                                        'Market Share',
+                                        '$marketShare%',
+                                        Colors.orange[400]!,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Column(
-                            children: [
-                              _buildMetricRow(
-                                Icons.attach_money,
-                                'Revenue',
-                                '\$${revenue}M',
-                                Colors.green[400]!,
-                              ),
-                              const SizedBox(height: 8),
-                              _buildMetricRow(
-                                Icons.people,
-                                'Customers',
-                                '${customers}K',
-                                Colors.blue[400]!,
-                              ),
-                              const SizedBox(height: 8),
-                              _buildMetricRow(
-                                Icons.pie_chart,
-                                'Market Share',
-                                '$marketShare%',
-                                Colors.orange[400]!,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ).build(),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                    .build(),
           ),
         ),
         const SizedBox(height: 16),
@@ -257,11 +260,7 @@ Widget buildBubbleChartTab(
           ),
           child: Row(
             children: [
-              Icon(
-                Icons.insights,
-                size: 20,
-                color: Colors.blue[700],
-              ),
+              Icon(Icons.insights, size: 20, color: Colors.blue[700]),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -298,27 +297,12 @@ Widget buildBubbleChartTab(
   );
 }
 
-Widget _buildMetricRow(
-  IconData icon,
-  String label,
-  String value,
-  Color color,
-) {
+Widget _buildMetricRow(IconData icon, String label, String value, Color color) {
   return Row(
     children: [
-      Icon(
-        icon,
-        size: 16,
-        color: color,
-      ),
+      Icon(icon, size: 16, color: color),
       const SizedBox(width: 8),
-      Text(
-        label,
-        style: TextStyle(
-          color: Colors.grey[400],
-          fontSize: 12,
-        ),
-      ),
+      Text(label, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
       const Spacer(),
       Text(
         value,
@@ -351,31 +335,37 @@ List<Map<String, dynamic>> _generateBubbleData() {
     {'name': 'DataFlow Systems', 'category': 'SMB', 'growth': 25},
   ];
 
-  final result = companies.map((company) {
-    final isEnterprise = company['category'] == 'Enterprise';
-    final isSMB = company['category'] == 'SMB';
-    final growth = (company['growth'] as int).toDouble();
+  final result =
+      companies.map((company) {
+          final isEnterprise = company['category'] == 'Enterprise';
+          final isSMB = company['category'] == 'SMB';
+          final growth = (company['growth'] as int).toDouble();
 
-    // More spread out distribution for better visualization
-    final baseRevenue = isEnterprise ? 250.0 : (isSMB ? 150.0 : 50.0);
-    final baseCustomers = isEnterprise ? 180.0 : (isSMB ? 120.0 : 60.0);
-    final baseMarketShare = isEnterprise ? 18.0 : (isSMB ? 10.0 : 5.0);
+          // More spread out distribution for better visualization
+          final baseRevenue = isEnterprise ? 250.0 : (isSMB ? 150.0 : 50.0);
+          final baseCustomers = isEnterprise ? 180.0 : (isSMB ? 120.0 : 60.0);
+          final baseMarketShare = isEnterprise ? 18.0 : (isSMB ? 10.0 : 5.0);
 
-    // Add more variance for better spread
-    final variance = random.nextDouble() * 0.8 + 0.6; // 0.6 to 1.4 multiplier
+          // Add more variance for better spread
+          final variance =
+              random.nextDouble() * 0.8 + 0.6; // 0.6 to 1.4 multiplier
 
-    return {
-      'name': company['name'],
-      'category': company['category'],
-      'revenue': (baseRevenue * variance).roundToDouble(),
-      'customers': (baseCustomers * variance).roundToDouble(),
-      'marketShare':
-          (baseMarketShare * variance * (1 + growth / 100)).roundToDouble(),
-      'growth': growth,
-    };
-  }).toList()
-    ..sort((a, b) =>
-        (b['marketShare'] as double).compareTo(a['marketShare'] as double));
+          return {
+            'name': company['name'],
+            'category': company['category'],
+            'revenue': (baseRevenue * variance).roundToDouble(),
+            'customers': (baseCustomers * variance).roundToDouble(),
+            'marketShare':
+                (baseMarketShare * variance * (1 + growth / 100))
+                    .roundToDouble(),
+            'growth': growth,
+          };
+        }).toList()
+        ..sort(
+          (a, b) => (b['marketShare'] as double).compareTo(
+            a['marketShare'] as double,
+          ),
+        );
 
   return result;
 }

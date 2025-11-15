@@ -125,8 +125,10 @@ class _LegendWidgetState extends State<LegendWidget> {
     }
 
     // Create default text style using theme colors
-    final defaultTextStyle =
-        TextStyle(fontSize: 12, color: widget.theme.axisColor);
+    final defaultTextStyle = TextStyle(
+      fontSize: 12,
+      color: widget.theme.axisColor,
+    );
 
     // Merge with custom text style, preserving theme color if no color is specified
     final effectiveTextStyle = widget.config.textStyle != null
@@ -210,16 +212,24 @@ class _LegendWidgetState extends State<LegendWidget> {
 
     final shouldStack = _shouldStackColorItems(textStyle);
 
-    List<Widget> makeLegendItems(List<LegendItem> items, String? title,
-        TextStyle textStyle, bool shouldStack) {
+    List<Widget> makeLegendItems(
+      List<LegendItem> items,
+      String? title,
+      TextStyle textStyle,
+      bool shouldStack,
+    ) {
       final legendWidgets = <Widget>[];
 
       if (title != null && items.isNotEmpty && widget.config.showTitles) {
-        legendWidgets.add(Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text(title,
-              style: textStyle.copyWith(fontWeight: FontWeight.bold)),
-        ));
+        legendWidgets.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: Text(
+              title,
+              style: textStyle.copyWith(fontWeight: FontWeight.bold),
+            ),
+          ),
+        );
       }
 
       // Add color legend items - stack if there's a bubble size guide and
@@ -231,11 +241,14 @@ class _LegendWidgetState extends State<LegendWidget> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: items
-                      .map((item) => Padding(
-                            padding: EdgeInsets.only(
-                                bottom: widget.config.itemSpacing / 2),
-                            child: _buildLegendItem(item, textStyle),
-                          ))
+                      .map(
+                        (item) => Padding(
+                          padding: EdgeInsets.only(
+                            bottom: widget.config.itemSpacing / 2,
+                          ),
+                          child: _buildLegendItem(item, textStyle),
+                        ),
+                      )
                       .toList(),
                 )
               : Wrap(
@@ -251,9 +264,11 @@ class _LegendWidgetState extends State<LegendWidget> {
     }
 
     widgets.addAll(
-        makeLegendItems(widget.itemsY, widget.yTitle, textStyle, shouldStack));
-    widgets.addAll(makeLegendItems(
-        widget.itemsY2, widget.y2Title, textStyle, shouldStack));
+      makeLegendItems(widget.itemsY, widget.yTitle, textStyle, shouldStack),
+    );
+    widgets.addAll(
+      makeLegendItems(widget.itemsY2, widget.y2Title, textStyle, shouldStack),
+    );
 
     return Wrap(
       spacing: widget.config.itemSpacing * 2,
@@ -278,36 +293,48 @@ class _LegendWidgetState extends State<LegendWidget> {
     if (widget.yTitle != null &&
         widget.itemsY.isNotEmpty &&
         widget.config.showTitles) {
-      widgets.add(Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Text(widget.yTitle!,
-            style: textStyle.copyWith(fontWeight: FontWeight.bold)),
-      ));
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            widget.yTitle!,
+            style: textStyle.copyWith(fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
     }
 
     // Add color legend items
     widgets.addAll(
-      widget.itemsY.map((item) => Padding(
-            padding: EdgeInsets.only(bottom: widget.config.itemSpacing),
-            child: _buildLegendItem(item, textStyle),
-          )),
+      widget.itemsY.map(
+        (item) => Padding(
+          padding: EdgeInsets.only(bottom: widget.config.itemSpacing),
+          child: _buildLegendItem(item, textStyle),
+        ),
+      ),
     );
 
     if (widget.y2Title != null &&
         widget.itemsY2.isNotEmpty &&
         widget.config.showTitles) {
-      widgets.add(Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: Text(widget.y2Title!,
-            style: textStyle.copyWith(fontWeight: FontWeight.bold)),
-      ));
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            widget.y2Title!,
+            style: textStyle.copyWith(fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
     }
 
     widgets.addAll(
-      widget.itemsY2.map((item) => Padding(
-            padding: EdgeInsets.only(bottom: widget.config.itemSpacing),
-            child: _buildLegendItem(item, textStyle),
-          )),
+      widget.itemsY2.map(
+        (item) => Padding(
+          padding: EdgeInsets.only(bottom: widget.config.itemSpacing),
+          child: _buildLegendItem(item, textStyle),
+        ),
+      ),
     );
 
     return Column(
@@ -456,13 +483,25 @@ class _LegendWidgetState extends State<LegendWidget> {
           children: [
             // Bubble guide always shows three bubbles: min, median, and max from the domain
             _buildBubbleItem(
-                displayMinSize, formatValue(minValue), guide.color, textStyle),
+              displayMinSize,
+              formatValue(minValue),
+              guide.color,
+              textStyle,
+            ),
             SizedBox(width: widget.config.itemSpacing),
             _buildBubbleItem(
-                displayMidSize, formatValue(midValue), guide.color, textStyle),
+              displayMidSize,
+              formatValue(midValue),
+              guide.color,
+              textStyle,
+            ),
             SizedBox(width: widget.config.itemSpacing),
             _buildBubbleItem(
-                displayMaxSize, formatValue(maxValue), guide.color, textStyle),
+              displayMaxSize,
+              formatValue(maxValue),
+              guide.color,
+              textStyle,
+            ),
           ],
         ),
       ],
@@ -526,21 +565,40 @@ class _LegendWidgetState extends State<LegendWidget> {
         ),
         // Bubble guide always shows three bubbles: min, median, and max from the domain
         SizedBox(height: LegendWidget._bubbleTitleSpacing),
-        _buildBubbleItemWithAlignment(displayMinSize, formatValue(minValue),
-            guide.color, maxDiameter, textStyle),
+        _buildBubbleItemWithAlignment(
+          displayMinSize,
+          formatValue(minValue),
+          guide.color,
+          maxDiameter,
+          textStyle,
+        ),
         SizedBox(height: widget.config.itemSpacing / 4),
-        _buildBubbleItemWithAlignment(displayMidSize, formatValue(midValue),
-            guide.color, maxDiameter, textStyle),
+        _buildBubbleItemWithAlignment(
+          displayMidSize,
+          formatValue(midValue),
+          guide.color,
+          maxDiameter,
+          textStyle,
+        ),
         SizedBox(height: widget.config.itemSpacing / 4),
-        _buildBubbleItemWithAlignment(displayMaxSize, formatValue(maxValue),
-            guide.color, maxDiameter, textStyle),
+        _buildBubbleItemWithAlignment(
+          displayMaxSize,
+          formatValue(maxValue),
+          guide.color,
+          maxDiameter,
+          textStyle,
+        ),
       ],
     );
   }
 
   /// Build a single bubble item (for horizontal layout)
   Widget _buildBubbleItem(
-      double size, String value, Color color, TextStyle textStyle) {
+    double size,
+    String value,
+    Color color,
+    TextStyle textStyle,
+  ) {
     final diameter = size * 2;
     // fontSize is guaranteed non-null from effectiveTextStyle in build()
     final baseFontSize = textStyle.fontSize!;
@@ -559,19 +617,19 @@ class _LegendWidgetState extends State<LegendWidget> {
           ),
         ),
         SizedBox(height: LegendWidget._bubbleLabelSpacing),
-        Text(
-          value,
-          style: textStyle.copyWith(
-            fontSize: labelFontSize,
-          ),
-        ),
+        Text(value, style: textStyle.copyWith(fontSize: labelFontSize)),
       ],
     );
   }
 
   /// Build a single bubble item with alignment (for vertical layout)
-  Widget _buildBubbleItemWithAlignment(double size, String value, Color color,
-      double maxDiameter, TextStyle textStyle) {
+  Widget _buildBubbleItemWithAlignment(
+    double size,
+    String value,
+    Color color,
+    double maxDiameter,
+    TextStyle textStyle,
+  ) {
     final diameter = size * 2;
     // fontSize is guaranteed non-null from effectiveTextStyle in build()
     final baseFontSize = textStyle.fontSize!;
@@ -595,12 +653,7 @@ class _LegendWidgetState extends State<LegendWidget> {
           ),
         ),
         const SizedBox(width: 6),
-        Text(
-          value,
-          style: textStyle.copyWith(
-            fontSize: labelFontSize,
-          ),
-        ),
+        Text(value, style: textStyle.copyWith(fontSize: labelFontSize)),
       ],
     );
   }
@@ -645,21 +698,21 @@ class LegendGenerator {
     if (yColumn != null && primaryGeometries.isNotEmpty) {
       // Filter categories that have data in the primary Y column
       final primaryCategories = categories.where((category) {
-        return data.any((row) =>
-            row[colorColumn]?.toString() == category && row[yColumn] != null);
+        return data.any(
+          (row) =>
+              row[colorColumn]?.toString() == category && row[yColumn] != null,
+        );
       }).toList();
 
       // Use global index of original categories to maintain consistent colors
-      itemsY.addAll(primaryCategories.map((category) {
-        final globalIndex = categories.indexOf(category);
-        final color = colorPalette[globalIndex % colorPalette.length];
+      itemsY.addAll(
+        primaryCategories.map((category) {
+          final globalIndex = categories.indexOf(category);
+          final color = colorPalette[globalIndex % colorPalette.length];
 
-        return LegendItem(
-          label: category,
-          color: color,
-          symbol: symbol,
-        );
-      }));
+          return LegendItem(label: category, color: color, symbol: symbol);
+        }),
+      );
     }
 
     // Generate legend items for secondary Y-axis (y2Column)
@@ -667,21 +720,21 @@ class LegendGenerator {
     if (y2Column != null && secondaryGeometries.isNotEmpty) {
       // Filter categories that have data in the secondary Y column
       final secondaryCategories = categories.where((category) {
-        return data.any((row) =>
-            row[colorColumn]?.toString() == category && row[y2Column] != null);
+        return data.any(
+          (row) =>
+              row[colorColumn]?.toString() == category && row[y2Column] != null,
+        );
       }).toList();
 
       // Use global index of original categories to maintain consistent colors
-      itemsY2.addAll(secondaryCategories.map((category) {
-        final globalIndex = categories.indexOf(category);
-        final color = colorPalette[globalIndex % colorPalette.length];
+      itemsY2.addAll(
+        secondaryCategories.map((category) {
+          final globalIndex = categories.indexOf(category);
+          final color = colorPalette[globalIndex % colorPalette.length];
 
-        return LegendItem(
-          label: category,
-          color: color,
-          symbol: symbol,
-        );
-      }));
+          return LegendItem(label: category, color: color, symbol: symbol);
+        }),
+      );
     }
 
     return (itemsY, itemsY2);
@@ -689,7 +742,8 @@ class LegendGenerator {
 
   /// Determine the most appropriate symbol based on chart geometries
   static LegendSymbol _determineSymbolFromGeometries(
-      List<Geometry> geometries) {
+    List<Geometry> geometries,
+  ) {
     if (geometries.isEmpty) return LegendSymbol.circle;
 
     // Priority: check for specific geometry types

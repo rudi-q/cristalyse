@@ -11,8 +11,9 @@ void main() {
       {'quarter': 'Q2', 'revenue': 1100, 'product': 'ProductB'},
     ];
 
-    testWidgets('Chart with basic legend should build without errors',
-        (WidgetTester tester) async {
+    testWidgets('Chart with basic legend should build without errors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -29,8 +30,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('Chart with positioned legend should build without errors',
-        (WidgetTester tester) async {
+    testWidgets('Chart with positioned legend should build without errors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -47,28 +49,30 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('Chart with custom legend styling should build without errors',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CristalyseChart()
-                .data(testData)
-                .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                .geomBar(style: BarStyle.grouped)
-                .legend(
-                  position: LegendPosition.right,
-                  backgroundColor: Colors.white.withValues(alpha: 0.9),
-                  textStyle: const TextStyle(fontSize: 12),
-                  symbolSize: 16.0,
-                )
-                .build(),
+    testWidgets(
+      'Chart with custom legend styling should build without errors',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: CristalyseChart()
+                  .data(testData)
+                  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                  .geomBar(style: BarStyle.grouped)
+                  .legend(
+                    position: LegendPosition.right,
+                    backgroundColor: Colors.white.withValues(alpha: 0.9),
+                    textStyle: const TextStyle(fontSize: 12),
+                    symbolSize: 16.0,
+                  )
+                  .build(),
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
-    });
+        expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+      },
+    );
 
     test('LegendConfig should have correct default values', () {
       const config = LegendConfig();
@@ -110,24 +114,28 @@ void main() {
       expect(items[1].label, 'ProductB');
       expect(items[0].color, Colors.blue);
       expect(items[1].color, Colors.red);
-      expect(items[0].symbol,
-          LegendSymbol.square); // Should be square for bar geometry
+      expect(
+        items[0].symbol,
+        LegendSymbol.square,
+      ); // Should be square for bar geometry
       expect(items[1].symbol, LegendSymbol.square);
     });
 
-    test('LegendGenerator should return empty list for missing color column',
-        () {
-      final (items, _) = LegendGenerator.generateFromData(
-        data: testData,
-        colorColumn: null,
-        yColumn: 'revenue',
-        y2Column: null,
-        colorPalette: [Colors.blue, Colors.red],
-        geometries: [BarGeometry()],
-      );
+    test(
+      'LegendGenerator should return empty list for missing color column',
+      () {
+        final (items, _) = LegendGenerator.generateFromData(
+          data: testData,
+          colorColumn: null,
+          yColumn: 'revenue',
+          y2Column: null,
+          colorPalette: [Colors.blue, Colors.red],
+          geometries: [BarGeometry()],
+        );
 
-      expect(items.isEmpty, true);
-    });
+        expect(items.isEmpty, true);
+      },
+    );
 
     test('LegendGenerator should determine correct symbol from geometry', () {
       // Test bar geometry
@@ -164,37 +172,39 @@ void main() {
       expect(pointItems.first.symbol, LegendSymbol.circle);
     });
 
-    test('LegendGenerator should generate correct legend items for dual y-axis',
-        () {
-      final testData = [
-        {'quarter': 'Q1', 'revenue': 1000, 'product': 'ProductA'},
-        {'quarter': 'Q2', 'loss': 10, 'product': 'LossA'},
-        {'quarter': 'Q1', 'revenue': 800, 'product': 'ProductA'},
-        {'quarter': 'Q2', 'loss': 10, 'product': 'LossA'},
-      ];
+    test(
+      'LegendGenerator should generate correct legend items for dual y-axis',
+      () {
+        final testData = [
+          {'quarter': 'Q1', 'revenue': 1000, 'product': 'ProductA'},
+          {'quarter': 'Q2', 'loss': 10, 'product': 'LossA'},
+          {'quarter': 'Q1', 'revenue': 800, 'product': 'ProductA'},
+          {'quarter': 'Q2', 'loss': 10, 'product': 'LossA'},
+        ];
 
-      final (itemsY, itemsY2) = LegendGenerator.generateFromData(
-        data: testData,
-        colorColumn: 'product',
-        yColumn: 'revenue',
-        y2Column: 'loss',
-        colorPalette: [Colors.blue, Colors.red],
-        geometries: [
-          BarGeometry(style: BarStyle.grouped, yAxis: YAxis.primary),
-          BarGeometry(style: BarStyle.grouped, yAxis: YAxis.secondary)
-        ],
-      );
+        final (itemsY, itemsY2) = LegendGenerator.generateFromData(
+          data: testData,
+          colorColumn: 'product',
+          yColumn: 'revenue',
+          y2Column: 'loss',
+          colorPalette: [Colors.blue, Colors.red],
+          geometries: [
+            BarGeometry(style: BarStyle.grouped, yAxis: YAxis.primary),
+            BarGeometry(style: BarStyle.grouped, yAxis: YAxis.secondary),
+          ],
+        );
 
-      expect(itemsY.length, 1);
-      expect(itemsY[0].label, 'ProductA');
-      expect(itemsY[0].color, Colors.blue);
-      expect(itemsY[0].symbol, LegendSymbol.square);
+        expect(itemsY.length, 1);
+        expect(itemsY[0].label, 'ProductA');
+        expect(itemsY[0].color, Colors.blue);
+        expect(itemsY[0].symbol, LegendSymbol.square);
 
-      expect(itemsY2.length, 1);
-      expect(itemsY2[0].label, 'LossA');
-      expect(itemsY2[0].color, Colors.red);
-      expect(itemsY2[0].symbol, LegendSymbol.square);
-    });
+        expect(itemsY2.length, 1);
+        expect(itemsY2[0].label, 'LossA');
+        expect(itemsY2[0].color, Colors.red);
+        expect(itemsY2[0].symbol, LegendSymbol.square);
+      },
+    );
 
     test('LegendItem equality should work correctly', () {
       const item1 = LegendItem(label: 'Test', color: Colors.blue);
@@ -205,8 +215,9 @@ void main() {
       expect(item1, isNot(equals(item3)));
     });
 
-    testWidgets('Legend text should inherit theme color for dark themes',
-        (WidgetTester tester) async {
+    testWidgets('Legend text should inherit theme color for dark themes', (
+      WidgetTester tester,
+    ) async {
       const darkTheme = ChartTheme(
         backgroundColor: Colors.black,
         plotBackgroundColor: Colors.black,
@@ -241,8 +252,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('Chart with floating legend should build without errors',
-        (WidgetTester tester) async {
+    testWidgets('Chart with floating legend should build without errors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -263,30 +275,31 @@ void main() {
     });
 
     testWidgets(
-        'Chart with floating legend and custom styling should build without errors',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: CristalyseChart()
-                .data(testData)
-                .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                .geomBar(style: BarStyle.grouped)
-                .legend(
-                  position: LegendPosition.floating,
-                  floatingOffset: const Offset(100, 50),
-                  backgroundColor: Colors.white.withValues(alpha: 0.95),
-                  textStyle: const TextStyle(fontSize: 14),
-                  symbolSize: 16.0,
-                  borderRadius: 8.0,
-                )
-                .build(),
+      'Chart with floating legend and custom styling should build without errors',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: CristalyseChart()
+                  .data(testData)
+                  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                  .geomBar(style: BarStyle.grouped)
+                  .legend(
+                    position: LegendPosition.floating,
+                    floatingOffset: const Offset(100, 50),
+                    backgroundColor: Colors.white.withValues(alpha: 0.95),
+                    textStyle: const TextStyle(fontSize: 14),
+                    symbolSize: 16.0,
+                    borderRadius: 8.0,
+                  )
+                  .build(),
+            ),
           ),
-        ),
-      );
+        );
 
-      expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
-    });
+        expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
+      },
+    );
 
     test('LegendConfig with floating position should set correct defaults', () {
       const config = LegendConfig(
@@ -307,9 +320,7 @@ void main() {
         floatingDraggable: false,
       );
 
-      final copied = original.copyWith(
-        floatingOffset: const Offset(100, 60),
-      );
+      final copied = original.copyWith(floatingOffset: const Offset(100, 60));
 
       expect(copied.position, LegendPosition.floating);
       expect(copied.floatingOffset, const Offset(100, 60));

@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('AnimatedCristalyseChartWidget renders without errors',
-      (WidgetTester tester) async {
+  testWidgets('AnimatedCristalyseChartWidget renders without errors', (
+    WidgetTester tester,
+  ) async {
     // Prepare test data
     final testData = [
       {'x': 'A', 'y': 10, 'value': 5},
@@ -22,9 +23,7 @@ void main() {
           data: testData,
           xColumn: 'x',
           yColumn: 'y',
-          geometries: [
-            BarGeometry(),
-          ],
+          geometries: [BarGeometry()],
           theme: ChartTheme.defaultTheme(),
         ),
       ),
@@ -43,8 +42,9 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('AnimatedCristalyseChartWidget renders heatmap correctly',
-      (WidgetTester tester) async {
+  testWidgets('AnimatedCristalyseChartWidget renders heatmap correctly', (
+    WidgetTester tester,
+  ) async {
     // Prepare heatmap test data
     final heatMapData = [
       {'heatX': 'Mon', 'heatY': 'Morning', 'temp': 20},
@@ -69,7 +69,7 @@ void main() {
                 Colors.blue,
                 Colors.green,
                 Colors.yellow,
-                Colors.red
+                Colors.red,
               ],
             ),
           ],
@@ -91,8 +91,9 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('AnimatedCristalyseChartWidget handles pie chart correctly',
-      (WidgetTester tester) async {
+  testWidgets('AnimatedCristalyseChartWidget handles pie chart correctly', (
+    WidgetTester tester,
+  ) async {
     // Prepare pie chart test data
     final pieData = [
       {'category': 'A', 'value': 30},
@@ -108,12 +109,7 @@ void main() {
           data: pieData,
           pieCategoryColumn: 'category',
           pieValueColumn: 'value',
-          geometries: [
-            PieGeometry(
-              showLabels: true,
-              showPercentages: true,
-            ),
-          ],
+          geometries: [PieGeometry(showLabels: true, showPercentages: true)],
           theme: ChartTheme.defaultTheme(),
         ),
       ),

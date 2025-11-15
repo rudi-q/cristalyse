@@ -1,11 +1,11 @@
 ---
 title: "Interactions"
-description: "Add tooltips, hover effects, clicks, and panning to your charts"
+description: "Add tooltips, hover effects, clicks, panning, and zooming to your charts"
 ---
 
 ## Overview
 
-Cristalyse provides rich interaction capabilities that make your charts engaging and informative. From simple tooltips to complex pan and zoom operations, every interaction is optimized for performance and accessibility.
+Cristalyse provides rich interaction capabilities that make your charts engaging and informative. From simple tooltips to complex pan and zoom operations, every interaction is optimized for performance and accessibility. Support for pinch gestures, scroll wheel, and floating buttons brings intuitive zooming to all platforms.
 
 ## Tooltip Interactions
 
@@ -236,7 +236,7 @@ CristalyseChart()
   .build()
 ```
 
-## Pan and Zoom Interactions
+## Pan Interactions
 
 ### Basic Panning
 
@@ -378,6 +378,253 @@ class _ProgrammaticPanChartState extends State<ProgrammaticPanChart> {
 - Jump to bookmarked positions
 - Reset button after exploration
 - External slider controls for pan position
+
+### Zoom Interactions
+
+Enable intuitive zooming with pinch gestures, scroll wheel, and UI buttons:
+
+#### Basic Zoom Setup
+
+Quick zoom configuration with one method:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'day', y: 'revenue')
+  .geomLine()
+  .onZoom((info) {
+    print('Zoom scale: ${info.scaleX}x');
+    print('Visible range: ${info.visibleMinX} to ${info.visibleMaxX}');
+  })
+  .build()
+```
+
+#### Zoom Modes
+
+Zoom can be configured for different axis combinations:
+
+```dart
+// X-axis only (default)
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'value')
+  .geomLine()
+  .onZoom(
+    (info) => print('X zoom: ${info.scaleX}x'),
+    axis: ZoomAxis.x,
+  )
+  .build()
+
+// Y-axis only
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'value')
+  .geomLine()
+  .onZoom(
+    (info) => print('Y zoom: ${info.scaleY}x'),
+    axis: ZoomAxis.y,
+  )
+  .build()
+
+// Both axes simultaneously
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomPoint()
+  .onZoom(
+    (info) => print('Scale X: ${info.scaleX}x, Y: ${info.scaleY}x'),
+    axis: ZoomAxis.both,
+  )
+  .build()
+```
+
+#### Advanced Zoom Configuration
+
+Full control over zoom behavior and appearance:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'timestamp', y: 'metric', color: 'series')
+  .geomLine(strokeWidth: 2.0)
+  .geomPoint()
+  .interaction(
+    zoom: ZoomConfig(
+      enabled: true,
+      axes: ZoomAxis.both,                    // Zoom X and Y axes
+      maxScale: 16.0,                         // Maximum 16x zoom
+      minScale: 1.0,                          // Minimum 1x (no zoom out past original)
+      wheelSensitivity: 0.0015,               // Scroll wheel sensitivity (0.0005-0.0035)
+      buttonStep: 1.4,                        // Zoom 40% per button press
+      showButtons: true,                      // Show +/- floating buttons
+      buttonAlignment: Alignment.bottomRight, // Button position
+      buttonPadding: const EdgeInsets.all(20), // Space from chart edge
+      onZoomStart: (info) {
+        print('Zoom started at ${info.visibleMinX}');
+      },
+      onZoomUpdate: (info) {
+        print('Zooming - Scale: ${info.scaleX}x');
+        // Update UI in real-time
+        setState(() {
+          currentZoomLevel = info.scaleX ?? 1.0;
+          visibleRange = '${info.visibleMinX?.toStringAsFixed(2)} - ${info.visibleMaxX?.toStringAsFixed(2)}';
+        });
+      },
+      onZoomEnd: (info) {
+        print('Zoom ended');
+        // Fetch new data for visible range if needed
+        if (info.visibleMinX != null && info.visibleMaxX != null) {
+          loadDataForRange(info.visibleMinX!, info.visibleMaxX!);
+        }
+      },
+    ),
+  )
+  .build()
+```
+
+#### Zoom Input Methods
+
+**Pinch Gesture (Touch):**
+- Two-finger pinch to zoom in/out
+- Zoom centered at pinch focal point
+- Works with configured axes
+
+**Scroll Wheel (Desktop):**
+- Scroll up to zoom in, scroll down to zoom out
+- Zoom centered at cursor position
+- Configurable sensitivity with `wheelSensitivity`
+- Precise zoom control for time-series and technical charts
+
+**Floating Buttons (All Platforms):**
+- Optional +/- buttons for touch-friendly zoom
+- Configurable positioning with `buttonAlignment`
+- Adjustable zoom increment with `buttonStep`
+- Accessible for users with limited touch capability
+
+**Single Finger (Touch):**
+- Single finger performs pan gesture
+- Works alongside zoom when multi-touch is detected
+
+#### Zoom Information
+
+The `ZoomInfo` object provides comprehensive zoom state data:
+
+```dart
+ZoomInfo(
+  // Visible axis ranges in data coordinates
+  visibleMinX: 100.0,
+  visibleMaxX: 500.0,
+  visibleMinY: 10.0,
+  visibleMaxY: 90.0,
+  
+  // Zoom scale factors (1.0 = no zoom, 4.0 = 4x zoom)
+  scaleX: 2.0,      // 2x zoom on X-axis
+  scaleY: 1.5,      // 1.5x zoom on Y-axis
+  
+  // Current zoom lifecycle state
+  state: ZoomState.update,  // start, update, or end
+)
+```
+
+Use `ZoomState` to differentiate interaction phases:
+- `ZoomState.start` - User begins zoom gesture
+- `ZoomState.update` - Zoom in progress (fires continuously)
+- `ZoomState.end` - User completes zoom gesture
+
+#### Combined Zoom & Pan
+
+Zoom and pan work seamlessly together:
+
+```dart
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'timestamp', y: 'value', color: 'category')
+  .geomLine(strokeWidth: 2.0)
+  .geomPoint(size: 5.0)
+  .interaction(
+    zoom: ZoomConfig(
+      enabled: true,
+      axes: ZoomAxis.x,  // Zoom on X-axis only (time dimension)
+      wheelSensitivity: 0.0015,
+      showButtons: true,
+      onZoomUpdate: (info) {
+        setState(() {
+          zoomDisplay = 'Zoom: ${info.scaleX?.toStringAsFixed(1)}x • '
+              'Range: ${info.visibleMinX?.toStringAsFixed(0)} - ${info.visibleMaxX?.toStringAsFixed(0)}';
+        });
+      },
+    ),
+    pan: PanConfig(
+      enabled: true,
+      updateXDomain: true,  // Pan X-axis
+      updateYDomain: false, // Keep Y-axis fixed
+      throttle: const Duration(milliseconds: 16),
+      onPanUpdate: (info) => print('Panning to ${info.visibleMinX}'),
+    ),
+    tooltip: TooltipConfig(
+      builder: DefaultTooltips.multi({
+        'timestamp': 'Time',
+        'value': 'Value',
+        'category': 'Category',
+      }),
+    ),
+  )
+  .build()
+```
+
+#### Use Cases
+
+**Time-Series Exploration:**
+```dart
+// Users can zoom into specific time periods
+// then pan to explore surrounding data
+CristalyseChart()
+  .data(stockData)
+  .mapping(x: 'date', y: 'price')
+  .geomLine()
+  .interaction(
+    zoom: ZoomConfig(
+      axes: ZoomAxis.x,
+      showButtons: true,  // Easy zoom on mobile
+    ),
+    pan: PanConfig(enabled: true, updateXDomain: true),
+  )
+  .build()
+```
+
+**Scientific Visualizations:**
+```dart
+// Independent X/Y zooming for scatter plots
+CristalyseChart()
+  .data(measurementData)
+  .mapping(x: 'temperature', y: 'pressure', color: 'material')
+  .geomPoint(size: 8.0)
+  .interaction(
+    zoom: ZoomConfig(
+      axes: ZoomAxis.both,  // Zoom both axes independently
+      maxScale: 32.0,       // Allow deep zoom for detailed analysis
+    ),
+  )
+  .build()
+```
+
+**Mobile Dashboards:**
+```dart
+// Touch-friendly zoom buttons for accessibility
+CristalyseChart()
+  .data(mobileData)
+  .mapping(x: 'hour', y: 'users')
+  .geomBar()
+  .interaction(
+    zoom: ZoomConfig(
+      axes: ZoomAxis.x,
+      showButtons: true,
+      buttonAlignment: Alignment.topRight,  // Accessible location
+      buttonStep: 1.5,                      // Larger steps for mobile
+    ),
+  )
+  .build()
+```
 
 ### Pan with Data Loading
 
@@ -617,6 +864,7 @@ class _KeyboardNavigableChartState extends State<KeyboardNavigableChart> {
   <Accordion title="Performance">
     - Debounce rapid interactions to prevent performance issues
     - Use throttling for pan operations (16-32ms intervals)
+    - Zoom updates are throttled internally and cannot be configured
     - Optimize tooltip rendering for large datasets
     - Consider disabling interactions during animations
   </Accordion>
@@ -645,8 +893,11 @@ class _KeyboardNavigableChartState extends State<KeyboardNavigableChart> {
   <Card title="Click Actions" icon="mouse-pointer">
     Navigation, details, and context menus triggered by clicks
   </Card>
-  <Card title="Pan & Zoom" icon="move">
-    Explore large datasets with smooth panning interactions
+  <Card title="Zoom Interactions" icon="search-plus">
+    Pinch, scroll wheel, and button-based zoom for all platforms
+  </Card>
+  <Card title="Pan Interactions" icon="move">
+    Explore large datasets with smooth panning gestures
   </Card>
   <Card title="Hover Effects" icon="eye">
     Visual highlights and data previews on mouse hover

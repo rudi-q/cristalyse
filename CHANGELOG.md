@@ -1,3 +1,109 @@
+# Changelog
+
+## 1.15.0 - 2025-11-11
+
+#### 🔍 Zoom & Pan Interactions
+
+**New Features:**
+- **Zoom Interactions**: Pinch, scroll wheel, and button-based zooming on continuous scales
+  - `ZoomConfig` class for comprehensive zoom configuration
+  - Three zoom modes: X-axis only, Y-axis only, or both axes simultaneously
+  - Multiple input methods: Pinch gestures, scroll wheel, floating +/- buttons
+  - Real-time zoom state callbacks (start, update, end)
+
+- **Scroll Wheel Zoom**: Native support for mouse wheel zooming
+  - Configurable sensitivity with `wheelSensitivity` parameter
+  - Zoom focused at cursor position for intuitive interaction
+  - Works seamlessly with existing pan operations
+
+- **Pinch Gesture Zoom**: Full multi-touch support
+  - Zoom centered at pinch focal point
+  - Smooth integration with single-finger pan gestures
+  - Respects zoom axis configuration
+
+- **Floating Zoom Controls**: Optional UI buttons for touch-friendly zooming
+  - Configurable button placement with `buttonAlignment`
+  - Adjustable zoom step size with `buttonStep` parameter
+  - Theme-aware styling
+  - Can be disabled for minimalist interfaces
+
+- **Zoom State Information**: Live callbacks expose detailed zoom metrics
+  - `visibleMinX`, `visibleMaxX` - Current visible X-axis range
+  - `visibleMinY`, `visibleMaxY` - Current visible Y-axis range
+  - `scaleX`, `scaleY` - Zoom scale factors
+  - `state` - Zoom lifecycle (start, update, end)
+
+**Technical Implementation:**
+- New `ZoomConfig` class with comprehensive configuration options
+- New `ZoomInfo` class for zoom event information
+- New `ZoomAxis` enum: `x`, `y`, `both`
+- New `ZoomState` enum: `start`, `update`, `end`
+- New `ZoomCallback` typedef for zoom event handlers
+- Enhanced `ChartInteraction` to include optional `zoom` parameter
+- Quick-setup `onZoom()` method on `CristalyseChart` API
+- Full integration with existing pan interactions and domain management
+- Zoom domain clamping respects original scale boundaries
+
+**API Examples:**
+
+```dart
+// Quick zoom setup (X-axis only)
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'day', y: 'revenue')
+  .geomLine()
+  .onZoom((info) {
+    print('Zoom scale: ${info.scaleX}x');
+  })
+  .build()
+
+// Advanced zoom configuration
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'value')
+  .geomLine()
+  .interaction(
+    zoom: ZoomConfig(
+      enabled: true,
+      axes: ZoomAxis.both,           // Zoom on both axes
+      maxScale: 16.0,                // Maximum 16x zoom
+      minScale: 1.0,                 // Minimum 1x (no zoom out)
+      wheelSensitivity: 0.0015,      // Scroll wheel sensitivity
+      buttonStep: 1.4,               // 40% zoom step for buttons
+      showButtons: true,             // Show +/- buttons
+      buttonAlignment: Alignment.bottomRight,
+      onZoomStart: (info) => print('Zoom started'),
+      onZoomUpdate: (info) => print('Scale: ${info.scaleX}x'),
+      onZoomEnd: (info) => print('Zoom ended'),
+    ),
+  )
+  .build()
+```
+
+**New Example:**
+- Full zoom interaction demo in example app (21st chart example)
+- Interactive controls for zoom mode, sensitivity, and button steps
+- Live zoom information display with visible ranges and scale factors
+- Touch, mouse scroll, and button interaction showcase
+
+**Use Cases:**
+- Time-series data exploration with precise zoom control
+- Scatter plots requiring X/Y axis independent zooming
+- Touch-friendly interfaces on mobile devices
+- Desktop applications with mouse wheel support
+- Accessibility: Zoom buttons for users with limited touch capability
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- New `zoom` parameter in `.interaction()` is optional
+- New `onZoom()` method is additive, doesn't affect existing code
+- Zoom respects existing domain boundaries and pan configuration
+- Comprehensive gesture handling (pinch, scroll, single-touch pan)
+- Example app demonstrates all zoom modes and configuration options
+
+---
+
 ## 1.14.0 - 2025-11-09
 
 #### 🎯 Tick Configuration for Scales

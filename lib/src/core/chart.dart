@@ -156,8 +156,11 @@ class CristalyseChart {
   /// - [geomProgress] for configuring progress bar appearance
   /// - [ProgressOrientation] for bar orientation options
   /// - [ProgressStyle] for styling options (filled, gradient, striped, etc.)
-  CristalyseChart mappingProgress(
-      {String? value, String? label, String? category}) {
+  CristalyseChart mappingProgress({
+    String? value,
+    String? label,
+    String? category,
+  }) {
     _progressValueColumn = value;
     _progressLabelColumn = label;
     _progressCategoryColumn = category;
@@ -541,10 +544,11 @@ class CristalyseChart {
     TickConfig? tickConfig,
   }) {
     _xScale = LinearScale(
-        limits: (min, max),
-        labelFormatter: labels,
-        title: title,
-        tickConfig: tickConfig);
+      limits: (min, max),
+      labelFormatter: labels,
+      title: title,
+      tickConfig: tickConfig,
+    );
     return this;
   }
 
@@ -557,10 +561,11 @@ class CristalyseChart {
     TickConfig? tickConfig,
   }) {
     _yScale = LinearScale(
-        limits: (min, max),
-        labelFormatter: labels,
-        title: title,
-        tickConfig: tickConfig);
+      limits: (min, max),
+      labelFormatter: labels,
+      title: title,
+      tickConfig: tickConfig,
+    );
     return this;
   }
 
@@ -579,10 +584,11 @@ class CristalyseChart {
     TickConfig? tickConfig,
   }) {
     _y2Scale = LinearScale(
-        limits: (min, max),
-        labelFormatter: labels,
-        title: title,
-        tickConfig: tickConfig);
+      limits: (min, max),
+      labelFormatter: labels,
+      title: title,
+      tickConfig: tickConfig,
+    );
     return this;
   }
 
@@ -666,7 +672,8 @@ class CristalyseChart {
     if ((categoryColors == null || categoryColors.isEmpty) &&
         (categoryGradients == null || categoryGradients.isEmpty)) {
       throw ArgumentError(
-          'Either categoryColors or categoryGradients must be provided and non-empty');
+        'Either categoryColors or categoryGradients must be provided and non-empty',
+      );
     }
     if (_colorColumn != null) {
       final String colorColumn = _colorColumn ?? '';
@@ -674,20 +681,26 @@ class CristalyseChart {
       // Apply solid colors if provided
       if (categoryColors != null && categoryColors.isNotEmpty) {
         _theme = _theme.customPalette(
-            data: _data, color: colorColumn, categoryColors: categoryColors);
+          data: _data,
+          color: colorColumn,
+          categoryColors: categoryColors,
+        );
       }
 
       // Apply gradients if provided
       if (categoryGradients != null && categoryGradients.isNotEmpty) {
         _theme = _theme.customGradientPalette(
-            data: _data,
-            color: colorColumn,
-            categoryGradients: categoryGradients);
+          data: _data,
+          color: colorColumn,
+          categoryGradients: categoryGradients,
+        );
       }
     } else {
-      throw ArgumentError("'color' argument is missing from .mapping. \n"
-          "The correct code should look like this .mapping(x:'', y='', color='')\n"
-          "If you don't wish to add a category column, remove customPalette() from your CristalyseChart declaration code.\n\n");
+      throw ArgumentError(
+        "'color' argument is missing from .mapping. \n"
+        "The correct code should look like this .mapping(x:'', y='', color='')\n"
+        "If you don't wish to add a category column, remove customPalette() from your CristalyseChart declaration code.\n\n",
+      );
     }
     return this;
   }
@@ -759,6 +772,7 @@ class CristalyseChart {
     HoverConfig? hover,
     ClickConfig? click,
     PanConfig? pan,
+    ZoomConfig? zoom,
     bool enabled = true,
   }) {
     _interaction = ChartInteraction(
@@ -766,6 +780,7 @@ class CristalyseChart {
       hover: hover,
       click: click,
       pan: pan,
+      zoom: zoom,
       enabled: enabled,
     );
     return this;
@@ -818,6 +833,22 @@ class CristalyseChart {
         onPanUpdate: callback,
         throttle: throttle ?? const Duration(milliseconds: 100),
       ),
+      enabled: true,
+    );
+    return this;
+  }
+
+  /// Quick zoom setup (defaults to X-axis zooming)
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.onZoom((info) {
+  ///   print('Zoom scale: ${info.scaleX}');
+  /// });
+  /// ```
+  CristalyseChart onZoom(ZoomCallback callback, {ZoomAxis axis = ZoomAxis.x}) {
+    _interaction = ChartInteraction(
+      zoom: ZoomConfig(enabled: true, axes: axis, onZoomUpdate: callback),
       enabled: true,
     );
     return this;
@@ -1132,21 +1163,22 @@ extension ChartThemeExtension on ChartTheme {
   /// ```
   ///
   /// Returns a new [ChartTheme] with the custom color palette applied.
-  ChartTheme customPalette(
-      {required List<Map<String, dynamic>> data,
-      required String color,
-      required Map<String, Color> categoryColors}) {
+  ChartTheme customPalette({
+    required List<Map<String, dynamic>> data,
+    required String color,
+    required Map<String, Color> categoryColors,
+  }) {
     // Extract unique categories
     final categories = data.map((d) => d[color] as String).toSet().toList();
     // Build color palette in the order categories appear
     final colorPalette = categories
-        .map((category) =>
-            categoryColors[category] ??
-            this.colorPalette[categories.indexOf(category)])
+        .map(
+          (category) =>
+              categoryColors[category] ??
+              this.colorPalette[categories.indexOf(category)],
+        )
         .toList();
-    return copyWith(
-      colorPalette: colorPalette,
-    );
+    return copyWith(colorPalette: colorPalette);
   }
 
   /// Creates a new [ChartTheme] with custom gradients for specific categories
@@ -1196,8 +1228,6 @@ extension ChartThemeExtension on ChartTheme {
     required String color,
     required Map<String, Gradient> categoryGradients,
   }) {
-    return copyWith(
-      categoryGradients: categoryGradients,
-    );
+    return copyWith(categoryGradients: categoryGradients);
   }
 }

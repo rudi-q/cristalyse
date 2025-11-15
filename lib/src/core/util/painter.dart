@@ -39,13 +39,14 @@ import '../../widgets/animated_chart_painter.dart' show AnimatedChartPainter;
 ///
 /// CustomPaint(painter: painter, child: Container())
 /// ```
-AnimatedChartPainter chartPainterAnimated(
-    {required AnimatedCristalyseChartWidget widget,
-    required BuildContext context,
-    required Size size,
-    required double animationProgress,
-    List<double>? panXDomain,
-    List<double>? panYDomain}) {
+AnimatedChartPainter chartPainterAnimated({
+  required AnimatedCristalyseChartWidget widget,
+  required BuildContext context,
+  required Size size,
+  required double animationProgress,
+  List<double>? panXDomain,
+  List<double>? panYDomain,
+}) {
   // Force panYDomain to null if updateYDomain is false
   // otherwise the configured Y domain will be overridden by the original domain during set bounds
   if (widget.interaction.pan?.updateYDomain == false) {

@@ -16,11 +16,7 @@ import '../geometry.dart';
 /// - `dataDriven`: Tight range around actual data (min, max) with minimal
 /// padding. For trend analysis charts (lines, points, bubbles, heat maps).
 
-enum BoundsBehavior {
-  zeroBaseline,
-  dataDriven,
-  notApplicable,
-}
+enum BoundsBehavior { zeroBaseline, dataDriven, notApplicable }
 
 /// Represents axis bounds with minimum and maximum values.
 class Bounds {
@@ -104,8 +100,9 @@ class BoundsCalculator {
     if (limits != null && limits.$1 != null && limits.$2 != null) {
       if (limits.$1! > limits.$2!) {
         throw ArgumentError(
-            'Specified limits were inverted: min (${limits.$1}) > max (${limits.$2}). '
-            'Min must be less than or equal to max.');
+          'Specified limits were inverted: min (${limits.$1}) > max (${limits.$2}). '
+          'Min must be less than or equal to max.',
+        );
       }
       return Bounds(limits.$1!, limits.$2!);
     }
@@ -120,8 +117,12 @@ class BoundsCalculator {
     final dataMax = values.reduce(math.max);
 
     // Apply geometry behavior fallbacks when limits not fully specified
-    final behaviorFallbacks =
-        _getGeometryAwareDefaults(dataMin, dataMax, geometries, applyPadding);
+    final behaviorFallbacks = _getGeometryAwareDefaults(
+      dataMin,
+      dataMax,
+      geometries,
+      applyPadding,
+    );
 
     // Use min XOR max limits if specified, otherwise use respective geometry behavior fallbacks
     final finalMin = limits?.$1 ?? behaviorFallbacks.min;
@@ -157,9 +158,10 @@ class BoundsCalculator {
     // They are handled at highest precedence in calculateBounds()
     if (behaviors.contains(BoundsBehavior.notApplicable)) {
       throw StateError(
-          'BoundsBehavior.notApplicable should be handled in calculateBounds() '
-          'before reaching _getGeometryAwareDefaults(). Its presence in this method '
-          'indicates a logic error.');
+        'BoundsBehavior.notApplicable should be handled in calculateBounds() '
+        'before reaching _getGeometryAwareDefaults(). Its presence in this method '
+        'indicates a logic error.',
+      );
     }
 
     if (dataMin == dataMax) {
@@ -194,7 +196,10 @@ class BoundsCalculator {
   /// This behavior ensures that bars and areas grow from a zero baseline as a sensible, meaningful
   /// default to compare quantities visually.
   static Bounds _calculateZeroBaseline(
-      double dataMin, double dataMax, bool applyPadding) {
+    double dataMin,
+    double dataMax,
+    bool applyPadding,
+  ) {
     if (!applyPadding) {
       // No padding - use exact data bounds with zero baseline
       if (dataMax <= 0) {
@@ -224,7 +229,10 @@ class BoundsCalculator {
   /// This default behavior focuses bounds around the actual data range with minimal padding,
   /// providing better resolution for trend analysis and pattern recognition.
   static Bounds _calculateDataDriven(
-      double dataMin, double dataMax, bool applyPadding) {
+    double dataMin,
+    double dataMax,
+    bool applyPadding,
+  ) {
     if (!applyPadding) {
       // No padding - use exact data bounds
       return Bounds(dataMin, dataMax);

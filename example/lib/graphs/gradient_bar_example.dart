@@ -63,10 +63,7 @@ class GradientBarExample extends StatelessWidget {
           children: [
             const Text(
               'Quarterly Revenue with Gradient Bars',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             const Text(
@@ -75,24 +72,25 @@ class GradientBarExample extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: CristalyseChart()
-                  .data(data)
-                  .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
-                  .geomBar(
-                    width: 0.7,
-                    borderRadius: BorderRadius.circular(8),
-                  )
-                  .scaleXOrdinal()
-                  .scaleYContinuous(
-                    min: 0,
-                    labels: (value) => '\$${value.round()}k',
-                  )
-                  .customPalette(categoryGradients: quarterlyGradients)
-                  .animate(
-                    duration: const Duration(milliseconds: 1200),
-                    curve: Curves.easeOutBack,
-                  )
-                  .build(),
+              child:
+                  CristalyseChart()
+                      .data(data)
+                      .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
+                      .geomBar(
+                        width: 0.7,
+                        borderRadius: BorderRadius.circular(8),
+                      )
+                      .scaleXOrdinal()
+                      .scaleYContinuous(
+                        min: 0,
+                        labels: (value) => '\$${value.round()}k',
+                      )
+                      .customPalette(categoryGradients: quarterlyGradients)
+                      .animate(
+                        duration: const Duration(milliseconds: 1200),
+                        curve: Curves.easeOutBack,
+                      )
+                      .build(),
             ),
             const SizedBox(height: 16),
             const Text(

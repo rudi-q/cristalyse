@@ -40,24 +40,30 @@ class _TimeBasedLineChartWidgetState extends State<TimeBasedLineChartWidget> {
           const SizedBox(height: 16),
           SizedBox(
             height: 400,
-            child: CristalyseChart()
-                .data(_data)
-                .mapping(x: 'x', y: 'y')
-                .geomLine(
-                    strokeWidth: 1.0 + widget.sliderValue * 9.0, alpha: 0.9)
-                .scaleXContinuous(
-                    title: 'Timestamp',
-                    tickConfig: TickConfig(simpleLinear: _simpleLinear),
-                    labels: (value) {
-                      final date =
-                          DateTime.fromMillisecondsSinceEpoch(value.toInt());
-                      return DateFormat('MM/dd HH:mm:ss').format(date);
-                    })
-                .scaleYContinuous(
-                    title: 'Value (units)',
-                    tickConfig: TickConfig(simpleLinear: _simpleLinear))
-                .theme(widget.currentTheme)
-                .build(),
+            child:
+                CristalyseChart()
+                    .data(_data)
+                    .mapping(x: 'x', y: 'y')
+                    .geomLine(
+                      strokeWidth: 1.0 + widget.sliderValue * 9.0,
+                      alpha: 0.9,
+                    )
+                    .scaleXContinuous(
+                      title: 'Timestamp',
+                      tickConfig: TickConfig(simpleLinear: _simpleLinear),
+                      labels: (value) {
+                        final date = DateTime.fromMillisecondsSinceEpoch(
+                          value.toInt(),
+                        );
+                        return DateFormat('MM/dd HH:mm:ss').format(date);
+                      },
+                    )
+                    .scaleYContinuous(
+                      title: 'Value (units)',
+                      tickConfig: TickConfig(simpleLinear: _simpleLinear),
+                    )
+                    .theme(widget.currentTheme)
+                    .build(),
           ),
           // toggle switch
           SwitchListTile(
@@ -76,8 +82,11 @@ class _TimeBasedLineChartWidgetState extends State<TimeBasedLineChartWidget> {
 }
 
 // Keep the original function for backward compatibility
-Widget buildTimeBasedLineChartTab(ChartTheme currentTheme,
-    List<Map<String, dynamic>> data, double sliderValue) {
+Widget buildTimeBasedLineChartTab(
+  ChartTheme currentTheme,
+  List<Map<String, dynamic>> data,
+  double sliderValue,
+) {
   return TimeBasedLineChartWidget(
     currentTheme: currentTheme,
     data: data,
@@ -89,5 +98,5 @@ const _data = [
   {'x': 1761421958320.0, 'y': 4.900000095367432, 's': 'cooler.temp.avg'},
   {'x': 1761421959321.0, 'y': 5.0, 's': 'cooler.temp.avg'},
   {'x': 1761421960320.0, 'y': 5.0, 's': 'cooler.temp.avg'},
-  {'x': 1761421961320.0, 'y': 4.900000095367432, 's': 'cooler.temp.avg'}
+  {'x': 1761421961320.0, 'y': 4.900000095367432, 's': 'cooler.temp.avg'},
 ];

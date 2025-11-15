@@ -45,8 +45,11 @@ void main() {
           'growth': growth,
         };
       }).toList()
-        ..sort((a, b) =>
-            (b['marketShare'] as double).compareTo(a['marketShare'] as double));
+        ..sort(
+          (a, b) => (b['marketShare'] as double).compareTo(
+            a['marketShare'] as double,
+          ),
+        );
 
       // Extract market share values
       final marketShares =
@@ -59,9 +62,7 @@ void main() {
       final minBubbleSize = 5.0; // 5px radius minimum
       final maxBubbleSize = 15.0; // 15px radius maximum
 
-      final sizeScale = SizeScale(
-        range: [minBubbleSize, maxBubbleSize],
-      );
+      final sizeScale = SizeScale(range: [minBubbleSize, maxBubbleSize]);
       sizeScale.setBounds([minMarketShare, maxMarketShare], null, []);
 
       // Verify each company gets appropriate bubble size
@@ -71,15 +72,23 @@ void main() {
         final name = company['name'];
 
         // Check size is within bounds
-        expect(bubbleSize, greaterThanOrEqualTo(minBubbleSize),
-            reason: '$name bubble should be at least min size');
-        expect(bubbleSize, lessThanOrEqualTo(maxBubbleSize),
-            reason: '$name bubble should not exceed max size');
+        expect(
+          bubbleSize,
+          greaterThanOrEqualTo(minBubbleSize),
+          reason: '$name bubble should be at least min size',
+        );
+        expect(
+          bubbleSize,
+          lessThanOrEqualTo(maxBubbleSize),
+          reason: '$name bubble should not exceed max size',
+        );
       }
 
       // Verify relative sizing is correct
-      bubbleData.sort((a, b) =>
-          (a['marketShare'] as double).compareTo(b['marketShare'] as double));
+      bubbleData.sort(
+        (a, b) =>
+            (a['marketShare'] as double).compareTo(b['marketShare'] as double),
+      );
 
       for (int i = 1; i < bubbleData.length; i++) {
         final prevShare = bubbleData[i - 1]['marketShare'] as double;
@@ -87,9 +96,11 @@ void main() {
         final prevSize = sizeScale.scale(prevShare);
         final currSize = sizeScale.scale(currShare);
 
-        expect(currSize, greaterThanOrEqualTo(prevSize),
-            reason:
-                'Larger market share must have larger or equal bubble size');
+        expect(
+          currSize,
+          greaterThanOrEqualTo(prevSize),
+          reason: 'Larger market share must have larger or equal bubble size',
+        );
       }
 
       // Test with slider at 1.0 (maximum sizes)
@@ -108,8 +119,11 @@ void main() {
         final sizeAtMax = sizeScaleMax.scale(marketShare);
 
         // Size should increase with slider
-        expect(sizeAtMax, greaterThan(sizeAtMin),
-            reason: 'Bubble should be larger when slider is at max');
+        expect(
+          sizeAtMax,
+          greaterThan(sizeAtMin),
+          reason: 'Bubble should be larger when slider is at max',
+        );
 
         // But relative proportions should be maintained
         final proportionAtMin =
@@ -117,14 +131,18 @@ void main() {
         final proportionAtMax = (sizeAtMax - minBubbleSizeMax) /
             (maxBubbleSizeMax - minBubbleSizeMax);
 
-        expect(proportionAtMax, closeTo(proportionAtMin, 0.01),
-            reason:
-                'Relative size proportion should be maintained across slider values');
+        expect(
+          proportionAtMax,
+          closeTo(proportionAtMin, 0.01),
+          reason:
+              'Relative size proportion should be maintained across slider values',
+        );
       }
     });
 
-    testWidgets('Bubble chart renders without overflow',
-        (WidgetTester tester) async {
+    testWidgets('Bubble chart renders without overflow', (
+      WidgetTester tester,
+    ) async {
       // Test that bubbles don't overflow the chart area
       final testData = [
         {'x': 10.0, 'y': 10.0, 'size': 5.0, 'cat': 'A'},
@@ -141,10 +159,7 @@ void main() {
               child: CristalyseChart()
                   .data(testData)
                   .mapping(x: 'x', y: 'y', size: 'size', color: 'cat')
-                  .geomBubble(
-                    minSize: 5.0,
-                    maxSize: 20.0,
-                  )
+                  .geomBubble(minSize: 5.0, maxSize: 20.0)
                   .scaleXContinuous()
                   .scaleYContinuous()
                   .build(),

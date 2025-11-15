@@ -28,7 +28,7 @@ class HeatMapExample extends StatelessWidget {
       '4pm',
       '6pm',
       '8pm',
-      '10pm'
+      '10pm',
     ];
 
     final random = math.Random(42); // Fixed seed for consistency
@@ -61,21 +61,13 @@ class HeatMapExample extends StatelessWidget {
         // Add some randomness
         final value =
             (baseValue + (random.nextDouble() - 0.5) * 0.3).clamp(0.0, 1.0) *
-                100; // Convert to percentage
+            100; // Convert to percentage
 
         // Occasionally add null values to show gaps
         if (random.nextDouble() < 0.05) {
-          data.add({
-            'day': day,
-            'hour': hour,
-            'activity': null,
-          });
+          data.add({'day': day, 'hour': hour, 'activity': null});
         } else {
-          data.add({
-            'day': day,
-            'hour': hour,
-            'activity': value,
-          });
+          data.add({'day': day, 'hour': hour, 'activity': value});
         }
       }
     }
@@ -143,9 +135,7 @@ class HeatMapExample extends StatelessWidget {
                     height: 12,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(2),
-                      gradient: LinearGradient(
-                        colors: heatMapColors,
-                      ),
+                      gradient: LinearGradient(colors: heatMapColors),
                     ),
                   ),
                   const SizedBox(width: 4),
@@ -165,31 +155,32 @@ class HeatMapExample extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: CristalyseChart()
-                .data(heatMapData)
-                .mappingHeatMap(x: 'day', y: 'hour', value: 'activity')
-                .geomHeatMap(
-                  cellSpacing: 1,
-                  cellBorderRadius: BorderRadius.circular(3),
-                  showValues: true,
-                  valueFormatter: (value) => '${value.toStringAsFixed(0)}%',
-                  valueTextStyle: const TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  // Ensure min/max values cover the full range of your data (0-100 for percentages)
-                  minValue: 0,
-                  maxValue: 100,
-                  colorGradient: heatMapColors,
-                  interpolateColors: true,
-                  nullValueColor: Colors.grey.shade200,
-                )
-                .theme(theme)
-                .animate(
-                  duration: const Duration(milliseconds: 800),
-                  curve: Curves.easeOutCubic,
-                )
-                .build(),
+            child:
+                CristalyseChart()
+                    .data(heatMapData)
+                    .mappingHeatMap(x: 'day', y: 'hour', value: 'activity')
+                    .geomHeatMap(
+                      cellSpacing: 1,
+                      cellBorderRadius: BorderRadius.circular(3),
+                      showValues: true,
+                      valueFormatter: (value) => '${value.toStringAsFixed(0)}%',
+                      valueTextStyle: const TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      // Ensure min/max values cover the full range of your data (0-100 for percentages)
+                      minValue: 0,
+                      maxValue: 100,
+                      colorGradient: heatMapColors,
+                      interpolateColors: true,
+                      nullValueColor: Colors.grey.shade200,
+                    )
+                    .theme(theme)
+                    .animate(
+                      duration: const Duration(milliseconds: 800),
+                      curve: Curves.easeOutCubic,
+                    )
+                    .build(),
           ),
         ),
       ],
@@ -201,10 +192,7 @@ class HeatMapExample extends StatelessWidget {
 class ContributionHeatMap extends StatelessWidget {
   final ChartTheme theme;
 
-  const ContributionHeatMap({
-    super.key,
-    required this.theme,
-  });
+  const ContributionHeatMap({super.key, required this.theme});
 
   List<Map<String, dynamic>> _generateContributionData() {
     final weeks = List.generate(12, (i) => 'W${i + 1}');
@@ -226,17 +214,9 @@ class ContributionHeatMap extends StatelessWidget {
         if (random.nextDouble() < probability) {
           // Generate contribution count (0-10)
           final contributions = (random.nextDouble() * 10).round();
-          data.add({
-            'week': week,
-            'day': day,
-            'contributions': contributions,
-          });
+          data.add({'week': week, 'day': day, 'contributions': contributions});
         } else {
-          data.add({
-            'week': week,
-            'day': day,
-            'contributions': 0,
-          });
+          data.add({'week': week, 'day': day, 'contributions': 0});
         }
       }
     }
@@ -287,26 +267,27 @@ class ContributionHeatMap extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: CristalyseChart()
-                .data(contributionData)
-                .mappingHeatMap(x: 'week', y: 'day', value: 'contributions')
-                .geomHeatMap(
-                  cellSpacing: 3,
-                  cellBorderRadius: BorderRadius.circular(2),
-                  showValues: false, // Don't show values for cleaner look
-                  minValue: 0,
-                  maxValue: 10,
-                  colorGradient: contributionColors,
-                  interpolateColors: false, // Use discrete colors
-                  nullValueColor: const Color(0xFFEBEDF0),
-                  cellAspectRatio: 1.0, // Square cells
-                )
-                .theme(theme)
-                .animate(
-                  duration: const Duration(milliseconds: 1000),
-                  curve: Curves.easeOutBack,
-                )
-                .build(),
+            child:
+                CristalyseChart()
+                    .data(contributionData)
+                    .mappingHeatMap(x: 'week', y: 'day', value: 'contributions')
+                    .geomHeatMap(
+                      cellSpacing: 3,
+                      cellBorderRadius: BorderRadius.circular(2),
+                      showValues: false, // Don't show values for cleaner look
+                      minValue: 0,
+                      maxValue: 10,
+                      colorGradient: contributionColors,
+                      interpolateColors: false, // Use discrete colors
+                      nullValueColor: const Color(0xFFEBEDF0),
+                      cellAspectRatio: 1.0, // Square cells
+                    )
+                    .theme(theme)
+                    .animate(
+                      duration: const Duration(milliseconds: 1000),
+                      curve: Curves.easeOutBack,
+                    )
+                    .build(),
           ),
         ),
         // Legend
@@ -323,19 +304,18 @@ class ContributionHeatMap extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              ...contributionColors.map((color) => Container(
-                    width: 12,
-                    height: 12,
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(2),
-                      border: Border.all(
-                        color: Colors.grey.shade300,
-                        width: 0.5,
-                      ),
-                    ),
-                  )),
+              ...contributionColors.map(
+                (color) => Container(
+                  width: 12,
+                  height: 12,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(2),
+                    border: Border.all(color: Colors.grey.shade300, width: 0.5),
+                  ),
+                ),
+              ),
               const SizedBox(width: 4),
               Text(
                 'More',
@@ -353,10 +333,7 @@ class ContributionHeatMap extends StatelessWidget {
 }
 
 Widget buildHeatMapTab(ChartTheme theme, List<Color> colorPalette) {
-  return HeatMapExample(
-    theme: theme,
-    colorPalette: colorPalette,
-  );
+  return HeatMapExample(theme: theme, colorPalette: colorPalette);
 }
 
 Widget buildContributionHeatMapTab(ChartTheme theme) {
