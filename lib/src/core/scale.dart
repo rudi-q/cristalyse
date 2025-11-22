@@ -195,14 +195,18 @@ class LinearScale extends Scale {
       if (_tickConfig?.integersOnly == true && niceTicks.isNotEmpty) {
         final minTick = niceTicks.first.ceil();
         final maxTick = niceTicks.last.floor();
-        // skip if bad tick spec
         if (maxTick >= minTick) {
           final step = (niceTicks.length > 1)
               ? (niceTicks[1] - niceTicks[0]).round().abs()
               : 1;
+          final safeStep = step > 0 ? step : 1;
           niceTicks = [
-            for (var tick = minTick; tick <= maxTick; tick += step) tick.toDouble()
+            for (var tick = minTick; tick <= maxTick; tick += safeStep) tick.toDouble()
           ];
+        } else {
+          // Use the nearest integer to the midpoint
+          final nearest = ((niceTicks.first + niceTicks.last) / 2).round();
+          niceTicks = [nearest.toDouble()];
         }
       }
 
