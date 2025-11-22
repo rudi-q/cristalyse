@@ -201,7 +201,7 @@ class LinearScale extends Scale {
               ? (niceTicks[1] - niceTicks[0]).round().abs()
               : 1;
           niceTicks = [
-            for (var tick = minTick; tick <= maxTick; tick += step) tick
+            for (var tick = minTick; tick <= maxTick; tick += step) tick.toDouble()
           ];
         }
       }
