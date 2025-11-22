@@ -182,7 +182,7 @@ class LinearScale extends Scale {
       final targetLabelCount = (screenLength / pixelsPerLabel).round();
       final targetDensity = targetLabelCount / screenLength; // labels per pixel
 
-      final niceTicks = WilkinsonLabeling.extended(
+      var niceTicks = WilkinsonLabeling.extended(
         bounds.min,
         bounds.max,
         screenLength,
@@ -190,6 +190,21 @@ class LinearScale extends Scale {
         limits: effectiveLimits,
         simpleLinear: _tickConfig?.simpleLinear ?? false,
       );
+
+      // NEW: Integer ticks feature, clamp ticks to integers if requested
+      if (_tickConfig?.integersOnly == true && niceTicks.isNotEmpty) {
+        final minTick = niceTicks.first.ceil();
+        final maxTick = niceTicks.last.floor();
+        // skip if bad tick spec
+        if (maxTick >= minTick) {
+          final step = (niceTicks.length > 1)
+              ? (niceTicks[1] - niceTicks[0]).round().abs()
+              : 1;
+          niceTicks = [
+            for (var tick = minTick; tick <= maxTick; tick += step) tick
+          ];
+        }
+      }
 
       if (niceTicks.isNotEmpty) {
         // Cache ticks for getTicks() to avoid recomputing
@@ -382,7 +397,7 @@ class SizeScale extends Scale {
     if (value[0] < 0 || value[1] < 0) {
       throw ArgumentError(
         'SizeScale range values must be non-negative. '
-        'Got range: [${value[0]}, ${value[1]}]',
+        'Got range: [[${value[0]}, ${value[1]}]',
       );
     }
     super.range = value;
@@ -562,7 +577,10 @@ class TickConfig {
   /// If true, use simple linear ticks instead of Wilkinson algorithm
   final bool simpleLinear;
 
-  TickConfig({List<double>? ticks, this.simpleLinear = false})
+  /// If true, ticks must be integers only (NEW)
+  final bool integersOnly;
+
+  TickConfig({List<double>? ticks, this.simpleLinear = false, this.integersOnly = false})
       : assert(
           ticks == null || ticks.isNotEmpty,
           'When provided, ticks must be non-empty.',
