@@ -201,7 +201,8 @@ class LinearScale extends Scale {
               : 1;
           final safeStep = step > 0 ? step : 1;
           niceTicks = [
-            for (var tick = minTick; tick <= maxTick; tick += safeStep) tick.toDouble()
+            for (var tick = minTick; tick <= maxTick; tick += safeStep)
+              tick.toDouble()
           ];
         } else {
           // Use the nearest integer to the midpoint
@@ -584,7 +585,10 @@ class TickConfig {
   /// If true, ticks must be integers only (NEW)
   final bool integersOnly;
 
-  TickConfig({List<double>? ticks, this.simpleLinear = false, this.integersOnly = false})
+  TickConfig(
+      {List<double>? ticks,
+      this.simpleLinear = false,
+      this.integersOnly = false})
       : assert(
           ticks == null || ticks.isNotEmpty,
           'When provided, ticks must be non-empty.',
