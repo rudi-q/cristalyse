@@ -205,9 +205,17 @@ class LinearScale extends Scale {
               tick.toDouble()
           ];
         } else {
-          // Use the nearest integer to the midpoint
-          final nearest = ((niceTicks.first + niceTicks.last) / 2).round();
-          niceTicks = [nearest.toDouble()];
+          // Use the nearest integer to the midpoint, and clamp to effectiveLimits if present
+          final midpoint = (niceTicks.first + niceTicks.last) / 2;
+          int nearest = midpoint.round();
+          // Clamp to effectiveLimits if set
+          double lower = effectiveLimits?.$1 ?? double.negativeInfinity;
+          double upper = effectiveLimits?.$2 ?? double.infinity;
+          if (nearest >= lower && nearest <= upper) {
+            niceTicks = [nearest.toDouble()];
+          } else {
+            niceTicks = [];
+          }
         }
       }
 
