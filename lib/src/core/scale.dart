@@ -397,7 +397,7 @@ class SizeScale extends Scale {
     if (value[0] < 0 || value[1] < 0) {
       throw ArgumentError(
         'SizeScale range values must be non-negative. '
-        'Got range: [[${value[0]}, ${value[1]}]',
+        'Got range: [${value[0]}, ${value[1]}]',
       );
     }
     super.range = value;
