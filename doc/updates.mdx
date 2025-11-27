@@ -12,6 +12,36 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 27, 2025" description="v1.16.0">
+  ### 📏 Integer-Only Ticks
+
+  **Force axis ticks to be integers!**
+
+  **Integer-Only Ticks:**
+  - New `integersOnly` parameter in `TickConfig`
+  - Automatically clamps ticks to integer values
+  - Ensures step size is at least 1
+  - Ideal for count data (people, items, events) where fractional values don't make sense
+
+  **Use Cases:**
+  - Count data (e.g., number of users, items sold)
+  - Discrete events
+  - Avoiding "1.5 people" in charts
+
+  ```dart
+  CristalyseChart()
+    .scaleYContinuous(
+      tickConfig: TickConfig(
+        integersOnly: true,
+      ),
+    )
+  ```
+
+  **Quality Assurance:**
+  - Zero breaking changes - fully backward compatible
+  - Production ready
+</Update>
+
 <Update label="November 11, 2025" description="v1.15.0">
   ### 🔍 Zoom & Pan Interactions
   

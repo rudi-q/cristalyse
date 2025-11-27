@@ -1,5 +1,32 @@
 # Changelog
 
+## 1.16.0 - 2025-11-27
+
+#### 📏 Integer-Only Ticks
+
+**New Features:**
+- **Integer-Only Ticks**: Force axis ticks to be integers
+  - New `integersOnly` parameter in `TickConfig`
+  - Automatically clamps ticks to integer values
+  - Ensures step size is at least 1
+  - Ideal for count data (people, items, events) where fractional values don't make sense
+
+**Technical Implementation:**
+- Updated `TickConfig` to include `integersOnly` property
+- Enhanced `LinearScale` to respect integer constraints during tick generation
+
+**API Example:**
+```dart
+CristalyseChart()
+  .scaleYContinuous(
+    tickConfig: TickConfig(
+      integersOnly: true, // No more 1.5 people!
+    ),
+  )
+```
+
+---
+
 ## 1.15.0 - 2025-11-11
 
 #### 🔍 Zoom & Pan Interactions
