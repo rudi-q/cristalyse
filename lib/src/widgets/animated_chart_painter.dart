@@ -1000,6 +1000,51 @@ class AnimatedChartPainter extends CustomPainter {
     }
   }
 
+  /// Computes an RRect with rounded corners only on the outward edge
+  /// (away from the zero baseline) based on bar value and orientation.
+  RRect _computeOutwardRRect({
+    required Rect barRect,
+    required BorderRadius borderRadius,
+    required double yValForBar,
+    required bool coordFlipped,
+  }) {
+    if (coordFlipped) {
+      // Horizontal bars
+      if (yValForBar >= 0) {
+        // Positive: Round right side (top-right, bottom-right)
+        return RRect.fromRectAndCorners(
+          barRect,
+          topRight: borderRadius.topRight,
+          bottomRight: borderRadius.bottomRight,
+        );
+      } else {
+        // Negative: Round left side (top-left, bottom-left)
+        return RRect.fromRectAndCorners(
+          barRect,
+          topLeft: borderRadius.topLeft,
+          bottomLeft: borderRadius.bottomLeft,
+        );
+      }
+    } else {
+      // Vertical bars
+      if (yValForBar >= 0) {
+        // Positive: Round top side (top-left, top-right)
+        return RRect.fromRectAndCorners(
+          barRect,
+          topLeft: borderRadius.topLeft,
+          topRight: borderRadius.topRight,
+        );
+      } else {
+        // Negative: Round bottom side (bottom-left, bottom-right)
+        return RRect.fromRectAndCorners(
+          barRect,
+          bottomLeft: borderRadius.bottomLeft,
+          bottomRight: borderRadius.bottomRight,
+        );
+      }
+    }
+  }
+
   void _drawSingleBar(
     Canvas canvas,
     Rect plotArea,
@@ -1134,45 +1179,12 @@ class AnimatedChartPainter extends CustomPainter {
     if (geometry.borderRadius != null &&
         geometry.borderRadius != BorderRadius.zero) {
       if (geometry.roundOutwardEdges) {
-        // Calculate custom border radius based on value and orientation
-        RRect rrect;
-        final radius = geometry.borderRadius!; // Use as base
-
-        if (coordFlipped) {
-          // Horizontal bars
-          if (yValForBar >= 0) {
-            // Positive: Round right side (top-right, bottom-right)
-            rrect = RRect.fromRectAndCorners(
-              barRect,
-              topRight: radius.topRight,
-              bottomRight: radius.bottomRight,
-            );
-          } else {
-            // Negative: Round left side (top-left, bottom-left)
-            rrect = RRect.fromRectAndCorners(
-              barRect,
-              topLeft: radius.topLeft,
-              bottomLeft: radius.bottomLeft,
-            );
-          }
-        } else {
-          // Vertical bars
-          if (yValForBar >= 0) {
-            // Positive: Round top side (top-left, top-right)
-            rrect = RRect.fromRectAndCorners(
-              barRect,
-              topLeft: radius.topLeft,
-              topRight: radius.topRight,
-            );
-          } else {
-            // Negative: Round bottom side (bottom-left, bottom-right)
-            rrect = RRect.fromRectAndCorners(
-              barRect,
-              bottomLeft: radius.bottomLeft,
-              bottomRight: radius.bottomRight,
-            );
-          }
-        }
+        final rrect = _computeOutwardRRect(
+          barRect: barRect,
+          borderRadius: geometry.borderRadius!,
+          yValForBar: yValForBar,
+          coordFlipped: coordFlipped,
+        );
         canvas.drawRRect(rrect, paint);
       } else {
         canvas.drawRRect(geometry.borderRadius!.toRRect(barRect), paint);
@@ -1192,39 +1204,12 @@ class AnimatedChartPainter extends CustomPainter {
       if (geometry.borderRadius != null &&
           geometry.borderRadius != BorderRadius.zero) {
         if (geometry.roundOutwardEdges) {
-          // Re-calculate same RRect for border
-          RRect rrect;
-          final radius = geometry.borderRadius!;
-
-          if (coordFlipped) {
-            if (yValForBar >= 0) {
-              rrect = RRect.fromRectAndCorners(
-                barRect,
-                topRight: radius.topRight,
-                bottomRight: radius.bottomRight,
-              );
-            } else {
-              rrect = RRect.fromRectAndCorners(
-                barRect,
-                topLeft: radius.topLeft,
-                bottomLeft: radius.bottomLeft,
-              );
-            }
-          } else {
-            if (yValForBar >= 0) {
-              rrect = RRect.fromRectAndCorners(
-                barRect,
-                topLeft: radius.topLeft,
-                topRight: radius.topRight,
-              );
-            } else {
-              rrect = RRect.fromRectAndCorners(
-                barRect,
-                bottomLeft: radius.bottomLeft,
-                bottomRight: radius.bottomRight,
-              );
-            }
-          }
+          final rrect = _computeOutwardRRect(
+            barRect: barRect,
+            borderRadius: geometry.borderRadius!,
+            yValForBar: yValForBar,
+            coordFlipped: coordFlipped,
+          );
           canvas.drawRRect(rrect, borderPaint);
         } else {
           canvas.drawRRect(

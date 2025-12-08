@@ -1,21 +1,21 @@
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
+/// Static demo data for positive/negative value chart
+const List<Map<String, dynamic>> _mixedDemoData = [
+  {'category': 'A', 'value': 25.0},
+  {'category': 'B', 'value': -15.0},
+  {'category': 'C', 'value': 40.0},
+  {'category': 'D', 'value': -30.0},
+  {'category': 'E', 'value': 10.0},
+  {'category': 'F', 'value': -20.0},
+];
+
 Widget buildBarChartTab(
   ChartTheme currentTheme,
   List<Map<String, dynamic>> data,
   double sliderValue,
 ) {
-  // Data with positive and negative values for rounded bar demo
-  final mixedData = [
-    {'category': 'A', 'value': 25.0},
-    {'category': 'B', 'value': -15.0},
-    {'category': 'C', 'value': 40.0},
-    {'category': 'D', 'value': -30.0},
-    {'category': 'E', 'value': 10.0},
-    {'category': 'F', 'value': -20.0},
-  ];
-
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
@@ -70,17 +70,17 @@ Widget buildBarChartTab(
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
           ),
-          child: Row(
+          child: const Row(
             children: [
               Icon(Icons.new_releases, color: Colors.blue, size: 20),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'New Feature: roundOutwardEdges property',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: Colors.blue[700],
+                    color: Color(0xFF1976D2), // Colors.blue[700]
                   ),
                 ),
               ),
@@ -92,7 +92,7 @@ Widget buildBarChartTab(
           height: 400,
           child:
               CristalyseChart()
-                  .data(mixedData)
+                  .data(_mixedDemoData)
                   .mapping(x: 'category', y: 'value')
                   .geomBar(
                     width: sliderValue.clamp(0.1, 1.0),
