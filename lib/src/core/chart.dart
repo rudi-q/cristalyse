@@ -260,6 +260,7 @@ class CristalyseChart {
     BarStyle? style,
     BorderRadius? borderRadius,
     double? borderWidth,
+    bool? roundOutwardEdges,
     YAxis? yAxis,
   }) {
     final barGeom = BarGeometry(
@@ -270,6 +271,7 @@ class CristalyseChart {
       style: style ?? BarStyle.grouped,
       borderRadius: borderRadius,
       borderWidth: borderWidth ?? 0.0,
+      roundOutwardEdges: roundOutwardEdges ?? false,
       yAxis: yAxis ?? YAxis.primary,
     );
     _geometries.add(barGeom);

@@ -80,6 +80,7 @@ class BarGeometry extends Geometry {
   final BarStyle style;
   final BorderRadius? borderRadius;
   final double borderWidth;
+  final bool roundOutwardEdges;
 
   BarGeometry({
     this.width = 0.8,
@@ -89,6 +90,7 @@ class BarGeometry extends Geometry {
     this.style = BarStyle.grouped,
     this.borderRadius,
     this.borderWidth = 0.0,
+    this.roundOutwardEdges = false,
     super.yAxis,
     super.interactive,
   });
