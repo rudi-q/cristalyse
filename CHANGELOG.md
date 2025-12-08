@@ -1,5 +1,69 @@
 # Changelog
 
+## 1.17.0 - 2025-12-08
+
+#### 📊 Bar Chart Positive/Negative Value Enhancements
+
+**New Features:**
+- **Smart Rounded Corners**: `roundOutwardEdges` property for conditional corner rounding
+  - Positive bars: Rounded corners on top (vertical) or right (horizontal)
+  - Negative bars: Rounded corners on bottom (vertical) or left (horizontal)
+  - Sharp edges at zero baseline for clean alignment
+  - Works with existing `borderRadius` parameter
+  
+- **Conditional Bar Colors**: Different colors for positive and negative values
+  - New `positiveColor` parameter for bars with values >= 0
+  - New `negativeColor` parameter for bars with values < 0
+  - Intelligent fallback chain: positiveColor/negativeColor → color → colorScale → theme
+  - Perfect for financial charts, variance analysis, and profit/loss visualization
+
+**Technical Implementation:**
+- Added `roundOutwardEdges`, `positiveColor`, and `negativeColor` to `BarGeometry`
+- Updated `CristalyseChart.geomBar()` API with new parameters
+- Implemented `_computeOutwardRRect()` helper method to eliminate code duplication
+- Enhanced `_drawSingleBar()` with value-based conditional rendering logic
+- Fixed negative bar rendering bug (bars extending below zero baseline)
+
+**API Example:**
+```dart
+final profitLossData = [
+  {'month': 'Jan', 'pnl': 45000.0},
+  {'month': 'Feb', 'pnl': -12000.0},
+  {'month': 'Mar', 'pnl': 67000.0},
+  {'month': 'Apr', 'pnl': -8000.0},
+];
+
+CristalyseChart()
+  .data(profitLossData)
+  .mapping(x: 'month', y: 'pnl')
+  .geomBar(
+    borderRadius: BorderRadius.circular(12),
+    roundOutwardEdges: true,        // Smart rounding
+    positiveColor: Colors.green,    // Gains
+    negativeColor: Colors.red,      // Losses
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous()
+  .build()
+```
+
+**Bug Fixes:**
+- Fixed negative bar rendering (bars extending below zero were not displaying)
+- Corrected bar rect calculation to handle negative heights properly
+
+**Documentation:**
+- Updated `bar-charts.mdx` with comprehensive examples
+- Added "Positive/Negative Value Styling" section with financial dashboard example
+- Code quality improvements: extracted helper method, const optimizations, top-level const data
+
+**Quality Assurance:**
+- Zero breaking changes - fully backward compatible
+- All new parameters are optional (default to `false`/`null`)
+- `flutter analyze` passes with no issues
+- Example app updated with live demonstration
+
+---
+
 ## 1.16.0 - 2025-11-27
 
 #### 📏 Integer-Only Ticks

@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.16.0** - Production ready with integer-only ticks, pinch, scroll wheel, and button-based zoom interactions, tick configuration for continuous scales, optional Y-axis titles in legends, boundary clamping for pan operations, programmatic pan controller, interactive floating legends, and intelligent axis bounds
+**Current Version: 1.17.0** - Production ready with bar chart positive/negative value styling, integer-only ticks, pinch, scroll wheel, and button-based zoom interactions, tick configuration for continuous scales, optional Y-axis titles in legends, boundary clamping for pan operations, programmatic pan controller, interactive floating legends, and intelligent axis bounds
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1131,6 +1131,7 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.14.0** - **Tick configuration for scales** with explicit tick positions and simple linear spacing options (by [@jbbjarnason](https://github.com/jbbjarnason))
 - ✅ **v1.15.0** - **Zoom & pan interactions** with pinch gestures, scroll wheel support, and floating zoom buttons for multi-touch and desktop platforms
 - ✅ **v1.16.0** - **Integer-only ticks** for continuous scales, ensuring clean integer values for count data
+- ✅ **v1.17.0** - **Bar chart positive/negative value styling** with smart rounded corners (`roundOutwardEdges`) and conditional colors (`positiveColor`/`negativeColor`) for financial charts and variance analysis
 
 ## Support This Project
 
