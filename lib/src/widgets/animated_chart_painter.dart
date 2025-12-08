@@ -1015,9 +1015,32 @@ class AnimatedChartPainter extends CustomPainter {
     double? customWidth,
     double yStackOffset = 0,
   }) {
-    // Priority: geometry.color > colorScale > theme fallback
+    // Determine color based on value sign if positiveColor/negativeColor are specified
+    // Priority: positiveColor/negativeColor > geometry.color > colorScale > theme fallback
     final dynamic colorOrGradient;
-    if (geometry.color != null) {
+
+    // Check if we should use positive/negative colors
+    final bool usePositiveNegativeColors =
+        geometry.positiveColor != null || geometry.negativeColor != null;
+
+    if (usePositiveNegativeColors) {
+      // Use value-based coloring
+      if (yValForBar >= 0) {
+        // Positive value: use positiveColor, fall back to color, then theme
+        colorOrGradient = geometry.positiveColor ??
+            geometry.color ??
+            (theme.colorPalette.isNotEmpty
+                ? theme.colorPalette.first
+                : theme.primaryColor);
+      } else {
+        // Negative value: use negativeColor, fall back to color, then theme
+        colorOrGradient = geometry.negativeColor ??
+            geometry.color ??
+            (theme.colorPalette.length > 1
+                ? theme.colorPalette[1]
+                : theme.primaryColor);
+      }
+    } else if (geometry.color != null) {
       colorOrGradient = geometry.color!;
     } else if (colorColumn != null) {
       colorOrGradient = colorScale.scale(dataPoint[colorColumn]);

@@ -75,6 +75,8 @@ class LineGeometry extends Geometry {
 class BarGeometry extends Geometry {
   final double width;
   final Color? color;
+  final Color? positiveColor;
+  final Color? negativeColor;
   final double alpha;
   final BarOrientation orientation;
   final BarStyle style;
@@ -85,6 +87,8 @@ class BarGeometry extends Geometry {
   BarGeometry({
     this.width = 0.8,
     this.color,
+    this.positiveColor,
+    this.negativeColor,
     this.alpha = 1.0,
     this.orientation = BarOrientation.vertical,
     this.style = BarStyle.grouped,

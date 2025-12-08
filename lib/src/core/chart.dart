@@ -255,6 +255,8 @@ class CristalyseChart {
   CristalyseChart geomBar({
     double? width,
     Color? color,
+    Color? positiveColor,
+    Color? negativeColor,
     double? alpha,
     BarOrientation? orientation,
     BarStyle? style,
@@ -266,6 +268,8 @@ class CristalyseChart {
     final barGeom = BarGeometry(
       width: width ?? 0.8,
       color: color,
+      positiveColor: positiveColor,
+      negativeColor: negativeColor,
       alpha: alpha ?? 1.0,
       orientation: orientation ?? BarOrientation.vertical,
       style: style ?? BarStyle.grouped,

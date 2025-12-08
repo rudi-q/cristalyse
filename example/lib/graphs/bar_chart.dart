@@ -98,7 +98,9 @@ Widget buildBarChartTab(
                     width: sliderValue.clamp(0.1, 1.0),
                     alpha: 0.9,
                     borderRadius: BorderRadius.circular(15),
-                    roundOutwardEdges: true, // NEW FEATURE
+                    roundOutwardEdges: true,
+                    positiveColor: Colors.green,
+                    negativeColor: Colors.red,
                   )
                   .scaleXOrdinal()
                   .scaleYContinuous()
@@ -111,7 +113,7 @@ Widget buildBarChartTab(
         ),
         const SizedBox(height: 16),
         const Text(
-          '• Positive bars: rounded top, sharp bottom\n• Negative bars: rounded bottom, sharp top\n• Zero-based edge remains sharp for clean baseline\n• Perfect for financial data and variance charts',
+          '• positiveColor: green for gains/profits\n• negativeColor: red for losses/deficits\n• roundOutwardEdges: smart corner rounding\n• Perfect for financial data and variance charts',
         ),
       ],
     ),
