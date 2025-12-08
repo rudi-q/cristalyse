@@ -12,6 +12,73 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="December 8, 2025" description="v1.17.0">
+  ### 📊 Bar Chart Positive/Negative Value Styling
+  
+  **Smart rounded corners and conditional colors for financial charts!**
+  
+  **Smart Rounded Corners (`roundOutwardEdges`):**
+  - Positive bars: Rounded top (vertical) or right (horizontal)
+  - Negative bars: Rounded bottom (vertical) or left (horizontal)
+  - Sharp edge at zero baseline for clean alignment
+  - Works seamlessly with existing `borderRadius` parameter
+  
+  **Conditional Bar Colors:**
+  - New `positiveColor` parameter for values >= 0
+  - New `negativeColor` parameter for values < 0
+  - Smart fallback: positiveColor/negativeColor → color → colorScale → theme
+  - Perfect for profit/loss, variance analysis, financial dashboards
+  
+  **Use Cases:**
+  - Financial dashboards showing gains and losses
+  - Variance charts highlighting positive and negative deviations
+  - Performance metrics with above/below target visualization
+  - Budget analysis with overspending and savings
+  
+  ```dart
+  // Financial Dashboard Example
+  final profitLossData = [
+    {'month': 'Jan', 'pnl': 45000.0},
+    {'month': 'Feb', 'pnl': -12000.0},
+    {'month': 'Mar', 'pnl': 67000.0},
+    {'month': 'Apr', 'pnl': -8000.0},
+  ];
+  
+  CristalyseChart()
+    .data(profitLossData)
+    .mapping(x: 'month', y: 'pnl')
+    .geomBar(
+      borderRadius: BorderRadius.circular(12),
+      roundOutwardEdges: true,        // Smart rounding
+      positiveColor: Colors.green,    // Gains
+      negativeColor: Colors.red,      // Losses
+    )
+    .scaleXOrdinal()
+    .scaleYContinuous()
+    .build()
+  ```
+  
+  **Enhanced Example App:**
+  - Updated bar chart demo with positive/negative value showcase
+  - Live demonstration at `#/bar-chart` route
+  - Visual comparison of standard vs. smart-rounded bars
+  
+  **Bug Fixes:**
+  - Fixed negative bar rendering (bars extending below zero)
+  - Corrected bar rect calculation for negative heights
+  
+  **Code Quality:**
+  - Extracted `_computeOutwardRRect()` helper to eliminate code duplication
+  - Optimized example with const widgets and top-level data
+  
+  **Quality Assurance:**
+  - Zero breaking changes - fully backward compatible
+  - All new parameters optional (default to `false`/`null`)
+  - `flutter analyze` passes with no issues
+  
+  [View bar chart documentation](/charts/bar-charts#positivenegative-value-styling)
+</Update>
+
 <Update label="November 27, 2025" description="v1.16.0">
   ### 📏 Integer-Only Ticks
 
