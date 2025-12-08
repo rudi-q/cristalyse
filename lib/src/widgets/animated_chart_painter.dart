@@ -1000,6 +1000,51 @@ class AnimatedChartPainter extends CustomPainter {
     }
   }
 
+  /// Computes an RRect with rounded corners only on the outward edge
+  /// (away from the zero baseline) based on bar value and orientation.
+  RRect _computeOutwardRRect({
+    required Rect barRect,
+    required BorderRadius borderRadius,
+    required double yValForBar,
+    required bool coordFlipped,
+  }) {
+    if (coordFlipped) {
+      // Horizontal bars
+      if (yValForBar >= 0) {
+        // Positive: Round right side (top-right, bottom-right)
+        return RRect.fromRectAndCorners(
+          barRect,
+          topRight: borderRadius.topRight,
+          bottomRight: borderRadius.bottomRight,
+        );
+      } else {
+        // Negative: Round left side (top-left, bottom-left)
+        return RRect.fromRectAndCorners(
+          barRect,
+          topLeft: borderRadius.topLeft,
+          bottomLeft: borderRadius.bottomLeft,
+        );
+      }
+    } else {
+      // Vertical bars
+      if (yValForBar >= 0) {
+        // Positive: Round top side (top-left, top-right)
+        return RRect.fromRectAndCorners(
+          barRect,
+          topLeft: borderRadius.topLeft,
+          topRight: borderRadius.topRight,
+        );
+      } else {
+        // Negative: Round bottom side (bottom-left, bottom-right)
+        return RRect.fromRectAndCorners(
+          barRect,
+          bottomLeft: borderRadius.bottomLeft,
+          bottomRight: borderRadius.bottomRight,
+        );
+      }
+    }
+  }
+
   void _drawSingleBar(
     Canvas canvas,
     Rect plotArea,
@@ -1015,9 +1060,32 @@ class AnimatedChartPainter extends CustomPainter {
     double? customWidth,
     double yStackOffset = 0,
   }) {
-    // Priority: geometry.color > colorScale > theme fallback
+    // Determine color based on value sign if positiveColor/negativeColor are specified
+    // Priority: positiveColor/negativeColor > geometry.color > colorScale > theme fallback
     final dynamic colorOrGradient;
-    if (geometry.color != null) {
+
+    // Check if we should use positive/negative colors
+    final bool usePositiveNegativeColors =
+        geometry.positiveColor != null || geometry.negativeColor != null;
+
+    if (usePositiveNegativeColors) {
+      // Use value-based coloring
+      if (yValForBar >= 0) {
+        // Positive value: use positiveColor, fall back to color, then theme
+        colorOrGradient = geometry.positiveColor ??
+            geometry.color ??
+            (theme.colorPalette.isNotEmpty
+                ? theme.colorPalette.first
+                : theme.primaryColor);
+      } else {
+        // Negative value: use negativeColor, fall back to color, then theme
+        colorOrGradient = geometry.negativeColor ??
+            geometry.color ??
+            (theme.colorPalette.length > 1
+                ? theme.colorPalette[1]
+                : theme.primaryColor);
+      }
+    } else if (geometry.color != null) {
       colorOrGradient = geometry.color!;
     } else if (colorColumn != null) {
       colorOrGradient = colorScale.scale(dataPoint[colorColumn]);
@@ -1071,12 +1139,25 @@ class AnimatedChartPainter extends CustomPainter {
       final yEnd = plotArea.top + yScale.scale(yValForBar + yStackOffset);
       final barHeight = (yStart - yEnd);
 
-      barRect = Rect.fromLTWH(
-        xPos.isFinite ? xPos : 0,
-        yStart - (barHeight * animationProgress),
-        barWidth.isFinite ? barWidth : 0,
-        barHeight.isFinite ? barHeight * animationProgress : 0,
-      );
+      // Handle both positive and negative bars
+      if (barHeight >= 0) {
+        // Positive bar: grows upward from baseline
+        barRect = Rect.fromLTWH(
+          xPos.isFinite ? xPos : 0,
+          yStart - (barHeight * animationProgress),
+          barWidth.isFinite ? barWidth : 0,
+          barHeight.isFinite ? barHeight * animationProgress : 0,
+        );
+      } else {
+        // Negative bar: grows downward from baseline
+        final absHeight = barHeight.abs();
+        barRect = Rect.fromLTWH(
+          xPos.isFinite ? xPos : 0,
+          yStart,
+          barWidth.isFinite ? barWidth : 0,
+          absHeight.isFinite ? absHeight * animationProgress : 0,
+        );
+      }
     }
 
     if (!barRect.isFinite || barRect.isEmpty) {
@@ -1097,7 +1178,17 @@ class AnimatedChartPainter extends CustomPainter {
 
     if (geometry.borderRadius != null &&
         geometry.borderRadius != BorderRadius.zero) {
-      canvas.drawRRect(geometry.borderRadius!.toRRect(barRect), paint);
+      if (geometry.roundOutwardEdges) {
+        final rrect = _computeOutwardRRect(
+          barRect: barRect,
+          borderRadius: geometry.borderRadius!,
+          yValForBar: yValForBar,
+          coordFlipped: coordFlipped,
+        );
+        canvas.drawRRect(rrect, paint);
+      } else {
+        canvas.drawRRect(geometry.borderRadius!.toRRect(barRect), paint);
+      }
     } else {
       canvas.drawRect(barRect, paint);
     }
@@ -1112,7 +1203,18 @@ class AnimatedChartPainter extends CustomPainter {
 
       if (geometry.borderRadius != null &&
           geometry.borderRadius != BorderRadius.zero) {
-        canvas.drawRRect(geometry.borderRadius!.toRRect(barRect), borderPaint);
+        if (geometry.roundOutwardEdges) {
+          final rrect = _computeOutwardRRect(
+            barRect: barRect,
+            borderRadius: geometry.borderRadius!,
+            yValForBar: yValForBar,
+            coordFlipped: coordFlipped,
+          );
+          canvas.drawRRect(rrect, borderPaint);
+        } else {
+          canvas.drawRRect(
+              geometry.borderRadius!.toRRect(barRect), borderPaint);
+        }
       } else {
         canvas.drawRect(barRect, borderPaint);
       }

@@ -189,6 +189,92 @@ CristalyseChart()
   .build()
 ```
 
+### Positive/Negative Value Styling
+
+<Info>
+**New in v1.17.0**: Style positive and negative bars differently with smart rounded corners and conditional colors. Perfect for financial data, variance charts, and profit/loss visualizations.
+</Info>
+
+#### Smart Rounded Corners
+
+Round only the outward edges of bars (away from the zero baseline):
+
+```dart
+final varianceData = [
+  {'category': 'A', 'value': 25.0},
+  {'category': 'B', 'value': -15.0},
+  {'category': 'C', 'value': 40.0},
+  {'category': 'D', 'value': -30.0},
+];
+
+CristalyseChart()
+  .data(varianceData)
+  .mapping(x: 'category', y: 'value')
+  .geomBar(
+    borderRadius: BorderRadius.circular(12),
+    roundOutwardEdges: true, // Positive: rounded top, Negative: rounded bottom
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous()
+  .build()
+```
+
+#### Conditional Colors
+
+Apply different colors based on value sign:
+
+```dart
+CristalyseChart()
+  .data(varianceData)
+  .mapping(x: 'category', y: 'value')
+  .geomBar(
+    borderRadius: BorderRadius.circular(12),
+    roundOutwardEdges: true,
+    positiveColor: Colors.green,  // Green for gains/profits
+    negativeColor: Colors.red,    // Red for losses/deficits
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous()
+  .build()
+```
+
+#### Combined Example (Financial Dashboard)
+
+```dart
+final profitLossData = [
+  {'month': 'Jan', 'pnl': 45000.0},
+  {'month': 'Feb', 'pnl': -12000.0},
+  {'month': 'Mar', 'pnl': 67000.0},
+  {'month': 'Apr', 'pnl': -8000.0},
+  {'month': 'May', 'pnl': 89000.0},
+];
+
+CristalyseChart()
+  .data(profitLossData)
+  .mapping(x: 'month', y: 'pnl')
+  .geomBar(
+    width: 0.7,
+    borderRadius: BorderRadius.circular(8),
+    roundOutwardEdges: true,
+    positiveColor: const Color(0xFF10B981), // Emerald green
+    negativeColor: const Color(0xFFEF4444),  // Red
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous(
+    labels: (value) => '\$${(value / 1000).toStringAsFixed(0)}k',
+  )
+  .theme(ChartTheme.defaultTheme())
+  .animate(
+    duration: Duration(milliseconds: 1000),
+    curve: Curves.easeOutBack,
+  )
+  .build()
+```
+
+<Tip>
+**Pro Tip**: Combine `roundOutwardEdges` with `positiveColor`/`negativeColor` for professional-looking financial charts. The sharp edge at the zero baseline creates a clean, aligned appearance.
+</Tip>
+
 ### Gradient Colors
 
 <Info>
