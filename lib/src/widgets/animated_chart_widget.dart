@@ -145,8 +145,7 @@ class _AnimatedCristalyseChartWidgetState
         widget.geometries != oldWidget.geometries) {
       _animationController.reset();
       _animationController.forward();
-      _interactionDetector?.invalidate();
-      _interactionDetector = null;
+      _resetInteractionDetector();
       _resetViewDomains();
     }
 
@@ -194,6 +193,13 @@ class _AnimatedCristalyseChartWidgetState
     _originalYDomain = null;
     _baseXSpan = null;
     _baseYSpan = null;
+  }
+
+  /// Invalidate and clear the interaction detector.
+  /// This forces a rebuild with current pan/zoom domains on next hover/tap.
+  void _resetInteractionDetector() {
+    _interactionDetector?.invalidate();
+    _interactionDetector = null;
   }
 
   void _ensureViewDomainsInitialized(Rect plotArea) {
@@ -586,8 +592,7 @@ class _AnimatedCristalyseChartWidgetState
       if (xChanged || yChanged) {
         // Invalidate interaction detector to force rebuild with new pan domain
         // This fixes tooltip offset when panning programmatically
-        _interactionDetector?.invalidate();
-        _interactionDetector = null;
+        _resetInteractionDetector();
 
         setState(() {});
         final panConfig = widget.interaction.pan;
@@ -1525,8 +1530,7 @@ class _AnimatedCristalyseChartWidgetState
 
     // Invalidate interaction detector to force rebuild with new pan domain
     // This fixes tooltip offset when panning (detector cached stale positions)
-    _interactionDetector?.invalidate();
-    _interactionDetector = null;
+    _resetInteractionDetector();
 
     // Calculate the data range per pixel for current pan domain
     final xRange = _panXDomain![1] - _panXDomain![0];
@@ -1765,8 +1769,7 @@ class _AnimatedCristalyseChartWidgetState
 
     if (changed) {
       setState(() {});
-      _interactionDetector?.invalidate();
-      _interactionDetector = null;
+      _resetInteractionDetector();
     }
 
     return changed;
