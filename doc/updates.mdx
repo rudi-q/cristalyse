@@ -12,6 +12,47 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="December 10, 2025" description="v1.17.1">
+  ### 🐛 Interactive Legend Tooltip Fix
+  
+  **Tooltips now work correctly with interactive legends!**
+  
+  **What was fixed:**
+  - Tooltips now appear when hovering over charts with `interactive: true` legends
+  - Previously, enabling interactive legends caused tooltips to stop working
+  - Affected chart types: line charts, area charts, bar charts, and all other geometries
+  
+  **Root Cause:**
+  - When interactive legends filter data, the chart creates a new widget for filtered data
+  - This filtered chart was missing the `ChartTooltipOverlay` wrapper
+  - Fix ensures tooltip overlay is properly applied to filtered charts
+  
+  **Example:**
+  ```dart
+  // Now works perfectly together!
+  CristalyseChart()
+    .data(salesData)
+    .mapping(x: 'quarter', y: 'revenue', color: 'product')
+    .geomBar(style: BarStyle.grouped)
+    .legend(interactive: true)  // ✅ Click to toggle categories
+    .interaction(
+      tooltip: TooltipConfig(
+        builder: (point) => Text(
+          '${point.getDisplayValue('product')}: \$${point.getDisplayValue('revenue')}k',
+        ),
+      ),
+    )
+    .build()
+  ```
+  
+  **Quality Assurance:**
+  - All 297 tests passing
+  - Zero breaking changes
+  - Example app updated with demonstration
+  
+  [View legend documentation](/features/legends)
+</Update>
+
 <Update label="December 8, 2025" description="v1.17.0">
   ### 📊 Bar Chart Positive/Negative Value Styling
   
