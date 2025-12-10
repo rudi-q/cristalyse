@@ -938,7 +938,7 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
-    return AnimatedBuilder(
+    Widget chartContent = AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
         return LayoutBuilder(
@@ -983,6 +983,19 @@ class _AnimatedCristalyseChartWidgetState
         );
       },
     );
+
+    // Wrap with tooltip overlay if tooltips are enabled
+    // This ensures tooltips work even when the chart is being filtered
+    // by interactive legends (fixes tooltip missing bug)
+    if (widget.interaction.enabled && widget.interaction.tooltip != null) {
+      chartContent = ChartTooltipOverlay(
+        config: widget.interaction.tooltip!,
+        tooltipBuilder: widget.interaction.tooltip!.builder,
+        child: chartContent,
+      );
+    }
+
+    return chartContent;
   }
 
   /// Build interactive chart with custom data

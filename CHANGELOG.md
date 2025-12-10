@@ -1,5 +1,43 @@
 # Changelog
 
+## 1.17.1 - 2025-12-10
+
+#### 🐛 Bug Fixes
+
+**Fixed Tooltips Not Working with Interactive Legends:**
+- Tooltips now correctly appear when hovering over charts with `interactive: true` legends
+- Previously, enabling interactive legends caused tooltips to stop working on line, area, and bar charts
+- Root cause: Filtered chart widget was not wrapped with `ChartTooltipOverlay`
+- Fix: `_buildChartWidget()` now properly wraps filtered charts with tooltip overlay
+
+**Technical Details:**
+- Modified `_buildChartWidget()` in `animated_chart_widget.dart`
+- Wrapped filtered chart content with `ChartTooltipOverlay` when tooltips are enabled
+- Ensures tooltip functionality is preserved during legend toggle operations
+
+**API Example:**
+```dart
+// Now works correctly with both tooltips and interactive legends
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .legend(interactive: true)  // ✅ Tooltips now work with this!
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) => Text('${point.getDisplayValue('product')}: \$${point.getDisplayValue('revenue')}k'),
+    ),
+  )
+  .build()
+```
+
+**Quality Assurance:**
+- All 297 tests passing
+- Zero breaking changes - fully backward compatible
+- Updated example app with interactive legend + tooltip demonstration
+
+---
+
 ## 1.17.0 - 2025-12-08
 
 #### 📊 Bar Chart Positive/Negative Value Enhancements
