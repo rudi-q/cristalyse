@@ -584,6 +584,11 @@ class _AnimatedCristalyseChartWidgetState
         _panYDomain = [panInfo.visibleMinY!, panInfo.visibleMaxY!];
       }
       if (xChanged || yChanged) {
+        // Invalidate interaction detector to force rebuild with new pan domain
+        // This fixes tooltip offset when panning programmatically
+        _interactionDetector?.invalidate();
+        _interactionDetector = null;
+
         setState(() {});
         final panConfig = widget.interaction.pan;
         if (panConfig != null) {
@@ -1517,6 +1522,11 @@ class _AnimatedCristalyseChartWidgetState
   /// Update pan domains based on delta movement
   void _updatePanDomains(Rect plotArea, Offset delta) {
     if (_panXDomain == null) return;
+
+    // Invalidate interaction detector to force rebuild with new pan domain
+    // This fixes tooltip offset when panning (detector cached stale positions)
+    _interactionDetector?.invalidate();
+    _interactionDetector = null;
 
     // Calculate the data range per pixel for current pan domain
     final xRange = _panXDomain![1] - _panXDomain![0];
