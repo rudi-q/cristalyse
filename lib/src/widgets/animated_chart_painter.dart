@@ -38,6 +38,7 @@ class AnimatedChartPainter extends CustomPainter {
   final bool coordFlipped;
   final List<double>? panXDomain;
   final List<double>? panYDomain;
+  final ValueChanged<Rect>? onChartAreaComputed;
 
   /// Creates an [AnimatedChartPainter] with comprehensive chart rendering capabilities.
   ///
@@ -94,6 +95,7 @@ class AnimatedChartPainter extends CustomPainter {
     this.coordFlipped = false,
     this.panXDomain,
     this.panYDomain,
+    this.onChartAreaComputed,
   });
 
   /// Renders the complete chart visualization on the provided canvas.
@@ -225,6 +227,10 @@ class AnimatedChartPainter extends CustomPainter {
       size.width - leftPadding - rightPadding,
       size.height - theme.padding.top - bottomPadding,
     );
+
+    // Store for widget to use in interaction detection
+    // Use callback to ensure widget has persistent access even if repaint is skipped
+    onChartAreaComputed?.call(plotArea);
 
     if (plotArea.width <= 0 || plotArea.height <= 0) {
       return;

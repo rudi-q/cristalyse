@@ -108,6 +108,9 @@ class _AnimatedCristalyseChartWidgetState
   /// Track latest plot area for gesture conversions
   Rect? _currentPlotArea;
 
+  /// Actual plot area computed by painter, persistent across repaints
+  Rect? _actualPlotArea;
+
   /// Scale gesture tracking
   double _lastScaleFactor = 1.0;
   Offset? _lastScaleFocalPoint;
@@ -250,9 +253,7 @@ class _AnimatedCristalyseChartWidgetState
       return;
     }
 
-    if (_interactionDetector == null) {
-      _setupInteractionDetector(plotArea);
-    }
+    _ensureInteractionDetector(plotArea);
 
     // Use larger hit test radius for more forgiving detection
     final hitRadius = math.max(
@@ -387,9 +388,7 @@ class _AnimatedCristalyseChartWidgetState
 
     // Handle tooltip/hover interactions ONLY if panning is not enabled
     if (hasTooltips && panConfig?.enabled != true) {
-      if (_interactionDetector == null) {
-        _setupInteractionDetector(plotArea);
-      }
+      _ensureInteractionDetector(plotArea);
 
       // Use even larger radius for touch interactions
       final hitRadius = math.max(
@@ -454,6 +453,7 @@ class _AnimatedCristalyseChartWidgetState
     ScaleStartDetails details,
     Rect plotArea,
   ) {
+    _ensureInteractionDetector(plotArea);
     _ensureViewDomainsInitialized(plotArea);
     _lastScaleFactor = 1.0;
     _lastScaleFocalPoint = details.localFocalPoint;
@@ -521,6 +521,8 @@ class _AnimatedCristalyseChartWidgetState
     if (!_isZoomEnabled || event is! PointerScrollEvent) return;
     final zoomConfig = _zoomConfig;
     if (zoomConfig == null) return;
+
+    _ensureInteractionDetector(plotArea);
 
     final localPosition = event.localPosition;
     if (!plotArea.contains(localPosition)) return;
@@ -630,9 +632,7 @@ class _AnimatedCristalyseChartWidgetState
       return;
     }
 
-    if (_interactionDetector == null) {
-      _setupInteractionDetector(plotArea);
-    }
+    _ensureInteractionDetector(plotArea);
 
     final point = _interactionDetector!.detectPoint(
       details.localPosition,
@@ -689,6 +689,13 @@ class _AnimatedCristalyseChartWidgetState
     );
   }
 
+  void _ensureInteractionDetector(Rect plotArea) {
+    if (_interactionDetector == null ||
+        _interactionDetector!.plotArea != plotArea) {
+      _setupInteractionDetector(plotArea);
+    }
+  }
+
   Widget _buildInteractiveChart(BuildContext context, Size size) {
     final animationValue = _animation.value;
     if (!animationValue.isFinite || animationValue.isNaN) {
@@ -711,14 +718,19 @@ class _AnimatedCristalyseChartWidgetState
       );
     }
 
+    final yAxisSpace = _estimateYAxisSpace(widget);
     final y2AxisSpace = _estimateY2AxisSpace(widget);
+    final xAxisSpace = _estimateXAxisSpace(widget);
+
+    final leftPadding = widget.theme.padding.left + yAxisSpace;
     final rightPadding = widget.theme.padding.right + y2AxisSpace;
+    final bottomPadding = widget.theme.padding.bottom + xAxisSpace;
 
     final plotArea = Rect.fromLTWH(
-      widget.theme.padding.left,
+      leftPadding,
       widget.theme.padding.top,
-      size.width - widget.theme.padding.left - rightPadding,
-      size.height - widget.theme.padding.vertical,
+      size.width - leftPadding - rightPadding,
+      size.height - widget.theme.padding.top - bottomPadding,
     );
 
     _setupScales(plotArea.width, plotArea.height);
@@ -732,26 +744,37 @@ class _AnimatedCristalyseChartWidgetState
       animationProgress: math.max(0.0, math.min(1.0, animationValue)),
       panXDomain: _panXDomain,
       panYDomain: _panYDomain,
+      onChartAreaComputed: (area) {
+        if (_actualPlotArea != area) {
+          _actualPlotArea = area;
+        }
+      },
     );
 
     Widget chart = CustomPaint(painter: chartPainter, child: Container());
 
     // Wrap with gesture detection if interactions are enabled
     if (widget.interaction.enabled) {
+      // Use painter's actual plotArea for hit-testing (falls back to estimate if not yet painted)
+      final effectivePlotArea = _actualPlotArea ?? plotArea;
+
       chart = MouseRegion(
-        onHover: (event) => _handleMouseHover(context, event, plotArea),
+        onHover: (event) =>
+            _handleMouseHover(context, event, effectivePlotArea),
         onExit: (event) => _handleMouseExit(context, event),
         child: Listener(
-          onPointerSignal: (event) => _handlePointerSignal(event, plotArea),
+          onPointerSignal: (event) =>
+              _handlePointerSignal(event, effectivePlotArea),
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
             onScaleStart: (details) =>
-                _handleScaleStart(context, details, plotArea),
+                _handleScaleStart(context, details, effectivePlotArea),
             onScaleUpdate: (details) =>
-                _handleScaleUpdate(context, details, plotArea),
+                _handleScaleUpdate(context, details, effectivePlotArea),
             onScaleEnd: (details) =>
-                _handleScaleEnd(context, details, plotArea),
-            onTapUp: (details) => _handleTap(context, details, plotArea),
+                _handleScaleEnd(context, details, effectivePlotArea),
+            onTapUp: (details) =>
+                _handleTap(context, details, effectivePlotArea),
             child: chart,
           ),
         ),
@@ -1068,26 +1091,35 @@ class _AnimatedCristalyseChartWidgetState
       animationProgress: math.max(0.0, math.min(1.0, animationValue)),
       panXDomain: _panXDomain,
       panYDomain: _panYDomain,
+      onChartAreaComputed: (area) {
+        if (_actualPlotArea != area) {
+          _actualPlotArea = area;
+        }
+      },
     );
 
     Widget chart = CustomPaint(painter: chartPainter, child: Container());
 
     // Wrap with gesture detection if interactions are enabled
     if (tempWidget.interaction.enabled) {
+      final effectivePlotArea = _actualPlotArea ?? plotArea;
       chart = MouseRegion(
-        onHover: (event) => _handleMouseHover(context, event, plotArea),
+        onHover: (event) =>
+            _handleMouseHover(context, event, effectivePlotArea),
         onExit: (event) => _handleMouseExit(context, event),
         child: Listener(
-          onPointerSignal: (event) => _handlePointerSignal(event, plotArea),
+          onPointerSignal: (event) =>
+              _handlePointerSignal(event, effectivePlotArea),
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
             onScaleStart: (details) =>
-                _handleScaleStart(context, details, plotArea),
+                _handleScaleStart(context, details, effectivePlotArea),
             onScaleUpdate: (details) =>
-                _handleScaleUpdate(context, details, plotArea),
+                _handleScaleUpdate(context, details, effectivePlotArea),
             onScaleEnd: (details) =>
-                _handleScaleEnd(context, details, plotArea),
-            onTapUp: (details) => _handleTap(context, details, plotArea),
+                _handleScaleEnd(context, details, effectivePlotArea),
+            onTapUp: (details) =>
+                _handleTap(context, details, effectivePlotArea),
             child: chart,
           ),
         ),
@@ -1309,6 +1341,28 @@ class _AnimatedCristalyseChartWidgetState
     return (hasSecondaryY && chartWidget.y2Scale != null) ? 80.0 : 0.0;
   }
 
+  /// Estimate primary Y-axis space for layout purposes
+  /// This mirrors the painter's calculation for consistent hit-testing
+  double _estimateYAxisSpace(AnimatedCristalyseChartWidget chartWidget) {
+    if (chartWidget.yScale == null) return 0.0;
+
+    // Conservative estimate matching painter's calculation:
+    // axisWidth * 2 + tickToLabelSpacing + labelWidth + optional title
+    // ~4 + 4 + 50 + optional 20 = ~60-80px
+    return 60.0;
+  }
+
+  /// Estimate X-axis space for layout purposes
+  /// This mirrors the painter's calculation for consistent hit-testing
+  double _estimateXAxisSpace(AnimatedCristalyseChartWidget chartWidget) {
+    if (chartWidget.xScale == null) return 0.0;
+
+    // Conservative estimate matching painter's calculation:
+    // axisWidth * 2 + tickToLabelSpacing + labelHeight + optional title
+    // ~4 + 4 + 16 + optional 16 = ~30-40px
+    return 30.0;
+  }
+
   void _setupScales(double width, double height) {
     _setupXScale(width, widget.geometries.any((g) => g is BarGeometry));
     _setupYScale(
@@ -1389,6 +1443,16 @@ class _AnimatedCristalyseChartWidgetState
         if (values.isNotEmpty) {
           // Use geometry-aware bounds calculation
           scale.setBounds(values, null, widget.geometries);
+
+          // Apply pan domain if available (for interaction hit-testing)
+          // This mirrors the painter's approach to ensure detector matches rendering
+          if (!widget.coordFlipped && _panXDomain != null) {
+            scale.setBounds(
+              values,
+              (_panXDomain![0], _panXDomain![1]),
+              widget.geometries,
+            );
+          }
         } else {
           scale.setBounds([], null, widget.geometries);
         }
@@ -1468,6 +1532,18 @@ class _AnimatedCristalyseChartWidgetState
       if (values.isNotEmpty) {
         // Use geometry-aware bounds calculation
         scale.setBounds(values, null, widget.geometries);
+
+        // Apply pan domain if available (for interaction hit-testing)
+        // This mirrors the painter's approach to ensure detector matches rendering
+        if (!widget.coordFlipped &&
+            axis == YAxis.primary &&
+            _panYDomain != null) {
+          scale.setBounds(
+            values,
+            (_panYDomain![0], _panYDomain![1]),
+            widget.geometries,
+          );
+        }
       } else {
         scale.setBounds([], null, widget.geometries);
       }
