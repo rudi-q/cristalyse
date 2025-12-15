@@ -46,6 +46,7 @@ AnimatedChartPainter chartPainterAnimated({
   required double animationProgress,
   List<double>? panXDomain,
   List<double>? panYDomain,
+  ValueChanged<Rect>? onChartAreaComputed,
 }) {
   // Force panYDomain to null if updateYDomain is false
   // otherwise the configured Y domain will be overridden by the original domain during set bounds
@@ -78,5 +79,6 @@ AnimatedChartPainter chartPainterAnimated({
     coordFlipped: widget.coordFlipped,
     panXDomain: panXDomain,
     panYDomain: panYDomain,
+    onChartAreaComputed: onChartAreaComputed,
   );
 }

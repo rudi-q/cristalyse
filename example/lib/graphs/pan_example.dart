@@ -297,6 +297,23 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                           boundaryClampingX: boundaryClamping,
                           boundaryClampingY: boundaryClamping,
                         ),
+                        tooltip: TooltipConfig(
+                          builder:
+                              (point) => Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.8),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  '${point.getDisplayValue('x')}: ${point.getDisplayValue('y')} data',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                        ),
                       )
                       .legend(
                         position: LegendPosition.topRight,

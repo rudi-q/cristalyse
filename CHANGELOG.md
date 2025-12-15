@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.17.2 - 2025-12-15
+
+#### 🐛 Bug Fixes
+
+**Fixed Tooltip Offset on Pan:**
+- Fixed an issue where tooltips were offset when panning the chart.
+- Ensured strict synchronization between the painter's plot area and the interaction detector.
+- Implemented `onChartAreaComputed` callback to persist the precise plot area across frame repaints.
+
+---
+
 ## 1.17.1 - 2025-12-10
 
 #### 🐛 Bug Fixes
