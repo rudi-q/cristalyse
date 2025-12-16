@@ -182,7 +182,7 @@ class LinearScale extends Scale {
       final targetLabelCount = (screenLength / pixelsPerLabel).round();
       final targetDensity = targetLabelCount / screenLength; // labels per pixel
 
-      final niceTicks = WilkinsonLabeling.extended(
+      var niceTicks = WilkinsonLabeling.extended(
         bounds.min,
         bounds.max,
         screenLength,
@@ -190,6 +190,34 @@ class LinearScale extends Scale {
         limits: effectiveLimits,
         simpleLinear: _tickConfig?.simpleLinear ?? false,
       );
+
+      // NEW: Integer ticks feature, clamp ticks to integers if requested
+      if (_tickConfig?.integersOnly == true && niceTicks.isNotEmpty) {
+        final minTick = niceTicks.first.ceil();
+        final maxTick = niceTicks.last.floor();
+        if (maxTick >= minTick) {
+          final step = (niceTicks.length > 1)
+              ? (niceTicks[1] - niceTicks[0]).round().abs()
+              : 1;
+          final safeStep = step > 0 ? step : 1;
+          niceTicks = [
+            for (var tick = minTick; tick <= maxTick; tick += safeStep)
+              tick.toDouble()
+          ];
+        } else {
+          // Use the nearest integer to the midpoint, and clamp to effectiveLimits if present
+          final midpoint = (niceTicks.first + niceTicks.last) / 2;
+          int nearest = midpoint.round();
+          // Clamp to effectiveLimits if set
+          double lower = effectiveLimits?.$1 ?? double.negativeInfinity;
+          double upper = effectiveLimits?.$2 ?? double.infinity;
+          if (nearest >= lower && nearest <= upper) {
+            niceTicks = [nearest.toDouble()];
+          } else {
+            niceTicks = [];
+          }
+        }
+      }
 
       if (niceTicks.isNotEmpty) {
         // Cache ticks for getTicks() to avoid recomputing
@@ -562,7 +590,13 @@ class TickConfig {
   /// If true, use simple linear ticks instead of Wilkinson algorithm
   final bool simpleLinear;
 
-  TickConfig({List<double>? ticks, this.simpleLinear = false})
+  /// If true, ticks must be integers only (NEW)
+  final bool integersOnly;
+
+  TickConfig(
+      {List<double>? ticks,
+      this.simpleLinear = false,
+      this.integersOnly = false})
       : assert(
           ticks == null || ticks.isNotEmpty,
           'When provided, ticks must be non-empty.',

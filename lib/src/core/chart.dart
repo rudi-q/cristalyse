@@ -255,21 +255,27 @@ class CristalyseChart {
   CristalyseChart geomBar({
     double? width,
     Color? color,
+    Color? positiveColor,
+    Color? negativeColor,
     double? alpha,
     BarOrientation? orientation,
     BarStyle? style,
     BorderRadius? borderRadius,
     double? borderWidth,
+    bool? roundOutwardEdges,
     YAxis? yAxis,
   }) {
     final barGeom = BarGeometry(
       width: width ?? 0.8,
       color: color,
+      positiveColor: positiveColor,
+      negativeColor: negativeColor,
       alpha: alpha ?? 1.0,
       orientation: orientation ?? BarOrientation.vertical,
       style: style ?? BarStyle.grouped,
       borderRadius: borderRadius,
       borderWidth: borderWidth ?? 0.0,
+      roundOutwardEdges: roundOutwardEdges ?? false,
       yAxis: yAxis ?? YAxis.primary,
     );
     _geometries.add(barGeom);

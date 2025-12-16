@@ -282,6 +282,26 @@ Widget buildLegendExampleTab(
                       itemSpacing: 10.0,
                       borderRadius: 8.0,
                     )
+                    .interaction(
+                      tooltip: TooltipConfig(
+                        builder:
+                            (point) => Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  point.getDisplayValue('product'),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
+                                ),
+                              ],
+                            ),
+                      ),
+                    )
                     .animate(
                       duration: const Duration(milliseconds: 800),
                       curve: Curves.easeInOut,

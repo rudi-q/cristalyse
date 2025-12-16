@@ -1,5 +1,145 @@
 # Changelog
 
+## 1.17.2 - 2025-12-15
+
+#### 🐛 Bug Fixes
+
+**Fixed Tooltip Offset on Pan:**
+- Fixed an issue where tooltips were offset when panning the chart.
+- Ensured strict synchronization between the painter's plot area and the interaction detector.
+- Implemented `onChartAreaComputed` callback to persist the precise plot area across frame repaints.
+
+---
+
+## 1.17.1 - 2025-12-10
+
+#### 🐛 Bug Fixes
+
+**Fixed Tooltips Not Working with Interactive Legends:**
+- Tooltips now correctly appear when hovering over charts with `interactive: true` legends
+- Previously, enabling interactive legends caused tooltips to stop working on line, area, and bar charts
+- Root cause: Filtered chart widget was not wrapped with `ChartTooltipOverlay`
+- Fix: `_buildChartWidget()` now properly wraps filtered charts with tooltip overlay
+
+**Technical Details:**
+- Modified `_buildChartWidget()` in `animated_chart_widget.dart`
+- Wrapped filtered chart content with `ChartTooltipOverlay` when tooltips are enabled
+- Ensures tooltip functionality is preserved during legend toggle operations
+
+**API Example:**
+```dart
+// Now works correctly with both tooltips and interactive legends
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .legend(interactive: true)  // ✅ Tooltips now work with this!
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) => Text('${point.getDisplayValue('product')}: \$${point.getDisplayValue('revenue')}k'),
+    ),
+  )
+  .build()
+```
+
+**Quality Assurance:**
+- All 297 tests passing
+- Zero breaking changes - fully backward compatible
+- Updated example app with interactive legend + tooltip demonstration
+
+---
+
+## 1.17.0 - 2025-12-08
+
+#### 📊 Bar Chart Positive/Negative Value Enhancements
+
+**New Features:**
+- **Smart Rounded Corners**: `roundOutwardEdges` property for conditional corner rounding
+  - Positive bars: Rounded corners on top (vertical) or right (horizontal)
+  - Negative bars: Rounded corners on bottom (vertical) or left (horizontal)
+  - Sharp edges at zero baseline for clean alignment
+  - Works with existing `borderRadius` parameter
+  
+- **Conditional Bar Colors**: Different colors for positive and negative values
+  - New `positiveColor` parameter for bars with values >= 0
+  - New `negativeColor` parameter for bars with values < 0
+  - Intelligent fallback chain: positiveColor/negativeColor → color → colorScale → theme
+  - Perfect for financial charts, variance analysis, and profit/loss visualization
+
+**Technical Implementation:**
+- Added `roundOutwardEdges`, `positiveColor`, and `negativeColor` to `BarGeometry`
+- Updated `CristalyseChart.geomBar()` API with new parameters
+- Implemented `_computeOutwardRRect()` helper method to eliminate code duplication
+- Enhanced `_drawSingleBar()` with value-based conditional rendering logic
+- Fixed negative bar rendering bug (bars extending below zero baseline)
+
+**API Example:**
+```dart
+final profitLossData = [
+  {'month': 'Jan', 'pnl': 45000.0},
+  {'month': 'Feb', 'pnl': -12000.0},
+  {'month': 'Mar', 'pnl': 67000.0},
+  {'month': 'Apr', 'pnl': -8000.0},
+];
+
+CristalyseChart()
+  .data(profitLossData)
+  .mapping(x: 'month', y: 'pnl')
+  .geomBar(
+    borderRadius: BorderRadius.circular(12),
+    roundOutwardEdges: true,        // Smart rounding
+    positiveColor: Colors.green,    // Gains
+    negativeColor: Colors.red,      // Losses
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous()
+  .build()
+```
+
+**Bug Fixes:**
+- Fixed negative bar rendering (bars extending below zero were not displaying)
+- Corrected bar rect calculation to handle negative heights properly
+
+**Documentation:**
+- Updated `bar-charts.mdx` with comprehensive examples
+- Added "Positive/Negative Value Styling" section with financial dashboard example
+- Code quality improvements: extracted helper method, const optimizations, top-level const data
+
+**Quality Assurance:**
+- Zero breaking changes - fully backward compatible
+- All new parameters are optional (default to `false`/`null`)
+- `flutter analyze` passes with no issues
+- Example app updated with live demonstration
+
+---
+
+## 1.16.0 - 2025-11-27
+
+#### 📏 Integer-Only Ticks
+
+**New Features:**
+- **Integer-Only Ticks**: Force axis ticks to be integers
+  - New `integersOnly` parameter in `TickConfig`
+  - Automatically clamps ticks to integer values
+  - Ensures step size is at least 1
+  - Ideal for count data (people, items, events) where fractional values don't make sense
+
+**Technical Implementation:**
+- Updated `TickConfig` to include `integersOnly` property
+- Enhanced `LinearScale` to respect integer constraints during tick generation
+
+**API Example:**
+```dart
+CristalyseChart()
+  .scaleYContinuous(
+    tickConfig: TickConfig(
+      integersOnly: true, // No more 1.5 people!
+    ),
+  )
+```
+
+---
+
 ## 1.15.0 - 2025-11-11
 
 #### 🔍 Zoom & Pan Interactions

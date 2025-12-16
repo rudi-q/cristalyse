@@ -75,20 +75,26 @@ class LineGeometry extends Geometry {
 class BarGeometry extends Geometry {
   final double width;
   final Color? color;
+  final Color? positiveColor;
+  final Color? negativeColor;
   final double alpha;
   final BarOrientation orientation;
   final BarStyle style;
   final BorderRadius? borderRadius;
   final double borderWidth;
+  final bool roundOutwardEdges;
 
   BarGeometry({
     this.width = 0.8,
     this.color,
+    this.positiveColor,
+    this.negativeColor,
     this.alpha = 1.0,
     this.orientation = BarOrientation.vertical,
     this.style = BarStyle.grouped,
     this.borderRadius,
     this.borderWidth = 0.0,
+    this.roundOutwardEdges = false,
     super.yAxis,
     super.interactive,
   });
