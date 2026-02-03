@@ -36,7 +36,7 @@ Widget buildBarChartTab(
           child:
               CristalyseChart()
                   .data(data)
-                  .mapping(x: 'quarter', y: 'revenue')
+                  .mapping(x: 'quarter', y: 'revenue', color: 'bar')
                   .geomBar(width: sliderValue.clamp(0.1, 1.0), alpha: 0.8)
                   .scaleXOrdinal()
                   .scaleYContinuous(min: 0)

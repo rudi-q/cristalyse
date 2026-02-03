@@ -270,9 +270,8 @@ class OrdinalScale extends Scale {
     }
 
     final totalRange = _range[1] - _range[0];
-    final totalPadding = _padding * totalRange;
-    final availableSpace = totalRange - totalPadding;
-    _bandWidth = availableSpace / _domain.length;
+    final step = totalRange / _domain.length;
+    _bandWidth = step * (1 - _padding);
   }
 
   @override
@@ -281,11 +280,10 @@ class OrdinalScale extends Scale {
     if (index == -1) return _range[0];
 
     final totalRange = _range[1] - _range[0];
-    final paddingSpace = _padding * totalRange / 2; // Split padding
+    final step = totalRange / _domain.length;
 
-    return _range[0] +
-        paddingSpace +
-        index * (_bandWidth + _padding * totalRange / _domain.length);
+    // Position at start of band: offset into step by half the padding fraction
+    return _range[0] + index * step + (_padding * step / 2);
   }
 
   /// Get the center position of a band
@@ -337,13 +335,12 @@ class OrdinalScale extends Scale {
     if (_domain.isEmpty) return null;
 
     final totalRange = _range[1] - _range[0];
-    final paddingSpace = _padding * totalRange / 2;
-    final effectiveValue = screenValue - _range[0] - paddingSpace;
+    final step = totalRange / _domain.length;
+    final effectiveValue = screenValue - _range[0];
 
     if (effectiveValue < 0) return _domain.first;
 
-    final bandWithPadding = _bandWidth + _padding * totalRange / _domain.length;
-    final index = (effectiveValue / bandWithPadding).floor();
+    final index = (effectiveValue / step).floor();
 
     if (index >= _domain.length) return _domain.last;
     return _domain[index];
