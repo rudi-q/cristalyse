@@ -134,18 +134,18 @@ class _ChartScreenState extends State<ChartScreen>
 
     // Realistic bar chart - Quarterly Revenue
     final quarters = [
-      'Jan 2024',
-      'Feb 2024',
-      'Mar 2024',
-      'Apr 2024',
-      'May 2024',
-      'Jun 2024',
-      'Jul 2024',
-      'Aug 2024',
-      'Sep 2024',
-      'Oct 2024',
-      'Nov 2024',
-      'Dec 2024',
+      'Q1 2023',
+      'Q2 2023',
+      'Q3 2023',
+      'Q4 2023',
+      'Q1 2024',
+      'Q2 2024',
+      'Q3 2024',
+      'Q4 2024',
+      'Q1 2025',
+      'Q2 2025',
+      'Q3 2025',
+      'Q4 2025',
     ];
     _barChartData =
         quarters.asMap().entries.map((entry) {
