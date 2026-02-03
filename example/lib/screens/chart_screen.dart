@@ -134,34 +134,36 @@ class _ChartScreenState extends State<ChartScreen>
 
     // Realistic bar chart - Quarterly Revenue
     final quarters = [
-      'Q1 2024',
-      'Q2 2024',
-      'Q3 2024',
-      'Q4 2024',
-      'Q5 2024',
-      'Q6 2024',
-      'Q7 2024',
-      'Q8 2024',
-      'Q9 2024',
-      'Q10 2024',
+      'Jan 2024',
+      'Feb 2024',
+      'Mar 2024',
+      'Apr 2024',
+      'May 2024',
+      'Jun 2024',
+      'Jul 2024',
+      'Aug 2024',
+      'Sep 2024',
+      'Oct 2024',
+      'Nov 2024',
+      'Dec 2024',
     ];
     _barChartData =
         quarters.asMap().entries.map((entry) {
           final revenue =
               120 + entry.key * 25 + math.Random().nextDouble() * 20;
-          return {
-            'quarter': entry.value,
-            'revenue': revenue,
-            'bar': 'Bar 1',
-          };
+          return {'quarter': entry.value, 'revenue': revenue, 'bar': 'Bar 1'};
         }).toList();
-    _barChartData.addAll(quarters
-        .map((e) => {
+    _barChartData.addAll(
+      quarters
+          .map(
+            (e) => {
               'quarter': e,
               'revenue': 120 + math.Random().nextDouble() * 20,
               'bar': 'Bar 2',
-            })
-        .toList());
+            },
+          )
+          .toList(),
+    );
 
     // Realistic grouped bar data - Product Performance
     final products = ['Mobile App', 'Web Platform', 'API Services'];
