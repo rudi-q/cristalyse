@@ -3,7 +3,11 @@ import 'dart:math' as math;
 import 'package:cristalyse/cristalyse.dart';
 import 'package:flutter/material.dart';
 
-Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
+Widget buildBubbleChartTab(
+  BuildContext context,
+  ChartTheme theme,
+  double sliderValue,
+) {
   // Use proper bubble data generation without random values on each render
   final bubbleData = _generateBubbleData();
 
@@ -31,9 +35,9 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
     colorPalette: theme.colorPalette, // Use theme's actual color palette
     padding: theme.padding,
     axisTextStyle: theme.axisTextStyle,
-    axisLabelStyle: const TextStyle(
+    axisLabelStyle: TextStyle(
       fontSize: 11,
-      color: Colors.black87,
+      color: theme.axisColor,
       fontWeight: FontWeight.w500,
     ),
   );
@@ -57,7 +61,10 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
             const SizedBox(height: 8),
             SelectableText(
               'Company performance metrics: Revenue vs Customer base',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -65,7 +72,7 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -93,7 +100,9 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
                           0.75, // Slightly transparent for overlapping bubbles
                       borderWidth: 2.0,
                       borderColor:
-                          Colors.white, // White border for better contrast
+                          Theme.of(context)
+                              .colorScheme
+                              .surface, // Match background for better contrast
                       shape: PointShape.circle,
                       showLabels: false, // Clean look with tooltips
                     )
@@ -107,7 +116,9 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
                     .legend(
                       position: LegendPosition.right,
                       interactive: true,
-                      backgroundColor: Colors.white.withValues(alpha: 0.95),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.surface.withValues(alpha: 0.95),
                       borderRadius: 8.0,
                       symbolSize: 14.0,
                       itemSpacing: 10.0,
@@ -254,13 +265,21 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.blue[50],
+            color: Theme.of(context).colorScheme.primaryContainer,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.blue[200]!),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.3),
+            ),
           ),
           child: Row(
             children: [
-              Icon(Icons.insights, size: 20, color: Colors.blue[700]),
+              Icon(
+                Icons.insights,
+                size: 20,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -271,7 +290,7 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: Colors.blue[900],
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -282,7 +301,7 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
                       '• Click legend items to show/hide categories',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.blue[700],
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                         height: 1.4,
                       ),
                     ),

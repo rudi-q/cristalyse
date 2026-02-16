@@ -693,7 +693,7 @@ class _ChartScreenState extends State<ChartScreen> {
           colorPalette: _colorPalettes[_currentPaletteIndex],
         );
       case 5:
-        return buildBubbleChartTab(currentTheme, _sliderValue);
+        return buildBubbleChartTab(context, currentTheme, _sliderValue);
       case 6:
         return buildBarChartTab(currentTheme, _barChartData, _sliderValue);
       case 7:
