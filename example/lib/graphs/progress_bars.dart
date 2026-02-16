@@ -7,7 +7,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Progress Bars Showcase',
           style: TextStyle(
             fontSize: 18,
@@ -16,14 +16,14 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        const SelectableText(
           'Horizontal, vertical, and circular progress bars with animations',
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(height: 16),
 
         // Horizontal Progress Bars
-        Text(
+        SelectableText(
           'Horizontal Progress Bars',
           style: TextStyle(
             fontSize: 16,
@@ -59,7 +59,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
         const SizedBox(height: 24),
 
         // Vertical Progress Bars
-        Text(
+        SelectableText(
           'Vertical Progress Bars',
           style: TextStyle(
             fontSize: 16,
@@ -96,7 +96,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
         const SizedBox(height: 24),
 
         // Circular Progress Bars
-        Text(
+        SelectableText(
           'Circular Progress Bars',
           style: TextStyle(
             fontSize: 16,
@@ -131,7 +131,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
         const SizedBox(height: 24),
 
         // Stacked Progress Bars
-        Text(
+        SelectableText(
           'Stacked Progress Bars',
           style: TextStyle(
             fontSize: 16,
@@ -173,7 +173,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
         const SizedBox(height: 24),
 
         // Grouped Progress Bars
-        Text(
+        SelectableText(
           'Grouped Progress Bars',
           style: TextStyle(
             fontSize: 16,
@@ -211,7 +211,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
         const SizedBox(height: 24),
 
         // Gauge Progress Bars
-        Text(
+        SelectableText(
           'Gauge/Speedometer Progress',
           style: TextStyle(
             fontSize: 16,
@@ -251,7 +251,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
         const SizedBox(height: 24),
 
         // Concentric Progress Bars
-        Text(
+        SelectableText(
           'Concentric Ring Progress',
           style: TextStyle(
             fontSize: 16,
@@ -287,7 +287,7 @@ Widget buildProgressBarsTab(ChartTheme currentTheme, double sliderValue) {
         ),
         const SizedBox(height: 16),
 
-        const Text(
+        const SelectableText(
           '• Horizontal bars grow from left to right with gradient fill\n'
           '• Vertical bars grow from bottom to top with solid colors\n'
           '• Circular progress shows completion as arcs from 12 o\'clock\n'

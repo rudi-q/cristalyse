@@ -11,7 +11,7 @@ Widget buildDualAxisTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Dual Y-Axis Chart',
           style: TextStyle(
             fontSize: 18,
@@ -20,7 +20,7 @@ Widget buildDualAxisTab(
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        const SelectableText(
           'Revenue (bars, left axis) vs Conversion Rate (line, right axis)',
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
@@ -85,7 +85,7 @@ Widget buildDualAxisTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Bars show revenue (left Y-axis in \$K format)\n• Line shows conversion rate (right Y-axis in %)\n• Two independent scales for different data ranges\n• Perfect for correlating volume vs efficiency metrics',
         ),
       ],

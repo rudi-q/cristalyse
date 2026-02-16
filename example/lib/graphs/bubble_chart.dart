@@ -46,7 +46,7 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            SelectableText(
               'Market Analysis Dashboard',
               style: TextStyle(
                 fontSize: 20,
@@ -55,7 +55,7 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
+            SelectableText(
               'Company performance metrics: Revenue vs Customer base',
               style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
@@ -180,7 +180,7 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
                                       ),
                                       const SizedBox(width: 8),
                                       Expanded(
-                                        child: Text(
+                                        child: SelectableText(
                                           name,
                                           style: const TextStyle(
                                             color: Colors.white,
@@ -202,7 +202,7 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
                                             12,
                                           ),
                                         ),
-                                        child: Text(
+                                        child: SelectableText(
                                           category,
                                           style: const TextStyle(
                                             color: Colors.white,
@@ -266,7 +266,7 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    SelectableText(
                       'Interactive Chart',
                       style: TextStyle(
                         fontSize: 13,
@@ -275,7 +275,7 @@ Widget buildBubbleChartTab(ChartTheme theme, double sliderValue) {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
+                    SelectableText(
                       '• Bubble size indicates market share percentage\n'
                       '• Hover over bubbles to see detailed metrics\n'
                       '• Color represents company category\n'
@@ -302,9 +302,9 @@ Widget _buildMetricRow(IconData icon, String label, String value, Color color) {
     children: [
       Icon(icon, size: 16, color: color),
       const SizedBox(width: 8),
-      Text(label, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+      SelectableText(label, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
       const Spacer(),
-      Text(
+      SelectableText(
         value,
         style: const TextStyle(
           color: Colors.white,

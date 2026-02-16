@@ -536,7 +536,7 @@ class _ChartScreenState extends State<ChartScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          SelectableText(
             title,
             style: TextStyle(
               fontSize: 10,
@@ -545,7 +545,7 @@ class _ChartScreenState extends State<ChartScreen> {
             ),
           ),
           const SizedBox(height: 2),
-          Text(
+          SelectableText(
             value,
             style: TextStyle(
               fontSize: 16,
@@ -553,7 +553,7 @@ class _ChartScreenState extends State<ChartScreen> {
               color: color,
             ),
           ),
-          Text(
+          SelectableText(
             change,
             style: TextStyle(
               fontSize: 9,
@@ -600,7 +600,7 @@ class _ChartScreenState extends State<ChartScreen> {
                           size: 18,
                         ),
                         const SizedBox(width: 8),
-                        Text(
+                        SelectableText(
                           'Chart Controls',
                           style: TextStyle(
                             fontSize: 14,
@@ -626,7 +626,7 @@ class _ChartScreenState extends State<ChartScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              SelectableText(
                                 _getDisplayedValue(),
                                 style: TextStyle(
                                   fontSize: 12,
@@ -959,7 +959,7 @@ class _ChartScreenState extends State<ChartScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                const SelectableText(
                   'Chart Gallery',
                   style: TextStyle(
                     color: Colors.white,
@@ -1013,7 +1013,7 @@ class _ChartScreenState extends State<ChartScreen> {
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
+                        child: const SelectableText(
                           'New',
                           style: TextStyle(
                             color: Colors.white,
@@ -1034,7 +1034,7 @@ class _ChartScreenState extends State<ChartScreen> {
                           color: Colors.orange,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
+                        child: const SelectableText(
                           'Exp',
                           style: TextStyle(
                             color: Colors.white,
@@ -1046,7 +1046,7 @@ class _ChartScreenState extends State<ChartScreen> {
                     ],
                   ],
                 ),
-                subtitle: Text(
+                subtitle: SelectableText(
                   route.description,
                   style: TextStyle(
                     fontSize: 12,
@@ -1127,7 +1127,7 @@ class _ChartScreenState extends State<ChartScreen> {
                                 else
                                   const SizedBox(width: 16),
                                 const SizedBox(width: 8),
-                                Text(entry.value),
+                                SelectableText(entry.value),
                               ],
                             ),
                           ),
@@ -1164,7 +1164,7 @@ class _ChartScreenState extends State<ChartScreen> {
                                 else
                                   const SizedBox(width: 16),
                                 const SizedBox(width: 8),
-                                Text(entry.value),
+                                SelectableText(entry.value),
                                 const SizedBox(width: 12),
                                 Row(
                                   children:
@@ -1228,7 +1228,7 @@ class _ChartScreenState extends State<ChartScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
+                            SelectableText(
                               chartTitles[widget.chartIndex],
                               style: const TextStyle(
                                 fontSize: 24,
@@ -1236,7 +1236,7 @@ class _ChartScreenState extends State<ChartScreen> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            Text(
+                            SelectableText(
                               chartDescriptions[widget.chartIndex],
                               style: TextStyle(
                                 fontSize: 14,
@@ -1321,7 +1321,7 @@ class _ChartScreenState extends State<ChartScreen> {
                               size: 18,
                             ),
                             const SizedBox(width: 8),
-                            Text(
+                            SelectableText(
                               'Chart Features',
                               style: TextStyle(
                                 fontSize: 14,
@@ -1365,7 +1365,7 @@ class _ChartScreenState extends State<ChartScreen> {
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: Text(
+                        child: SelectableText(
                           feature,
                           style: TextStyle(
                             fontSize: 13,
@@ -1389,7 +1389,7 @@ class _ChartScreenState extends State<ChartScreen> {
     return OutlinedButton.icon(
       onPressed: () => _launchUrl(docsUrl),
       icon: const Icon(CupertinoIcons.book, size: 18),
-      label: const Text(
+      label: const SelectableText(
         'View Docs',
         style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
       ),
@@ -1415,7 +1415,7 @@ class _ChartScreenState extends State<ChartScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Could not open documentation: $urlString'),
+            content: SelectableText('Could not open documentation: $urlString'),
             backgroundColor: Colors.red,
           ),
         );

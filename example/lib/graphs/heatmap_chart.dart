@@ -101,7 +101,7 @@ class HeatMapExample extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    SelectableText(
                       'Weekly Activity Heatmap',
                       style: TextStyle(
                         fontSize: 16,
@@ -109,7 +109,7 @@ class HeatMapExample extends StatelessWidget {
                         color: theme.axisColor,
                       ),
                     ),
-                    Text(
+                    SelectableText(
                       'User engagement patterns throughout the week',
                       style: TextStyle(
                         fontSize: 12,
@@ -122,7 +122,7 @@ class HeatMapExample extends StatelessWidget {
               // Inline legend to save space
               Row(
                 children: [
-                  Text(
+                  SelectableText(
                     '0%',
                     style: TextStyle(
                       fontSize: 10,
@@ -139,7 +139,7 @@ class HeatMapExample extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Text(
+                  SelectableText(
                     '100%',
                     style: TextStyle(
                       fontSize: 10,
@@ -245,7 +245,7 @@ class ContributionHeatMap extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              SelectableText(
                 'Contribution Activity',
                 style: TextStyle(
                   fontSize: 18,
@@ -254,7 +254,7 @@ class ContributionHeatMap extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
+              SelectableText(
                 'Code contributions over the last 12 weeks',
                 style: TextStyle(
                   fontSize: 14,
@@ -296,7 +296,7 @@ class ContributionHeatMap extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(
+              SelectableText(
                 'Less',
                 style: TextStyle(
                   fontSize: 10,
@@ -317,7 +317,7 @@ class ContributionHeatMap extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
-              Text(
+              SelectableText(
                 'More',
                 style: TextStyle(
                   fontSize: 10,

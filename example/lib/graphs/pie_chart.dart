@@ -20,7 +20,7 @@ Widget buildPieChartTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Revenue Distribution - Percentage Display',
           style: TextStyle(
             fontSize: 18,
@@ -51,11 +51,11 @@ Widget buildPieChartTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Slices animate in with staggered timing\n• Percentages shown on labels\n• Smooth elastic animation curve',
         ),
         const SizedBox(height: 32),
-        Text(
+        SelectableText(
           'User Distribution - Donut Chart with Compact Number Formatting',
           style: TextStyle(
             fontSize: 18,
@@ -90,7 +90,7 @@ Widget buildPieChartTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Donut chart with inner radius\n• Shows actual values instead of percentages\n• Different animation curve\n• Uses NumberFormat.compact() formatting',
         ),
       ],

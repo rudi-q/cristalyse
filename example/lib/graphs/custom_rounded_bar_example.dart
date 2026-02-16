@@ -15,7 +15,7 @@ class CustomRoundedBarExample extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Custom Rounded Bars')),
+      appBar: AppBar(title: const SelectableText('Custom Rounded Bars')),
       body: Center(
         child: SizedBox(
           height: 400,

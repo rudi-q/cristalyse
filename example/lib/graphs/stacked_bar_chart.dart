@@ -12,7 +12,7 @@ Widget buildStackedBarTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Revenue Breakdown by Category',
           style: TextStyle(
             fontSize: 18,
@@ -21,7 +21,7 @@ Widget buildStackedBarTab(
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        const SelectableText(
           'Stacked segments showing part-to-whole relationships with currency formatting',
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
@@ -56,7 +56,7 @@ Widget buildStackedBarTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Segments stack on top of each other\n• Each color represents a different category\n• Right-side legend shows revenue categories\n• Direct NumberFormat.simpleCurrency() usage\n• Great for showing part-to-whole relationships\n• Animated segment-by-segment building',
         ),
       ],

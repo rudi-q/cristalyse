@@ -11,7 +11,7 @@ Widget buildScatterPlotTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Animated Scatter Plot',
           style: TextStyle(
             fontSize: 18,
@@ -45,7 +45,7 @@ Widget buildScatterPlotTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Points animate in with staggered timing\n• Size and color mapped to data\n• Top-right legend shows categories\n• Smooth elastic animation curve',
         ),
       ],

@@ -105,18 +105,18 @@ class _ExportDemoState extends State<ExportDemo> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      SelectableText(
                         point.getDisplayValue('month'),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
+                      SelectableText(
                         'Revenue: \$${point.getDisplayValue('revenue')}k',
                         style: const TextStyle(color: Colors.white),
                       ),
-                      Text(
+                      SelectableText(
                         'Users: ${point.getDisplayValue('users')}',
                         style: const TextStyle(color: Colors.white),
                       ),
@@ -149,7 +149,7 @@ class _ExportDemoState extends State<ExportDemo> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
+            content: SelectableText(
               'Chart exported successfully!\nSaved to: ${result.filePath}',
             ),
             backgroundColor: Colors.green,
@@ -165,7 +165,7 @@ class _ExportDemoState extends State<ExportDemo> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Export failed: $e'),
+            content: SelectableText('Export failed: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -180,7 +180,7 @@ class _ExportDemoState extends State<ExportDemo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          SelectableText(
             'Chart Export Demo',
             style: TextStyle(
               fontSize: 24,
@@ -189,7 +189,7 @@ class _ExportDemoState extends State<ExportDemo> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          const SelectableText(
             'Export your charts as scalable SVG vector graphics for reports and presentations.',
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
@@ -218,7 +218,7 @@ class _ExportDemoState extends State<ExportDemo> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  const SelectableText(
                     'Export Options',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -229,7 +229,7 @@ class _ExportDemoState extends State<ExportDemo> {
                     child: ElevatedButton.icon(
                       onPressed: _isExporting ? null : _exportAsSvg,
                       icon: const Icon(Icons.photo_filter),
-                      label: const Text('Export as SVG'),
+                      label: const SelectableText('Export as SVG'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.colorPalette[1],
                         foregroundColor: Colors.white,
@@ -255,7 +255,7 @@ class _ExportDemoState extends State<ExportDemo> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                         SizedBox(width: 12),
-                        Text('Exporting chart...'),
+                        SelectableText('Exporting chart...'),
                       ],
                     ),
                   ],
@@ -272,18 +272,18 @@ class _ExportDemoState extends State<ExportDemo> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          const SelectableText(
                             'Last Export Result:',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
-                          Text(
+                          SelectableText(
                             'Format: ${_lastExportResult!.format.name.toUpperCase()}',
                           ),
-                          Text(
+                          SelectableText(
                             'Dimensions: ${_lastExportResult!.dimensions.width.toInt()} × ${_lastExportResult!.dimensions.height.toInt()}',
                           ),
-                          Text(
+                          SelectableText(
                             'File Size: ${(_lastExportResult!.fileSizeBytes / 1024).toStringAsFixed(1)} KB',
                           ),
                           Text(
@@ -310,7 +310,7 @@ class _ExportDemoState extends State<ExportDemo> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  const SelectableText(
                     'Usage Examples',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -324,12 +324,12 @@ class _ExportDemoState extends State<ExportDemo> {
                     child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        SelectableText(
                           'Simple SVG Export:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 4),
-                        Text(
+                        SelectableText(
                           'final result = await chart.exportAsSvg(\\n'
                           '  width: 1200,\\n'
                           '  height: 800,\\n'
@@ -341,12 +341,12 @@ class _ExportDemoState extends State<ExportDemo> {
                           ),
                         ),
                         SizedBox(height: 16),
-                        Text(
+                        SelectableText(
                           'SVG Benefits:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 4),
-                        Text(
+                        SelectableText(
                           '• Scalable vector graphics\\n'
                           '• Small file sizes\\n'
                           '• Perfect for presentations\\n'
