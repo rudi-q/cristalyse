@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:cristalyse/cristalyse.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -411,7 +412,7 @@ class _ChartScreenState extends State<ChartScreen>
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.w500,
-              color: Colors.grey[600],
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 2),
@@ -427,7 +428,7 @@ class _ChartScreenState extends State<ChartScreen>
             change,
             style: TextStyle(
               fontSize: 9,
-              color: Colors.green[600],
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.green[400] : Colors.green[600],
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -462,7 +463,7 @@ class _ChartScreenState extends State<ChartScreen>
                     Row(
                       children: [
                         Icon(
-                          Icons.tune,
+                          CupertinoIcons.slider_horizontal_3,
                           color: Theme.of(context).primaryColor,
                           size: 18,
                         ),
@@ -479,7 +480,7 @@ class _ChartScreenState extends State<ChartScreen>
                         IconButton(
                           onPressed:
                               () => setState(() => _showControls = false),
-                          icon: const Icon(Icons.keyboard_arrow_up),
+                          icon: const Icon(CupertinoIcons.chevron_up),
                           iconSize: 18,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -498,7 +499,7 @@ class _ChartScreenState extends State<ChartScreen>
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.grey[700],
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               SliderTheme(
@@ -946,7 +947,7 @@ class _ChartScreenState extends State<ChartScreen>
                   route.description,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isSelected ? Colors.grey[300] : Colors.grey[600],
+                    color: isSelected ? Colors.grey[300] : Colors.grey[500],
                   ),
                 ),
                 onTap: () {
@@ -993,11 +994,6 @@ class _ChartScreenState extends State<ChartScreen>
           ],
         ),
         actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.list_alt),
-            tooltip: 'Jump to Chart',
-            onSelected: (route) {
-              context.go(route);
             },
             itemBuilder:
                 (context) =>
@@ -1035,7 +1031,7 @@ class _ChartScreenState extends State<ChartScreen>
           ),
           IconButton(
             onPressed: () => setState(() => _showControls = !_showControls),
-            icon: Icon(_showControls ? Icons.visibility_off : Icons.visibility),
+            icon: Icon(_showControls ? CupertinoIcons.slider_horizontal_below_rectangle : CupertinoIcons.slider_horizontal_3),
           ),
         ],
       ),
@@ -1068,7 +1064,7 @@ class _ChartScreenState extends State<ChartScreen>
                               chartDescriptions[widget.chartIndex],
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey[600],
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 height: 1.3,
                               ),
                             ),
@@ -1141,7 +1137,7 @@ class _ChartScreenState extends State<ChartScreen>
                         Row(
                           children: [
                             Icon(
-                              Icons.auto_awesome,
+                              CupertinoIcons.sparkles,
                               color: Theme.of(context).primaryColor,
                               size: 18,
                             ),
@@ -1247,25 +1243,24 @@ class _ChartScreenState extends State<ChartScreen>
   }
 
   Widget _buildViewDocsButton(String docsUrl) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor.withAlpha(26),
-        borderRadius: BorderRadius.circular(8),
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    return OutlinedButton.icon(
+      onPressed: () => _launchUrl(docsUrl),
+      icon: const Icon(CupertinoIcons.book, size: 18),
+      label: const Text(
+        'View Docs',
+        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
       ),
-      child: OutlinedButton.icon(
-        onPressed: () => _launchUrl(docsUrl),
-        icon: const Icon(Icons.menu_book, size: 18),
-        label: const Text(
-          'View Docs',
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: isDark ? Colors.white70 : theme.primaryColor,
+        backgroundColor: isDark ? Colors.white.withAlpha(20) : theme.primaryColor.withAlpha(26),
+        side: BorderSide(
+          color: isDark ? Colors.white24 : theme.primaryColor,
+          width: isDark ? 1.0 : 2.0,
         ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: Theme.of(context).primaryColor,
-          backgroundColor: Colors.white,
-          side: BorderSide(color: Theme.of(context).primaryColor, width: 2.0),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

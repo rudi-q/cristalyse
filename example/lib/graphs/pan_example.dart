@@ -133,7 +133,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                       'Width: ${(visibleMaxX - visibleMinX).toStringAsFixed(1)} • Events: $totalPanEvents',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[800],
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
