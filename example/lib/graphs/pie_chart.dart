@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 Widget buildPieChartTab(
+  BuildContext context,
   ChartTheme currentTheme,
   List<Map<String, dynamic>> data,
   double sliderValue,
@@ -38,7 +39,7 @@ Widget buildPieChartTab(
                     outerRadius:
                         100.0 + sliderValue * 50.0, // Use slider for radius
                     strokeWidth: 2.0,
-                    strokeColor: Colors.white,
+                    strokeColor: Theme.of(context).scaffoldBackgroundColor,
                     showLabels: true,
                     showPercentages: true, // Show default percentage formatting
                   )
@@ -73,7 +74,7 @@ Widget buildPieChartTab(
                     innerRadius: 60.0, // Creates larger donut hole
                     outerRadius: 120.0,
                     strokeWidth: 3.0,
-                    strokeColor: Colors.white,
+                    strokeColor: Theme.of(context).scaffoldBackgroundColor,
                     showLabels: true,
                     showPercentages:
                         false, // Show formatted user counts instead

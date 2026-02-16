@@ -40,11 +40,9 @@ class ChartScreen extends StatefulWidget {
   State<ChartScreen> createState() => _ChartScreenState();
 }
 
-class _ChartScreenState extends State<ChartScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _fabAnimationController;
-  late Animation<double> _fabAnimation;
+class _ChartScreenState extends State<ChartScreen> {
 
+  bool _hasSetDefaults = false;
   int _currentThemeIndex = 0;
   final _themes = [
     ChartTheme.defaultTheme(),
@@ -53,7 +51,7 @@ class _ChartScreenState extends State<ChartScreen>
     ChartTheme.solarizedDarkTheme(),
   ];
 
-  final _themeNames = ['Default', 'Dark', 'Solarized Light', 'Solarized Dark'];
+  final _themeNames = ['Light (default)', 'Dark', 'Solarized Light', 'Solarized Dark'];
 
   int _currentPaletteIndex = 0;
   final _colorPalettes = [
@@ -94,21 +92,26 @@ class _ChartScreenState extends State<ChartScreen>
   @override
   void initState() {
     super.initState();
-    _fabAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _fabAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(
-        parent: _fabAnimationController,
-        curve: Curves.elasticOut,
-      ),
-    );
 
     _generateSampleData();
     _generateStackedBarData();
     _generateDualAxisData();
-    _fabAnimationController.forward();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasSetDefaults) {
+      _hasSetDefaults = true;
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      if (isDark) {
+        _currentThemeIndex = 1; // Dark theme
+        _currentPaletteIndex = 2; // Cool palette
+      } else {
+        _currentThemeIndex = 0; // Default (light) theme
+        _currentPaletteIndex = 1; // Warm palette
+      }
+    }
   }
 
   void _generateSampleData() {
@@ -297,7 +300,6 @@ class _ChartScreenState extends State<ChartScreen>
 
   @override
   void dispose() {
-    _fabAnimationController.dispose();
     super.dispose();
   }
 
@@ -525,44 +527,6 @@ class _ChartScreenState extends State<ChartScreen>
                             ],
                           ),
                         ),
-                        const SizedBox(width: 20),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${_themeNames[_currentThemeIndex]} • ${_paletteNames[_currentPaletteIndex]}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children:
-                                  _colorPalettes[_currentPaletteIndex]
-                                      .take(4)
-                                      .map(
-                                        (color) => Container(
-                                          width: 16,
-                                          height: 16,
-                                          margin: const EdgeInsets.only(
-                                            right: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: color,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 1.5,
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ],
@@ -610,7 +574,7 @@ class _ChartScreenState extends State<ChartScreen>
       case 9:
         return buildStackedBarTab(currentTheme, _stackedBarData, _sliderValue);
       case 10:
-        return buildPieChartTab(currentTheme, _scatterPlotData, _sliderValue);
+        return buildPieChartTab(context, currentTheme, _scatterPlotData, _sliderValue);
       case 11:
         return buildDualAxisTab(currentTheme, _dualAxisData, _sliderValue);
       case 12:
@@ -635,6 +599,7 @@ class _ChartScreenState extends State<ChartScreen>
         return const AdvancedGradientExample();
       case 19:
         return buildLegendExampleTab(
+          context,
           currentTheme,
           _groupedBarData,
           _sliderValue,
@@ -994,40 +959,90 @@ class _ChartScreenState extends State<ChartScreen>
           ],
         ),
         actions: [
+          // Theme Dropdown
+          PopupMenuButton<int>(
+            icon: const Icon(CupertinoIcons.sun_max),
+            tooltip: 'Theme',
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            onSelected: (int index) {
+              setState(() {
+                _currentThemeIndex = index;
+              });
             },
-            itemBuilder:
-                (context) =>
-                    AppRouter.routes
-                        .map(
-                          (route) => PopupMenuItem(
-                            value: route.path,
-                            child: ListTile(
-                              leading: Icon(route.icon, size: 20),
-                              title: Text(route.title),
-                              subtitle:
-                                  route.isNew
-                                      ? const Text(
-                                        'New!',
-                                        style: TextStyle(
-                                          color: Colors.green,
-                                          fontSize: 10,
-                                        ),
-                                      )
-                                      : route.isExperimental
-                                      ? const Text(
-                                        'Experimental',
-                                        style: TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 10,
-                                        ),
-                                      )
-                                      : null,
-                              dense: true,
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                          ),
-                        )
-                        .toList(),
+            itemBuilder: (context) => _themeNames
+                .asMap()
+                .entries
+                .map(
+                  (entry) => PopupMenuItem<int>(
+                    value: entry.key,
+                    child: Row(
+                      children: [
+                        if (entry.key == _currentThemeIndex)
+                          const Icon(CupertinoIcons.checkmark_alt, size: 16)
+                        else
+                          const SizedBox(width: 16),
+                        const SizedBox(width: 8),
+                        Text(entry.value),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+          // Palette Dropdown
+          PopupMenuButton<int>(
+            icon: const Icon(CupertinoIcons.paintbrush),
+            tooltip: 'Color Palette',
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            onSelected: (int index) {
+              setState(() {
+                _currentPaletteIndex = index;
+              });
+            },
+            itemBuilder: (context) => _paletteNames
+                .asMap()
+                .entries
+                .map(
+                  (entry) => PopupMenuItem<int>(
+                    value: entry.key,
+                    child: Row(
+                      children: [
+                        if (entry.key == _currentPaletteIndex)
+                          const Icon(CupertinoIcons.checkmark_alt, size: 16)
+                        else
+                          const SizedBox(width: 16),
+                        const SizedBox(width: 8),
+                        Text(entry.value),
+                        const SizedBox(width: 12),
+                        Row(
+                          children: _colorPalettes[entry.key]
+                              .take(3)
+                              .map(
+                                (c) => Container(
+                                  width: 12,
+                                  height: 12,
+                                  margin: const EdgeInsets.only(right: 3),
+                                  decoration: BoxDecoration(
+                                    color: c,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[300]!,
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
           ),
           IconButton(
             onPressed: () => setState(() => _showControls = !_showControls),
@@ -1163,45 +1178,6 @@ class _ChartScreenState extends State<ChartScreen>
           ),
         ],
       ),
-      floatingActionButton: AnimatedBuilder(
-        animation: _fabAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _fabAnimation.value,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                FloatingActionButton.extended(
-                  heroTag: "theme_fab",
-                  onPressed: () {
-                    setState(() {
-                      _currentThemeIndex =
-                          (_currentThemeIndex + 1) % _themes.length;
-                    });
-                  },
-                  icon: const Icon(Icons.palette),
-                  label: Text(_themeNames[_currentThemeIndex]),
-                  backgroundColor: Theme.of(context).primaryColor,
-                  foregroundColor: Colors.white,
-                ),
-                const SizedBox(width: 16),
-                FloatingActionButton(
-                  heroTag: "palette_fab",
-                  onPressed: () {
-                    setState(() {
-                      _currentPaletteIndex =
-                          (_currentPaletteIndex + 1) % _colorPalettes.length;
-                    });
-                  },
-                  backgroundColor: _colorPalettes[_currentPaletteIndex].first,
-                  foregroundColor: Colors.white,
-                  child: const Icon(Icons.color_lens),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
     );
   }
 
@@ -1229,7 +1205,7 @@ class _ChartScreenState extends State<ChartScreen>
                           feature,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey[700],
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             height: 1.3,
                           ),
                         ),
