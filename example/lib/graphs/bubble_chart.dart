@@ -302,7 +302,10 @@ Widget _buildMetricRow(IconData icon, String label, String value, Color color) {
     children: [
       Icon(icon, size: 16, color: color),
       const SizedBox(width: 8),
-      SelectableText(label, style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+      SelectableText(
+        label,
+        style: TextStyle(color: Colors.grey[400], fontSize: 12),
+      ),
       const Spacer(),
       SelectableText(
         value,

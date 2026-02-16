@@ -105,7 +105,9 @@ class GradientBarExample extends StatelessWidget {
                 SelectableText('• Custom gradient colors for each category'),
                 SelectableText('• Rounded corners with BorderRadius'),
                 SelectableText('• Smooth back-ease animation'),
-                SelectableText('• Custom Y-axis labels with currency formatting'),
+                SelectableText(
+                  '• Custom Y-axis labels with currency formatting',
+                ),
               ],
             ),
           ],

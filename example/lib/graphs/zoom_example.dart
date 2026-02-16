@@ -173,7 +173,10 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
                       value: ZoomAxis.x,
                       child: SelectableText('X axis (default)'),
                     ),
-                    DropdownMenuItem(value: ZoomAxis.y, child: SelectableText('Y axis')),
+                    DropdownMenuItem(
+                      value: ZoomAxis.y,
+                      child: SelectableText('Y axis'),
+                    ),
                     DropdownMenuItem(
                       value: ZoomAxis.both,
                       child: SelectableText('Both axes'),
