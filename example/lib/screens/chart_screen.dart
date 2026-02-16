@@ -43,51 +43,46 @@ class ChartScreen extends StatefulWidget {
 class _ChartScreenState extends State<ChartScreen> {
   bool _hasSetDefaults = false;
   int _currentThemeIndex = 0;
-  final _themes = [
-    ChartTheme.defaultTheme(),
-    ChartTheme.darkTheme(),
-    const ChartTheme(
-      backgroundColor: Colors.white,
-      plotBackgroundColor: Colors.white,
-      primaryColor: Colors.black,
-      borderColor: Colors.black,
-      gridColor: Color(0xFFBDBDBD),
-      axisColor: Colors.black,
-      gridWidth: 0.8,
-      axisWidth: 1.5,
-      pointSizeDefault: 5.0,
-      pointSizeMin: 3.0,
-      pointSizeMax: 14.0,
-      colorPalette: [
-        Color(0xFF0000CC),
-        Color(0xFFCC0000),
-        Color(0xFF007700),
-        Color(0xFFCC6600),
-        Color(0xFF6600CC),
-        Color(0xFF006666),
-      ],
-      padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
-      axisTextStyle: TextStyle(
-        fontSize: 13,
-        color: Colors.black,
-        fontWeight: FontWeight.w600,
-      ),
-      axisLabelStyle: TextStyle(
-        fontSize: 13,
-        color: Colors.black,
-        fontWeight: FontWeight.w600,
+  final List<({String name, ChartTheme theme})> _themeData = [
+    (name: 'Light (default)', theme: ChartTheme.defaultTheme()),
+    (name: 'Dark', theme: ChartTheme.darkTheme()),
+    (
+      name: 'High Contrast',
+      theme: const ChartTheme(
+        backgroundColor: Colors.white,
+        plotBackgroundColor: Colors.white,
+        primaryColor: Colors.black,
+        borderColor: Colors.black,
+        gridColor: Color(0xFFBDBDBD),
+        axisColor: Colors.black,
+        gridWidth: 0.8,
+        axisWidth: 1.5,
+        pointSizeDefault: 5.0,
+        pointSizeMin: 3.0,
+        pointSizeMax: 14.0,
+        colorPalette: [
+          Color(0xFF0000CC),
+          Color(0xFFCC0000),
+          Color(0xFF007700),
+          Color(0xFFCC6600),
+          Color(0xFF6600CC),
+          Color(0xFF006666),
+        ],
+        padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+        axisTextStyle: TextStyle(
+          fontSize: 13,
+          color: Colors.black,
+          fontWeight: FontWeight.w600,
+        ),
+        axisLabelStyle: TextStyle(
+          fontSize: 13,
+          color: Colors.black,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     ),
-    ChartTheme.solarizedLightTheme(),
-    ChartTheme.solarizedDarkTheme(),
-  ];
-
-  final _themeNames = [
-    'Light (default)',
-    'Dark',
-    'High Contrast',
-    'Solarized Light',
-    'Solarized Dark',
+    (name: 'Solarized Light', theme: ChartTheme.solarizedLightTheme()),
+    (name: 'Solarized Dark', theme: ChartTheme.solarizedDarkTheme()),
   ];
 
   int _currentPaletteIndex = 0;
@@ -431,7 +426,7 @@ class _ChartScreenState extends State<ChartScreen> {
   }
 
   ChartTheme get currentTheme {
-    final baseTheme = _themes[_currentThemeIndex];
+    final baseTheme = _themeData[_currentThemeIndex].theme;
     return baseTheme.copyWith(
       colorPalette: _colorPalettes[_currentPaletteIndex],
     );
@@ -1046,7 +1041,7 @@ class _ChartScreenState extends State<ChartScreen> {
                     ],
                   ],
                 ),
-                subtitle: SelectableText(
+                subtitle: Text(
                   route.description,
                   style: TextStyle(
                     fontSize: 12,
@@ -1111,7 +1106,7 @@ class _ChartScreenState extends State<ChartScreen> {
             },
             itemBuilder:
                 (context) =>
-                    _themeNames
+                    _themeData
                         .asMap()
                         .entries
                         .map(
@@ -1127,7 +1122,7 @@ class _ChartScreenState extends State<ChartScreen> {
                                 else
                                   const SizedBox(width: 16),
                                 const SizedBox(width: 8),
-                                SelectableText(entry.value),
+                                Text(entry.value.name),
                               ],
                             ),
                           ),
@@ -1164,7 +1159,7 @@ class _ChartScreenState extends State<ChartScreen> {
                                 else
                                   const SizedBox(width: 16),
                                 const SizedBox(width: 8),
-                                SelectableText(entry.value),
+                                Text(entry.value),
                                 const SizedBox(width: 12),
                                 Row(
                                   children:
@@ -1389,7 +1384,7 @@ class _ChartScreenState extends State<ChartScreen> {
     return OutlinedButton.icon(
       onPressed: () => _launchUrl(docsUrl),
       icon: const Icon(CupertinoIcons.book, size: 18),
-      label: const SelectableText(
+      label: const Text(
         'View Docs',
         style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
       ),
@@ -1415,7 +1410,7 @@ class _ChartScreenState extends State<ChartScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: SelectableText('Could not open documentation: $urlString'),
+            content: Text('Could not open documentation: $urlString'),
             backgroundColor: Colors.red,
           ),
         );
