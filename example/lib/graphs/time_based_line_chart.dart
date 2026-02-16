@@ -29,7 +29,7 @@ class _TimeBasedLineChartWidgetState extends State<TimeBasedLineChartWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SelectableText(
+          Text(
             'Animated Line Chart',
             style: TextStyle(
               fontSize: 18,
@@ -67,7 +67,7 @@ class _TimeBasedLineChartWidgetState extends State<TimeBasedLineChartWidget> {
           ),
           // toggle switch
           SwitchListTile(
-            title: const SelectableText('Use simple linear ticks'),
+            title: const Text('Use simple linear ticks'),
             value: _simpleLinear,
             onChanged: (value) {
               setState(() {

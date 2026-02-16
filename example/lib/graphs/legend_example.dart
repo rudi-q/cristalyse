@@ -13,7 +13,7 @@ Widget buildLegendExampleTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SelectableText(
+        Text(
           'Legend Examples',
           style: TextStyle(
             fontSize: 18,
@@ -22,7 +22,7 @@ Widget buildLegendExampleTab(
           ),
         ),
         const SizedBox(height: 8),
-        SelectableText(
+        Text(
           'Demonstrating different legend positions and configurations',
           style: TextStyle(
             fontSize: 12,
@@ -305,13 +305,13 @@ Widget buildLegendExampleTab(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SelectableText(
+                                Text(
                                   point.getDisplayValue('product'),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SelectableText(
+                                Text(
                                   '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
                                 ),
                               ],
@@ -340,7 +340,7 @@ Widget _buildExampleSection({
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      SelectableText(
+      Text(
         title,
         style: TextStyle(
           fontSize: 16,
@@ -349,7 +349,7 @@ Widget _buildExampleSection({
         ),
       ),
       const SizedBox(height: 4),
-      SelectableText(
+      Text(
         description,
         style: TextStyle(
           fontSize: 13,

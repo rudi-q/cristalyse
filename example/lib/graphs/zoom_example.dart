@@ -171,15 +171,12 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
                   items: const [
                     DropdownMenuItem(
                       value: ZoomAxis.x,
-                      child: SelectableText('X axis (default)'),
+                      child: Text('X axis (default)'),
                     ),
-                    DropdownMenuItem(
-                      value: ZoomAxis.y,
-                      child: SelectableText('Y axis'),
-                    ),
+                    DropdownMenuItem(value: ZoomAxis.y, child: Text('Y axis')),
                     DropdownMenuItem(
                       value: ZoomAxis.both,
-                      child: SelectableText('Both axes'),
+                      child: Text('Both axes'),
                     ),
                   ],
                 ),
@@ -189,7 +186,7 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SelectableText(
+                    Text(
                       'Button step ${_buttonStep.toStringAsFixed(2)}x',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
@@ -207,7 +204,7 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
             ],
           ),
           const SizedBox(height: 12),
-          SelectableText(
+          Text(
             'Scroll sensitivity ${(1000 * _wheelSensitivity).toStringAsFixed(2)}',
             style: Theme.of(context).textTheme.bodySmall,
           ),
@@ -226,7 +223,7 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
                 value: _showButtons,
                 onChanged: (value) => setState(() => _showButtons = value),
               ),
-              const SelectableText('Show floating zoom buttons'),
+              const Text('Show floating zoom buttons'),
             ],
           ),
           const SizedBox(height: 8),
@@ -386,7 +383,7 @@ class _InfoTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SelectableText(
+                  Text(
                     label,
                     style: TextStyle(
                       fontSize: 11,
@@ -395,7 +392,7 @@ class _InfoTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  SelectableText(
+                  Text(
                     value,
                     style: TextStyle(
                       fontSize: 13,
@@ -423,7 +420,7 @@ class _InstructionChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Chip(
       avatar: Icon(icon, size: 16),
-      label: SelectableText(label),
+      label: Text(label),
       side: BorderSide(color: Theme.of(context).dividerColor),
     );
   }

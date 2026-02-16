@@ -55,7 +55,7 @@ class AdvancedGradientExample extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const SelectableText('Advanced Gradient Examples'),
+        title: const Text('Advanced Gradient Examples'),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
       ),

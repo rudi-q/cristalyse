@@ -29,7 +29,7 @@ class DebugGradientExample extends StatelessWidget {
             .build();
 
     return Scaffold(
-      appBar: AppBar(title: const SelectableText('Debug Gradient')),
+      appBar: AppBar(title: const Text('Debug Gradient')),
       body: Center(child: SizedBox(height: 400, child: builtWidget)),
     );
   }

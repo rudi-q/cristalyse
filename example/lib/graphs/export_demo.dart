@@ -105,18 +105,18 @@ class _ExportDemoState extends State<ExportDemo> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SelectableText(
+                      Text(
                         point.getDisplayValue('month'),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SelectableText(
+                      Text(
                         'Revenue: \$${point.getDisplayValue('revenue')}k',
                         style: const TextStyle(color: Colors.white),
                       ),
-                      SelectableText(
+                      Text(
                         'Users: ${point.getDisplayValue('users')}',
                         style: const TextStyle(color: Colors.white),
                       ),
@@ -149,7 +149,7 @@ class _ExportDemoState extends State<ExportDemo> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: SelectableText(
+            content: Text(
               'Chart exported successfully!\nSaved to: ${result.filePath}',
             ),
             backgroundColor: Colors.green,
@@ -165,7 +165,7 @@ class _ExportDemoState extends State<ExportDemo> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: SelectableText('Export failed: $e'),
+            content: Text('Export failed: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -229,7 +229,7 @@ class _ExportDemoState extends State<ExportDemo> {
                     child: ElevatedButton.icon(
                       onPressed: _isExporting ? null : _exportAsSvg,
                       icon: const Icon(Icons.photo_filter),
-                      label: const SelectableText('Export as SVG'),
+                      label: const Text('Export as SVG'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.colorPalette[1],
                         foregroundColor: Colors.white,

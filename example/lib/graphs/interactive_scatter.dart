@@ -302,7 +302,7 @@ class TooltipExamples {
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const SelectableText('Close'),
+                    child: const Text('Close'),
                   ),
                 ],
               ),

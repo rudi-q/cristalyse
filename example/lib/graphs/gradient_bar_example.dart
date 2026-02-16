@@ -52,7 +52,7 @@ class GradientBarExample extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const SelectableText('Gradient Bar Chart Example'),
+        title: const Text('Gradient Bar Chart Example'),
         backgroundColor: Colors.blueGrey,
         foregroundColor: Colors.white,
       ),
