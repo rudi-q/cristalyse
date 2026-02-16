@@ -41,7 +41,6 @@ class ChartScreen extends StatefulWidget {
 }
 
 class _ChartScreenState extends State<ChartScreen> {
-
   bool _hasSetDefaults = false;
   int _currentThemeIndex = 0;
   final _themes = [
@@ -68,8 +67,16 @@ class _ChartScreenState extends State<ChartScreen> {
         Color(0xFF006666),
       ],
       padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
-      axisTextStyle: TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w600),
-      axisLabelStyle: TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w600),
+      axisTextStyle: TextStyle(
+        fontSize: 13,
+        color: Colors.black,
+        fontWeight: FontWeight.w600,
+      ),
+      axisLabelStyle: TextStyle(
+        fontSize: 13,
+        color: Colors.black,
+        fontWeight: FontWeight.w600,
+      ),
     ),
     ChartTheme.solarizedLightTheme(),
     ChartTheme.solarizedDarkTheme(),
@@ -550,7 +557,10 @@ class _ChartScreenState extends State<ChartScreen> {
             change,
             style: TextStyle(
               fontSize: 9,
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.green[400] : Colors.green[600],
+              color:
+                  Theme.of(context).brightness == Brightness.dark
+                      ? Colors.green[400]
+                      : Colors.green[600],
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -621,7 +631,10 @@ class _ChartScreenState extends State<ChartScreen> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               SliderTheme(
@@ -694,7 +707,12 @@ class _ChartScreenState extends State<ChartScreen> {
       case 9:
         return buildStackedBarTab(currentTheme, _stackedBarData, _sliderValue);
       case 10:
-        return buildPieChartTab(context, currentTheme, _scatterPlotData, _sliderValue);
+        return buildPieChartTab(
+          context,
+          currentTheme,
+          _scatterPlotData,
+          _sliderValue,
+        );
       case 11:
         return buildDualAxisTab(currentTheme, _dualAxisData, _sliderValue);
       case 12:
@@ -1091,25 +1109,30 @@ class _ChartScreenState extends State<ChartScreen> {
                 _currentThemeIndex = index;
               });
             },
-            itemBuilder: (context) => _themeNames
-                .asMap()
-                .entries
-                .map(
-                  (entry) => PopupMenuItem<int>(
-                    value: entry.key,
-                    child: Row(
-                      children: [
-                        if (entry.key == _currentThemeIndex)
-                          const Icon(CupertinoIcons.checkmark_alt, size: 16)
-                        else
-                          const SizedBox(width: 16),
-                        const SizedBox(width: 8),
-                        Text(entry.value),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
+            itemBuilder:
+                (context) =>
+                    _themeNames
+                        .asMap()
+                        .entries
+                        .map(
+                          (entry) => PopupMenuItem<int>(
+                            value: entry.key,
+                            child: Row(
+                              children: [
+                                if (entry.key == _currentThemeIndex)
+                                  const Icon(
+                                    CupertinoIcons.checkmark_alt,
+                                    size: 16,
+                                  )
+                                else
+                                  const SizedBox(width: 16),
+                                const SizedBox(width: 8),
+                                Text(entry.value),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
           ),
           // Palette Dropdown
           PopupMenuButton<int>(
@@ -1123,50 +1146,68 @@ class _ChartScreenState extends State<ChartScreen> {
                 _currentPaletteIndex = index;
               });
             },
-            itemBuilder: (context) => _paletteNames
-                .asMap()
-                .entries
-                .map(
-                  (entry) => PopupMenuItem<int>(
-                    value: entry.key,
-                    child: Row(
-                      children: [
-                        if (entry.key == _currentPaletteIndex)
-                          const Icon(CupertinoIcons.checkmark_alt, size: 16)
-                        else
-                          const SizedBox(width: 16),
-                        const SizedBox(width: 8),
-                        Text(entry.value),
-                        const SizedBox(width: 12),
-                        Row(
-                          children: _colorPalettes[entry.key]
-                              .take(3)
-                              .map(
-                                (c) => Container(
-                                  width: 12,
-                                  height: 12,
-                                  margin: const EdgeInsets.only(right: 3),
-                                  decoration: BoxDecoration(
-                                    color: c,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[600]! : Colors.grey[300]!,
-                                      width: 0.5,
-                                    ),
-                                  ),
+            itemBuilder:
+                (context) =>
+                    _paletteNames
+                        .asMap()
+                        .entries
+                        .map(
+                          (entry) => PopupMenuItem<int>(
+                            value: entry.key,
+                            child: Row(
+                              children: [
+                                if (entry.key == _currentPaletteIndex)
+                                  const Icon(
+                                    CupertinoIcons.checkmark_alt,
+                                    size: 16,
+                                  )
+                                else
+                                  const SizedBox(width: 16),
+                                const SizedBox(width: 8),
+                                Text(entry.value),
+                                const SizedBox(width: 12),
+                                Row(
+                                  children:
+                                      _colorPalettes[entry.key]
+                                          .take(3)
+                                          .map(
+                                            (c) => Container(
+                                              width: 12,
+                                              height: 12,
+                                              margin: const EdgeInsets.only(
+                                                right: 3,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: c,
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color:
+                                                      Theme.of(
+                                                                context,
+                                                              ).brightness ==
+                                                              Brightness.dark
+                                                          ? Colors.grey[600]!
+                                                          : Colors.grey[300]!,
+                                                  width: 0.5,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
                                 ),
-                              )
-                              .toList(),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-                .toList(),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList(),
           ),
           IconButton(
             onPressed: () => setState(() => _showControls = !_showControls),
-            icon: Icon(_showControls ? CupertinoIcons.slider_horizontal_below_rectangle : CupertinoIcons.slider_horizontal_3),
+            icon: Icon(
+              _showControls
+                  ? CupertinoIcons.slider_horizontal_below_rectangle
+                  : CupertinoIcons.slider_horizontal_3,
+            ),
           ),
         ],
       ),
@@ -1199,7 +1240,10 @@ class _ChartScreenState extends State<ChartScreen> {
                               chartDescriptions[widget.chartIndex],
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                color:
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                 height: 1.3,
                               ),
                             ),
@@ -1325,7 +1369,8 @@ class _ChartScreenState extends State<ChartScreen> {
                           feature,
                           style: TextStyle(
                             fontSize: 13,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
                             height: 1.3,
                           ),
                         ),
@@ -1350,7 +1395,10 @@ class _ChartScreenState extends State<ChartScreen> {
       ),
       style: OutlinedButton.styleFrom(
         foregroundColor: isDark ? Colors.white70 : theme.primaryColor,
-        backgroundColor: isDark ? Colors.white.withAlpha(20) : theme.primaryColor.withAlpha(26),
+        backgroundColor:
+            isDark
+                ? Colors.white.withAlpha(20)
+                : theme.primaryColor.withAlpha(26),
         side: BorderSide(
           color: isDark ? Colors.white24 : theme.primaryColor,
           width: isDark ? 1.0 : 2.0,

@@ -24,7 +24,13 @@ Widget buildLegendExampleTab(
         const SizedBox(height: 8),
         Text(
           'Demonstrating different legend positions and configurations',
-          style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[700]),
+          style: TextStyle(
+            fontSize: 12,
+            color:
+                Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[400]
+                    : Colors.grey[700],
+          ),
         ),
         const SizedBox(height: 24),
 
@@ -170,7 +176,9 @@ Widget buildLegendExampleTab(
                     .theme(currentTheme)
                     .legend(
                       position: LegendPosition.right,
-                      backgroundColor: currentTheme.backgroundColor.withValues(alpha: 0.95),
+                      backgroundColor: currentTheme.backgroundColor.withValues(
+                        alpha: 0.95,
+                      ),
                       textStyle: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -343,12 +351,17 @@ Widget _buildExampleSection({
       const SizedBox(height: 4),
       Text(
         description,
-        style: TextStyle(fontSize: 13, color: isDark ? Colors.grey[400] : Colors.grey[700]),
+        style: TextStyle(
+          fontSize: 13,
+          color: isDark ? Colors.grey[400] : Colors.grey[700],
+        ),
       ),
       const SizedBox(height: 12),
       Container(
         decoration: BoxDecoration(
-          border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+          border: Border.all(
+            color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: ClipRRect(borderRadius: BorderRadius.circular(8), child: child),
