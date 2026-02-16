@@ -47,36 +47,156 @@ class _ChartScreenState extends State<ChartScreen> {
   final _themes = [
     ChartTheme.defaultTheme(),
     ChartTheme.darkTheme(),
+    const ChartTheme(
+      backgroundColor: Colors.white,
+      plotBackgroundColor: Colors.white,
+      primaryColor: Colors.black,
+      borderColor: Colors.black,
+      gridColor: Color(0xFFBDBDBD),
+      axisColor: Colors.black,
+      gridWidth: 0.8,
+      axisWidth: 1.5,
+      pointSizeDefault: 5.0,
+      pointSizeMin: 3.0,
+      pointSizeMax: 14.0,
+      colorPalette: [
+        Color(0xFF0000CC),
+        Color(0xFFCC0000),
+        Color(0xFF007700),
+        Color(0xFFCC6600),
+        Color(0xFF6600CC),
+        Color(0xFF006666),
+      ],
+      padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+      axisTextStyle: TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w600),
+      axisLabelStyle: TextStyle(fontSize: 13, color: Colors.black, fontWeight: FontWeight.w600),
+    ),
     ChartTheme.solarizedLightTheme(),
     ChartTheme.solarizedDarkTheme(),
   ];
 
-  final _themeNames = ['Light (default)', 'Dark', 'Solarized Light', 'Solarized Dark'];
+  final _themeNames = [
+    'Light (default)',
+    'Dark',
+    'High Contrast',
+    'Solarized Light',
+    'Solarized Dark',
+  ];
 
   int _currentPaletteIndex = 0;
   final _colorPalettes = [
     ChartTheme.defaultTheme().colorPalette,
+    // Warm — fire tones: red → orange → amber → gold
     const [
-      Color(0xfff44336),
-      Color(0xffe91e63),
-      Color(0xff9c27b0),
-      Color(0xff673ab7),
+      Color(0xFFDC2626),
+      Color(0xFFEA580C),
+      Color(0xFFD97706),
+      Color(0xFFCA8A04),
+      Color(0xFF92400E),
     ],
+    // Cool
     const [
       Color(0xff2196f3),
       Color(0xff00bcd4),
       Color(0xff009688),
       Color(0xff4caf50),
     ],
+    // Pastel
     const [
       Color(0xffffb74d),
       Color(0xffff8a65),
       Color(0xffdce775),
       Color(0xffaed581),
     ],
+    // Soft — soft rainbow spanning all hues
+    const [
+      Color(0xFF93C5FD),
+      Color(0xFFF9A8D4),
+      Color(0xFFA5B4FC),
+      Color(0xFF86EFAC),
+      Color(0xFFFDE68A),
+    ],
+    // Ocean
+    const [
+      Color(0xFF0077B6),
+      Color(0xFF00B4D8),
+      Color(0xFF90E0EF),
+      Color(0xFF023E8A),
+      Color(0xFF48CAE4),
+    ],
+    // Earth
+    const [
+      Color(0xFF606C38),
+      Color(0xFFDDA15E),
+      Color(0xFFBC6C25),
+      Color(0xFF283618),
+      Color(0xFFFEFAE0),
+    ],
+    // Neon
+    const [
+      Color(0xFFFF006E),
+      Color(0xFF8338EC),
+      Color(0xFF3A86FF),
+      Color(0xFFFB5607),
+      Color(0xFFFFBE0B),
+    ],
+    // Monochrome
+    const [
+      Color(0xFF212529),
+      Color(0xFF495057),
+      Color(0xFF6C757D),
+      Color(0xFFADB5BD),
+      Color(0xFFDEE2E6),
+    ],
+    // Tropical — vibrant warm-cool contrast
+    const [
+      Color(0xFFFF6B6B),
+      Color(0xFF4ECDC4),
+      Color(0xFFFFE66D),
+      Color(0xFF45B7D1),
+      Color(0xFFF7DC6F),
+    ],
+    // Jewel — deep saturated gemstones
+    const [
+      Color(0xFF1A5276),
+      Color(0xFF922B21),
+      Color(0xFF196F3D),
+      Color(0xFF6C3483),
+      Color(0xFFB9770E),
+    ],
+    // Forest
+    const [
+      Color(0xFF2D6A4F),
+      Color(0xFF40916C),
+      Color(0xFF52B788),
+      Color(0xFF74C69D),
+      Color(0xFF1B4332),
+    ],
+    // Slate
+    const [
+      Color(0xFF334155),
+      Color(0xFF475569),
+      Color(0xFF64748B),
+      Color(0xFF94A3B8),
+      Color(0xFFCBD5E1),
+    ],
   ];
 
-  final _paletteNames = ['Default', 'Warm', 'Cool', 'Pastel'];
+  final _paletteNames = [
+    'Default',
+    'Warm',
+    'Cool',
+    'Pastel',
+    'Soft',
+    'Ocean',
+    'Earth',
+    'Neon',
+    'Monochrome',
+    'Tropical',
+    'Jewel',
+    'Forest',
+    'Slate',
+  ];
 
   double _sliderValue = 0.5;
   bool _showControls = false;
@@ -106,7 +226,7 @@ class _ChartScreenState extends State<ChartScreen> {
       final isDark = Theme.of(context).brightness == Brightness.dark;
       if (isDark) {
         _currentThemeIndex = 1; // Dark theme
-        _currentPaletteIndex = 2; // Cool palette
+        _currentPaletteIndex = 4; // Ocean palette
       } else {
         _currentThemeIndex = 0; // Default (light) theme
         _currentPaletteIndex = 1; // Warm palette
