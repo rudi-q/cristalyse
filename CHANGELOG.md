@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.17.4 - 2026-02-17
+
+#### 🎨 Example App Enhancements
+
+**UI Overhaul & Dark Mode:**
+- **Dark Mode Support**: The example app now intelligently adapts to system brightness settings.
+- **New Palettes**: Added 13 distinct color palettes (Ocean, Warm, Cool, Neon, etc.) and new themes (High Contrast, Solarized).
+- **Gesture Reliability**: Replaced `SelectableText` with `Text` in AppBars, Buttons, and Dropdowns to fix gesture conflicts.
+- **Refactoring**: Converted theme/palette storage to strongly-typed records for better maintainability.
+- **Fixes**: Resolved hardcoded colors in bubble charts for better dark mode visibility.
+
+---
+
 ## 1.17.3 - 2026-02-09
 
 **Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix! 👏

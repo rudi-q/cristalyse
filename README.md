@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.17.3** - Production ready with fixed tooltips for interactive legends, bar chart positive/negative value styling, integer-only ticks, pinch/scroll wheel/button-based zoom, tick configuration, optional Y-axis titles in legends, boundary clamping, programmatic pan controller, interactive floating legends, and intelligent axis bounds
+**Current Version: 1.17.4** - Production ready with fixed tooltips for interactive legends, bar chart positive/negative value styling, integer-only ticks, pinch/scroll wheel/button-based zoom, tick configuration, optional Y-axis titles in legends, boundary clamping, programmatic pan controller, interactive floating legends, and intelligent axis bounds
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
