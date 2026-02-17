@@ -40,7 +40,8 @@ class ChartScreen extends StatefulWidget {
   State<ChartScreen> createState() => _ChartScreenState();
 }
 
-class _ChartScreenState extends State<ChartScreen> {
+class _ChartScreenState extends State<ChartScreen>
+    with SingleTickerProviderStateMixin {
   bool _hasSetDefaults = false;
   int _currentThemeIndex = 0;
   final List<({String name, ChartTheme theme})> _themeData = [
@@ -428,11 +429,6 @@ class _ChartScreenState extends State<ChartScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   ChartTheme get currentTheme {
     final baseTheme = _themeData[_currentThemeIndex].theme;
     return baseTheme.copyWith(
@@ -573,9 +569,9 @@ class _ChartScreenState extends State<ChartScreen> {
   }
 
   Widget _buildControlPanel() {
-    return AnimatedContainer(
+    return AnimatedSize(
       duration: const Duration(milliseconds: 300),
-      height: _showControls ? null : 0,
+      curve: Curves.easeInOut,
       child:
           _showControls
               ? Container(
@@ -962,7 +958,7 @@ class _ChartScreenState extends State<ChartScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const SelectableText(
+                const Text(
                   'Chart Gallery',
                   style: TextStyle(
                     color: Colors.white,
@@ -1016,7 +1012,7 @@ class _ChartScreenState extends State<ChartScreen> {
                           color: Colors.green,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const SelectableText(
+                        child: const Text(
                           'New',
                           style: TextStyle(
                             color: Colors.white,
@@ -1037,7 +1033,7 @@ class _ChartScreenState extends State<ChartScreen> {
                           color: Colors.orange,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const SelectableText(
+                        child: const Text(
                           'Exp',
                           style: TextStyle(
                             color: Colors.white,
