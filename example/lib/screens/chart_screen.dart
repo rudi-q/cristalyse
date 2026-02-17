@@ -86,118 +86,126 @@ class _ChartScreenState extends State<ChartScreen> {
   ];
 
   int _currentPaletteIndex = 0;
-  final _colorPalettes = [
-    ChartTheme.defaultTheme().colorPalette,
-    // Warm — fire tones: red → orange → amber → gold
-    const [
-      Color(0xFFDC2626),
-      Color(0xFFEA580C),
-      Color(0xFFD97706),
-      Color(0xFFCA8A04),
-      Color(0xFF92400E),
-    ],
-    // Cool
-    const [
-      Color(0xff2196f3),
-      Color(0xff00bcd4),
-      Color(0xff009688),
-      Color(0xff4caf50),
-    ],
-    // Pastel
-    const [
-      Color(0xffffb74d),
-      Color(0xffff8a65),
-      Color(0xffdce775),
-      Color(0xffaed581),
-    ],
-    // Soft — soft rainbow spanning all hues
-    const [
-      Color(0xFF93C5FD),
-      Color(0xFFF9A8D4),
-      Color(0xFFA5B4FC),
-      Color(0xFF86EFAC),
-      Color(0xFFFDE68A),
-    ],
-    // Ocean
-    const [
-      Color(0xFF0077B6),
-      Color(0xFF00B4D8),
-      Color(0xFF90E0EF),
-      Color(0xFF023E8A),
-      Color(0xFF48CAE4),
-    ],
-    // Earth
-    const [
-      Color(0xFF606C38),
-      Color(0xFFDDA15E),
-      Color(0xFFBC6C25),
-      Color(0xFF283618),
-      Color(0xFFFEFAE0),
-    ],
-    // Neon
-    const [
-      Color(0xFFFF006E),
-      Color(0xFF8338EC),
-      Color(0xFF3A86FF),
-      Color(0xFFFB5607),
-      Color(0xFFFFBE0B),
-    ],
-    // Monochrome
-    const [
-      Color(0xFF212529),
-      Color(0xFF495057),
-      Color(0xFF6C757D),
-      Color(0xFFADB5BD),
-      Color(0xFFDEE2E6),
-    ],
-    // Tropical — vibrant warm-cool contrast
-    const [
-      Color(0xFFFF6B6B),
-      Color(0xFF4ECDC4),
-      Color(0xFFFFE66D),
-      Color(0xFF45B7D1),
-      Color(0xFFF7DC6F),
-    ],
-    // Jewel — deep saturated gemstones
-    const [
-      Color(0xFF1A5276),
-      Color(0xFF922B21),
-      Color(0xFF196F3D),
-      Color(0xFF6C3483),
-      Color(0xFFB9770E),
-    ],
-    // Forest
-    const [
-      Color(0xFF2D6A4F),
-      Color(0xFF40916C),
-      Color(0xFF52B788),
-      Color(0xFF74C69D),
-      Color(0xFF1B4332),
-    ],
-    // Slate
-    const [
-      Color(0xFF334155),
-      Color(0xFF475569),
-      Color(0xFF64748B),
-      Color(0xFF94A3B8),
-      Color(0xFFCBD5E1),
-    ],
-  ];
-
-  final _paletteNames = [
-    'Default',
-    'Warm',
-    'Cool',
-    'Pastel',
-    'Soft',
-    'Ocean',
-    'Earth',
-    'Neon',
-    'Monochrome',
-    'Tropical',
-    'Jewel',
-    'Forest',
-    'Slate',
+  final List<({String name, List<Color> colors})> _paletteData = [
+    (name: 'Default', colors: ChartTheme.defaultTheme().colorPalette),
+    (
+      name: 'Warm',
+      colors: const [
+        Color(0xFFDC2626),
+        Color(0xFFEA580C),
+        Color(0xFFD97706),
+        Color(0xFFCA8A04),
+        Color(0xFF92400E),
+      ],
+    ),
+    (
+      name: 'Cool',
+      colors: const [
+        Color(0xff2196f3),
+        Color(0xff00bcd4),
+        Color(0xff009688),
+        Color(0xff4caf50),
+      ],
+    ),
+    (
+      name: 'Pastel',
+      colors: const [
+        Color(0xffffb74d),
+        Color(0xffff8a65),
+        Color(0xffdce775),
+        Color(0xffaed581),
+      ],
+    ),
+    (
+      name: 'Soft',
+      colors: const [
+        Color(0xFF93C5FD),
+        Color(0xFFF9A8D4),
+        Color(0xFFA5B4FC),
+        Color(0xFF86EFAC),
+        Color(0xFFFDE68A),
+      ],
+    ),
+    (
+      name: 'Ocean',
+      colors: const [
+        Color(0xFF0077B6),
+        Color(0xFF00B4D8),
+        Color(0xFF90E0EF),
+        Color(0xFF023E8A),
+        Color(0xFF48CAE4),
+      ],
+    ),
+    (
+      name: 'Earth',
+      colors: const [
+        Color(0xFF606C38),
+        Color(0xFFDDA15E),
+        Color(0xFFBC6C25),
+        Color(0xFF283618),
+        Color(0xFFFEFAE0),
+      ],
+    ),
+    (
+      name: 'Neon',
+      colors: const [
+        Color(0xFFFF006E),
+        Color(0xFF8338EC),
+        Color(0xFF3A86FF),
+        Color(0xFFFB5607),
+        Color(0xFFFFBE0B),
+      ],
+    ),
+    (
+      name: 'Monochrome',
+      colors: const [
+        Color(0xFF212529),
+        Color(0xFF495057),
+        Color(0xFF6C757D),
+        Color(0xFFADB5BD),
+        Color(0xFFDEE2E6),
+      ],
+    ),
+    (
+      name: 'Tropical',
+      colors: const [
+        Color(0xFFFF6B6B),
+        Color(0xFF4ECDC4),
+        Color(0xFFFFE66D),
+        Color(0xFF45B7D1),
+        Color(0xFFF7DC6F),
+      ],
+    ),
+    (
+      name: 'Jewel',
+      colors: const [
+        Color(0xFF1A5276),
+        Color(0xFF922B21),
+        Color(0xFF196F3D),
+        Color(0xFF6C3483),
+        Color(0xFFB9770E),
+      ],
+    ),
+    (
+      name: 'Forest',
+      colors: const [
+        Color(0xFF2D6A4F),
+        Color(0xFF40916C),
+        Color(0xFF52B788),
+        Color(0xFF74C69D),
+        Color(0xFF1B4332),
+      ],
+    ),
+    (
+      name: 'Slate',
+      colors: const [
+        Color(0xFF334155),
+        Color(0xFF475569),
+        Color(0xFF64748B),
+        Color(0xFF94A3B8),
+        Color(0xFFCBD5E1),
+      ],
+    ),
   ];
 
   double _sliderValue = 0.5;
@@ -228,7 +236,7 @@ class _ChartScreenState extends State<ChartScreen> {
       final isDark = Theme.of(context).brightness == Brightness.dark;
       if (isDark) {
         _currentThemeIndex = 1; // Dark theme
-        _currentPaletteIndex = 4; // Ocean palette
+        _currentPaletteIndex = 5; // Ocean palette
       } else {
         _currentThemeIndex = 0; // Default (light) theme
         _currentPaletteIndex = 1; // Warm palette
@@ -428,7 +436,7 @@ class _ChartScreenState extends State<ChartScreen> {
   ChartTheme get currentTheme {
     final baseTheme = _themeData[_currentThemeIndex].theme;
     return baseTheme.copyWith(
-      colorPalette: _colorPalettes[_currentPaletteIndex],
+      colorPalette: _paletteData[_currentPaletteIndex].colors,
     );
   }
 
@@ -685,7 +693,7 @@ class _ChartScreenState extends State<ChartScreen> {
       case 4:
         return AreaChartExample(
           theme: currentTheme,
-          colorPalette: _colorPalettes[_currentPaletteIndex],
+          colorPalette: _paletteData[_currentPaletteIndex].colors,
         );
       case 5:
         return buildBubbleChartTab(context, currentTheme, _sliderValue);
@@ -713,7 +721,7 @@ class _ChartScreenState extends State<ChartScreen> {
       case 12:
         return buildHeatMapTab(
           currentTheme,
-          _colorPalettes[_currentPaletteIndex],
+          _paletteData[_currentPaletteIndex].colors,
         );
       case 13:
         return buildContributionHeatMapTab(currentTheme);
@@ -724,7 +732,7 @@ class _ChartScreenState extends State<ChartScreen> {
       case 16:
         return ExportDemo(
           theme: currentTheme,
-          colorPalette: _colorPalettes[_currentPaletteIndex],
+          colorPalette: _paletteData[_currentPaletteIndex].colors,
         );
       case 17:
         return const DebugGradientExample();
@@ -1143,7 +1151,7 @@ class _ChartScreenState extends State<ChartScreen> {
             },
             itemBuilder:
                 (context) =>
-                    _paletteNames
+                    _paletteData
                         .asMap()
                         .entries
                         .map(
@@ -1159,11 +1167,11 @@ class _ChartScreenState extends State<ChartScreen> {
                                 else
                                   const SizedBox(width: 16),
                                 const SizedBox(width: 8),
-                                Text(entry.value),
+                                Text(entry.value.name),
                                 const SizedBox(width: 12),
                                 Row(
                                   children:
-                                      _colorPalettes[entry.key]
+                                      _paletteData[entry.key].colors
                                           .take(3)
                                           .map(
                                             (c) => Container(
