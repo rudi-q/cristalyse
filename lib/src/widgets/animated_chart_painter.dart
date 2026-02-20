@@ -187,16 +187,39 @@ class AnimatedChartPainter extends CustomPainter {
     // Calculate title font size for dimension calculations
     final titleFontSize = (axisLabelStyle.fontSize ?? 12) + 1;
 
-    // Calculate additional padding for axis titles and labels
+    // Measure heatmap Y-axis labels separately if present
+    double heatMapYAxisSpace = 0.0;
+    if (geometries.any((g) => g is HeatMapGeometry)) {
+      final yCol = heatMapYColumn ?? yColumn;
+      if (yCol != null && data.isNotEmpty) {
+        final yValues =
+            data.map((d) => d[yCol]).where((v) => v != null).toSet();
+        double maxHeatMapValWidth = 0.0;
+        for (final val in yValues) {
+          final tp = TextPainter(
+            text: TextSpan(text: val.toString(), style: axisLabelStyle),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          if (tp.width > maxHeatMapValWidth) maxHeatMapValWidth = tp.width;
+        }
+        if (maxHeatMapValWidth > 0) {
+          heatMapYAxisSpace =
+              theme.axisWidth * 2 + _tickToLabelSpacing + maxHeatMapValWidth;
+        }
+      }
+    }
+
     // Space for Y-axis labels + optional title (title height becomes width after -90° rotation)
-    final yAxisSpace = this.yScale != null
-        ? theme.axisWidth * 2 + // tick marks
-            _tickToLabelSpacing + // gap to labels
-            labelDimensions.maxYLabelWidth + // labels
-            (this.yScale?.title != null
-                ? _labelToTitleSpacing + titleFontSize // gap + title height
-                : 0.0)
-        : 0.0;
+    final yAxisSpace = math.max(
+        heatMapYAxisSpace,
+        this.yScale != null
+            ? theme.axisWidth * 2 + // tick marks
+                _tickToLabelSpacing + // gap to labels
+                labelDimensions.maxYLabelWidth + // labels
+                (this.yScale?.title != null
+                    ? _labelToTitleSpacing + titleFontSize // gap + title height
+                    : 0.0)
+            : 0.0);
     final leftPadding = theme.padding.left + yAxisSpace;
 
     // Space for Y2-axis labels + optional title (title height becomes width after +90° rotation)
@@ -1579,7 +1602,7 @@ class AnimatedChartPainter extends CustomPainter {
       for (final entry in groupedData.entries) {
         final colorValue = entry.key;
         final groupData = entry.value;
-        final lineColor = geometry.color ?? colorScale.scale(colorValue);
+        final lineColor = colorScale.scale(colorValue);
         _drawSingleLineAnimated(
           canvas,
           plotArea,
@@ -1754,7 +1777,7 @@ class AnimatedChartPainter extends CustomPainter {
       for (final entry in groupedData.entries) {
         final colorValue = entry.key;
         final groupData = entry.value;
-        final areaColor = geometry.color ?? colorScale.scale(colorValue);
+        final areaColor = colorScale.scale(colorValue);
         _drawSingleArea(
           canvas,
           plotArea,
@@ -3948,42 +3971,66 @@ class AnimatedChartPainter extends CustomPainter {
     // Measure X-axis labels
     if (xScale != null) {
       final xTicks = xScale.getTicks();
-      for (final tick in xTicks) {
-        final label = xScale.formatLabel(tick);
-        final textPainter = TextPainter(
-          text: TextSpan(text: label, style: style),
+      if (xTicks.isEmpty) {
+        final fallbackTp = TextPainter(
+          text: TextSpan(text: '888.88', style: style),
           textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        maxXLabelHeight = math.max(maxXLabelHeight, textPainter.height);
+        )..layout();
+        maxXLabelHeight = math.max(maxXLabelHeight, fallbackTp.height);
+      } else {
+        for (final tick in xTicks) {
+          final label = xScale.formatLabel(tick);
+          final textPainter = TextPainter(
+            text: TextSpan(text: label, style: style),
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          maxXLabelHeight = math.max(maxXLabelHeight, textPainter.height);
+        }
       }
     }
 
     // Measure Y-axis labels
     if (yScale != null) {
       final yTicks = yScale.getTicks();
-      for (final tick in yTicks) {
-        final label = yScale.formatLabel(tick);
-        final textPainter = TextPainter(
-          text: TextSpan(text: label, style: style),
+      if (yTicks.isEmpty) {
+        final fallbackTp = TextPainter(
+          text: TextSpan(text: '888.88', style: style),
           textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        maxYLabelWidth = math.max(maxYLabelWidth, textPainter.width);
+        )..layout();
+        maxYLabelWidth = math.max(maxYLabelWidth, fallbackTp.width);
+      } else {
+        for (final tick in yTicks) {
+          final label = yScale.formatLabel(tick);
+          final textPainter = TextPainter(
+            text: TextSpan(text: label, style: style),
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          maxYLabelWidth = math.max(maxYLabelWidth, textPainter.width);
+        }
       }
     }
 
     // Measure Y2-axis labels
     if (y2Scale != null) {
       final y2Ticks = y2Scale.getTicks();
-      for (final tick in y2Ticks) {
-        final label = y2Scale.formatLabel(tick);
-        final textPainter = TextPainter(
-          text: TextSpan(text: label, style: style),
+      if (y2Ticks.isEmpty) {
+        final fallbackTp = TextPainter(
+          text: TextSpan(text: '888.88', style: style),
           textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        maxY2LabelWidth = math.max(maxY2LabelWidth, textPainter.width);
+        )..layout();
+        maxY2LabelWidth = math.max(maxY2LabelWidth, fallbackTp.width);
+      } else {
+        for (final tick in y2Ticks) {
+          final label = y2Scale.formatLabel(tick);
+          final textPainter = TextPainter(
+            text: TextSpan(text: label, style: style),
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          maxY2LabelWidth = math.max(maxY2LabelWidth, textPainter.width);
+        }
       }
     }
 

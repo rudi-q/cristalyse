@@ -14,6 +14,14 @@ Widget buildComboBarLineTab(ChartTheme currentTheme, double sliderValue) {
     {'month': 'Apr', 'revenue': 140, 'category': 'Product B'},
   ];
 
+  // Distinct data for the Line to avoid drawing a zigzag path due to multiple points
+  final lineData = [
+    {'month': 'Jan', 'revenue': 100},
+    {'month': 'Feb', 'revenue': 120},
+    {'month': 'Mar', 'revenue': 140},
+    {'month': 'Apr', 'revenue': 180},
+  ];
+
   return SingleChildScrollView(
     padding: const EdgeInsets.all(16),
     child: Column(
@@ -30,22 +38,51 @@ Widget buildComboBarLineTab(ChartTheme currentTheme, double sliderValue) {
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
-          child:
+          child: Stack(
+            children: [
+              // 1. Bottom Chart: The Categorical Bars
               CristalyseChart()
                   .data(comboData)
                   .mapping(x: 'month', y: 'revenue', color: 'category')
-                  // Bar uses mapped categorical color
                   .geomBar(width: sliderValue.clamp(0.1, 1.0), alpha: 0.8)
-                  // Line uses a fixed color, so it should be continuous and not fragment by category
-                  .geomLine(color: Colors.blue[800], strokeWidth: 3.0)
                   .scaleXOrdinal()
-                  .scaleYContinuous(min: 0)
+                  .scaleYContinuous(
+                    min: 0,
+                    max: 250,
+                  ) // Fix scale to align layers
                   .theme(currentTheme)
                   .animate(
                     duration: const Duration(milliseconds: 1000),
                     curve: Curves.easeOutBack,
                   )
                   .build(),
+              // 2. Top Chart: The Continuous Line with average Data
+              CristalyseChart()
+                  .data(lineData)
+                  .mapping(x: 'month', y: 'revenue') // No color mapping!
+                  // Line uses explicit fixed color
+                  .geomLine(color: Colors.blue.shade800, strokeWidth: 3.0)
+                  .scaleXOrdinal()
+                  .scaleYContinuous(
+                    min: 0,
+                    max: 250,
+                  ) // Fix scale to align layers
+                  // Make theme transparent so it doesn't draw a second set of axes/grids
+                  .theme(
+                    currentTheme.copyWith(
+                      backgroundColor: Colors.transparent,
+                      plotBackgroundColor: Colors.transparent,
+                      gridColor: Colors.transparent,
+                      axisColor: Colors.transparent,
+                    ),
+                  )
+                  .animate(
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOutBack,
+                  )
+                  .build(),
+            ],
+          ),
         ),
         const SizedBox(height: 16),
         const SelectableText(

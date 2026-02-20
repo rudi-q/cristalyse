@@ -11,6 +11,7 @@ import '../graphs/advanced_gradient_example.dart';
 import '../graphs/area_chart.dart';
 import '../graphs/bar_chart.dart';
 import '../graphs/bubble_chart.dart';
+import '../graphs/combo_bar_line_chart.dart';
 import '../graphs/debug_gradient.dart';
 import '../graphs/dual_axis_chart.dart';
 import '../graphs/export_demo.dart';
@@ -28,7 +29,6 @@ import '../graphs/scatter_plot.dart';
 import '../graphs/stacked_bar_chart.dart';
 import '../graphs/time_based_line_chart.dart';
 import '../graphs/zoom_example.dart';
-import '../graphs/combo_bar_line_chart.dart';
 import '../router/app_router.dart';
 import '../utils/chart_feature_list.dart';
 
@@ -70,7 +70,7 @@ class _ChartScreenState extends State<ChartScreen>
           Color(0xFF6600CC),
           Color(0xFF006666),
         ],
-        padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+        padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
         axisTextStyle: TextStyle(
           fontSize: 13,
           color: Colors.black,
@@ -453,6 +453,7 @@ class _ChartScreenState extends State<ChartScreen>
       case 6:
       case 7:
       case 8:
+      case 22:
         final value = _sliderValue.clamp(0.1, 1.0);
         return 'Bar Width: ${(value * 100).toStringAsFixed(0)}%';
       case 9: // Pie chart
@@ -1099,6 +1100,8 @@ class _ChartScreenState extends State<ChartScreen>
       chartHeight = 450; // Slightly larger for heatmaps
     } else if (widget.chartIndex == 21 || title.contains('Zoom & Navigation')) {
       chartHeight = 640; // Extra room for zoom demo controls + chart
+    } else if (widget.chartIndex == 22) {
+      chartHeight = 420; // Room for Combo Chart SizedBox
     }
 
     return Scaffold(

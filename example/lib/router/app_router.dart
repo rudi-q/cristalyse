@@ -237,7 +237,7 @@ class AppRouter {
       title: 'Dual Y-Axis',
       icon: Icons.analytics,
       description: 'Dual-axis charts for comparing different metrics',
-      docsUrl: 'https://docs.cristalyse.com/charts/dual-axis',
+      docsUrl: 'https://docs.cristalyse.com/charts/dual-axis-charts',
     ),
     RouteInfo(
       path: '/heatmap',
@@ -322,7 +322,7 @@ class AppRouter {
       icon: Icons.auto_graph,
       description: 'Combo chart rendering both geometries cleanly',
       isNew: true,
-      docsUrl: 'https://docs.cristalyse.com/charts/combo-charts',
+      docsUrl: null,
     ),
   ];
 }
