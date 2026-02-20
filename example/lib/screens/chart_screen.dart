@@ -28,6 +28,7 @@ import '../graphs/scatter_plot.dart';
 import '../graphs/stacked_bar_chart.dart';
 import '../graphs/time_based_line_chart.dart';
 import '../graphs/zoom_example.dart';
+import '../graphs/combo_bar_line_chart.dart';
 import '../router/app_router.dart';
 import '../utils/chart_feature_list.dart';
 
@@ -489,6 +490,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Legend Examples',
       'Time-Based Line Chart',
       'Zoom & Navigation Demo',
+      'Combo Chart (Bar + Line)',
     ];
   }
 
@@ -516,6 +518,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Comprehensive legend showcase • 9 positioning options including new floating legends',
       'Line chart with time-based data on x-axis',
       'Pinch, scroll, and button-based zoom controls with live callbacks',
+      'Bar correctly colored by categorical variable with a single continuous overlaid line.',
     ];
   }
 
@@ -749,6 +752,8 @@ class _ChartScreenState extends State<ChartScreen>
         );
       case 21:
         return buildZoomExampleTab(currentTheme, _sliderValue);
+      case 22:
+        return buildComboBarLineTab(currentTheme, _sliderValue);
       default:
         return Container();
     }
@@ -932,6 +937,17 @@ class _ChartScreenState extends State<ChartScreen>
             '+/- helpers',
             Colors.purple,
           ),
+        ];
+      case 22:
+        return [
+          _buildStatsCard(
+            'Bug 82 Fix',
+            'Safe',
+            'No line slicing',
+            Colors.green,
+          ),
+          _buildStatsCard('Color Map', 'Cat', 'Dodge spacing', Colors.blue),
+          _buildStatsCard('Line', 'Solid', 'Continuous', Colors.purple),
         ];
       default:
         return [];
