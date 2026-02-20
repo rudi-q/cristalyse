@@ -1568,7 +1568,7 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     }
 
-    if (colorColumn != null) {
+    if (colorColumn != null && geometry.color == null) {
       // Group by color and draw separate lines
       final groupedData = <dynamic, List<Map<String, dynamic>>>{};
       for (final point in data) {
@@ -1743,7 +1743,7 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     }
 
-    if (colorColumn != null) {
+    if (colorColumn != null && geometry.color == null) {
       // Group by color and draw separate areas
       final groupedData = <dynamic, List<Map<String, dynamic>>>{};
       for (final point in data) {
