@@ -46,6 +46,7 @@ AnimatedChartPainter chartPainterAnimated({
   required double animationProgress,
   List<double>? panXDomain,
   List<double>? panYDomain,
+  double? heatMapYAxisSpace,
   ValueChanged<Rect>? onChartAreaComputed,
 }) {
   // Force panYDomain to null if updateYDomain is false
@@ -79,6 +80,7 @@ AnimatedChartPainter chartPainterAnimated({
     coordFlipped: widget.coordFlipped,
     panXDomain: panXDomain,
     panYDomain: panYDomain,
+    heatMapYAxisSpace: heatMapYAxisSpace,
     onChartAreaComputed: onChartAreaComputed,
   );
 }

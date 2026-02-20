@@ -712,6 +712,7 @@ class _AnimatedCristalyseChartWidgetState
             animationProgress: 1.0,
             panXDomain: _panXDomain,
             panYDomain: _panYDomain,
+            heatMapYAxisSpace: _getHeatMapYAxisSpace(),
           ),
           child: Container(),
         ),
@@ -744,6 +745,7 @@ class _AnimatedCristalyseChartWidgetState
       animationProgress: math.max(0.0, math.min(1.0, animationValue)),
       panXDomain: _panXDomain,
       panYDomain: _panYDomain,
+      heatMapYAxisSpace: _getHeatMapYAxisSpace(),
       onChartAreaComputed: (area) {
         if (_actualPlotArea != area) {
           _actualPlotArea = area;
@@ -1341,15 +1343,59 @@ class _AnimatedCristalyseChartWidgetState
     return (hasSecondaryY && chartWidget.y2Scale != null) ? 80.0 : 0.0;
   }
 
+  double? _cachedHeatMapYAxisSpace;
+  int? _heatMapCacheHash;
+
+  double _getHeatMapYAxisSpace() {
+    final hasHeatMap = widget.geometries.any((g) => g is HeatMapGeometry);
+    if (!hasHeatMap || widget.data.isEmpty) return 0.0;
+
+    final yCol = widget.heatMapYColumn ?? widget.yColumn;
+    final axisLabelStyle = widget.theme.axisLabelStyle ??
+        const TextStyle(color: Colors.black, fontSize: 12);
+
+    final hash = Object.hash(
+      widget.data,
+      yCol,
+      axisLabelStyle,
+      widget.theme.axisWidth,
+    );
+
+    if (_heatMapCacheHash == hash && _cachedHeatMapYAxisSpace != null) {
+      return _cachedHeatMapYAxisSpace!;
+    }
+
+    _heatMapCacheHash = hash;
+    double maxHeatMapValWidth = 0.0;
+
+    if (yCol != null) {
+      final yValues =
+          widget.data.map((d) => d[yCol]).where((v) => v != null).toSet();
+      for (final val in yValues) {
+        final tp = TextPainter(
+          text: TextSpan(text: val.toString(), style: axisLabelStyle),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        if (tp.width > maxHeatMapValWidth) maxHeatMapValWidth = tp.width;
+      }
+    }
+
+    if (maxHeatMapValWidth > 0) {
+      _cachedHeatMapYAxisSpace = widget.theme.axisWidth * 2 +
+          4.0 +
+          maxHeatMapValWidth; // 4.0 is _tickToLabelSpacing
+    } else {
+      _cachedHeatMapYAxisSpace = 0.0;
+    }
+
+    return _cachedHeatMapYAxisSpace!;
+  }
+
   /// Estimate primary Y-axis space for layout purposes
   /// This mirrors the painter's calculation for consistent hit-testing
   double _estimateYAxisSpace(AnimatedCristalyseChartWidget chartWidget) {
-    if (chartWidget.yScale == null) return 0.0;
-
-    // Conservative estimate matching painter's calculation:
-    // axisWidth * 2 + tickToLabelSpacing + labelWidth + optional title
-    // ~4 + 4 + 50 + optional 20 = ~60-80px
-    return 60.0;
+    double baseSpace = chartWidget.yScale == null ? 0.0 : 60.0;
+    return math.max(baseSpace, _getHeatMapYAxisSpace());
   }
 
   /// Estimate X-axis space for layout purposes

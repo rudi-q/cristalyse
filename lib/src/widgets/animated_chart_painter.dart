@@ -38,6 +38,7 @@ class AnimatedChartPainter extends CustomPainter {
   final bool coordFlipped;
   final List<double>? panXDomain;
   final List<double>? panYDomain;
+  final double? heatMapYAxisSpace;
   final ValueChanged<Rect>? onChartAreaComputed;
 
   /// Creates an [AnimatedChartPainter] with comprehensive chart rendering capabilities.
@@ -95,6 +96,7 @@ class AnimatedChartPainter extends CustomPainter {
     this.coordFlipped = false,
     this.panXDomain,
     this.panYDomain,
+    this.heatMapYAxisSpace,
     this.onChartAreaComputed,
   });
 
@@ -187,9 +189,10 @@ class AnimatedChartPainter extends CustomPainter {
     // Calculate title font size for dimension calculations
     final titleFontSize = (axisLabelStyle.fontSize ?? 12) + 1;
 
-    // Measure heatmap Y-axis labels separately if present
-    double heatMapYAxisSpace = 0.0;
-    if (geometries.any((g) => g is HeatMapGeometry)) {
+    // Use cached heatmap Y-axis label space if provided, otherwise compute it
+    double heatMapYAxisSpace = this.heatMapYAxisSpace ?? 0.0;
+    if (this.heatMapYAxisSpace == null &&
+        geometries.any((g) => g is HeatMapGeometry)) {
       final yCol = heatMapYColumn ?? yColumn;
       if (yCol != null && data.isNotEmpty) {
         final yValues =
@@ -2756,6 +2759,7 @@ class AnimatedChartPainter extends CustomPainter {
         oldDelegate.sizeScale != sizeScale ||
         oldDelegate.theme != theme ||
         oldDelegate.animationProgress != animationProgress ||
+        oldDelegate.heatMapYAxisSpace != heatMapYAxisSpace ||
         oldDelegate.coordFlipped != coordFlipped ||
         !_listEquals(oldDelegate.panXDomain, panXDomain) ||
         !_listEquals(oldDelegate.panYDomain, panYDomain);
