@@ -2020,7 +2020,8 @@ class AnimatedChartPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.right,
       );
-      textPainter.layout(minWidth: 0, maxWidth: plotArea.left - 16);
+      textPainter.layout(
+          minWidth: 0, maxWidth: math.max(0.0, plotArea.left - 8));
       textPainter.paint(
         canvas,
         Offset(
@@ -2609,7 +2610,8 @@ class AnimatedChartPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.right,
       );
-      textPainter.layout(minWidth: 0, maxWidth: plotArea.left - 16);
+      textPainter.layout(
+          minWidth: 0, maxWidth: math.max(0.0, plotArea.left - 8));
       textPainter.paint(
         canvas,
         Offset(
