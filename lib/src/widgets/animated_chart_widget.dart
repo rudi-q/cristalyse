@@ -1359,9 +1359,13 @@ class _AnimatedCristalyseChartWidgetState
     final axisLabelStyle = chartWidget.theme.axisLabelStyle ??
         const TextStyle(color: Colors.black, fontSize: 12);
 
+    final yValues = yCol != null
+        ? chartWidget.data.map((d) => d[yCol]).where((v) => v != null).toSet()
+        : <dynamic>{};
+
     final hash = Object.hash(
-      chartWidget.data,
-      yCol,
+      Object.hashAll(yValues),
+      yValues.length,
       axisLabelStyle,
       chartWidget.theme.axisWidth,
     );
