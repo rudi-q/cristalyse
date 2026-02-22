@@ -1076,13 +1076,16 @@ class _AnimatedCristalyseChartWidgetState
     }
 
     final heatMapYAxisSpace = _getHeatMapYAxisSpace(tempWidget);
+    final yAxisSpace = _estimateYAxisSpace(tempWidget);
     final y2AxisSpace = _estimateY2AxisSpace(tempWidget);
+    final leftPadding =
+        tempWidget.theme.padding.left + math.max(heatMapYAxisSpace, yAxisSpace);
     final rightPadding = tempWidget.theme.padding.right + y2AxisSpace;
 
     final plotArea = Rect.fromLTWH(
-      tempWidget.theme.padding.left,
+      leftPadding,
       tempWidget.theme.padding.top,
-      size.width - tempWidget.theme.padding.left - rightPadding,
+      size.width - leftPadding - rightPadding,
       size.height - tempWidget.theme.padding.vertical,
     );
 
@@ -1378,14 +1381,13 @@ class _AnimatedCristalyseChartWidgetState
     double maxHeatMapValWidth = 0.0;
 
     if (yCol != null) {
-      final yValues =
-          chartWidget.data.map((d) => d[yCol]).where((v) => v != null).toSet();
       for (final val in yValues) {
         final tp = TextPainter(
           text: TextSpan(text: val.toString(), style: axisLabelStyle),
           textDirection: TextDirection.ltr,
         )..layout();
         if (tp.width > maxHeatMapValWidth) maxHeatMapValWidth = tp.width;
+        tp.dispose();
       }
     }
 
