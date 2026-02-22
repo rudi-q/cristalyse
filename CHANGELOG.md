@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.17.5 - 2026-02-22
+
+#### 🐛 Bug Fixes & Layout Optimization
+
+**Chart Padding & Heatmap Layout:**
+- **Dynamic Padding:** Removed hardcoded 80px left padding fallback. The chart widget now dynamically calculates the perfect left padding based on Y-axis labels and heatmap strings.
+- **Heatmap Layout Fix:** Fixed an issue where heatmap Y-axis labels could get clipped due to incorrect space estimation.
+- **Memory Leak Fix:** Addressed a `TextPainter` memory leak in `_getHeatMapYAxisSpace` by ensuring engine Paragraph resources are properly disposed.
+- **Tighter Default Themes:** Default `ChartTheme` padding has been tightened for a more pristine layout without wasting blank space, thanks to the newly improved dynamic bounds estimation.
+
+**Geometry Color Mapping Fix:**
+- **Color Bleeding Resolved:** Fixed a bug in `geomLine()` and `geomArea()` where specifying a fixed `color:` override would be ignored if the data also contained categorical color classifications. Explicit geometry colors now correctly override categorical scale colors.
+
+#### 📊 Example Enhancements
+- **Combo Charts:** Added a new "Combo Bar+Line" chart demonstrating categorical colored bars with a single continuous line overlaid. 
+
+---
+
 ## 1.17.4 - 2026-02-17
 
 #### 🎨 Example App Enhancements

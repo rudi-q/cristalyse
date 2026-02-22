@@ -12,6 +12,23 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="February 22, 2026" description="v1.17.5">
+  ### 🐛 Layout Optimizations & Bug Fixes
+  
+  **Crisper layouts, less wasted space, and perfect combo charts!**
+  
+  **What was fixed:**
+  - **Dynamic Left Padding:** Removed the hardcoded 80px left padding fallback. The chart now dynamically calculates the exact width needed for Y-axis labels and heatmaps.
+  - **Memory & Clipping:** Fixed heatmap Y-axis layout clipping and resolved a `TextPainter` memory leak.
+  - **Geometry Color Priorities:** Fixed a bug where explicit `geomLine(color: ...)` overrides were ignored if the data had categorical color mappings. You can now cleanly mix and match color logic in combo charts!
+  - **Theme Adjustments:** Default `ChartTheme` padding has been tightened for a much cleaner out-of-the-box appearance.
+
+  **Quality Assurance:**
+  - 100% backward compatible API.
+  - Fixes apply automatically to existing setups.
+</Update>
+
+
 <Update label="February 17, 2026" description="v1.17.4">
   ### 🎨 Example App UI Overhaul & Fixes
 
