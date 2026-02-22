@@ -1,4 +1,5 @@
 import 'package:cristalyse_example/main.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -45,8 +46,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify floating action buttons are present
-      expect(find.byIcon(Icons.palette), findsOneWidget);
-      expect(find.byIcon(Icons.color_lens), findsOneWidget);
+      expect(find.byIcon(CupertinoIcons.paintbrush), findsOneWidget);
+      expect(find.byIcon(CupertinoIcons.sun_max), findsOneWidget);
     });
 
     testWidgets('Controls toggle should work', (WidgetTester tester) async {
@@ -54,14 +55,17 @@ void main() {
       await tester.pumpAndSettle();
 
       // Find and tap the controls toggle button
-      final controlsButton = find.byIcon(Icons.visibility);
+      final controlsButton = find.byIcon(CupertinoIcons.slider_horizontal_3);
       expect(controlsButton, findsOneWidget);
 
       await tester.tap(controlsButton);
       await tester.pumpAndSettle();
 
-      // After tapping, icon should change to visibility_off
-      expect(find.byIcon(Icons.visibility_off), findsOneWidget);
+      // After tapping, icon should change to active state
+      expect(
+        find.byIcon(CupertinoIcons.slider_horizontal_below_rectangle),
+        findsOneWidget,
+      );
     });
   });
 }

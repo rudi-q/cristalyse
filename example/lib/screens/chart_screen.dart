@@ -943,22 +943,12 @@ class _ChartScreenState extends State<ChartScreen>
         return [
           _buildStatsCard(
             'Color Bleed',
-            'Bars: Grouped',
+            'None',
             'No line slicing',
             Colors.green,
           ),
-          _buildStatsCard(
-            'Bars: Grouped',
-            'Categorical',
-            'Dodge spacing',
-            Colors.blue,
-          ),
-          _buildStatsCard(
-            'Line: Continuous',
-            'Solid',
-            'Continuous',
-            Colors.purple,
-          ),
+          _buildStatsCard('Bars', 'Categorical', 'Dodge spacing', Colors.blue),
+          _buildStatsCard('Line', 'Solid', 'Continuous trend', Colors.purple),
         ];
       default:
         return [];

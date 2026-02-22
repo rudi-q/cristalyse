@@ -10,7 +10,7 @@ import '../themes/chart_theme.dart';
 /// Custom painter with animation support
 class AnimatedChartPainter extends CustomPainter {
   // Spacing constants for axis label and title positioning
-  static const double _tickToLabelSpacing = 4.0;
+  static const double tickToLabelSpacing = 4.0;
   static const double _labelToTitleSpacing = 8.0;
 
   final List<Map<String, dynamic>> data;
@@ -207,7 +207,7 @@ class AnimatedChartPainter extends CustomPainter {
         }
         if (maxHeatMapValWidth > 0) {
           heatMapYAxisSpace =
-              theme.axisWidth * 2 + _tickToLabelSpacing + maxHeatMapValWidth;
+              theme.axisWidth * 2 + tickToLabelSpacing + maxHeatMapValWidth;
         }
       }
     }
@@ -217,7 +217,7 @@ class AnimatedChartPainter extends CustomPainter {
         heatMapYAxisSpace,
         this.yScale != null
             ? theme.axisWidth * 2 + // tick marks
-                _tickToLabelSpacing + // gap to labels
+                tickToLabelSpacing + // gap to labels
                 labelDimensions.maxYLabelWidth + // labels
                 (this.yScale?.title != null
                     ? _labelToTitleSpacing + titleFontSize // gap + title height
@@ -228,7 +228,7 @@ class AnimatedChartPainter extends CustomPainter {
     // Space for Y2-axis labels + optional title (title height becomes width after +90° rotation)
     final y2AxisSpace = this.y2Scale != null
         ? theme.axisWidth * 2 +
-            _tickToLabelSpacing +
+            tickToLabelSpacing +
             labelDimensions.maxY2LabelWidth +
             (this.y2Scale?.title != null
                 ? _labelToTitleSpacing + titleFontSize // gap + title height
@@ -239,7 +239,7 @@ class AnimatedChartPainter extends CustomPainter {
     // Space for X-axis labels + optional title (not rotated, height is vertical)
     final xAxisSpace = this.xScale != null
         ? theme.axisWidth * 2 +
-            _tickToLabelSpacing +
+            tickToLabelSpacing +
             labelDimensions.maxXLabelHeight +
             (this.xScale?.title != null
                 ? _labelToTitleSpacing + titleFontSize // gap + title height
@@ -2020,7 +2020,7 @@ class AnimatedChartPainter extends CustomPainter {
         canvas,
         Offset(
           pos - textPainter.width / 2,
-          xTickOuterEdge + _tickToLabelSpacing,
+          xTickOuterEdge + tickToLabelSpacing,
         ),
       );
     }
@@ -2051,7 +2051,7 @@ class AnimatedChartPainter extends CustomPainter {
       textPainter.paint(
         canvas,
         Offset(
-          yTickOuterEdge - _tickToLabelSpacing - textPainter.width,
+          yTickOuterEdge - tickToLabelSpacing - textPainter.width,
           pos - textPainter.height / 2,
         ),
       );
@@ -2085,7 +2085,7 @@ class AnimatedChartPainter extends CustomPainter {
         textPainter.paint(
           canvas,
           Offset(
-            y2TickOuterEdge + _tickToLabelSpacing,
+            y2TickOuterEdge + tickToLabelSpacing,
             pos - textPainter.height / 2,
           ),
         );
@@ -2094,11 +2094,11 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Calculate label alignment positions (where label edges meet tick spacing)
     final xLabelAlignEdge =
-        xTickOuterEdge + _tickToLabelSpacing; // Top edge of X labels
+        xTickOuterEdge + tickToLabelSpacing; // Top edge of X labels
     final yLabelAlignEdge =
-        yTickOuterEdge - _tickToLabelSpacing; // Right edge of Y labels
+        yTickOuterEdge - tickToLabelSpacing; // Right edge of Y labels
     final y2LabelAlignEdge =
-        y2TickOuterEdge + _tickToLabelSpacing; // Left edge of Y2 labels
+        y2TickOuterEdge + tickToLabelSpacing; // Left edge of Y2 labels
 
     // Calculate label outer edges using alignment position and max dimensions
     final xLabelOuterEdge = xLabelAlignEdge + maxXLabelHeight; // Bottom edge
@@ -3977,7 +3977,7 @@ class AnimatedChartPainter extends CustomPainter {
       final xTicks = xScale.getTicks();
       if (xTicks.isEmpty) {
         final fallbackTp = TextPainter(
-          text: TextSpan(text: '888.88', style: style),
+          text: TextSpan(text: '8,888,888', style: style),
           textDirection: TextDirection.ltr,
         )..layout();
         maxXLabelHeight = math.max(maxXLabelHeight, fallbackTp.height);
@@ -3999,7 +3999,7 @@ class AnimatedChartPainter extends CustomPainter {
       final yTicks = yScale.getTicks();
       if (yTicks.isEmpty) {
         final fallbackTp = TextPainter(
-          text: TextSpan(text: '888.88', style: style),
+          text: TextSpan(text: '8,888,888', style: style),
           textDirection: TextDirection.ltr,
         )..layout();
         maxYLabelWidth = math.max(maxYLabelWidth, fallbackTp.width);
@@ -4021,7 +4021,7 @@ class AnimatedChartPainter extends CustomPainter {
       final y2Ticks = y2Scale.getTicks();
       if (y2Ticks.isEmpty) {
         final fallbackTp = TextPainter(
-          text: TextSpan(text: '888.88', style: style),
+          text: TextSpan(text: '8,888,888', style: style),
           textDirection: TextDirection.ltr,
         )..layout();
         maxY2LabelWidth = math.max(maxY2LabelWidth, fallbackTp.width);

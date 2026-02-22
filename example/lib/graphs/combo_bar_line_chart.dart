@@ -27,15 +27,6 @@ Widget buildComboBarLineTab(ChartTheme currentTheme, double sliderValue) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SelectableText(
-          'Bar + Line Combo Chart',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: currentTheme.axisColor,
-          ),
-        ),
-        const SizedBox(height: 16),
         SizedBox(
           height: 400,
           child: Stack(
@@ -92,7 +83,7 @@ Widget buildComboBarLineTab(ChartTheme currentTheme, double sliderValue) {
         ),
         const SizedBox(height: 16),
         const SelectableText(
-          '• Demonstrates a mix of mapped aesthetic (color: category) for bars.\n• Demonstrates fixed aesthetic (color: fixed) for the line, keeping it a single continuous line instead of breaking it apart.\n• Visual confirmation for Bug Fix #82.',
+          '• Demonstrates a mix of mapped aesthetic (color: category) for bars.\n• Demonstrates fixed aesthetic (color: fixed) for the line, keeping it a single continuous line instead of breaking it apart.\n• Visual confirmation for fix.',
         ),
       ],
     ),
