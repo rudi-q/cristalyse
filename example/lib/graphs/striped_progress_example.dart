@@ -8,7 +8,7 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Striped Progress Bars',
           style: TextStyle(
             fontSize: 18,
@@ -17,14 +17,14 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        const SelectableText(
           'Progress bars with diagonal stripe patterns for enhanced visual distinction',
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(height: 16),
 
         // Horizontal Striped Progress Bars
-        Text(
+        SelectableText(
           'Horizontal Striped Bars',
           style: TextStyle(
             fontSize: 16,
@@ -60,7 +60,7 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
         const SizedBox(height: 24),
 
         // Vertical Striped Progress Bars
-        Text(
+        SelectableText(
           'Vertical Striped Bars',
           style: TextStyle(
             fontSize: 16,
@@ -95,7 +95,7 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
         ),
         const SizedBox(height: 16),
 
-        const Text(
+        const SelectableText(
           '• Striped pattern creates visual distinction from solid fills\\n'
           '• Diagonal stripes at 45-degree angle\\n'
           '• Works with both horizontal and vertical orientations\\n'

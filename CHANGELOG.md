@@ -1,5 +1,56 @@
 # Changelog
 
+## 1.17.5 - 2026-02-22
+
+#### 🐛 Bug Fixes & Layout Optimization
+
+**Chart Padding & Heatmap Layout:**
+- **Dynamic Padding:** Removed hardcoded 80px left padding fallback. The chart widget now dynamically calculates the perfect left padding based on Y-axis labels and heatmap strings.
+- **Heatmap Layout Fix:** Fixed an issue where heatmap Y-axis labels could get clipped due to incorrect space estimation.
+- **Memory Leak Fix:** Addressed a `TextPainter` memory leak in `_getHeatMapYAxisSpace` by ensuring engine Paragraph resources are properly disposed.
+- **Tighter Default Themes:** Default `ChartTheme` padding has been tightened for a more pristine layout without wasting blank space, thanks to the newly improved dynamic bounds estimation.
+
+**Geometry Color Mapping Fix:**
+- **Color Bleeding Resolved:** Fixed a bug in `geomLine()` and `geomArea()` where specifying a fixed `color:` override would be ignored if the data also contained categorical color classifications. Explicit geometry colors now correctly override categorical scale colors.
+
+#### 📊 Example Enhancements
+- **Combo Charts:** Added a new "Combo Bar+Line" chart demonstrating categorical colored bars with a single continuous line overlaid. 
+
+---
+
+## 1.17.4 - 2026-02-17
+
+#### 🎨 Example App Enhancements
+
+**UI Overhaul & Dark Mode:**
+- **Dark Mode Support**: The example app now intelligently adapts to system brightness settings.
+- **New Palettes**: Added 13 distinct color palettes (Ocean, Warm, Cool, Neon, etc.) and new themes (High Contrast, Solarized).
+- **Gesture Reliability**: Replaced `SelectableText` with `Text` in AppBars, Buttons, and Dropdowns to fix gesture conflicts.
+- **Refactoring**: Converted theme/palette storage to strongly-typed records for better maintainability.
+- **Fixes**: Resolved hardcoded colors in bubble charts for better dark mode visibility.
+
+---
+
+## 1.17.3 - 2026-02-09
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix! 👏
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+#### 🐛 Bug Fixes
+
+**Fixed OrdinalScale Inversion Overflow:**
+- Fixed a bug where `OrdinalScale.invert()` would overflow at the edges of the range.
+- Corrected the formula to use the proper step calculation, aligning it with the `scale()` method.
+
+#### 📊 Example Enhancements
+
+**Multi-Series Bar Chart Demo:**
+- Enhanced the example app with multi-series data to better demonstrate grouped bar chart functionality.
+- Updated bar chart mapping to include category-based color coding.
+
+---
+
 ## 1.17.2 - 2025-12-15
 
 #### 🐛 Bug Fixes

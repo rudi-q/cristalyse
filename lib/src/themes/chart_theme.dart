@@ -66,7 +66,7 @@ class ChartTheme {
         Colors.cyan,
         Colors.lime,
       ],
-      padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+      padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
       axisTextStyle: TextStyle(fontSize: 12, color: Colors.black87),
       axisLabelStyle: TextStyle(fontSize: 12, color: Colors.black87),
     );
@@ -98,7 +98,7 @@ class ChartTheme {
         Colors.cyanAccent,
         Colors.limeAccent,
       ],
-      padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+      padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
       axisTextStyle: TextStyle(fontSize: 12, color: Colors.white70),
       axisLabelStyle: TextStyle(fontSize: 12, color: Colors.white70),
     );
@@ -128,7 +128,7 @@ class ChartTheme {
         Color(0xFF2aa198), // cyan
         Color(0xFFcb4b16), // orange
       ],
-      padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+      padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
       axisTextStyle: TextStyle(
         fontSize: 12,
         color: Color(0xFF586e75),
@@ -164,7 +164,7 @@ class ChartTheme {
         Color(0xFF2aa198), // cyan
         Color(0xFFcb4b16), // orange
       ],
-      padding: EdgeInsets.only(left: 80, right: 20, top: 20, bottom: 40),
+      padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
       axisTextStyle: TextStyle(fontSize: 12, color: Color(0xFF839496)), // base0
       axisLabelStyle: TextStyle(
         fontSize: 12,

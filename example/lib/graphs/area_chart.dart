@@ -66,7 +66,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          SelectableText(
             'Area Chart - Website Traffic',
             style: TextStyle(
               fontSize: 18,
@@ -75,7 +75,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          const SelectableText(
             'Showcasing area charts with smooth fills and stroke outlines',
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
@@ -134,7 +134,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
                                 color: Colors.black.withValues(alpha: 0.8),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: Text(
+                              child: SelectableText(
                                 '${point.getDisplayValue('month')}: ${point.getDisplayValue('traffic')} visitors',
                                 style: const TextStyle(
                                   color: Colors.white,
@@ -150,7 +150,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
           const SizedBox(height: 24),
 
           // Multi-Series Stacked Areas
-          Text(
+          SelectableText(
             'Multi-Series Area Chart - Mobile vs Desktop',
             style: TextStyle(
               fontSize: 16,
@@ -212,7 +212,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  SelectableText(
                                     '${point.getDisplayValue('platform')} Traffic',
                                     style: const TextStyle(
                                       color: Colors.white,
@@ -220,7 +220,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Text(
+                                  SelectableText(
                                     '${point.getDisplayValue('month')}: ${point.getDisplayValue('visitors')} visitors',
                                     style: const TextStyle(
                                       color: Colors.white,
@@ -238,7 +238,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
           const SizedBox(height: 24),
 
           // Combined Line + Area Chart
-          const Text(
+          const SelectableText(
             'Combined Line + Area Chart',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
@@ -306,7 +306,7 @@ class _AreaChartExampleState extends State<AreaChartExample> {
                                 color: Colors.black.withValues(alpha: 0.8),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: Text(
+                              child: SelectableText(
                                 '${point.getDisplayValue('month')}: ${point.getDisplayValue('traffic')} visitors',
                                 style: const TextStyle(
                                   color: Colors.white,

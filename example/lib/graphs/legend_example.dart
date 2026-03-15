@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 Widget buildLegendExampleTab(
+  BuildContext context,
   ChartTheme currentTheme,
   List<Map<String, dynamic>> data,
   double sliderValue,
@@ -21,14 +22,21 @@ Widget buildLegendExampleTab(
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Demonstrating different legend positions and configurations',
-          style: TextStyle(fontSize: 12, color: Colors.grey),
+          style: TextStyle(
+            fontSize: 12,
+            color:
+                Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[400]
+                    : Colors.grey[700],
+          ),
         ),
         const SizedBox(height: 24),
 
         // Example 1: Floating Legend
         _buildExampleSection(
+          context: context,
           title: 'Floating Legend with Custom Position & Interactivity',
           description:
               'Free-floating legend with absolute positioning - perfect for overlays',
@@ -77,6 +85,7 @@ Widget buildLegendExampleTab(
 
         // Example 2: Basic legend (default topRight position)
         _buildExampleSection(
+          context: context,
           title: 'Basic Legend (Default Position)',
           description: 'Simple .legend() call with smart defaults',
           child: SizedBox(
@@ -109,6 +118,7 @@ Widget buildLegendExampleTab(
 
         // Example 3: Bottom positioned legend
         _buildExampleSection(
+          context: context,
           title: 'Bottom Legend',
           description: 'Legend positioned at the bottom of the chart',
           child: SizedBox(
@@ -143,6 +153,7 @@ Widget buildLegendExampleTab(
 
         // Example 4: Right positioned legend with custom styling
         _buildExampleSection(
+          context: context,
           title: 'Right Legend with Custom Styling',
           description:
               'Custom background and symbol size (text adapts to theme)',
@@ -165,7 +176,9 @@ Widget buildLegendExampleTab(
                     .theme(currentTheme)
                     .legend(
                       position: LegendPosition.right,
-                      backgroundColor: Colors.white.withValues(alpha: 0.95),
+                      backgroundColor: currentTheme.backgroundColor.withValues(
+                        alpha: 0.95,
+                      ),
                       textStyle: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -187,6 +200,7 @@ Widget buildLegendExampleTab(
 
         // Example 5: Dark Theme Demonstration
         _buildExampleSection(
+          context: context,
           title: 'Dark Theme Support',
           description: 'Legend text automatically adapts to dark themes',
           child: SizedBox(
@@ -219,6 +233,7 @@ Widget buildLegendExampleTab(
 
         // Example 6: Line chart with legend
         _buildExampleSection(
+          context: context,
           title: 'Line Chart with Legend',
           description: 'Legend automatically adapts to line chart geometry',
           child: SizedBox(
@@ -248,6 +263,7 @@ Widget buildLegendExampleTab(
 
         // Example 7: Interactive Legend
         _buildExampleSection(
+          context: context,
           title: 'Interactive Legend (Click to Toggle)',
           description:
               'Click legend items to show/hide categories • Auto-managed state',
@@ -315,30 +331,37 @@ Widget buildLegendExampleTab(
 }
 
 Widget _buildExampleSection({
+  required BuildContext context,
   required String title,
   required String description,
   required Widget child,
 }) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w600,
-          color: Colors.black87,
+          color: isDark ? Colors.white : Colors.black87,
         ),
       ),
       const SizedBox(height: 4),
       Text(
         description,
-        style: const TextStyle(fontSize: 13, color: Colors.grey),
+        style: TextStyle(
+          fontSize: 13,
+          color: isDark ? Colors.grey[400] : Colors.grey[700],
+        ),
       ),
       const SizedBox(height: 12),
       Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(
+            color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: ClipRRect(borderRadius: BorderRadius.circular(8), child: child),

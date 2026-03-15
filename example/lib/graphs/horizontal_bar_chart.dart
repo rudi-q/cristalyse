@@ -11,7 +11,7 @@ Widget buildHorizontalBarTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Horizontal Bar Chart',
           style: TextStyle(
             fontSize: 18,
@@ -20,7 +20,7 @@ Widget buildHorizontalBarTab(
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        const SelectableText(
           'Team headcount by department',
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
@@ -48,7 +48,7 @@ Widget buildHorizontalBarTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Bars grow from left to right\n• Categorical Y-axis for departments\n• Clean whole number formatting for headcount\n• Great for ranking data',
         ),
       ],

@@ -139,6 +139,12 @@ class AppRouter {
           return const ChartScreen(chartIndex: 21);
         },
       ),
+      GoRoute(
+        path: '/combo-bar-line',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ChartScreen(chartIndex: 22);
+        },
+      ),
     ],
   );
 
@@ -231,7 +237,7 @@ class AppRouter {
       title: 'Dual Y-Axis',
       icon: Icons.analytics,
       description: 'Dual-axis charts for comparing different metrics',
-      docsUrl: 'https://docs.cristalyse.com/charts/dual-axis',
+      docsUrl: 'https://docs.cristalyse.com/charts/dual-axis-charts',
     ),
     RouteInfo(
       path: '/heatmap',
@@ -309,6 +315,14 @@ class AppRouter {
       description: 'Pinch, scroll, and floating buttons for zooming',
       isNew: true,
       docsUrl: 'https://docs.cristalyse.com/features/interactions',
+    ),
+    RouteInfo(
+      path: '/combo-bar-line',
+      title: 'Combo Bar+Line',
+      icon: Icons.auto_graph,
+      description: 'Combo chart rendering both geometries cleanly',
+      isNew: true,
+      docsUrl: null,
     ),
   ];
 }

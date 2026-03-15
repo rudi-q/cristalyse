@@ -23,6 +23,7 @@ import '../../widgets/animated_chart_painter.dart' show AnimatedChartPainter;
 /// - [animationProgress]: The current animation progress value (0.0 to 1.0).
 /// - [panXDomain]: Optional pan domain for the X-axis. Used for interactive panning.
 /// - [panYDomain]: Optional pan domain for the Y-axis. Used for interactive panning.
+/// - [heatMapYAxisSpace]: Space reserved on the Y axis for heatmap rendering.
 ///
 /// Returns a fully configured [AnimatedChartPainter] instance ready for use with [CustomPaint].
 ///
@@ -46,6 +47,7 @@ AnimatedChartPainter chartPainterAnimated({
   required double animationProgress,
   List<double>? panXDomain,
   List<double>? panYDomain,
+  double? heatMapYAxisSpace,
   ValueChanged<Rect>? onChartAreaComputed,
 }) {
   // Force panYDomain to null if updateYDomain is false
@@ -79,6 +81,7 @@ AnimatedChartPainter chartPainterAnimated({
     coordFlipped: widget.coordFlipped,
     panXDomain: panXDomain,
     panYDomain: panYDomain,
+    heatMapYAxisSpace: heatMapYAxisSpace,
     onChartAreaComputed: onChartAreaComputed,
   );
 }

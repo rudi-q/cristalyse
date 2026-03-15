@@ -11,7 +11,7 @@ Widget buildInteractiveScatterTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Interactive Scatter Plot',
           style: TextStyle(
             fontSize: 18,
@@ -20,7 +20,7 @@ Widget buildInteractiveScatterTab(
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        const SelectableText(
           'Hover over points to see tooltips • Tap points for details',
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
@@ -60,7 +60,7 @@ Widget buildInteractiveScatterTab(
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              SelectableText(
                                 'Sales Data',
                                 style: TextStyle(
                                   color: currentTheme.primaryColor,
@@ -69,28 +69,28 @@ Widget buildInteractiveScatterTab(
                                 ),
                               ),
                               const SizedBox(height: 6),
-                              Text(
+                              SelectableText(
                                 'Week: ${point.getDisplayValue('x')}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
                                 ),
                               ),
-                              Text(
+                              SelectableText(
                                 'Revenue: \$${point.getDisplayValue('y')}k',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
                                 ),
                               ),
-                              Text(
+                              SelectableText(
                                 'Segment: ${point.getDisplayValue('category')}',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 12,
                                 ),
                               ),
-                              Text(
+                              SelectableText(
                                 'Deal Size: ${point.getDisplayValue('size')}',
                                 style: const TextStyle(
                                   color: Colors.white,
@@ -161,7 +161,7 @@ class _InteractionGuide extends StatelessWidget {
                 size: 18,
               ),
               const SizedBox(width: 8),
-              Text(
+              SelectableText(
                 'Interactive Features',
                 style: TextStyle(
                   fontSize: 14,
@@ -210,7 +210,7 @@ class _InteractionGuide extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              SelectableText(
                 title,
                 style: const TextStyle(
                   fontSize: 13,
@@ -218,7 +218,7 @@ class _InteractionGuide extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
+              SelectableText(
                 description,
                 style: TextStyle(
                   fontSize: 12,
@@ -266,18 +266,18 @@ class TooltipExamples {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          SelectableText(
             'Week ${point.getDisplayValue('week')}',
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
+          SelectableText(
             'Revenue: \$${revenue}k',
             style: const TextStyle(color: Colors.white),
           ),
-          Text(
+          SelectableText(
             status,
             style: TextStyle(
               color: performance >= target ? Colors.green : Colors.orange,
@@ -297,8 +297,8 @@ class TooltipExamples {
           context: context,
           builder:
               (context) => AlertDialog(
-                title: const Text('Data Point Details'),
-                content: Text('Selected: ${point.data}'),
+                title: const SelectableText('Data Point Details'),
+                content: SelectableText('Selected: ${point.data}'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),

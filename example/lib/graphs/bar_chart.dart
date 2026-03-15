@@ -22,7 +22,7 @@ Widget buildBarChartTab(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Standard Bar Chart
-        Text(
+        SelectableText(
           'Standard Bar Chart',
           style: TextStyle(
             fontSize: 18,
@@ -36,7 +36,7 @@ Widget buildBarChartTab(
           child:
               CristalyseChart()
                   .data(data)
-                  .mapping(x: 'quarter', y: 'revenue')
+                  .mapping(x: 'quarter', y: 'revenue', color: 'bar')
                   .geomBar(width: sliderValue.clamp(0.1, 1.0), alpha: 0.8)
                   .scaleXOrdinal()
                   .scaleYContinuous(min: 0)
@@ -48,13 +48,13 @@ Widget buildBarChartTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Bars grow from bottom with staggered timing\n• Categorical X-axis with ordinal scale\n• Smooth back-ease animation',
         ),
         const SizedBox(height: 32),
 
         // Custom Rounded Bars (Positive/Negative)
-        Text(
+        SelectableText(
           'Smart Rounded Corners (Positive/Negative)',
           style: TextStyle(
             fontSize: 18,
@@ -75,7 +75,7 @@ Widget buildBarChartTab(
               Icon(Icons.new_releases, color: Colors.blue, size: 20),
               SizedBox(width: 8),
               Expanded(
-                child: Text(
+                child: SelectableText(
                   'New Feature: roundOutwardEdges property',
                   style: TextStyle(
                     fontSize: 12,
@@ -112,7 +112,7 @@ Widget buildBarChartTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• positiveColor: green for gains/profits\n• negativeColor: red for losses/deficits\n• roundOutwardEdges: smart corner rounding\n• Perfect for financial data and variance charts',
         ),
       ],

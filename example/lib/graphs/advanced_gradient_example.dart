@@ -64,12 +64,12 @@ class AdvancedGradientExample extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            const SelectableText(
               'Regional Sales with Advanced Gradients',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
+            const SelectableText(
               'Demonstrating different gradient types: Radial, Linear, Sweep, and custom stops.',
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
@@ -107,7 +107,7 @@ class AdvancedGradientExample extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            const Text(
+            const SelectableText(
               'Customer Satisfaction Points',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
@@ -141,7 +141,7 @@ class AdvancedGradientExample extends StatelessWidget {
             ),
 
             const SizedBox(height: 24),
-            const Text(
+            const SelectableText(
               'Gradient Types Used:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
@@ -149,12 +149,12 @@ class AdvancedGradientExample extends StatelessWidget {
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('• North: RadialGradient (center to edges)'),
-                Text('• South: LinearGradient (diagonal)'),
-                Text('• East: SweepGradient (circular sweep)'),
-                Text('• West: LinearGradient (with custom stops)'),
-                Text('• Works with both bars and points'),
-                Text('• Borders and rounded corners supported'),
+                SelectableText('• North: RadialGradient (center to edges)'),
+                SelectableText('• South: LinearGradient (diagonal)'),
+                SelectableText('• East: SweepGradient (circular sweep)'),
+                SelectableText('• West: LinearGradient (with custom stops)'),
+                SelectableText('• Works with both bars and points'),
+                SelectableText('• Borders and rounded corners supported'),
               ],
             ),
           ],

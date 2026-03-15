@@ -61,12 +61,12 @@ class GradientBarExample extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            const SelectableText(
               'Quarterly Revenue with Gradient Bars',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text(
+            const SelectableText(
               'Each bar features a gradient from light to dark, showing depth and visual appeal.',
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
@@ -93,7 +93,7 @@ class GradientBarExample extends StatelessWidget {
                       .build(),
             ),
             const SizedBox(height: 16),
-            const Text(
+            const SelectableText(
               'Features demonstrated:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
@@ -101,11 +101,13 @@ class GradientBarExample extends StatelessWidget {
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('• Linear gradients from bottom to top'),
-                Text('• Custom gradient colors for each category'),
-                Text('• Rounded corners with BorderRadius'),
-                Text('• Smooth back-ease animation'),
-                Text('• Custom Y-axis labels with currency formatting'),
+                SelectableText('• Linear gradients from bottom to top'),
+                SelectableText('• Custom gradient colors for each category'),
+                SelectableText('• Rounded corners with BorderRadius'),
+                SelectableText('• Smooth back-ease animation'),
+                SelectableText(
+                  '• Custom Y-axis labels with currency formatting',
+                ),
               ],
             ),
           ],

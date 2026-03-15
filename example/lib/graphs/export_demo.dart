@@ -180,7 +180,7 @@ class _ExportDemoState extends State<ExportDemo> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          SelectableText(
             'Chart Export Demo',
             style: TextStyle(
               fontSize: 24,
@@ -189,7 +189,7 @@ class _ExportDemoState extends State<ExportDemo> {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          const SelectableText(
             'Export your charts as scalable SVG vector graphics for reports and presentations.',
             style: TextStyle(fontSize: 14, color: Colors.grey),
           ),
@@ -218,7 +218,7 @@ class _ExportDemoState extends State<ExportDemo> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  const SelectableText(
                     'Export Options',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -255,7 +255,7 @@ class _ExportDemoState extends State<ExportDemo> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                         SizedBox(width: 12),
-                        Text('Exporting chart...'),
+                        SelectableText('Exporting chart...'),
                       ],
                     ),
                   ],
@@ -272,18 +272,18 @@ class _ExportDemoState extends State<ExportDemo> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          const SelectableText(
                             'Last Export Result:',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(height: 8),
-                          Text(
+                          SelectableText(
                             'Format: ${_lastExportResult!.format.name.toUpperCase()}',
                           ),
-                          Text(
+                          SelectableText(
                             'Dimensions: ${_lastExportResult!.dimensions.width.toInt()} × ${_lastExportResult!.dimensions.height.toInt()}',
                           ),
-                          Text(
+                          SelectableText(
                             'File Size: ${(_lastExportResult!.fileSizeBytes / 1024).toStringAsFixed(1)} KB',
                           ),
                           Text(
@@ -310,7 +310,7 @@ class _ExportDemoState extends State<ExportDemo> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  const SelectableText(
                     'Usage Examples',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
@@ -324,12 +324,12 @@ class _ExportDemoState extends State<ExportDemo> {
                     child: const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        SelectableText(
                           'Simple SVG Export:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 4),
-                        Text(
+                        SelectableText(
                           'final result = await chart.exportAsSvg(\\n'
                           '  width: 1200,\\n'
                           '  height: 800,\\n'
@@ -341,12 +341,12 @@ class _ExportDemoState extends State<ExportDemo> {
                           ),
                         ),
                         SizedBox(height: 16),
-                        Text(
+                        SelectableText(
                           'SVG Benefits:',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SizedBox(height: 4),
-                        Text(
+                        SelectableText(
                           '• Scalable vector graphics\\n'
                           '• Small file sizes\\n'
                           '• Perfect for presentations\\n'

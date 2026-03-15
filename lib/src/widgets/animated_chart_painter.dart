@@ -10,7 +10,7 @@ import '../themes/chart_theme.dart';
 /// Custom painter with animation support
 class AnimatedChartPainter extends CustomPainter {
   // Spacing constants for axis label and title positioning
-  static const double _tickToLabelSpacing = 4.0;
+  static const double tickToLabelSpacing = 4.0;
   static const double _labelToTitleSpacing = 8.0;
 
   final List<Map<String, dynamic>> data;
@@ -38,6 +38,7 @@ class AnimatedChartPainter extends CustomPainter {
   final bool coordFlipped;
   final List<double>? panXDomain;
   final List<double>? panYDomain;
+  final double? heatMapYAxisSpace;
   final ValueChanged<Rect>? onChartAreaComputed;
 
   /// Creates an [AnimatedChartPainter] with comprehensive chart rendering capabilities.
@@ -95,6 +96,7 @@ class AnimatedChartPainter extends CustomPainter {
     this.coordFlipped = false,
     this.panXDomain,
     this.panYDomain,
+    this.heatMapYAxisSpace,
     this.onChartAreaComputed,
   });
 
@@ -187,22 +189,46 @@ class AnimatedChartPainter extends CustomPainter {
     // Calculate title font size for dimension calculations
     final titleFontSize = (axisLabelStyle.fontSize ?? 12) + 1;
 
-    // Calculate additional padding for axis titles and labels
+    // Use cached heatmap Y-axis label space if provided, otherwise compute it
+    double heatMapYAxisSpace = this.heatMapYAxisSpace ?? 0.0;
+    if (this.heatMapYAxisSpace == null &&
+        geometries.any((g) => g is HeatMapGeometry)) {
+      final yCol = heatMapYColumn ?? yColumn;
+      if (yCol != null && data.isNotEmpty) {
+        final yValues =
+            data.map((d) => d[yCol]).where((v) => v != null).toSet();
+        double maxHeatMapValWidth = 0.0;
+        for (final val in yValues) {
+          final tp = TextPainter(
+            text: TextSpan(text: val.toString(), style: axisLabelStyle),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          if (tp.width > maxHeatMapValWidth) maxHeatMapValWidth = tp.width;
+        }
+        if (maxHeatMapValWidth > 0) {
+          heatMapYAxisSpace =
+              theme.axisWidth * 2 + tickToLabelSpacing + maxHeatMapValWidth;
+        }
+      }
+    }
+
     // Space for Y-axis labels + optional title (title height becomes width after -90° rotation)
-    final yAxisSpace = this.yScale != null
-        ? theme.axisWidth * 2 + // tick marks
-            _tickToLabelSpacing + // gap to labels
-            labelDimensions.maxYLabelWidth + // labels
-            (this.yScale?.title != null
-                ? _labelToTitleSpacing + titleFontSize // gap + title height
-                : 0.0)
-        : 0.0;
+    final yAxisSpace = math.max(
+        heatMapYAxisSpace,
+        this.yScale != null
+            ? theme.axisWidth * 2 + // tick marks
+                tickToLabelSpacing + // gap to labels
+                labelDimensions.maxYLabelWidth + // labels
+                (this.yScale?.title != null
+                    ? _labelToTitleSpacing + titleFontSize // gap + title height
+                    : 0.0)
+            : 0.0);
     final leftPadding = theme.padding.left + yAxisSpace;
 
     // Space for Y2-axis labels + optional title (title height becomes width after +90° rotation)
     final y2AxisSpace = this.y2Scale != null
         ? theme.axisWidth * 2 +
-            _tickToLabelSpacing +
+            tickToLabelSpacing +
             labelDimensions.maxY2LabelWidth +
             (this.y2Scale?.title != null
                 ? _labelToTitleSpacing + titleFontSize // gap + title height
@@ -213,7 +239,7 @@ class AnimatedChartPainter extends CustomPainter {
     // Space for X-axis labels + optional title (not rotated, height is vertical)
     final xAxisSpace = this.xScale != null
         ? theme.axisWidth * 2 +
-            _tickToLabelSpacing +
+            tickToLabelSpacing +
             labelDimensions.maxXLabelHeight +
             (this.xScale?.title != null
                 ? _labelToTitleSpacing + titleFontSize // gap + title height
@@ -1568,7 +1594,7 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     }
 
-    if (colorColumn != null) {
+    if (colorColumn != null && geometry.color == null) {
       // Group by color and draw separate lines
       final groupedData = <dynamic, List<Map<String, dynamic>>>{};
       for (final point in data) {
@@ -1579,7 +1605,7 @@ class AnimatedChartPainter extends CustomPainter {
       for (final entry in groupedData.entries) {
         final colorValue = entry.key;
         final groupData = entry.value;
-        final lineColor = geometry.color ?? colorScale.scale(colorValue);
+        final lineColor = colorScale.scale(colorValue);
         _drawSingleLineAnimated(
           canvas,
           plotArea,
@@ -1743,7 +1769,7 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     }
 
-    if (colorColumn != null) {
+    if (colorColumn != null && geometry.color == null) {
       // Group by color and draw separate areas
       final groupedData = <dynamic, List<Map<String, dynamic>>>{};
       for (final point in data) {
@@ -1754,7 +1780,7 @@ class AnimatedChartPainter extends CustomPainter {
       for (final entry in groupedData.entries) {
         final colorValue = entry.key;
         final groupData = entry.value;
-        final areaColor = geometry.color ?? colorScale.scale(colorValue);
+        final areaColor = colorScale.scale(colorValue);
         _drawSingleArea(
           canvas,
           plotArea,
@@ -1994,7 +2020,7 @@ class AnimatedChartPainter extends CustomPainter {
         canvas,
         Offset(
           pos - textPainter.width / 2,
-          xTickOuterEdge + _tickToLabelSpacing,
+          xTickOuterEdge + tickToLabelSpacing,
         ),
       );
     }
@@ -2020,11 +2046,12 @@ class AnimatedChartPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.right,
       );
-      textPainter.layout(minWidth: 0, maxWidth: plotArea.left - 16);
+      textPainter.layout(
+          minWidth: 0, maxWidth: math.max(0.0, plotArea.left - 8));
       textPainter.paint(
         canvas,
         Offset(
-          yTickOuterEdge - _tickToLabelSpacing - textPainter.width,
+          yTickOuterEdge - tickToLabelSpacing - textPainter.width,
           pos - textPainter.height / 2,
         ),
       );
@@ -2058,7 +2085,7 @@ class AnimatedChartPainter extends CustomPainter {
         textPainter.paint(
           canvas,
           Offset(
-            y2TickOuterEdge + _tickToLabelSpacing,
+            y2TickOuterEdge + tickToLabelSpacing,
             pos - textPainter.height / 2,
           ),
         );
@@ -2067,11 +2094,11 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Calculate label alignment positions (where label edges meet tick spacing)
     final xLabelAlignEdge =
-        xTickOuterEdge + _tickToLabelSpacing; // Top edge of X labels
+        xTickOuterEdge + tickToLabelSpacing; // Top edge of X labels
     final yLabelAlignEdge =
-        yTickOuterEdge - _tickToLabelSpacing; // Right edge of Y labels
+        yTickOuterEdge - tickToLabelSpacing; // Right edge of Y labels
     final y2LabelAlignEdge =
-        y2TickOuterEdge + _tickToLabelSpacing; // Left edge of Y2 labels
+        y2TickOuterEdge + tickToLabelSpacing; // Left edge of Y2 labels
 
     // Calculate label outer edges using alignment position and max dimensions
     final xLabelOuterEdge = xLabelAlignEdge + maxXLabelHeight; // Bottom edge
@@ -2609,7 +2636,8 @@ class AnimatedChartPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.right,
       );
-      textPainter.layout(minWidth: 0, maxWidth: plotArea.left - 16);
+      textPainter.layout(
+          minWidth: 0, maxWidth: math.max(0.0, plotArea.left - 8));
       textPainter.paint(
         canvas,
         Offset(
@@ -2731,6 +2759,7 @@ class AnimatedChartPainter extends CustomPainter {
         oldDelegate.sizeScale != sizeScale ||
         oldDelegate.theme != theme ||
         oldDelegate.animationProgress != animationProgress ||
+        oldDelegate.heatMapYAxisSpace != heatMapYAxisSpace ||
         oldDelegate.coordFlipped != coordFlipped ||
         !_listEquals(oldDelegate.panXDomain, panXDomain) ||
         !_listEquals(oldDelegate.panYDomain, panYDomain);
@@ -3946,42 +3975,66 @@ class AnimatedChartPainter extends CustomPainter {
     // Measure X-axis labels
     if (xScale != null) {
       final xTicks = xScale.getTicks();
-      for (final tick in xTicks) {
-        final label = xScale.formatLabel(tick);
-        final textPainter = TextPainter(
-          text: TextSpan(text: label, style: style),
+      if (xTicks.isEmpty) {
+        final fallbackTp = TextPainter(
+          text: TextSpan(text: '8,888,888', style: style),
           textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        maxXLabelHeight = math.max(maxXLabelHeight, textPainter.height);
+        )..layout();
+        maxXLabelHeight = math.max(maxXLabelHeight, fallbackTp.height);
+      } else {
+        for (final tick in xTicks) {
+          final label = xScale.formatLabel(tick);
+          final textPainter = TextPainter(
+            text: TextSpan(text: label, style: style),
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          maxXLabelHeight = math.max(maxXLabelHeight, textPainter.height);
+        }
       }
     }
 
     // Measure Y-axis labels
     if (yScale != null) {
       final yTicks = yScale.getTicks();
-      for (final tick in yTicks) {
-        final label = yScale.formatLabel(tick);
-        final textPainter = TextPainter(
-          text: TextSpan(text: label, style: style),
+      if (yTicks.isEmpty) {
+        final fallbackTp = TextPainter(
+          text: TextSpan(text: '8,888,888', style: style),
           textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        maxYLabelWidth = math.max(maxYLabelWidth, textPainter.width);
+        )..layout();
+        maxYLabelWidth = math.max(maxYLabelWidth, fallbackTp.width);
+      } else {
+        for (final tick in yTicks) {
+          final label = yScale.formatLabel(tick);
+          final textPainter = TextPainter(
+            text: TextSpan(text: label, style: style),
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          maxYLabelWidth = math.max(maxYLabelWidth, textPainter.width);
+        }
       }
     }
 
     // Measure Y2-axis labels
     if (y2Scale != null) {
       final y2Ticks = y2Scale.getTicks();
-      for (final tick in y2Ticks) {
-        final label = y2Scale.formatLabel(tick);
-        final textPainter = TextPainter(
-          text: TextSpan(text: label, style: style),
+      if (y2Ticks.isEmpty) {
+        final fallbackTp = TextPainter(
+          text: TextSpan(text: '8,888,888', style: style),
           textDirection: TextDirection.ltr,
-        );
-        textPainter.layout();
-        maxY2LabelWidth = math.max(maxY2LabelWidth, textPainter.width);
+        )..layout();
+        maxY2LabelWidth = math.max(maxY2LabelWidth, fallbackTp.width);
+      } else {
+        for (final tick in y2Ticks) {
+          final label = y2Scale.formatLabel(tick);
+          final textPainter = TextPainter(
+            text: TextSpan(text: label, style: style),
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          maxY2LabelWidth = math.max(maxY2LabelWidth, textPainter.width);
+        }
       }
     }
 

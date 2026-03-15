@@ -11,7 +11,7 @@ Widget buildLineChartTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Animated Line Chart',
           style: TextStyle(
             fontSize: 18,
@@ -34,7 +34,7 @@ Widget buildLineChartTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Line draws from left to right\n• Smooth animation with partial segments\n• Responsive to theme changes',
         ),
       ],

@@ -120,7 +120,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    SelectableText(
                       'Range: ${visibleMinX.toStringAsFixed(1)} → ${visibleMaxX.toStringAsFixed(1)}',
                       style: TextStyle(
                         fontSize: 14,
@@ -129,11 +129,11 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                         color: Theme.of(context).primaryColor,
                       ),
                     ),
-                    Text(
+                    SelectableText(
                       'Width: ${(visibleMaxX - visibleMinX).toStringAsFixed(1)} • Events: $totalPanEvents',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[800],
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -151,7 +151,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                     });
                   },
                   decoration: InputDecoration(
-                    label: Text(
+                    label: SelectableText(
                       'Min X',
                       style: TextStyle(
                         fontSize: 12,
@@ -185,7 +185,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                     });
                   },
                   decoration: InputDecoration(
-                    label: Text(
+                    label: SelectableText(
                       'Max X',
                       style: TextStyle(
                         fontSize: 12,
@@ -232,7 +232,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
               ),
               Expanded(
                 child: SwitchListTile(
-                  title: Text(
+                  title: SelectableText(
                     'Boundary Clamping',
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
@@ -305,7 +305,7 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
                                   color: Colors.black.withValues(alpha: 0.8),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: Text(
+                                child: SelectableText(
                                   '${point.getDisplayValue('x')}: ${point.getDisplayValue('y')} data',
                                   style: const TextStyle(
                                     color: Colors.white,

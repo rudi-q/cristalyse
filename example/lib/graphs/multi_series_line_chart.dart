@@ -27,7 +27,7 @@ Widget buildMultiSeriesLineChartTab(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Chart 1: Multi-series Line + Points (the main fix demonstration)
-        Text(
+        SelectableText(
           'Multi-Series Line Chart with Points',
           style: TextStyle(
             fontSize: 18,
@@ -36,7 +36,7 @@ Widget buildMultiSeriesLineChartTab(
           ),
         ),
         const SizedBox(height: 8),
-        Text(
+        SelectableText(
           'Using the exact code from the documentation that was previously broken',
           style: TextStyle(fontSize: 14, color: Colors.grey[600]),
         ),
@@ -61,7 +61,7 @@ Widget buildMultiSeriesLineChartTab(
         const SizedBox(height: 24),
 
         // Chart 2: Lines only (no points)
-        Text(
+        SelectableText(
           'Multi-Series Lines Only',
           style: TextStyle(
             fontSize: 18,
@@ -70,7 +70,7 @@ Widget buildMultiSeriesLineChartTab(
           ),
         ),
         const SizedBox(height: 8),
-        Text(
+        SelectableText(
           'Demonstrates clean line separation without points',
           style: TextStyle(fontSize: 14, color: Colors.grey[600]),
         ),
@@ -97,7 +97,7 @@ Widget buildMultiSeriesLineChartTab(
         const SizedBox(height: 24),
 
         // Chart 3: Three series to really show the multi-series capability
-        Text(
+        SelectableText(
           'Three-Series Comparison',
           style: TextStyle(
             fontSize: 18,
@@ -106,7 +106,7 @@ Widget buildMultiSeriesLineChartTab(
           ),
         ),
         const SizedBox(height: 8),
-        Text(
+        SelectableText(
           'iOS vs Android vs Web platforms - each with separate lines',
           style: TextStyle(fontSize: 14, color: Colors.grey[600]),
         ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 Widget buildPieChartTab(
+  BuildContext context,
   ChartTheme currentTheme,
   List<Map<String, dynamic>> data,
   double sliderValue,
@@ -19,7 +20,7 @@ Widget buildPieChartTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Revenue Distribution - Percentage Display',
           style: TextStyle(
             fontSize: 18,
@@ -38,7 +39,7 @@ Widget buildPieChartTab(
                     outerRadius:
                         100.0 + sliderValue * 50.0, // Use slider for radius
                     strokeWidth: 2.0,
-                    strokeColor: Colors.white,
+                    strokeColor: Theme.of(context).scaffoldBackgroundColor,
                     showLabels: true,
                     showPercentages: true, // Show default percentage formatting
                   )
@@ -50,11 +51,11 @@ Widget buildPieChartTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Slices animate in with staggered timing\n• Percentages shown on labels\n• Smooth elastic animation curve',
         ),
         const SizedBox(height: 32),
-        Text(
+        SelectableText(
           'User Distribution - Donut Chart with Compact Number Formatting',
           style: TextStyle(
             fontSize: 18,
@@ -73,7 +74,7 @@ Widget buildPieChartTab(
                     innerRadius: 60.0, // Creates larger donut hole
                     outerRadius: 120.0,
                     strokeWidth: 3.0,
-                    strokeColor: Colors.white,
+                    strokeColor: Theme.of(context).scaffoldBackgroundColor,
                     showLabels: true,
                     showPercentages:
                         false, // Show formatted user counts instead
@@ -89,7 +90,7 @@ Widget buildPieChartTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Donut chart with inner radius\n• Shows actual values instead of percentages\n• Different animation curve\n• Uses NumberFormat.compact() formatting',
         ),
       ],

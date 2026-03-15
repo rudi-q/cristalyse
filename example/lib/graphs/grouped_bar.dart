@@ -12,7 +12,7 @@ Widget buildGroupedBarTab(
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Product Performance by Quarter',
           style: TextStyle(
             fontSize: 18,
@@ -21,7 +21,7 @@ Widget buildGroupedBarTab(
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        const SelectableText(
           'Multiple product lines compared side-by-side with currency formatting',
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
@@ -53,7 +53,7 @@ Widget buildGroupedBarTab(
                   .build(),
         ),
         const SizedBox(height: 16),
-        const Text(
+        const SelectableText(
           '• Multiple series grouped side-by-side\n• Uses direct NumberFormat.simpleCurrency()\n• Color mapping for different products\n• Auto-generated legend shows product categories\n• Coordinated group animation',
         ),
       ],
