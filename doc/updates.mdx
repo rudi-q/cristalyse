@@ -12,6 +12,27 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="April 4, 2026" description="v1.17.6">
+  ### 🐛 Tooltip Flickering Fix
+  
+  **Smooth tooltips, no more jitter!**
+  
+  **What was fixed:**
+  - **Eliminated tooltip flicker:** Tooltips no longer close and reopen when the mouse moves slightly while hovering over the same data point.
+  - **Smart Point Detection:** The chart now intelligently detects when the hovered data point hasn't changed. If the tooltip content would be identical, the existing tooltip is preserved instead of being recreated.
+  - **Comparison Logic:** Points are identified by `dataIndex + seriesName`, ensuring the fix works seamlessly with both single-series and multi-series charts.
+  
+  **Why this matters:**
+  - Users can now hover naturally over data points without experiencing visual jitter.
+  - Tooltips feel stable and responsive across all chart types.
+  - No performance impact — the optimization actually reduces unnecessary DOM updates.
+  
+  **Quality Assurance:**
+  - 297 tests pass — zero breaking changes.
+  - Fully backward compatible.
+  - Safe upgrade for all existing projects.
+</Update>
+
 <Update label="February 22, 2026" description="v1.17.5">
   ### 🐛 Layout Optimizations & Bug Fixes
   
