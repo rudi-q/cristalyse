@@ -18,6 +18,8 @@ xcuserdata
 Flutter/App.framework
 Flutter/Flutter.framework
 Flutter/Flutter.podspec
+Flutter/Debug.xcconfig
+Flutter/Release.xcconfig
 Flutter/Generated.xcconfig
 Flutter/ephemeral/
 Flutter/app.flx
@@ -26,6 +28,14 @@ Flutter/flutter_assets/
 Flutter/flutter_export_environment.sh
 ServiceDefinitions.json
 Runner/GeneratedPluginRegistrant.*
+
+# CocoaPods
+Podfile
+Podfile.lock
+
+# Xcode generated files and workspaces
+**/Runner.xcodeproj/
+**/Runner.xcworkspace/
 
 # Exceptions to above rules.
 !default.mode1v3

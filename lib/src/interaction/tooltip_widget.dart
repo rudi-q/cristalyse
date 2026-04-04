@@ -83,12 +83,10 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
   /// Show tooltip for a data point
   @override
   void showTooltip(DataPointInfo point, Offset position) {
-    // Update current state
-    _currentPoint = point;
-    _currentPosition = position;
-    _shouldShow = true;
-
     if (widget.config.builder == null) {
+      _currentPoint = point;
+      _currentPosition = position;
+      _shouldShow = true;
       return;
     }
 
@@ -96,13 +94,27 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
     _hideTimer?.cancel();
     _hideTimer = null;
 
-    // If already showing a tooltip, immediately switch to new point
+    // If already showing a tooltip, only recreate if the data point changed
     if (_isVisible && _overlayEntry != null) {
-      // Update position and recreate with new data
+      if (_isSamePoint(point, _currentPoint)) {
+        // Same point — update stored position but don't recreate the tooltip
+        _currentPosition = position;
+        _shouldShow = true;
+        return;
+      }
+      // Different point — update state and switch immediately
+      _currentPoint = point;
+      _currentPosition = position;
+      _shouldShow = true;
       _removeTooltip();
       _createTooltip();
       return;
     }
+
+    // Update current state
+    _currentPoint = point;
+    _currentPosition = position;
+    _shouldShow = true;
 
     // Cancel any existing show timer and start a new one
     _showTimer?.cancel();
@@ -179,6 +191,12 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
       debugPrint("Error creating tooltip: $e");
       _removeTooltip();
     }
+  }
+
+  /// Returns true if both points refer to the same data point.
+  bool _isSamePoint(DataPointInfo a, DataPointInfo? b) {
+    if (b == null) return false;
+    return a.dataIndex == b.dataIndex && a.seriesName == b.seriesName;
   }
 
   /// Remove tooltip overlay

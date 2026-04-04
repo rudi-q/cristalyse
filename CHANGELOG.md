@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.17.6 - 2026-04-04
+
+#### 🐛 Bug Fixes
+
+**Tooltip Flickering Fix:**
+- **Fixed tooltip flicker on subtle mouse movements:** When hovering over a chart, moving the mouse by even a single pixel while remaining over the same data point would cause the tooltip to close and immediately reopen, creating a visible flickering effect.
+- **Smart Point Detection:** Before closing and reopening the tooltip, the chart now checks if the hovered data point has actually changed. If the tooltip content would be the same, the existing tooltip is preserved instead of being recreated.
+- **Comparison Logic:** Points are identified by `dataIndex + seriesName`, ensuring the fix works correctly with multi-series charts and single-series data.
+
+**Quality Assurance:**
+- 297 tests pass — zero breaking changes.
+- Fully backward compatible.
+- Tooltip behavior improved across all chart types.
+
+---
+
 ## 1.17.5 - 2026-02-22
 
 #### 🐛 Bug Fixes & Layout Optimization
