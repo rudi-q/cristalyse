@@ -1,17 +1,10 @@
 # Flutter-related
 **/Flutter/ephemeral/
-**/Flutter/Debug.xcconfig
-**/Flutter/Release.xcconfig
-**/Flutter/Flutter-Debug.xcconfig
-**/Flutter/Flutter-Release.xcconfig
 **/Pods/
 
 # Xcode-related
 **/dgph
 **/xcuserdata/
-**/Runner.xcodeproj/
-**/Runner.xcworkspace/
 
 # CocoaPods
-Podfile
 Podfile.lock

@@ -1,0 +1,23 @@
+# Example app platform-specific files
+# These are needed in git for developers but shouldn't be in the published package
+example/ios/Podfile
+example/ios/Podfile.lock
+example/ios/Runner.xcodeproj/
+example/ios/Runner.xcworkspace/
+example/ios/Flutter/Debug.xcconfig
+example/ios/Flutter/Release.xcconfig
+
+example/macos/Podfile
+example/macos/Podfile.lock
+example/macos/Runner.xcodeproj/
+example/macos/Runner.xcworkspace/
+example/macos/Flutter/Flutter-Debug.xcconfig
+example/macos/Flutter/Flutter-Release.xcconfig
+
+# Build and generated files
+build/
+.dart_tool/
+.idea/
+
+# Documentation
+doc/

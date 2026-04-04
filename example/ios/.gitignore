@@ -30,12 +30,7 @@ ServiceDefinitions.json
 Runner/GeneratedPluginRegistrant.*
 
 # CocoaPods
-Podfile
 Podfile.lock
-
-# Xcode generated files and workspaces
-**/Runner.xcodeproj/
-**/Runner.xcworkspace/
 
 # Exceptions to above rules.
 !default.mode1v3

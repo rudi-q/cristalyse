@@ -45,9 +45,4 @@ app.*.map.json
 /android/app/release
 
 # CocoaPods
-Podfile
 Podfile.lock
-
-# Xcode generated files and workspaces
-**/Runner.xcodeproj/
-**/Runner.xcworkspace/
