@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../graphs/advanced_gradient_example.dart';
 import '../graphs/area_chart.dart';
+import '../graphs/axis_tooltip_example.dart';
 import '../graphs/bar_chart.dart';
 import '../graphs/bubble_chart.dart';
 import '../graphs/combo_bar_line_chart.dart';
@@ -492,6 +493,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Time-Based Line Chart',
       'Zoom & Navigation Demo',
       'Combo Chart (Bar + Line)',
+      'Axis-Based Tooltips',
     ];
   }
 
@@ -520,6 +522,7 @@ class _ChartScreenState extends State<ChartScreen>
       'Line chart with time-based data on x-axis',
       'Pinch, scroll, and button-based zoom controls with live callbacks',
       'Bar correctly colored by categorical variable with a single continuous overlaid line.',
+      'Hover anywhere on X-axis to see all platforms • Smooth crosshair indicator • Zero flickering',
     ];
   }
 
@@ -755,6 +758,8 @@ class _ChartScreenState extends State<ChartScreen>
         return buildZoomExampleTab(currentTheme, _sliderValue);
       case 22:
         return buildComboBarLineTab(currentTheme, _sliderValue);
+      case 23:
+        return const AxisTooltipExample();
       default:
         return Container();
     }
@@ -949,6 +954,12 @@ class _ChartScreenState extends State<ChartScreen>
           ),
           _buildStatsCard('Bars', 'Categorical', 'Dodge spacing', Colors.blue),
           _buildStatsCard('Line', 'Solid', 'Continuous trend', Colors.purple),
+        ];
+      case 23:
+        return [
+          _buildStatsCard('Trigger Mode', 'Axis', 'X-Position', Colors.blue),
+          _buildStatsCard('Smoothness', '100%', 'No Flicker', Colors.green),
+          _buildStatsCard('Crosshair', 'Active', 'Dashed Style', Colors.purple),
         ];
       default:
         return [];

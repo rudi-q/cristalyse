@@ -9,6 +9,7 @@ import '../core/scale.dart';
 import '../core/util/helper.dart';
 import '../core/util/painter.dart';
 import '../interaction/chart_interactions.dart';
+import '../interaction/crosshair_widget.dart';
 import '../interaction/interaction_detector.dart';
 import '../interaction/tooltip_widget.dart';
 import '../themes/chart_theme.dart';
@@ -88,6 +89,9 @@ class _AnimatedCristalyseChartWidgetState
   InteractionDetector? _interactionDetector;
 
   TooltipController? _cachedTooltipController;
+
+  /// Crosshair position for axis-based tooltips
+  Offset? _crosshairPosition;
 
   /// Pan state tracking
   DateTime? _lastPanCallback;
@@ -250,39 +254,92 @@ class _AnimatedCristalyseChartWidgetState
   ) {
     if (!widget.interaction.enabled ||
         (widget.interaction.hover?.onHover == null &&
-            widget.interaction.tooltip?.builder == null)) {
+            widget.interaction.tooltip?.builder == null &&
+            widget.interaction.tooltip?.multiPointBuilder == null)) {
       return;
     }
 
     _ensureInteractionDetector(plotArea);
 
-    // Use larger hit test radius for more forgiving detection
-    final hitRadius = math.max(
-      widget.interaction.hover?.hitTestRadius ?? 20.0,
-      25.0, // Minimum generous radius
-    );
-
-    final point = _interactionDetector!.detectPoint(
-      event.localPosition,
-      maxDistance: hitRadius,
-    );
-
     // Convert local position to global for tooltip positioning
     final RenderBox renderBox = hoverContext.findRenderObject() as RenderBox;
     final Offset globalPosition = renderBox.localToGlobal(event.localPosition);
 
-    // Handle hover callbacks
-    widget.interaction.hover?.onHover?.call(point);
+    // Check tooltip trigger mode
+    final tooltipConfig = widget.interaction.tooltip;
+    final useAxisMode =
+        tooltipConfig?.triggerMode == ChartTooltipTriggerMode.axis;
 
-    // Handle tooltips
-    if (widget.interaction.tooltip?.builder != null) {
-      if (point != null) {
-        // Keep showing tooltip as long as we have a valid point
-        showTooltip(hoverContext, point, globalPosition);
-      } else {
-        // Only hide if we truly have no nearby points
-        hideTooltip(hoverContext);
+    if (useAxisMode) {
+      // Axis mode: detect all points at X position
+      // Always snaps to nearest X position for continuous tooltip display
+      final points = _interactionDetector!.detectPointsByXPosition(
+        event.localPosition,
+      );
+
+      // Update crosshair position if needed
+      if (tooltipConfig?.showCrosshair == true && points.isNotEmpty) {
+        setState(() {
+          _crosshairPosition = event.localPosition;
+        });
+      } else if (_crosshairPosition != null) {
+        setState(() {
+          _crosshairPosition = null;
+        });
       }
+
+      // Handle hover callbacks (use first point for backward compatibility)
+      widget.interaction.hover?.onHover
+          ?.call(points.isNotEmpty ? points.first : null);
+
+      // Handle tooltips
+      if (tooltipConfig != null) {
+        if (points.isNotEmpty) {
+          // Show multi-point tooltip
+          _showMultiPointTooltip(hoverContext, points, globalPosition);
+        } else {
+          // No points found - hide tooltip
+          hideTooltip(hoverContext);
+        }
+      }
+    } else {
+      // Point mode: detect single closest point
+      final hitRadius = math.max(
+        widget.interaction.hover?.hitTestRadius ?? 20.0,
+        25.0, // Minimum generous radius
+      );
+
+      final point = _interactionDetector!.detectPoint(
+        event.localPosition,
+        maxDistance: hitRadius,
+      );
+
+      // Handle hover callbacks
+      widget.interaction.hover?.onHover?.call(point);
+
+      // Handle tooltips
+      if (tooltipConfig?.builder != null) {
+        if (point != null) {
+          // Keep showing tooltip as long as we have a valid point
+          showTooltip(hoverContext, point, globalPosition);
+        } else {
+          // Only hide if we truly have no nearby points
+          hideTooltip(hoverContext);
+        }
+      }
+    }
+  }
+
+  /// Helper to show multi-point tooltip
+  void _showMultiPointTooltip(
+    BuildContext context,
+    List<DataPointInfo> points,
+    Offset globalPosition,
+  ) {
+    if (_cachedTooltipController != null) {
+      _cachedTooltipController!.showMultiPointTooltip(points, globalPosition);
+    } else {
+      showMultiPointTooltip(context, points, globalPosition);
     }
   }
 
@@ -291,8 +348,16 @@ class _AnimatedCristalyseChartWidgetState
 
     widget.interaction.hover?.onExit?.call(null);
 
+    // Clear crosshair
+    if (_crosshairPosition != null) {
+      setState(() {
+        _crosshairPosition = null;
+      });
+    }
+
     // Always hide tooltip when mouse exits the chart area
-    if (widget.interaction.tooltip?.builder != null) {
+    if (widget.interaction.tooltip?.builder != null ||
+        widget.interaction.tooltip?.multiPointBuilder != null) {
       hideTooltip(exitContext);
     }
   }
@@ -391,30 +456,66 @@ class _AnimatedCristalyseChartWidgetState
     if (hasTooltips && panConfig?.enabled != true) {
       _ensureInteractionDetector(plotArea);
 
-      // Use even larger radius for touch interactions
-      final hitRadius = math.max(
-        widget.interaction.hover?.hitTestRadius ?? 30.0,
-        35.0, // Even more generous for touch
-      );
-
-      final point = _interactionDetector!.detectPoint(
-        localPosition,
-        maxDistance: hitRadius,
-      );
-
       // Convert local position to global for tooltip positioning
       final RenderBox renderBox = panContext.findRenderObject() as RenderBox;
       final Offset globalPosition = renderBox.localToGlobal(localPosition);
 
-      // Handle hover callbacks
-      widget.interaction.hover?.onHover?.call(point);
+      final tooltipConfig = widget.interaction.tooltip;
+      final useAxisMode =
+          tooltipConfig?.triggerMode == ChartTooltipTriggerMode.axis;
 
-      // Handle tooltips
-      if (widget.interaction.tooltip?.builder != null) {
-        if (point != null && widget.interaction.tooltip!.followPointer) {
-          showTooltip(panContext, point, globalPosition);
-        } else if (point == null) {
-          hideTooltip(panContext);
+      if (useAxisMode) {
+        // Axis mode: detect all points at X position
+        // Always snaps to nearest X position for continuous tooltip display
+        final points = _interactionDetector!.detectPointsByXPosition(
+          localPosition,
+        );
+
+        // Update crosshair position if needed
+        if (tooltipConfig?.showCrosshair == true && points.isNotEmpty) {
+          setState(() {
+            _crosshairPosition = localPosition;
+          });
+        } else if (_crosshairPosition != null) {
+          setState(() {
+            _crosshairPosition = null;
+          });
+        }
+
+        // Handle hover callbacks (use first point)
+        widget.interaction.hover?.onHover
+            ?.call(points.isNotEmpty ? points.first : null);
+
+        // Handle tooltips
+        if (tooltipConfig != null && tooltipConfig.followPointer) {
+          if (points.isNotEmpty) {
+            _showMultiPointTooltip(panContext, points, globalPosition);
+          } else {
+            hideTooltip(panContext);
+          }
+        }
+      } else {
+        // Point mode: use larger radius for touch interactions
+        final hitRadius = math.max(
+          widget.interaction.hover?.hitTestRadius ?? 30.0,
+          35.0, // Even more generous for touch
+        );
+
+        final point = _interactionDetector!.detectPoint(
+          localPosition,
+          maxDistance: hitRadius,
+        );
+
+        // Handle hover callbacks
+        widget.interaction.hover?.onHover?.call(point);
+
+        // Handle tooltips
+        if (tooltipConfig?.builder != null) {
+          if (point != null && tooltipConfig!.followPointer) {
+            showTooltip(panContext, point, globalPosition);
+          } else if (point == null) {
+            hideTooltip(panContext);
+          }
         }
       }
     }
@@ -442,11 +543,18 @@ class _AnimatedCristalyseChartWidgetState
     // Keep pan domains to maintain the panned view
     // Don't reset them so the chart stays in the panned position
 
+    // Clear crosshair on gesture end
+    if (_crosshairPosition != null) {
+      setState(() {
+        _crosshairPosition = null;
+      });
+    }
+
     widget.interaction.hover?.onExit?.call(null);
 
-    if (widget.interaction.tooltip?.builder != null) {
-      hideTooltip(panEndContext);
-    }
+    // Always hide tooltip on gesture end (not just when builder != null)
+    // This ensures both single-point and multi-point tooltips are hidden
+    hideTooltip(panEndContext);
   }
 
   void _handleScaleStart(
@@ -755,6 +863,23 @@ class _AnimatedCristalyseChartWidgetState
     );
 
     Widget chart = CustomPaint(painter: chartPainter, child: Container());
+
+    // Add crosshair overlay if enabled in axis mode
+    final showCrosshair = widget.interaction.tooltip?.showCrosshair == true &&
+        widget.interaction.tooltip?.triggerMode == ChartTooltipTriggerMode.axis;
+
+    if (showCrosshair) {
+      chart = Stack(
+        children: [
+          chart,
+          CrosshairOverlay(
+            position: _crosshairPosition,
+            plotArea: plotArea,
+            config: widget.interaction.tooltip!,
+          ),
+        ],
+      );
+    }
 
     // Wrap with gesture detection if interactions are enabled
     if (widget.interaction.enabled) {

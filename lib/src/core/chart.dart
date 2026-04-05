@@ -1056,6 +1056,7 @@ class CristalyseChart {
 extension TooltipConfigExtension on TooltipConfig {
   TooltipConfig copyWith({
     TooltipBuilder? builder,
+    MultiPointTooltipBuilder? multiPointBuilder,
     Duration? showDelay,
     Duration? hideDelay,
     bool? followPointer,
@@ -1064,9 +1065,15 @@ extension TooltipConfigExtension on TooltipConfig {
     Color? textColor,
     double? borderRadius,
     BoxShadow? shadow,
+    ChartTooltipTriggerMode? triggerMode,
+    bool? showCrosshair,
+    Color? crosshairColor,
+    double? crosshairWidth,
+    StrokeStyle? crosshairStyle,
   }) {
     return TooltipConfig(
       builder: builder ?? this.builder,
+      multiPointBuilder: multiPointBuilder ?? this.multiPointBuilder,
       showDelay: showDelay ?? this.showDelay,
       hideDelay: hideDelay ?? this.hideDelay,
       followPointer: followPointer ?? this.followPointer,
@@ -1075,6 +1082,11 @@ extension TooltipConfigExtension on TooltipConfig {
       textColor: textColor ?? this.textColor,
       borderRadius: borderRadius ?? this.borderRadius,
       shadow: shadow ?? this.shadow,
+      triggerMode: triggerMode ?? this.triggerMode,
+      showCrosshair: showCrosshair ?? this.showCrosshair,
+      crosshairColor: crosshairColor ?? this.crosshairColor,
+      crosshairWidth: crosshairWidth ?? this.crosshairWidth,
+      crosshairStyle: crosshairStyle ?? this.crosshairStyle,
     );
   }
 }
@@ -1176,14 +1188,16 @@ extension ChartThemeExtension on ChartTheme {
   }) {
     // Extract unique categories
     final categories = data.map((d) => d[color] as String).toSet().toList();
+    debugPrint(
+        'CustomPalette: Found ${categories.length} categories: $categories');
+    debugPrint(
+        'CustomPalette: Original palette length: ${this.colorPalette.length}');
     // Build color palette in the order categories appear
-    final colorPalette = categories
-        .map(
-          (category) =>
-              categoryColors[category] ??
-              this.colorPalette[categories.indexOf(category)],
-        )
-        .toList();
+    final colorPalette = categories.map((category) {
+      final categoryIndex = categories.indexOf(category);
+      final fallbackIndex = categoryIndex % this.colorPalette.length;
+      return categoryColors[category] ?? this.colorPalette[fallbackIndex];
+    }).toList();
     return copyWith(colorPalette: colorPalette);
   }
 

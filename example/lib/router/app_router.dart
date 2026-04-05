@@ -145,6 +145,12 @@ class AppRouter {
           return const ChartScreen(chartIndex: 22);
         },
       ),
+      GoRoute(
+        path: '/axis-tooltip',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ChartScreen(chartIndex: 23);
+        },
+      ),
     ],
   );
 
@@ -323,6 +329,13 @@ class AppRouter {
       description: 'Combo chart rendering both geometries cleanly',
       isNew: true,
       docsUrl: null,
+    ),
+    RouteInfo(
+      path: '/axis-tooltip',
+      title: 'Axis Tooltips',
+      icon: Icons.track_changes,
+      description: 'Smooth axis-based tooltips with crosshair indicator',
+      isNew: true,
     ),
   ];
 }
