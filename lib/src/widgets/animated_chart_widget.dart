@@ -468,13 +468,13 @@ class _AnimatedCristalyseChartWidgetState
         // Axis mode: detect all points at X position
         // Always snaps to nearest X position for continuous tooltip display
         final points = _interactionDetector!.detectPointsByXPosition(
-          details.localPosition,
+          localPosition,
         );
 
         // Update crosshair position if needed
         if (tooltipConfig?.showCrosshair == true && points.isNotEmpty) {
           setState(() {
-            _crosshairPosition = details.localPosition;
+            _crosshairPosition = localPosition;
           });
         } else if (_crosshairPosition != null) {
           setState(() {
@@ -502,7 +502,7 @@ class _AnimatedCristalyseChartWidgetState
         );
 
         final point = _interactionDetector!.detectPoint(
-          details.localPosition,
+          localPosition,
           maxDistance: hitRadius,
         );
 
