@@ -91,10 +91,12 @@ class AxisTooltipExample extends StatelessWidget {
           position: LegendPosition.topRight,
           backgroundColor: Colors.white.withValues(alpha: 0.9),
         )
-        .theme(ChartTheme.defaultTheme().copyWith(
-          plotBackgroundColor: Colors.grey.shade50,
-          gridColor: Colors.grey.shade300,
-        ))
+        .theme(
+          ChartTheme.defaultTheme().copyWith(
+            plotBackgroundColor: Colors.grey.shade50,
+            gridColor: Colors.grey.shade300,
+          ),
+        )
         .build();
   }
 }

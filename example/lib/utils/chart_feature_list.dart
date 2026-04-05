@@ -162,13 +162,13 @@ List<String> getChartFeatures(int tabIndex) {
         'Axis picker toggles X, Y, or dual-axis zooming at runtime',
         'Wheel sensitivity and button steps are fully configurable',
       ];
-    case 19: // Axis tooltips
+    case 23: // Axis tooltips
       return [
         'Axis-based tooltip triggering - hover anywhere on X position',
         'Multi-point tooltips showing all series simultaneously',
         'Vertical crosshair indicator with customizable styling',
         'Smooth rendering without flickering on mouse movement',
-        'Color-coded series indicators for easy identification'
+        'Color-coded series indicators for easy identification',
       ];
     default:
       return [];
