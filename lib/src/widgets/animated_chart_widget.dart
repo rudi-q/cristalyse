@@ -13,6 +13,7 @@ import '../interaction/crosshair_widget.dart';
 import '../interaction/interaction_detector.dart';
 import '../interaction/tooltip_widget.dart';
 import '../themes/chart_theme.dart';
+import 'animated_chart_painter.dart';
 import 'legend_widget.dart';
 
 /// Animated wrapper for the chart widget
@@ -105,6 +106,25 @@ class _AnimatedCristalyseChartWidgetState
   List<double>? _originalXDomain;
   List<double>? _originalYDomain;
 
+  /// Cached base spans for zoom calculations
+  double? _baseXSpan;
+  double? _baseYSpan;
+
+  /// Track latest plot area for gesture conversions
+  Rect? _currentPlotArea;
+
+  /// Actual plot area computed by painter, persistent across repaints
+  Rect? _actualPlotArea;
+
+  /// Scale gesture tracking
+  double _lastScaleFactor = 1.0;
+  Offset? _lastScaleFocalPoint;
+  bool _isPinchZoomActive = false;
+
+  ZoomConfig? get _zoomConfig => widget.interaction.zoom;
+  bool get _isZoomEnabled =>
+      widget.interaction.enabled && (_zoomConfig?.enabled ?? false);
+
   @override
   void initState() {
     super.initState();
@@ -118,6 +138,11 @@ class _AnimatedCristalyseChartWidgetState
     );
 
     _animationController.forward();
+    if (widget.interaction.pan?.controller != null) {
+      widget.interaction.pan!.controller!.addListener(
+        _handlePanControllerUpdate,
+      );
+    }
   }
 
   @override
@@ -128,11 +153,19 @@ class _AnimatedCristalyseChartWidgetState
         widget.geometries != oldWidget.geometries) {
       _animationController.reset();
       _animationController.forward();
-      _interactionDetector?.invalidate();
+      _resetInteractionDetector();
+      _resetViewDomains();
     }
 
     if (widget.animationDuration != oldWidget.animationDuration) {
       _animationController.duration = widget.animationDuration;
+    }
+
+    final oldController = oldWidget.interaction.pan?.controller;
+    final newController = widget.interaction.pan?.controller;
+    if (oldController != newController) {
+      oldController?.removeListener(_handlePanControllerUpdate);
+      newController?.addListener(_handlePanControllerUpdate);
     }
   }
 
@@ -153,7 +186,65 @@ class _AnimatedCristalyseChartWidgetState
   void dispose() {
     _cachedTooltipController?.hideTooltip();
     _animationController.dispose();
+    if (widget.interaction.pan?.controller != null) {
+      widget.interaction.pan!.controller!.removeListener(
+        _handlePanControllerUpdate,
+      );
+    }
     super.dispose();
+  }
+
+  void _resetViewDomains() {
+    _panXDomain = null;
+    _panYDomain = null;
+    _originalXDomain = null;
+    _originalYDomain = null;
+    _baseXSpan = null;
+    _baseYSpan = null;
+  }
+
+  /// Invalidate and clear the interaction detector.
+  /// This forces a rebuild with current pan/zoom domains on next hover/tap.
+  void _resetInteractionDetector() {
+    _interactionDetector?.invalidate();
+    _interactionDetector = null;
+  }
+
+  void _ensureViewDomainsInitialized(Rect plotArea) {
+    final hasBarGeometry = widget.geometries.any((g) => g is BarGeometry);
+    final panConfig = widget.interaction.pan;
+    final needsXDomain =
+        (panConfig?.enabled == true && panConfig!.updateXDomain != false) ||
+            (_isZoomEnabled &&
+                (_zoomConfig!.axes == ZoomAxis.x ||
+                    _zoomConfig!.axes == ZoomAxis.both));
+    final needsYDomain =
+        (panConfig?.enabled == true && panConfig!.updateYDomain == true) ||
+            (_isZoomEnabled &&
+                (_zoomConfig!.axes == ZoomAxis.y ||
+                    _zoomConfig!.axes == ZoomAxis.both));
+
+    if (needsXDomain && _panXDomain == null) {
+      final xScale = _setupXScale(plotArea.width, hasBarGeometry);
+      if (xScale is LinearScale) {
+        _panXDomain = List<double>.from(xScale.domain);
+        _originalXDomain = List<double>.from(xScale.domain);
+        _baseXSpan = (_originalXDomain![1] - _originalXDomain![0]).abs();
+      }
+    }
+
+    if (needsYDomain && _panYDomain == null) {
+      final yScale = _setupYScale(
+        plotArea.height,
+        hasBarGeometry,
+        YAxis.primary,
+      );
+      if (yScale is LinearScale) {
+        _panYDomain = List<double>.from(yScale.domain);
+        _originalYDomain = List<double>.from(yScale.domain);
+        _baseYSpan = (_originalYDomain![1] - _originalYDomain![0]).abs();
+      }
+    }
   }
 
   void _handleMouseHover(
@@ -168,9 +259,7 @@ class _AnimatedCristalyseChartWidgetState
       return;
     }
 
-    if (_interactionDetector == null) {
-      _setupInteractionDetector(plotArea);
-    }
+    _ensureInteractionDetector(plotArea);
 
     // Convert local position to global for tooltip positioning
     final RenderBox renderBox = hoverContext.findRenderObject() as RenderBox;
@@ -275,11 +364,11 @@ class _AnimatedCristalyseChartWidgetState
 
   void _handlePanStart(
     BuildContext panContext,
-    DragStartDetails details,
+    Offset localPosition,
     Rect plotArea,
   ) {
-    _panStartPosition = details.localPosition;
-    _panCurrentPosition = details.localPosition;
+    _panStartPosition = localPosition;
+    _panCurrentPosition = localPosition;
 
     // Store original domains for panning
     if (widget.interaction.pan?.enabled == true) {
@@ -313,7 +402,7 @@ class _AnimatedCristalyseChartWidgetState
       final panInfo = _calculatePanInfo(
         plotArea,
         PanState.start,
-        details.localPosition,
+        localPosition,
       );
       widget.interaction.pan!.onPanStart!(panInfo);
     }
@@ -321,7 +410,8 @@ class _AnimatedCristalyseChartWidgetState
 
   void _handlePanUpdate(
     BuildContext panContext,
-    DragUpdateDetails details,
+    Offset localPosition,
+    Offset delta,
     Rect plotArea,
   ) {
     final panConfig = widget.interaction.pan;
@@ -332,12 +422,12 @@ class _AnimatedCristalyseChartWidgetState
       return;
     }
 
-    _panCurrentPosition = details.localPosition;
+    _panCurrentPosition = localPosition;
 
     // Handle pan update callback with throttling - ONLY if pan is enabled
     if (panConfig?.enabled == true) {
       // Update pan domains based on delta
-      _updatePanDomains(plotArea, details.delta);
+      _updatePanDomains(plotArea, delta);
 
       // Fire callbacks with throttling
       if (panConfig?.onPanUpdate != null) {
@@ -348,8 +438,8 @@ class _AnimatedCristalyseChartWidgetState
           final panInfo = _calculatePanInfo(
             plotArea,
             PanState.update,
-            details.localPosition,
-            details.delta,
+            localPosition,
+            delta,
           );
           panConfig!.onPanUpdate!(panInfo);
         }
@@ -364,15 +454,11 @@ class _AnimatedCristalyseChartWidgetState
 
     // Handle tooltip/hover interactions ONLY if panning is not enabled
     if (hasTooltips && panConfig?.enabled != true) {
-      if (_interactionDetector == null) {
-        _setupInteractionDetector(plotArea);
-      }
+      _ensureInteractionDetector(plotArea);
 
       // Convert local position to global for tooltip positioning
       final RenderBox renderBox = panContext.findRenderObject() as RenderBox;
-      final Offset globalPosition = renderBox.localToGlobal(
-        details.localPosition,
-      );
+      final Offset globalPosition = renderBox.localToGlobal(localPosition);
 
       final tooltipConfig = widget.interaction.tooltip;
       final useAxisMode =
@@ -435,11 +521,7 @@ class _AnimatedCristalyseChartWidgetState
     }
   }
 
-  void _handlePanEnd(
-    BuildContext panEndContext,
-    DragEndDetails details,
-    Rect plotArea,
-  ) {
+  void _handlePanEnd(BuildContext panEndContext, Rect plotArea) {
     if (!widget.interaction.enabled) return;
 
     // Handle pan end callback
@@ -475,6 +557,180 @@ class _AnimatedCristalyseChartWidgetState
     hideTooltip(panEndContext);
   }
 
+  void _handleScaleStart(
+    BuildContext context,
+    ScaleStartDetails details,
+    Rect plotArea,
+  ) {
+    _ensureInteractionDetector(plotArea);
+    _ensureViewDomainsInitialized(plotArea);
+    _lastScaleFactor = 1.0;
+    _lastScaleFocalPoint = details.localFocalPoint;
+
+    if (details.pointerCount == 1) {
+      _handlePanStart(context, details.localFocalPoint, plotArea);
+    } else if (_isZoomEnabled && details.pointerCount >= 2) {
+      _isPinchZoomActive = true;
+      _emitZoomEvent(plotArea, ZoomState.start);
+    }
+  }
+
+  void _handleScaleUpdate(
+    BuildContext context,
+    ScaleUpdateDetails details,
+    Rect plotArea,
+  ) {
+    final localFocalPoint = details.localFocalPoint;
+    final previousFocalPoint = _lastScaleFocalPoint ?? localFocalPoint;
+
+    final panDelta = localFocalPoint - previousFocalPoint;
+    final zoomActive = _isZoomEnabled && details.pointerCount >= 2;
+
+    if (zoomActive) {
+      final scaleDelta =
+          details.scale / (_lastScaleFactor == 0 ? 1.0 : _lastScaleFactor);
+      if (scaleDelta.isFinite && scaleDelta != 1.0) {
+        final zoomApplied = _applyZoom(
+          scaleDelta,
+          localFocalPoint,
+          plotArea,
+          isGesture: true,
+        );
+        if (zoomApplied) {
+          _emitZoomEvent(plotArea, ZoomState.update);
+        }
+        _lastScaleFactor = details.scale;
+      }
+    }
+
+    if (panDelta != Offset.zero) {
+      _handlePanUpdate(context, localFocalPoint, panDelta, plotArea);
+    }
+
+    _lastScaleFocalPoint = localFocalPoint;
+  }
+
+  void _handleScaleEnd(
+    BuildContext context,
+    ScaleEndDetails details,
+    Rect plotArea,
+  ) {
+    _handlePanEnd(context, plotArea);
+
+    if (_isPinchZoomActive) {
+      _emitZoomEvent(plotArea, ZoomState.end);
+    }
+
+    _lastScaleFactor = 1.0;
+    _lastScaleFocalPoint = null;
+    _isPinchZoomActive = false;
+  }
+
+  void _handlePointerSignal(PointerSignalEvent event, Rect plotArea) {
+    if (!_isZoomEnabled || event is! PointerScrollEvent) return;
+    final zoomConfig = _zoomConfig;
+    if (zoomConfig == null) return;
+
+    _ensureInteractionDetector(plotArea);
+
+    final localPosition = event.localPosition;
+    if (!plotArea.contains(localPosition)) return;
+
+    final sensitivity = zoomConfig.wheelSensitivity;
+    final deltaY = event.scrollDelta.dy;
+    if (deltaY == 0) return;
+
+    final scaleDelta = math.exp(-deltaY * sensitivity);
+    if (!scaleDelta.isFinite || scaleDelta == 0) return;
+
+    final changed = _applyZoom(scaleDelta, localPosition, plotArea);
+
+    if (changed) {
+      _emitZoomEvent(plotArea, ZoomState.start);
+      _emitZoomEvent(plotArea, ZoomState.update);
+      _emitZoomEvent(plotArea, ZoomState.end);
+    }
+  }
+
+  void _handlePanControllerUpdate() {
+    final panController = widget.interaction.pan?.controller;
+    if (panController == null) return;
+    final panInfo = panController.targetPan;
+    if (panInfo == null) {
+      final currentXDomain = List<double>.from(_panXDomain ?? []);
+      final currentYDomain = List<double>.from(_panYDomain ?? []);
+      setState(() {
+        _panXDomain =
+            _originalXDomain != null ? List.from(_originalXDomain!) : null;
+        _panYDomain =
+            _originalYDomain != null ? List.from(_originalYDomain!) : null;
+      });
+      bool listEquals(List<double>? a, List<double>? b) {
+        if (a == null) return b == null;
+        if (b == null || a.length != b.length) return false;
+        for (int i = 0; i < a.length; i++) {
+          if (a[i] != b[i]) return false;
+        }
+        return true;
+      }
+
+      if (widget.interaction.pan?.onPanEnd != null &&
+          (!listEquals(currentXDomain, _panXDomain) ||
+              !listEquals(currentYDomain, _panYDomain))) {
+        widget.interaction.pan!.onPanEnd!(
+          PanInfo(
+            state: PanState.end,
+            visibleMinX: _panXDomain?[0],
+            visibleMaxX: _panXDomain?[1],
+            visibleMinY: _panYDomain?[0],
+            visibleMaxY: _panYDomain?[1],
+          ),
+        );
+      }
+    } else {
+      final xChanged = panInfo.visibleMaxX != null &&
+          panInfo.visibleMinX != null &&
+          panInfo.visibleMaxX! > panInfo.visibleMinX!;
+      if (xChanged) {
+        _panXDomain = [panInfo.visibleMinX!, panInfo.visibleMaxX!];
+      }
+      final yChanged = panInfo.visibleMaxY != null &&
+          panInfo.visibleMinY != null &&
+          panInfo.visibleMaxY! > panInfo.visibleMinY!;
+      if (yChanged) {
+        _panYDomain = [panInfo.visibleMinY!, panInfo.visibleMaxY!];
+      }
+      if (xChanged || yChanged) {
+        // Invalidate interaction detector to force rebuild with new pan domain
+        // This fixes tooltip offset when panning programmatically
+        _resetInteractionDetector();
+
+        setState(() {});
+        final panConfig = widget.interaction.pan;
+        if (panConfig != null) {
+          final updated = PanInfo(
+            state: panInfo.state,
+            visibleMinX: _panXDomain?[0],
+            visibleMaxX: _panXDomain?[1],
+            visibleMinY: _panYDomain?[0],
+            visibleMaxY: _panYDomain?[1],
+          );
+          switch (panInfo.state) {
+            case PanState.start:
+              panConfig.onPanStart?.call(updated);
+              break;
+            case PanState.update:
+              panConfig.onPanUpdate?.call(updated);
+              break;
+            case PanState.end:
+              panConfig.onPanEnd?.call(updated);
+              break;
+          }
+        }
+      }
+    }
+  }
+
   void _handleTap(
     BuildContext tapContext,
     TapUpDetails details,
@@ -485,9 +741,7 @@ class _AnimatedCristalyseChartWidgetState
       return;
     }
 
-    if (_interactionDetector == null) {
-      _setupInteractionDetector(plotArea);
-    }
+    _ensureInteractionDetector(plotArea);
 
     final point = _interactionDetector!.detectPoint(
       details.localPosition,
@@ -519,7 +773,9 @@ class _AnimatedCristalyseChartWidgetState
       YAxis.primary,
     );
     final y2Scale = hasSecondaryYAxis(
-            y2Column: widget.y2Column, geometries: widget.geometries)
+      y2Column: widget.y2Column,
+      geometries: widget.geometries,
+    )
         ? _setupYScale(
             plotArea.height,
             widget.geometries.any((g) => g is BarGeometry),
@@ -542,6 +798,13 @@ class _AnimatedCristalyseChartWidgetState
     );
   }
 
+  void _ensureInteractionDetector(Rect plotArea) {
+    if (_interactionDetector == null ||
+        _interactionDetector!.plotArea != plotArea) {
+      _setupInteractionDetector(plotArea);
+    }
+  }
+
   Widget _buildInteractiveChart(BuildContext context, Size size) {
     final animationValue = _animation.value;
     if (!animationValue.isFinite || animationValue.isNaN) {
@@ -552,35 +815,52 @@ class _AnimatedCristalyseChartWidgetState
         ),
         child: CustomPaint(
           painter: chartPainterAnimated(
-              widget: widget,
-              context: context,
-              size: size,
-              animationProgress: 1.0,
-              panXDomain: _panXDomain,
-              panYDomain: _panYDomain),
+            widget: widget,
+            context: context,
+            size: size,
+            animationProgress: 1.0,
+            panXDomain: _panXDomain,
+            panYDomain: _panYDomain,
+            heatMapYAxisSpace: _getHeatMapYAxisSpace(widget),
+          ),
           child: Container(),
         ),
       );
     }
 
-    final hasSecondaryY = hasSecondaryYAxis(
-        y2Column: widget.y2Column, geometries: widget.geometries);
-    final rightPadding = hasSecondaryY ? 80.0 : widget.theme.padding.right;
+    final yAxisSpace = _estimateYAxisSpace(widget);
+    final y2AxisSpace = _estimateY2AxisSpace(widget);
+    final xAxisSpace = _estimateXAxisSpace(widget);
+
+    final leftPadding = widget.theme.padding.left + yAxisSpace;
+    final rightPadding = widget.theme.padding.right + y2AxisSpace;
+    final bottomPadding = widget.theme.padding.bottom + xAxisSpace;
 
     final plotArea = Rect.fromLTWH(
-      widget.theme.padding.left,
+      leftPadding,
       widget.theme.padding.top,
-      size.width - widget.theme.padding.left - rightPadding,
-      size.height - widget.theme.padding.vertical,
+      size.width - leftPadding - rightPadding,
+      size.height - widget.theme.padding.top - bottomPadding,
     );
 
+    _setupScales(plotArea.width, plotArea.height);
+    _currentPlotArea = plotArea;
+    _ensureViewDomainsInitialized(plotArea);
+
     final chartPainter = chartPainterAnimated(
-        widget: widget,
-        context: context,
-        size: size,
-        animationProgress: math.max(0.0, math.min(1.0, animationValue)),
-        panXDomain: _panXDomain,
-        panYDomain: _panYDomain);
+      widget: widget,
+      context: context,
+      size: size,
+      animationProgress: math.max(0.0, math.min(1.0, animationValue)),
+      panXDomain: _panXDomain,
+      panYDomain: _panYDomain,
+      heatMapYAxisSpace: _getHeatMapYAxisSpace(widget),
+      onChartAreaComputed: (area) {
+        if (_actualPlotArea != area) {
+          _actualPlotArea = area;
+        }
+      },
+    );
 
     Widget chart = CustomPaint(painter: chartPainter, child: Container());
 
@@ -603,27 +883,51 @@ class _AnimatedCristalyseChartWidgetState
 
     // Wrap with gesture detection if interactions are enabled
     if (widget.interaction.enabled) {
+      // Use painter's actual plotArea for hit-testing (falls back to estimate if not yet painted)
+      final effectivePlotArea = _actualPlotArea ?? plotArea;
+
       chart = MouseRegion(
-        onHover: (event) => _handleMouseHover(context, event, plotArea),
+        onHover: (event) =>
+            _handleMouseHover(context, event, effectivePlotArea),
         onExit: (event) => _handleMouseExit(context, event),
-        child: GestureDetector(
-          onPanStart: (details) => _handlePanStart(context, details, plotArea),
-          onPanUpdate: (details) =>
-              _handlePanUpdate(context, details, plotArea),
-          onPanEnd: (details) => _handlePanEnd(context, details, plotArea),
-          onTapUp: (details) => _handleTap(context, details, plotArea),
-          child: chart,
+        child: Listener(
+          onPointerSignal: (event) =>
+              _handlePointerSignal(event, effectivePlotArea),
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onScaleStart: (details) =>
+                _handleScaleStart(context, details, effectivePlotArea),
+            onScaleUpdate: (details) =>
+                _handleScaleUpdate(context, details, effectivePlotArea),
+            onScaleEnd: (details) =>
+                _handleScaleEnd(context, details, effectivePlotArea),
+            onTapUp: (details) =>
+                _handleTap(context, details, effectivePlotArea),
+            child: chart,
+          ),
         ),
       );
     }
 
-    return Container(
+    Widget decoratedChart = Container(
       decoration: BoxDecoration(
         color: widget.theme.backgroundColor,
         border: Border.all(color: widget.theme.borderColor),
       ),
       child: chart,
     );
+
+    if (_isZoomEnabled && (_zoomConfig?.showButtons ?? false)) {
+      decoratedChart = Stack(
+        fit: StackFit.passthrough,
+        children: [
+          decoratedChart,
+          Positioned.fill(child: _buildZoomControls()),
+        ],
+      );
+    }
+
+    return decoratedChart;
   }
 
   @override
@@ -656,33 +960,335 @@ class _AnimatedCristalyseChartWidgetState
     return chart;
   }
 
+  // Internal state for managing hidden categories when not externally provided
+  final Set<String> _internalHiddenCategories = {};
+
+  /// Get filtered data based on hidden categories in legend
+  List<Map<String, dynamic>> _getFilteredData(Set<String> hiddenCategories) {
+    // If not interactive or no hidden categories, return original data
+    if (!widget.legendConfig!.interactive ||
+        hiddenCategories.isEmpty ||
+        widget.colorColumn == null) {
+      return widget.data;
+    }
+
+    // Filter out data points for hidden categories
+    return widget.data.where((datum) {
+      final category = datum[widget.colorColumn]?.toString();
+      return category != null && !hiddenCategories.contains(category);
+    }).toList();
+  }
+
   /// Build chart with legend positioned according to configuration
   Widget _buildChartWithLegend(BuildContext context, Widget chart) {
     final config = widget.legendConfig!;
 
     // Generate legend items from chart data
-    final legendItems = LegendGenerator.generateFromData(
+    final (legendItemsY, legendItemsY2) = LegendGenerator.generateFromData(
       data: widget.data,
       colorColumn: widget.colorColumn,
+      yColumn: widget.yColumn,
+      y2Column: widget.y2Column,
       colorPalette: widget.theme.colorPalette,
       geometries: widget.geometries,
     );
 
-    // If no legend items, return chart as-is
-    if (legendItems.isEmpty) return chart;
-
-    final legend = LegendWidget(
-      items: legendItems,
-      config: config,
-      theme: widget.theme,
+    // Extract information for bubble size guide, if present
+    final sizeScale = widget.sizeColumn != null ? _setupSizeScale() : null;
+    final bubbleGuide = LegendGenerator.extractBubbleGuide(
+      geometries: widget.geometries,
+      sizeScale: sizeScale,
     );
 
-    // Position legend based on configuration
-    return _positionLegend(chart, legend, config);
+    // If no legend items and no bubble guide, return chart as-is
+    if (legendItemsY.isEmpty && legendItemsY2.isEmpty && bubbleGuide == null) {
+      return chart;
+    }
+
+    // Use StatefulBuilder to manage interactive legend state
+    if (config.interactive && config.hiddenCategories == null) {
+      // Internal state management - pass hidden categories TO the legend config
+      // so the LegendWidget's internal state can be properly synchronized
+      final enhancedConfig = config.copyWith(
+        hiddenCategories: _internalHiddenCategories,
+        onToggle: (category, visible) {
+          // Update our internal state
+          setState(() {
+            if (visible) {
+              _internalHiddenCategories.remove(category);
+            } else {
+              _internalHiddenCategories.add(category);
+            }
+          });
+
+          // Call user callback if provided
+          config.onToggle?.call(category, visible);
+        },
+      );
+
+      final filteredData = _getFilteredData(_internalHiddenCategories);
+      final filteredChart = _buildChartWidget(context, filteredData);
+
+      final legend = LegendWidget(
+        yTitle: widget.yScale?.title,
+        itemsY: legendItemsY,
+        y2Title: widget.y2Scale?.title,
+        itemsY2: legendItemsY2,
+        config: enhancedConfig,
+        theme: widget.theme,
+        bubbleGuide: bubbleGuide,
+      );
+
+      return _positionLegend(filteredChart, legend, enhancedConfig);
+    } else if (config.interactive && config.hiddenCategories != null) {
+      // External state management
+      final filteredData = _getFilteredData(config.hiddenCategories!);
+      final filteredChart = _buildChartWidget(context, filteredData);
+
+      final legend = LegendWidget(
+        yTitle: widget.yScale?.title,
+        itemsY: legendItemsY,
+        y2Title: widget.y2Scale?.title,
+        itemsY2: legendItemsY2,
+        config: config,
+        theme: widget.theme,
+        bubbleGuide: bubbleGuide,
+      );
+
+      return _positionLegend(filteredChart, legend, config);
+    } else {
+      // Non-interactive legend
+      final legend = LegendWidget(
+        yTitle: widget.yScale?.title,
+        itemsY: legendItemsY,
+        y2Title: widget.y2Scale?.title,
+        itemsY2: legendItemsY2,
+        config: config,
+        theme: widget.theme,
+        bubbleGuide: bubbleGuide,
+      );
+
+      return _positionLegend(chart, legend, config);
+    }
+  }
+
+  /// Build the actual chart widget with filtered data
+  Widget _buildChartWidget(
+    BuildContext context,
+    List<Map<String, dynamic>> data,
+  ) {
+    // IMPORTANT: Create a ColorScale based on the ORIGINAL (unfiltered) data
+    // to preserve color-to-category mapping when filtering
+    ColorScale? preservedColorScale;
+    if (widget.colorColumn != null && widget.legendConfig!.interactive) {
+      final originalValues =
+          widget.data.map((d) => d[widget.colorColumn]).toSet().toList();
+
+      preservedColorScale = ColorScale(
+        values: originalValues,
+        colors: widget.theme.colorPalette,
+        gradients: widget.theme.categoryGradients != null
+            ? {
+                for (final value in originalValues)
+                  if (widget.theme.categoryGradients!.containsKey(
+                    value.toString(),
+                  ))
+                    value: widget.theme.categoryGradients![value.toString()]!,
+              }
+            : null,
+      );
+    }
+
+    Widget chartContent = AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // Create a temporary widget with filtered data
+            final tempWidget = AnimatedCristalyseChartWidget(
+              data: data,
+              xColumn: widget.xColumn,
+              yColumn: widget.yColumn,
+              y2Column: widget.y2Column,
+              colorColumn: widget.colorColumn,
+              sizeColumn: widget.sizeColumn,
+              pieValueColumn: widget.pieValueColumn,
+              pieCategoryColumn: widget.pieCategoryColumn,
+              heatMapXColumn: widget.heatMapXColumn,
+              heatMapYColumn: widget.heatMapYColumn,
+              heatMapValueColumn: widget.heatMapValueColumn,
+              progressValueColumn: widget.progressValueColumn,
+              progressLabelColumn: widget.progressLabelColumn,
+              progressCategoryColumn: widget.progressCategoryColumn,
+              geometries: widget.geometries,
+              xScale: widget.xScale,
+              yScale: widget.yScale,
+              y2Scale: widget.y2Scale,
+              colorScale: preservedColorScale ??
+                  widget.colorScale, // Use preserved scale
+              sizeScale: widget.sizeScale,
+              theme: widget.theme,
+              animationDuration: widget.animationDuration,
+              animationCurve: widget.animationCurve,
+              coordFlipped: widget.coordFlipped,
+              interaction: widget.interaction,
+              legendConfig: null, // Don't add legend again
+            );
+
+            return _buildInteractiveChartForData(
+              context,
+              constraints.biggest,
+              tempWidget,
+            );
+          },
+        );
+      },
+    );
+
+    // Wrap with tooltip overlay if tooltips are enabled
+    // This ensures tooltips work even when the chart is being filtered
+    // by interactive legends (fixes tooltip missing bug)
+    if (widget.interaction.enabled && widget.interaction.tooltip != null) {
+      chartContent = ChartTooltipOverlay(
+        config: widget.interaction.tooltip!,
+        tooltipBuilder: widget.interaction.tooltip!.builder,
+        child: chartContent,
+      );
+    }
+
+    return chartContent;
+  }
+
+  /// Build interactive chart with custom data
+  Widget _buildInteractiveChartForData(
+    BuildContext context,
+    Size size,
+    AnimatedCristalyseChartWidget tempWidget,
+  ) {
+    final animationValue = _animation.value;
+
+    // For very small sizes, return placeholder
+    if (size.width < 50 || size.height < 50) {
+      return Container(
+        decoration: BoxDecoration(
+          color: tempWidget.theme.backgroundColor,
+          border: Border.all(color: tempWidget.theme.borderColor),
+        ),
+      );
+    }
+
+    // For small sizes during animation, skip some expensive rendering
+    if (size.width < 200 || size.height < 150) {
+      final heatMapYAxisSpace = _getHeatMapYAxisSpace(tempWidget);
+      return Container(
+        decoration: BoxDecoration(
+          color: tempWidget.theme.backgroundColor,
+          border: Border.all(color: tempWidget.theme.borderColor),
+        ),
+        child: CustomPaint(
+          painter: chartPainterAnimated(
+            widget: tempWidget,
+            context: context,
+            size: size,
+            animationProgress: 1.0,
+            panXDomain: _panXDomain,
+            panYDomain: _panYDomain,
+            heatMapYAxisSpace: heatMapYAxisSpace,
+          ),
+          child: Container(),
+        ),
+      );
+    }
+
+    final heatMapYAxisSpace = _getHeatMapYAxisSpace(tempWidget);
+    final yAxisSpace = _estimateYAxisSpace(tempWidget);
+    final y2AxisSpace = _estimateY2AxisSpace(tempWidget);
+    final leftPadding =
+        tempWidget.theme.padding.left + math.max(heatMapYAxisSpace, yAxisSpace);
+    final rightPadding = tempWidget.theme.padding.right + y2AxisSpace;
+
+    final plotArea = Rect.fromLTWH(
+      leftPadding,
+      tempWidget.theme.padding.top,
+      size.width - leftPadding - rightPadding,
+      size.height - tempWidget.theme.padding.vertical,
+    );
+
+    _setupScales(plotArea.width, plotArea.height);
+    _currentPlotArea = plotArea;
+    _ensureViewDomainsInitialized(plotArea);
+
+    final chartPainter = chartPainterAnimated(
+      widget: tempWidget,
+      context: context,
+      size: size,
+      animationProgress: math.max(0.0, math.min(1.0, animationValue)),
+      panXDomain: _panXDomain,
+      panYDomain: _panYDomain,
+      heatMapYAxisSpace: heatMapYAxisSpace,
+      onChartAreaComputed: (area) {
+        if (_actualPlotArea != area) {
+          _actualPlotArea = area;
+        }
+      },
+    );
+
+    Widget chart = CustomPaint(painter: chartPainter, child: Container());
+
+    // Wrap with gesture detection if interactions are enabled
+    if (tempWidget.interaction.enabled) {
+      final effectivePlotArea = _actualPlotArea ?? plotArea;
+      chart = MouseRegion(
+        onHover: (event) =>
+            _handleMouseHover(context, event, effectivePlotArea),
+        onExit: (event) => _handleMouseExit(context, event),
+        child: Listener(
+          onPointerSignal: (event) =>
+              _handlePointerSignal(event, effectivePlotArea),
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onScaleStart: (details) =>
+                _handleScaleStart(context, details, effectivePlotArea),
+            onScaleUpdate: (details) =>
+                _handleScaleUpdate(context, details, effectivePlotArea),
+            onScaleEnd: (details) =>
+                _handleScaleEnd(context, details, effectivePlotArea),
+            onTapUp: (details) =>
+                _handleTap(context, details, effectivePlotArea),
+            child: chart,
+          ),
+        ),
+      );
+    }
+
+    Widget decoratedChart = Container(
+      decoration: BoxDecoration(
+        color: tempWidget.theme.backgroundColor,
+        border: Border.all(color: tempWidget.theme.borderColor),
+      ),
+      child: chart,
+    );
+
+    if (_isZoomEnabled && (_zoomConfig?.showButtons ?? false)) {
+      decoratedChart = Stack(
+        fit: StackFit.passthrough,
+        children: [
+          decoratedChart,
+          Positioned.fill(child: _buildZoomControls()),
+        ],
+      );
+    }
+
+    return decoratedChart;
   }
 
   /// Position legend relative to chart based on configuration
   Widget _positionLegend(Widget chart, Widget legend, LegendConfig config) {
+    // If floating position, always use floating layout
+    if (config.position == LegendPosition.floating) {
+      return _buildFloatingLegend(chart, legend, config);
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         // Check if we have bounded constraints
@@ -740,55 +1346,72 @@ class _AnimatedCristalyseChartWidgetState
         break;
       case LegendPosition.bottomRight:
         alignment = Alignment.bottomRight;
-        padding =
-            EdgeInsets.only(bottom: config.spacing, right: config.spacing);
+        padding = EdgeInsets.only(
+          bottom: config.spacing,
+          right: config.spacing,
+        );
+        break;
+      case LegendPosition.floating:
+        // This should not be reached, but provide a fallback
+        alignment = Alignment.topRight;
+        padding = EdgeInsets.only(top: config.spacing, right: config.spacing);
         break;
     }
 
     return Stack(
+      clipBehavior: Clip.none,
       children: [
         chart,
         Align(
           alignment: alignment,
-          child: Padding(
-            padding: padding,
-            child: legend,
-          ),
+          child: Padding(padding: padding, child: legend),
         ),
+      ],
+    );
+  }
+
+  /// Build floating legend with absolute positioning
+  Widget _buildFloatingLegend(
+    Widget chart,
+    Widget legend,
+    LegendConfig config,
+  ) {
+    // Default to top-left with 16px offset if not specified
+    final offset = config.floatingOffset ?? const Offset(16, 16);
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        chart,
+        Positioned(left: offset.dx, top: offset.dy, child: legend),
       ],
     );
   }
 
   /// Build legend using Flex layout for bounded constraints
   Widget _buildFlexLegend(
-      Widget chart, Widget legend, LegendConfig config, Widget spacing) {
+    Widget chart,
+    Widget legend,
+    LegendConfig config,
+    Widget spacing,
+  ) {
     switch (config.position) {
       case LegendPosition.top:
-        return Column(
-          children: [legend, spacing, Flexible(child: chart)],
-        );
+        return Column(children: [legend, spacing, Flexible(child: chart)]);
 
       case LegendPosition.bottom:
-        return Column(
-          children: [Flexible(child: chart), spacing, legend],
-        );
+        return Column(children: [Flexible(child: chart), spacing, legend]);
 
       case LegendPosition.left:
-        return Row(
-          children: [legend, spacing, Flexible(child: chart)],
-        );
+        return Row(children: [legend, spacing, Flexible(child: chart)]);
 
       case LegendPosition.right:
-        return Row(
-          children: [Flexible(child: chart), spacing, legend],
-        );
+        return Row(children: [Flexible(child: chart), spacing, legend]);
 
       case LegendPosition.topLeft:
         return Column(
           children: [
-            Row(
-              children: [legend, Flexible(child: Container())],
-            ),
+            Row(children: [legend, Flexible(child: Container())]),
             spacing,
             Flexible(child: chart),
           ],
@@ -797,9 +1420,7 @@ class _AnimatedCristalyseChartWidgetState
       case LegendPosition.topRight:
         return Column(
           children: [
-            Row(
-              children: [Flexible(child: Container()), legend],
-            ),
+            Row(children: [Flexible(child: Container()), legend]),
             spacing,
             Flexible(child: chart),
           ],
@@ -810,9 +1431,7 @@ class _AnimatedCristalyseChartWidgetState
           children: [
             Flexible(child: chart),
             spacing,
-            Row(
-              children: [legend, Flexible(child: Container())],
-            ),
+            Row(children: [legend, Flexible(child: Container())]),
           ],
         );
 
@@ -821,12 +1440,123 @@ class _AnimatedCristalyseChartWidgetState
           children: [
             Flexible(child: chart),
             spacing,
-            Row(
-              children: [Flexible(child: Container()), legend],
+            Row(children: [Flexible(child: Container()), legend]),
+          ],
+        );
+
+      case LegendPosition.floating:
+        // Floating position doesn't use flex layout, this shouldn't be reached
+        // But provide a fallback - just overlay the chart
+        return Stack(
+          children: [
+            chart,
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: EdgeInsets.all(config.spacing),
+                child: legend,
+              ),
             ),
           ],
         );
     }
+  }
+
+  /// Estimate Y2-axis space for layout purposes (conservative upper bound)
+  /// The painter will calculate the precise value at paint time.
+  /// This is only used for layout calculations where scales may not be fully set up.
+  double _estimateY2AxisSpace(AnimatedCristalyseChartWidget chartWidget) {
+    final hasSecondaryY = hasSecondaryYAxis(
+      y2Column: chartWidget.y2Column,
+      geometries: chartWidget.geometries,
+    );
+
+    // Use conservative estimate: 80px is a reasonable upper bound for most y2-axis labels
+    // The painter will refine this with actual label measurements at paint time
+    return (hasSecondaryY && chartWidget.y2Scale != null) ? 80.0 : 0.0;
+  }
+
+  double? _cachedHeatMapYAxisSpace;
+  int? _heatMapCacheHash;
+
+  double _getHeatMapYAxisSpace(AnimatedCristalyseChartWidget chartWidget) {
+    final hasHeatMap = chartWidget.geometries.any((g) => g is HeatMapGeometry);
+    if (!hasHeatMap || chartWidget.data.isEmpty) return 0.0;
+
+    final yCol = chartWidget.heatMapYColumn ?? chartWidget.yColumn;
+    final axisLabelStyle = chartWidget.theme.axisLabelStyle ??
+        const TextStyle(color: Colors.black, fontSize: 12);
+
+    final yValues = yCol != null
+        ? chartWidget.data.map((d) => d[yCol]).where((v) => v != null).toSet()
+        : <dynamic>{};
+
+    final hash = Object.hash(
+      Object.hashAll(yValues),
+      yValues.length,
+      axisLabelStyle,
+      chartWidget.theme.axisWidth,
+    );
+
+    if (_heatMapCacheHash == hash && _cachedHeatMapYAxisSpace != null) {
+      return _cachedHeatMapYAxisSpace!;
+    }
+
+    _heatMapCacheHash = hash;
+    double maxHeatMapValWidth = 0.0;
+
+    if (yCol != null) {
+      for (final val in yValues) {
+        final tp = TextPainter(
+          text: TextSpan(text: val.toString(), style: axisLabelStyle),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        if (tp.width > maxHeatMapValWidth) maxHeatMapValWidth = tp.width;
+        tp.dispose();
+      }
+    }
+
+    if (maxHeatMapValWidth > 0) {
+      _cachedHeatMapYAxisSpace = chartWidget.theme.axisWidth * 2 +
+          AnimatedChartPainter.tickToLabelSpacing +
+          maxHeatMapValWidth;
+    } else {
+      _cachedHeatMapYAxisSpace = 0.0;
+    }
+
+    return _cachedHeatMapYAxisSpace!;
+  }
+
+  /// Estimate primary Y-axis space for layout purposes
+  /// This mirrors the painter's calculation for consistent hit-testing
+  double _estimateYAxisSpace(AnimatedCristalyseChartWidget chartWidget) {
+    double baseSpace = chartWidget.yScale == null ? 0.0 : 60.0;
+    return math.max(baseSpace, _getHeatMapYAxisSpace(chartWidget));
+  }
+
+  /// Estimate X-axis space for layout purposes
+  /// This mirrors the painter's calculation for consistent hit-testing
+  double _estimateXAxisSpace(AnimatedCristalyseChartWidget chartWidget) {
+    if (chartWidget.xScale == null) return 0.0;
+
+    // Conservative estimate matching painter's calculation:
+    // axisWidth * 2 + tickToLabelSpacing + labelHeight + optional title
+    // ~4 + 4 + 16 + optional 16 = ~30-40px
+    return 30.0;
+  }
+
+  void _setupScales(double width, double height) {
+    _setupXScale(width, widget.geometries.any((g) => g is BarGeometry));
+    _setupYScale(
+      height,
+      widget.geometries.any((g) => g is BarGeometry),
+      YAxis.primary,
+    );
+    _setupYScale(
+      height,
+      widget.geometries.any((g) => g is BarGeometry),
+      YAxis.secondary,
+    );
   }
 
   Scale _setupXScale(double width, bool hasBarGeometry) {
@@ -837,9 +1567,7 @@ class _AnimatedCristalyseChartWidgetState
       final dataCol = widget.yColumn;
 
       if (dataCol == null || widget.data.isEmpty) {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, widget.geometries);
         scale.range = [0, width];
         return scale;
       }
@@ -851,32 +1579,10 @@ class _AnimatedCristalyseChartWidgetState
           .toList();
 
       if (values.isNotEmpty) {
-        double domainMin = scale.min ?? values.reduce(math.min);
-        double domainMax = scale.max ?? values.reduce(math.max);
-
-        if (domainMin == domainMax) {
-          if (domainMin == 0) {
-            domainMin = -0.5;
-            domainMax = 0.5;
-          } else if (domainMin > 0) {
-            domainMax = domainMin + domainMin.abs() * 0.2;
-            domainMin = 0;
-          } else {
-            domainMin = domainMin - domainMin.abs() * 0.2;
-            domainMax = 0;
-          }
-        } else {
-          if (domainMin > 0) domainMin = 0;
-          if (domainMax < 0) domainMax = 0;
-        }
-        scale.domain = [domainMin, domainMax];
-        if (scale.domain[0] == scale.domain[1]) {
-          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
-        }
+        // Use geometry-aware bounds calculation
+        scale.setBounds(values, null, widget.geometries);
       } else {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, widget.geometries);
       }
       scale.range = [0, width];
       return scale;
@@ -906,9 +1612,7 @@ class _AnimatedCristalyseChartWidgetState
         final scale =
             (preconfigured is LinearScale ? preconfigured : LinearScale());
         if (dataCol == null || widget.data.isEmpty) {
-          scale.domain = scale.min != null && scale.max != null
-              ? [scale.min!, scale.max!]
-              : [0, 1];
+          scale.setBounds([], null, widget.geometries);
           scale.range = [0, width];
           return scale;
         }
@@ -919,32 +1623,20 @@ class _AnimatedCristalyseChartWidgetState
             .toList();
 
         if (values.isNotEmpty) {
-          double domainMin = scale.min ?? values.reduce(math.min);
-          double domainMax = scale.max ?? values.reduce(math.max);
+          // Use geometry-aware bounds calculation
+          scale.setBounds(values, null, widget.geometries);
 
-          if (domainMin == domainMax) {
-            if (domainMin == 0) {
-              domainMin = -0.5;
-              domainMax = 0.5;
-            } else if (domainMin > 0) {
-              domainMax = domainMin + domainMin.abs() * 0.2;
-              domainMin = 0;
-            } else {
-              domainMin = domainMin - domainMin.abs() * 0.2;
-              domainMax = 0;
-            }
-          } else {
-            if (domainMin > 0) domainMin = 0;
-            if (domainMax < 0) domainMax = 0;
-          }
-          scale.domain = [domainMin, domainMax];
-          if (scale.domain[0] == scale.domain[1]) {
-            scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+          // Apply pan domain if available (for interaction hit-testing)
+          // This mirrors the painter's approach to ensure detector matches rendering
+          if (!widget.coordFlipped && _panXDomain != null) {
+            scale.setBounds(
+              values,
+              (_panXDomain![0], _panXDomain![1]),
+              widget.geometries,
+            );
           }
         } else {
-          scale.domain = scale.min != null && scale.max != null
-              ? [scale.min!, scale.max!]
-              : [0, 1];
+          scale.setBounds([], null, widget.geometries);
         }
         scale.range = [0, width];
         return scale;
@@ -982,9 +1674,7 @@ class _AnimatedCristalyseChartWidgetState
       final scale =
           (preconfigured is LinearScale ? preconfigured : LinearScale());
       if (dataCol == null || widget.data.isEmpty) {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, widget.geometries);
         scale.range = [height, 0];
         return scale;
       }
@@ -992,7 +1682,7 @@ class _AnimatedCristalyseChartWidgetState
       final relevantGeometries =
           widget.geometries.where((g) => g.yAxis == axis).toList();
       if (relevantGeometries.isEmpty) {
-        scale.domain = [0, 1];
+        scale.setBounds([0, 1], null, widget.geometries);
         scale.range = [height, 0];
         return scale;
       }
@@ -1022,46 +1712,83 @@ class _AnimatedCristalyseChartWidgetState
       }
 
       if (values.isNotEmpty) {
-        double domainMin = scale.min ?? 0;
-        double domainMax = scale.max ?? values.reduce(math.max);
+        // Use geometry-aware bounds calculation
+        scale.setBounds(values, null, widget.geometries);
 
-        if (hasStackedBars) {
-          domainMax = domainMax * 1.1;
-        }
-
-        if (domainMin == domainMax) {
-          if (domainMax == 0) {
-            domainMin = -0.5;
-            domainMax = 0.5;
-          } else if (domainMax > 0) {
-            domainMax = domainMax + domainMax * 0.2;
-            domainMin = 0;
-          } else {
-            domainMin = domainMin - domainMin.abs() * 0.2;
-            domainMax = 0;
-          }
-        } else {
-          if (domainMin > 0) domainMin = 0;
-          if (domainMax < 0) domainMax = 0;
-        }
-
-        scale.domain = [domainMin, domainMax];
-        if (scale.domain[0] == scale.domain[1]) {
-          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+        // Apply pan domain if available (for interaction hit-testing)
+        // This mirrors the painter's approach to ensure detector matches rendering
+        if (!widget.coordFlipped &&
+            axis == YAxis.primary &&
+            _panYDomain != null) {
+          scale.setBounds(
+            values,
+            (_panYDomain![0], _panYDomain![1]),
+            widget.geometries,
+          );
         }
       } else {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, widget.geometries);
       }
       scale.range = [height, 0];
       return scale;
     }
   }
 
+  /// Set up size scale for bubble charts
+  SizeScale _setupSizeScale() {
+    if (widget.sizeColumn == null) return SizeScale();
+
+    final values = widget.data
+        .map((d) => getNumericValue(d[widget.sizeColumn!]))
+        .where((v) => v != null)
+        .cast<double>()
+        .toList();
+
+    if (values.isEmpty) return SizeScale();
+
+    // Get bubble geometry and use its preconfigured size scale
+    final bubbleGeometries =
+        widget.geometries.whereType<BubbleGeometry>().toList();
+    final sizeScale = bubbleGeometries.isNotEmpty
+        ? bubbleGeometries.first.createSizeScale()
+        : (widget.sizeScale ??
+            SizeScale(
+              range: [widget.theme.pointSizeMin, widget.theme.pointSizeMax],
+            ));
+
+    // Set domain from data - limits are already in the scale
+    sizeScale.setBounds(values, null, widget.geometries);
+    return sizeScale;
+  }
+
+  void _updatePanDomain(
+    List<double> domain,
+    double delta,
+    bool clamp,
+    Scale? scale,
+  ) {
+    final newMin = domain[0] + delta;
+    final newMax = domain[1] + delta;
+    if (clamp && scale != null && scale is LinearScale) {
+      final clampMin = math.min(scale.valuesBoundaries[0], scale.domain[0]);
+      final clampMax = math.max(scale.valuesBoundaries[1], scale.domain[1]);
+      final shouldClamp = newMax > clampMax || newMin < clampMin;
+      if (shouldClamp) {
+        return;
+      }
+    }
+
+    domain[0] = newMin;
+    domain[1] = newMax;
+  }
+
   /// Update pan domains based on delta movement
   void _updatePanDomains(Rect plotArea, Offset delta) {
     if (_panXDomain == null) return;
+
+    // Invalidate interaction detector to force rebuild with new pan domain
+    // This fixes tooltip offset when panning (detector cached stale positions)
+    _resetInteractionDetector();
 
     // Calculate the data range per pixel for current pan domain
     final xRange = _panXDomain![1] - _panXDomain![0];
@@ -1073,13 +1800,12 @@ class _AnimatedCristalyseChartWidgetState
 
     // Update the pan domain progressively - allow infinite panning
     if (widget.interaction.pan?.updateXDomain != false) {
-      // Default to true if not specified
-      final newXMin = _panXDomain![0] + xDataDelta;
-      final newXMax = _panXDomain![1] + xDataDelta;
-
-      // Always allow panning - no blocking, visual clipping will handle boundaries
-      _panXDomain![0] = newXMin;
-      _panXDomain![1] = newXMax;
+      _updatePanDomain(
+        _panXDomain!,
+        xDataDelta,
+        widget.interaction.pan?.boundaryClampingX == true,
+        widget.xScale,
+      );
     }
 
     // Optionally handle Y panning too - allow infinite panning
@@ -1089,12 +1815,12 @@ class _AnimatedCristalyseChartWidgetState
       final yDataDelta =
           delta.dy / pixelsPerYUnit; // Positive for natural pan direction
 
-      final newYMin = _panYDomain![0] + yDataDelta;
-      final newYMax = _panYDomain![1] + yDataDelta;
-
-      // Always allow panning - visual clipping will handle boundaries
-      _panYDomain![0] = newYMin;
-      _panYDomain![1] = newYMax;
+      _updatePanDomain(
+        _panYDomain!,
+        yDataDelta,
+        widget.interaction.pan?.boundaryClampingY == true,
+        widget.yScale,
+      );
     }
   }
 
@@ -1177,6 +1903,264 @@ class _AnimatedCristalyseChartWidgetState
       state: state,
       delta: delta,
       totalDelta: totalDelta,
+    );
+  }
+
+  ZoomInfo _calculateZoomInfo(Rect plotArea, ZoomState state) {
+    double? visibleMinX = _panXDomain?[0];
+    double? visibleMaxX = _panXDomain?[1];
+    double? visibleMinY = _panYDomain?[0];
+    double? visibleMaxY = _panYDomain?[1];
+
+    if (visibleMinX == null || visibleMaxX == null) {
+      final xScale = _setupXScale(
+        plotArea.width,
+        widget.geometries.any((g) => g is BarGeometry),
+      );
+      if (xScale is LinearScale) {
+        visibleMinX = xScale.domain[0];
+        visibleMaxX = xScale.domain[1];
+      }
+    }
+
+    if (visibleMinY == null || visibleMaxY == null) {
+      final yScale = _setupYScale(
+        plotArea.height,
+        widget.geometries.any((g) => g is BarGeometry),
+        YAxis.primary,
+      );
+      if (yScale is LinearScale) {
+        visibleMinY = yScale.domain[0];
+        visibleMaxY = yScale.domain[1];
+      }
+    }
+
+    double? scaleX;
+    if (_baseXSpan != null && _panXDomain != null) {
+      final span = _panXDomain![1] - _panXDomain![0];
+      if (span != 0) {
+        scaleX = _baseXSpan! / span.abs();
+      }
+    }
+
+    double? scaleY;
+    if (_baseYSpan != null && _panYDomain != null) {
+      final span = _panYDomain![1] - _panYDomain![0];
+      if (span != 0) {
+        scaleY = _baseYSpan! / span.abs();
+      }
+    }
+
+    return ZoomInfo(
+      visibleMinX: visibleMinX,
+      visibleMaxX: visibleMaxX,
+      visibleMinY: visibleMinY,
+      visibleMaxY: visibleMaxY,
+      scaleX: scaleX,
+      scaleY: scaleY,
+      state: state,
+    );
+  }
+
+  void _emitZoomEvent(Rect plotArea, ZoomState state) {
+    if (!_isZoomEnabled) return;
+    final zoomConfig = _zoomConfig;
+    if (zoomConfig == null) return;
+    final info = _calculateZoomInfo(plotArea, state);
+    switch (state) {
+      case ZoomState.start:
+        zoomConfig.onZoomStart?.call(info);
+        break;
+      case ZoomState.update:
+        zoomConfig.onZoomUpdate?.call(info);
+        break;
+      case ZoomState.end:
+        zoomConfig.onZoomEnd?.call(info);
+        break;
+    }
+  }
+
+  bool _applyZoom(
+    double scaleDelta,
+    Offset focalPoint,
+    Rect plotArea, {
+    bool isGesture = false,
+  }) {
+    if (!_isZoomEnabled || scaleDelta == 1.0) return false;
+    final zoomConfig = _zoomConfig;
+    if (zoomConfig == null) return false;
+
+    bool changed = false;
+
+    final normalizedX =
+        ((focalPoint.dx - plotArea.left) / plotArea.width).clamp(0.0, 1.0);
+    final normalizedY =
+        (1 - (focalPoint.dy - plotArea.top) / plotArea.height).clamp(0.0, 1.0);
+
+    if ((zoomConfig.axes == ZoomAxis.x || zoomConfig.axes == ZoomAxis.both) &&
+        _panXDomain != null &&
+        _originalXDomain != null &&
+        _baseXSpan != null &&
+        _baseXSpan != 0) {
+      changed |= _applyZoomToDomain(
+        domain: _panXDomain!,
+        original: _originalXDomain!,
+        baseSpan: _baseXSpan!,
+        scaleDelta: scaleDelta,
+        normalizedFocal: normalizedX,
+      );
+    }
+
+    if ((zoomConfig.axes == ZoomAxis.y || zoomConfig.axes == ZoomAxis.both) &&
+        _panYDomain != null &&
+        _originalYDomain != null &&
+        _baseYSpan != null &&
+        _baseYSpan != 0) {
+      changed |= _applyZoomToDomain(
+        domain: _panYDomain!,
+        original: _originalYDomain!,
+        baseSpan: _baseYSpan!,
+        scaleDelta: scaleDelta,
+        normalizedFocal: normalizedY,
+      );
+    }
+
+    if (changed) {
+      setState(() {});
+      _resetInteractionDetector();
+    }
+
+    return changed;
+  }
+
+  Widget _buildZoomControls() {
+    final zoomConfig = _zoomConfig;
+    if (!_isZoomEnabled || zoomConfig == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Align(
+      alignment: zoomConfig.buttonAlignment,
+      child: Padding(
+        padding: zoomConfig.buttonPadding,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _ZoomButton(
+              icon: Icons.add,
+              onPressed: () => _handleZoomButtonPressed(true),
+              theme: widget.theme,
+            ),
+            const SizedBox(height: 8),
+            _ZoomButton(
+              icon: Icons.remove,
+              onPressed: () => _handleZoomButtonPressed(false),
+              theme: widget.theme,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleZoomButtonPressed(bool zoomIn) {
+    if (!_isZoomEnabled) return;
+    final plotArea = _currentPlotArea;
+    final zoomConfig = _zoomConfig;
+    if (plotArea == null || zoomConfig == null) return;
+
+    final step = zoomConfig.buttonStep < 1.0 ? 1.2 : zoomConfig.buttonStep;
+    final scaleDelta = zoomIn ? step : (1 / step);
+    final changed = _applyZoom(scaleDelta, plotArea.center, plotArea);
+    if (changed) {
+      _emitZoomEvent(plotArea, ZoomState.start);
+      _emitZoomEvent(plotArea, ZoomState.update);
+      _emitZoomEvent(plotArea, ZoomState.end);
+    }
+  }
+
+  bool _applyZoomToDomain({
+    required List<double> domain,
+    required List<double> original,
+    required double baseSpan,
+    required double scaleDelta,
+    required double normalizedFocal,
+  }) {
+    if (baseSpan == 0 || domain.length < 2) return false;
+
+    final zoomConfig = _zoomConfig!;
+    final minSpan =
+        baseSpan / (zoomConfig.maxScale <= 0 ? 1.0 : zoomConfig.maxScale);
+    final maxSpan =
+        baseSpan / (zoomConfig.minScale <= 0 ? 1.0 : zoomConfig.minScale);
+
+    final isDescending = domain[1] < domain[0];
+    final currentMin = isDescending ? domain[1] : domain[0];
+    final currentMax = isDescending ? domain[0] : domain[1];
+    final currentSpan = currentMax - currentMin;
+    if (currentSpan == 0) return false;
+
+    double proposedSpan = (currentSpan / scaleDelta).abs();
+    proposedSpan = proposedSpan.clamp(minSpan.abs(), maxSpan.abs());
+    if ((proposedSpan - currentSpan).abs() < 1e-3) {
+      return false;
+    }
+
+    final focalValue = currentMin + normalizedFocal * currentSpan;
+    double newMin = focalValue - normalizedFocal * proposedSpan;
+    double newMax = newMin + proposedSpan;
+
+    final originalMin = math.min(original[0], original[1]);
+    final originalMax = math.max(original[0], original[1]);
+
+    if (newMin < originalMin) {
+      final shift = originalMin - newMin;
+      newMin += shift;
+      newMax += shift;
+    }
+    if (newMax > originalMax) {
+      final shift = newMax - originalMax;
+      newMin -= shift;
+      newMax -= shift;
+    }
+
+    if (isDescending) {
+      domain[0] = newMax;
+      domain[1] = newMin;
+    } else {
+      domain[0] = newMin;
+      domain[1] = newMax;
+    }
+
+    return true;
+  }
+}
+
+class _ZoomButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+  final ChartTheme theme;
+
+  const _ZoomButton({
+    required this.icon,
+    required this.onPressed,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: theme.backgroundColor.withValues(alpha: 0.9),
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onPressed,
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Icon(icon, size: 18, color: theme.axisColor),
+        ),
+      ),
     );
   }
 }

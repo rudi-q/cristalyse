@@ -156,8 +156,11 @@ class CristalyseChart {
   /// - [geomProgress] for configuring progress bar appearance
   /// - [ProgressOrientation] for bar orientation options
   /// - [ProgressStyle] for styling options (filled, gradient, striped, etc.)
-  CristalyseChart mappingProgress(
-      {String? value, String? label, String? category}) {
+  CristalyseChart mappingProgress({
+    String? value,
+    String? label,
+    String? category,
+  }) {
     _progressValueColumn = value;
     _progressLabelColumn = label;
     _progressCategoryColumn = category;
@@ -252,21 +255,27 @@ class CristalyseChart {
   CristalyseChart geomBar({
     double? width,
     Color? color,
+    Color? positiveColor,
+    Color? negativeColor,
     double? alpha,
     BarOrientation? orientation,
     BarStyle? style,
     BorderRadius? borderRadius,
     double? borderWidth,
+    bool? roundOutwardEdges,
     YAxis? yAxis,
   }) {
     final barGeom = BarGeometry(
       width: width ?? 0.8,
       color: color,
+      positiveColor: positiveColor,
+      negativeColor: negativeColor,
       alpha: alpha ?? 1.0,
       orientation: orientation ?? BarOrientation.vertical,
       style: style ?? BarStyle.grouped,
       borderRadius: borderRadius,
       borderWidth: borderWidth ?? 0.0,
+      roundOutwardEdges: roundOutwardEdges ?? false,
       yAxis: yAxis ?? YAxis.primary,
     );
     _geometries.add(barGeom);
@@ -366,11 +375,19 @@ class CristalyseChart {
   /// represent two dimensions, and the bubble size represents the third dimension.
   /// Perfect for showing relationships between multiple continuous variables.
   ///
+  /// Size Scaling Behavior:
+  /// - Without `limits`: Scale domain uses actual data range, so `minSize`/`maxSize` map to actual min/max data values
+  /// - With `limits`: Scale domain is set to limits range; values outside limits still render but are scaled proportionally
+  /// - This preserves data accuracy - all values render, with outliers appearing larger/smaller than minSize/maxSize
+  /// - Use `limits` to set the scale's reference range for more consistent bubble sizing e.g. across charts
+  ///
   /// Example:
   /// ```dart
   /// chart.geomBubble(
-  ///   minSize: 10.0,
-  ///   maxSize: 50.0,
+  ///   minSize: 8.0,           // Bubble radius when value equals limits min (or data min if no limits)
+  ///   maxSize: 25.0,          // Bubble radius when value equals limits max (or data max if no limits)
+  ///   limits: (1000, 50000),  // Optional: set scale domain (in this example, values at 1000→8px, 50000→25px)
+  ///   title: 'Market Share (%)', // Optional: title for bubble size guide. Size guide displays if provided.
   ///   alpha: 0.7,
   ///   borderWidth: 2.0,
   ///   showLabels: true,
@@ -380,6 +397,8 @@ class CristalyseChart {
   CristalyseChart geomBubble({
     double? minSize,
     double? maxSize,
+    (double?, double?)? limits,
+    String? title,
     Color? color,
     double? alpha,
     PointShape? shape,
@@ -405,6 +424,8 @@ class CristalyseChart {
       BubbleGeometry(
         minSize: normalizedMinSize,
         maxSize: normalizedMaxSize,
+        limits: limits,
+        title: title,
         color: color,
         alpha: alpha ?? 0.7,
         shape: shape ?? PointShape.circle,
@@ -521,16 +542,36 @@ class CristalyseChart {
   }
 
   /// Configure continuous X scale
-  CristalyseChart scaleXContinuous(
-      {double? min, double? max, LabelCallback? labels}) {
-    _xScale = LinearScale(min: min, max: max, labelFormatter: labels);
+  CristalyseChart scaleXContinuous({
+    double? min,
+    double? max,
+    LabelCallback? labels,
+    String? title,
+    TickConfig? tickConfig,
+  }) {
+    _xScale = LinearScale(
+      limits: (min, max),
+      labelFormatter: labels,
+      title: title,
+      tickConfig: tickConfig,
+    );
     return this;
   }
 
   /// Configure continuous Y scale (primary/left axis)
-  CristalyseChart scaleYContinuous(
-      {double? min, double? max, LabelCallback? labels}) {
-    _yScale = LinearScale(min: min, max: max, labelFormatter: labels);
+  CristalyseChart scaleYContinuous({
+    double? min,
+    double? max,
+    LabelCallback? labels,
+    String? title,
+    TickConfig? tickConfig,
+  }) {
+    _yScale = LinearScale(
+      limits: (min, max),
+      labelFormatter: labels,
+      title: title,
+      tickConfig: tickConfig,
+    );
     return this;
   }
 
@@ -538,23 +579,34 @@ class CristalyseChart {
   ///
   /// Example:
   /// ```dart
-  /// chart.scaleY2Continuous(min: 0, max: 100) // For percentage data
+  /// chart.scaleY2Continuous(min: 0, max: 100, title: 'Conversion Rate (%)', tickConfig: TickConfig(simpleLinear: true)) // For percentage data
+  /// chart.scaleY2Continuous(min: 0, max: 100, title: 'Conversion Rate (%)', tickConfig: TickConfig(ticks: [0, 25, 50, 75, 100])) // For percentage data
   /// ```
-  CristalyseChart scaleY2Continuous(
-      {double? min, double? max, LabelCallback? labels}) {
-    _y2Scale = LinearScale(min: min, max: max, labelFormatter: labels);
+  CristalyseChart scaleY2Continuous({
+    double? min,
+    double? max,
+    LabelCallback? labels,
+    String? title,
+    TickConfig? tickConfig,
+  }) {
+    _y2Scale = LinearScale(
+      limits: (min, max),
+      labelFormatter: labels,
+      title: title,
+      tickConfig: tickConfig,
+    );
     return this;
   }
 
   /// Configure categorical X scale (useful for bar charts)
-  CristalyseChart scaleXOrdinal({LabelCallback? labels}) {
-    _xScale = OrdinalScale(labelFormatter: labels);
+  CristalyseChart scaleXOrdinal({LabelCallback? labels, String? title}) {
+    _xScale = OrdinalScale(labelFormatter: labels, title: title);
     return this;
   }
 
   /// Configure categorical Y scale
-  CristalyseChart scaleYOrdinal({LabelCallback? labels}) {
-    _yScale = OrdinalScale(labelFormatter: labels);
+  CristalyseChart scaleYOrdinal({LabelCallback? labels, String? title}) {
+    _yScale = OrdinalScale(labelFormatter: labels, title: title);
     return this;
   }
 
@@ -626,7 +678,8 @@ class CristalyseChart {
     if ((categoryColors == null || categoryColors.isEmpty) &&
         (categoryGradients == null || categoryGradients.isEmpty)) {
       throw ArgumentError(
-          'Either categoryColors or categoryGradients must be provided and non-empty');
+        'Either categoryColors or categoryGradients must be provided and non-empty',
+      );
     }
     if (_colorColumn != null) {
       final String colorColumn = _colorColumn ?? '';
@@ -634,20 +687,26 @@ class CristalyseChart {
       // Apply solid colors if provided
       if (categoryColors != null && categoryColors.isNotEmpty) {
         _theme = _theme.customPalette(
-            data: _data, color: colorColumn, categoryColors: categoryColors);
+          data: _data,
+          color: colorColumn,
+          categoryColors: categoryColors,
+        );
       }
 
       // Apply gradients if provided
       if (categoryGradients != null && categoryGradients.isNotEmpty) {
         _theme = _theme.customGradientPalette(
-            data: _data,
-            color: colorColumn,
-            categoryGradients: categoryGradients);
+          data: _data,
+          color: colorColumn,
+          categoryGradients: categoryGradients,
+        );
       }
     } else {
-      throw ArgumentError("'color' argument is missing from .mapping. \n"
-          "The correct code should look like this .mapping(x:'', y='', color='')\n"
-          "If you don't wish to add a category column, remove customPalette() from your CristalyseChart declaration code.\n\n");
+      throw ArgumentError(
+        "'color' argument is missing from .mapping. \n"
+        "The correct code should look like this .mapping(x:'', y='', color='')\n"
+        "If you don't wish to add a category column, remove customPalette() from your CristalyseChart declaration code.\n\n",
+      );
     }
     return this;
   }
@@ -719,6 +778,7 @@ class CristalyseChart {
     HoverConfig? hover,
     ClickConfig? click,
     PanConfig? pan,
+    ZoomConfig? zoom,
     bool enabled = true,
   }) {
     _interaction = ChartInteraction(
@@ -726,6 +786,7 @@ class CristalyseChart {
       hover: hover,
       click: click,
       pan: pan,
+      zoom: zoom,
       enabled: enabled,
     );
     return this;
@@ -783,6 +844,22 @@ class CristalyseChart {
     return this;
   }
 
+  /// Quick zoom setup (defaults to X-axis zooming)
+  ///
+  /// Example:
+  /// ```dart
+  /// chart.onZoom((info) {
+  ///   print('Zoom scale: ${info.scaleX}');
+  /// });
+  /// ```
+  CristalyseChart onZoom(ZoomCallback callback, {ZoomAxis axis = ZoomAxis.x}) {
+    _interaction = ChartInteraction(
+      zoom: ZoomConfig(enabled: true, axes: axis, onZoomUpdate: callback),
+      enabled: true,
+    );
+    return this;
+  }
+
   /// Quick click setup
   ///
   /// Example:
@@ -801,6 +878,7 @@ class CristalyseChart {
   ///
   /// Automatically generates a legend based on the color mapping column.
   /// Only works when a `color` mapping is defined in `.mapping()`.
+  /// Show titles for y and y2 axes titles for the legend group if showTitles is true.
   ///
   /// Basic usage:
   /// ```dart
@@ -815,6 +893,36 @@ class CristalyseChart {
   /// With positioning:
   /// ```dart
   /// chart.legend(position: LegendPosition.bottom)
+  /// ```
+  ///
+  /// With floating position:
+  /// ```dart
+  /// chart.legend(
+  ///   position: LegendPosition.floating,
+  ///   floatingOffset: Offset(100, 50), // x: 100, y: 50 from top-left
+  /// )
+  /// ```
+  ///
+  /// With interactive legend (click to toggle visibility):
+  /// ```dart
+  /// chart.legend(interactive: true) // Auto-managed state
+  /// ```
+  ///
+  /// With external state management:
+  /// ```dart
+  /// final hiddenCategories = useState(<String>{});
+  /// chart.legend(
+  ///   interactive: true,
+  ///   hiddenCategories: hiddenCategories.value,
+  ///   onToggle: (category, visible) {
+  ///     if (visible) {
+  ///       hiddenCategories.value.remove(category);
+  ///     } else {
+  ///       hiddenCategories.value.add(category);
+  ///     }
+  ///     hiddenCategories.value = {...hiddenCategories.value};
+  ///   },
+  /// )
   /// ```
   ///
   /// With custom styling:
@@ -835,6 +943,12 @@ class CristalyseChart {
     Color? backgroundColor,
     EdgeInsets? padding,
     double? borderRadius,
+    Offset? floatingOffset,
+    bool? floatingDraggable,
+    bool? interactive,
+    Set<String>? hiddenCategories,
+    void Function(String category, bool visible)? onToggle,
+    bool? showTitles,
   }) {
     _legendConfig = LegendConfig(
       position: position ?? LegendPosition.topRight,
@@ -846,6 +960,12 @@ class CristalyseChart {
       backgroundColor: backgroundColor,
       padding: padding ?? const EdgeInsets.all(8.0),
       borderRadius: borderRadius ?? 4.0,
+      floatingOffset: floatingOffset,
+      floatingDraggable: floatingDraggable ?? false,
+      interactive: interactive ?? false,
+      hiddenCategories: hiddenCategories,
+      onToggle: onToggle,
+      showTitles: showTitles ?? false,
     );
     return this;
   }
@@ -1061,10 +1181,11 @@ extension ChartThemeExtension on ChartTheme {
   /// ```
   ///
   /// Returns a new [ChartTheme] with the custom color palette applied.
-  ChartTheme customPalette(
-      {required List<Map<String, dynamic>> data,
-      required String color,
-      required Map<String, Color> categoryColors}) {
+  ChartTheme customPalette({
+    required List<Map<String, dynamic>> data,
+    required String color,
+    required Map<String, Color> categoryColors,
+  }) {
     // Extract unique categories
     final categories = data.map((d) => d[color] as String).toSet().toList();
     debugPrint(
@@ -1077,10 +1198,7 @@ extension ChartThemeExtension on ChartTheme {
       final fallbackIndex = categoryIndex % this.colorPalette.length;
       return categoryColors[category] ?? this.colorPalette[fallbackIndex];
     }).toList();
-    debugPrint('CustomPalette: New palette length: ${colorPalette.length}');
-    return copyWith(
-      colorPalette: colorPalette,
-    );
+    return copyWith(colorPalette: colorPalette);
   }
 
   /// Creates a new [ChartTheme] with custom gradients for specific categories
@@ -1130,8 +1248,6 @@ extension ChartThemeExtension on ChartTheme {
     required String color,
     required Map<String, Gradient> categoryGradients,
   }) {
-    return copyWith(
-      categoryGradients: categoryGradients,
-    );
+    return copyWith(categoryGradients: categoryGradients);
   }
 }

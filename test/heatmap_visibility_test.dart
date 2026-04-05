@@ -27,17 +27,13 @@ void main() {
         '5pm',
         '6pm',
         '7pm',
-        '8pm'
+        '8pm',
       ];
 
       for (final day in days) {
         for (final hour in hours) {
           final activity = (days.indexOf(day) + hours.indexOf(hour)) * 2.5;
-          testData.add({
-            'day': day,
-            'hour': hour,
-            'activity': activity,
-          });
+          testData.add({'day': day, 'hour': hour, 'activity': activity});
         }
       }
 
@@ -62,8 +58,9 @@ void main() {
       ];
     });
 
-    testWidgets('HeatMap widget renders without errors',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap widget renders without errors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -105,8 +102,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('HeatMap chart widget configuration is correct',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap chart widget configuration is correct', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -169,8 +167,9 @@ void main() {
       expect(heatMapGeometry.colorGradient!.length, equals(7));
     });
 
-    testWidgets('HeatMap data structure is correct',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap data structure is correct', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -182,9 +181,7 @@ void main() {
                 heatMapXColumn: 'day',
                 heatMapYColumn: 'hour',
                 heatMapValueColumn: 'activity',
-                geometries: [
-                  HeatMapGeometry(),
-                ],
+                geometries: [HeatMapGeometry()],
                 theme: testTheme,
               ),
             ),
@@ -211,8 +208,10 @@ void main() {
       // Verify day values
       final dayValues = data.map((d) => d['day']).toSet();
       expect(dayValues, hasLength(7));
-      expect(dayValues,
-          containsAll(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']));
+      expect(
+        dayValues,
+        containsAll(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']),
+      );
 
       // Verify hour values
       final hourValues = data.map((d) => d['hour']).toSet();
@@ -221,8 +220,9 @@ void main() {
       expect(hourValues, contains('8pm'));
     });
 
-    testWidgets('HeatMap renders within constrained height',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap renders within constrained height', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -252,8 +252,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('HeatMap animation completes successfully',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap animation completes successfully', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -265,9 +266,7 @@ void main() {
                 heatMapXColumn: 'day',
                 heatMapYColumn: 'hour',
                 heatMapValueColumn: 'activity',
-                geometries: [
-                  HeatMapGeometry(),
-                ],
+                geometries: [HeatMapGeometry()],
                 theme: testTheme,
                 animationDuration: const Duration(milliseconds: 500),
               ),
@@ -279,8 +278,9 @@ void main() {
       // Let the animation complete
       await tester.pump(); // Initial frame
       await tester.pump(const Duration(milliseconds: 100)); // Partial animation
-      await tester
-          .pump(const Duration(milliseconds: 500)); // Complete animation
+      await tester.pump(
+        const Duration(milliseconds: 500),
+      ); // Complete animation
 
       // Verify no exceptions during animation
       expect(tester.takeException(), isNull);
@@ -289,8 +289,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('HeatMap handles null values correctly',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap handles null values correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -303,9 +304,7 @@ void main() {
                 heatMapYColumn: 'y',
                 heatMapValueColumn: 'value',
                 geometries: [
-                  HeatMapGeometry(
-                    nullValueColor: Colors.grey.shade200,
-                  ),
+                  HeatMapGeometry(nullValueColor: Colors.grey.shade200),
                 ],
                 theme: testTheme,
               ),
@@ -332,8 +331,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('Contribution-style HeatMap renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('Contribution-style HeatMap renders correctly', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -378,12 +378,15 @@ void main() {
         find.byType(AnimatedCristalyseChartWidget),
       );
       expect(chartWidget.data, isNotEmpty);
-      expect(chartWidget.data.length,
-          equals(84)); // 12 weeks × 7 days = 84 data points
+      expect(
+        chartWidget.data.length,
+        equals(84),
+      ); // 12 weeks × 7 days = 84 data points
     });
 
-    testWidgets('HeatMap cells are rendered via CustomPaint',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap cells are rendered via CustomPaint', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -395,9 +398,7 @@ void main() {
                 heatMapXColumn: 'day',
                 heatMapYColumn: 'hour',
                 heatMapValueColumn: 'activity',
-                geometries: [
-                  HeatMapGeometry(),
-                ],
+                geometries: [HeatMapGeometry()],
                 theme: testTheme,
               ),
             ),
@@ -424,8 +425,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('HeatMap with custom color gradient',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap with custom color gradient', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -466,8 +468,9 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
-    testWidgets('HeatMap handles empty data gracefully',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap handles empty data gracefully', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -479,9 +482,7 @@ void main() {
                 heatMapXColumn: 'x',
                 heatMapYColumn: 'y',
                 heatMapValueColumn: 'value',
-                geometries: [
-                  HeatMapGeometry(),
-                ],
+                geometries: [HeatMapGeometry()],
                 theme: testTheme,
               ),
             ),

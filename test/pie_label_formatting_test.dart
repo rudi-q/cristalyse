@@ -10,9 +10,7 @@ void main() {
             {'category': 'B', 'value': 200},
           ])
           .mappingPie(value: 'value', category: 'category')
-          .geomPie(
-            showPercentages: true,
-          );
+          .geomPie(showPercentages: true);
 
       expect(chart, isNotNull);
       final widget = chart.build();
@@ -26,9 +24,7 @@ void main() {
             {'category': 'B', 'value': 200},
           ])
           .mappingPie(value: 'value', category: 'category')
-          .geomPie(
-            labels: (value) => 'Custom: ${value.toStringAsFixed(1)}',
-          );
+          .geomPie(labels: (value) => 'Custom: ${value.toStringAsFixed(1)}');
 
       expect(chart, isNotNull);
       final widget = chart.build();

@@ -8,7 +8,7 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        SelectableText(
           'Striped Progress Bars',
           style: TextStyle(
             fontSize: 18,
@@ -17,14 +17,14 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        const SelectableText(
           'Progress bars with diagonal stripe patterns for enhanced visual distinction',
           style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         const SizedBox(height: 16),
 
         // Horizontal Striped Progress Bars
-        Text(
+        SelectableText(
           'Horizontal Striped Bars',
           style: TextStyle(
             fontSize: 16,
@@ -35,27 +35,32 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
         const SizedBox(height: 8),
         SizedBox(
           height: 300,
-          child: CristalyseChart()
-              .data(_generateProgressData())
-              .mappingProgress(
-                  value: 'completion', label: 'task', category: 'department')
-              .geomProgress(
-                orientation: ProgressOrientation.horizontal,
-                style: ProgressStyle.striped,
-                thickness: 25.0,
-                cornerRadius: 8.0,
-                showLabel: true,
-              )
-              .theme(currentTheme)
-              .animate(
-                  duration: const Duration(milliseconds: 1200),
-                  curve: Curves.easeOutCubic)
-              .build(),
+          child:
+              CristalyseChart()
+                  .data(_generateProgressData())
+                  .mappingProgress(
+                    value: 'completion',
+                    label: 'task',
+                    category: 'department',
+                  )
+                  .geomProgress(
+                    orientation: ProgressOrientation.horizontal,
+                    style: ProgressStyle.striped,
+                    thickness: 25.0,
+                    cornerRadius: 8.0,
+                    showLabel: true,
+                  )
+                  .theme(currentTheme)
+                  .animate(
+                    duration: const Duration(milliseconds: 1200),
+                    curve: Curves.easeOutCubic,
+                  )
+                  .build(),
         ),
         const SizedBox(height: 24),
 
         // Vertical Striped Progress Bars
-        Text(
+        SelectableText(
           'Vertical Striped Bars',
           style: TextStyle(
             fontSize: 16,
@@ -66,31 +71,37 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
         const SizedBox(height: 8),
         SizedBox(
           height: 300,
-          child: CristalyseChart()
-              .data(_generateProgressData())
-              .mappingProgress(
-                  value: 'completion', label: 'task', category: 'department')
-              .geomProgress(
-                orientation: ProgressOrientation.vertical,
-                style: ProgressStyle.striped,
-                thickness: 30.0,
-                cornerRadius: 6.0,
-                showLabel: true,
-              )
-              .theme(currentTheme)
-              .animate(
-                  duration: const Duration(milliseconds: 1000),
-                  curve: Curves.easeOutCubic)
-              .build(),
+          child:
+              CristalyseChart()
+                  .data(_generateProgressData())
+                  .mappingProgress(
+                    value: 'completion',
+                    label: 'task',
+                    category: 'department',
+                  )
+                  .geomProgress(
+                    orientation: ProgressOrientation.vertical,
+                    style: ProgressStyle.striped,
+                    thickness: 30.0,
+                    cornerRadius: 6.0,
+                    showLabel: true,
+                  )
+                  .theme(currentTheme)
+                  .animate(
+                    duration: const Duration(milliseconds: 1000),
+                    curve: Curves.easeOutCubic,
+                  )
+                  .build(),
         ),
         const SizedBox(height: 16),
 
-        const Text(
-            '• Striped pattern creates visual distinction from solid fills\\n'
-            '• Diagonal stripes at 45-degree angle\\n'
-            '• Works with both horizontal and vertical orientations\\n'
-            '• Maintains rounded corners and smooth animations\\n'
-            '• Great for showing active/in-progress states'),
+        const SelectableText(
+          '• Striped pattern creates visual distinction from solid fills\\n'
+          '• Diagonal stripes at 45-degree angle\\n'
+          '• Works with both horizontal and vertical orientations\\n'
+          '• Maintains rounded corners and smooth animations\\n'
+          '• Great for showing active/in-progress states',
+        ),
       ],
     ),
   );
@@ -106,7 +117,7 @@ List<Map<String, dynamic>> _generateProgressData() {
     {
       'task': 'Marketing Campaign',
       'completion': 90.0,
-      'department': 'Marketing'
+      'department': 'Marketing',
     },
   ];
 }

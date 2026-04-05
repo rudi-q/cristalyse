@@ -4,8 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('HeatMap Widget Tests', () {
-    testWidgets('HeatMapExample renders without errors',
-        (WidgetTester tester) async {
+    testWidgets('HeatMapExample renders without errors', (
+      WidgetTester tester,
+    ) async {
       // Create a test app with HeatMapExample
       await tester.pumpWidget(
         MaterialApp(
@@ -26,12 +27,14 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
       expect(find.text('Weekly Activity Heatmap'), findsOneWidget);
       expect(
-          find.text('Hours spent on different activities throughout the week'),
-          findsOneWidget);
+        find.text('Hours spent on different activities throughout the week'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('HeatMap renders with data points',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap renders with data points', (
+      WidgetTester tester,
+    ) async {
       // Create test data
       final testData = [
         {'day': 'Mon', 'hour': '9AM', 'value': 5},
@@ -51,12 +54,7 @@ void main() {
                 heatMapXColumn: 'day',
                 heatMapYColumn: 'hour',
                 heatMapValueColumn: 'value',
-                geometries: [
-                  HeatMapGeometry(
-                    showValues: true,
-                    cellSpacing: 2,
-                  ),
-                ],
+                geometries: [HeatMapGeometry(showValues: true, cellSpacing: 2)],
                 theme: ChartTheme.defaultTheme(),
               ),
             ),
@@ -73,8 +71,9 @@ void main() {
       expect(find.byType(CustomPaint), findsWidgets);
     });
 
-    testWidgets('ContributionHeatMap renders without errors',
-        (WidgetTester tester) async {
+    testWidgets('ContributionHeatMap renders without errors', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -92,12 +91,14 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
       expect(find.text('Developer Contributions'), findsOneWidget);
       expect(
-          find.text('GitHub-style contribution graph showing daily activity'),
-          findsOneWidget);
+        find.text('GitHub-style contribution graph showing daily activity'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('HeatMap with null values renders correctly',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap with null values renders correctly', (
+      WidgetTester tester,
+    ) async {
       final testData = [
         {'x': 'A', 'y': '1', 'value': 5},
         {'x': 'A', 'y': '2', 'value': null}, // Null value
@@ -117,9 +118,7 @@ void main() {
                 heatMapYColumn: 'y',
                 heatMapValueColumn: 'value',
                 geometries: [
-                  HeatMapGeometry(
-                    nullValueColor: Colors.grey.shade200,
-                  ),
+                  HeatMapGeometry(nullValueColor: Colors.grey.shade200),
                 ],
                 theme: ChartTheme.defaultTheme(),
               ),
@@ -134,15 +133,17 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('HeatMap with custom color gradient',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap with custom color gradient', (
+      WidgetTester tester,
+    ) async {
       final testData = List.generate(
-          16,
-          (i) => {
-                'x': (i % 4).toString(),
-                'y': (i ~/ 4).toString(),
-                'value': i.toDouble(),
-              });
+        16,
+        (i) => {
+          'x': (i % 4).toString(),
+          'y': (i ~/ 4).toString(),
+          'value': i.toDouble(),
+        },
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -180,12 +181,13 @@ void main() {
 
     testWidgets('HeatMap with discrete colors', (WidgetTester tester) async {
       final testData = List.generate(
-          9,
-          (i) => {
-                'x': (i % 3).toString(),
-                'y': (i ~/ 3).toString(),
-                'value': i * 10.0,
-              });
+        9,
+        (i) => {
+          'x': (i % 3).toString(),
+          'y': (i ~/ 3).toString(),
+          'value': i * 10.0,
+        },
+      );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -222,8 +224,9 @@ void main() {
       expect(find.byType(AnimatedCristalyseChartWidget), findsOneWidget);
     });
 
-    testWidgets('HeatMap handles empty data gracefully',
-        (WidgetTester tester) async {
+    testWidgets('HeatMap handles empty data gracefully', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -235,9 +238,7 @@ void main() {
                 heatMapXColumn: 'x',
                 heatMapYColumn: 'y',
                 heatMapValueColumn: 'value',
-                geometries: [
-                  HeatMapGeometry(),
-                ],
+                geometries: [HeatMapGeometry()],
                 theme: ChartTheme.defaultTheme(),
               ),
             ),
@@ -268,9 +269,7 @@ void main() {
                 heatMapXColumn: 'x',
                 heatMapYColumn: 'y',
                 heatMapValueColumn: 'value',
-                geometries: [
-                  HeatMapGeometry(),
-                ],
+                geometries: [HeatMapGeometry()],
                 theme: ChartTheme.defaultTheme(),
                 animationDuration: const Duration(milliseconds: 500),
               ),
@@ -362,8 +361,9 @@ void main() {
 
       for (int week = 0; week < 52; week++) {
         for (int day = 0; day < 7; day++) {
-          final date =
-              now.subtract(Duration(days: (51 - week) * 7 + (6 - day)));
+          final date = now.subtract(
+            Duration(days: (51 - week) * 7 + (6 - day)),
+          );
           data.add({
             'week': 'W${week + 1}',
             'day': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][day],
@@ -408,11 +408,7 @@ class _TestHeatMapExample extends StatelessWidget {
           }
         }
 
-        data.add({
-          'day': days[d],
-          'hour': hours[h],
-          'activity': value,
-        });
+        data.add({'day': days[d], 'hour': hours[h], 'activity': value});
       }
     }
 

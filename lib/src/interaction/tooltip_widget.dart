@@ -295,6 +295,12 @@ class _ChartTooltipOverlayState extends State<ChartTooltipOverlay>
     }
   }
 
+  /// Returns true if both points refer to the same data point.
+  bool _isSamePoint(DataPointInfo a, DataPointInfo? b) {
+    if (b == null) return false;
+    return a.dataIndex == b.dataIndex && a.seriesName == b.seriesName;
+  }
+
   /// Remove tooltip overlay
   void _removeTooltip() {
     if (_overlayEntry != null) {

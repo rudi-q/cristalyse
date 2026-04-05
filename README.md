@@ -17,6 +17,7 @@
 [![pub package](https://img.shields.io/pub/v/cristalyse.svg?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse)
 [![pub points](https://img.shields.io/pub/points/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
 [![likes](https://img.shields.io/pub/likes/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
+[![Pub Downloads](https://img.shields.io/pub/dm/cristalyse?color=2cacbf&labelColor=145261)](https://pub.dev/packages/cristalyse/score)
 [![License: MIT](https://img.shields.io/badge/License-MIT-2cacbf.svg?labelColor=145261)](https://opensource.org/licenses/MIT)
 
 [![Web](https://img.shields.io/badge/Web-145261?logo=google-chrome&logoColor=white)](https://flutter.dev/)
@@ -1100,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.7.0** - Production ready with comprehensive chart library featuring automatic legend generation, flexible positioning, and professional styling
+**Current Version: 1.17.6** - Production ready with fixed tooltips for interactive legends, bar chart positive/negative value styling, integer-only ticks, pinch/scroll wheel/button-based zoom, tick configuration, optional Y-axis titles in legends, boundary clamping, programmatic pan controller, interactive floating legends, and intelligent axis bounds
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1114,13 +1115,23 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v0.8.0** - **Area chart support** with animations and multi-series capabilities
 - ✅ **v0.9.0** - **Enhanced dual Y-axis SVG export** with comprehensive scale support
 - ✅ **v1.0.0** - **Pie charts and donut charts** with exploded slices and smart label positioning
-- ✅ **v1.1.0** - **Advanced label formatting system** with NumberFormat integration
+- ✅ **v1.1.0** - **Advanced label formatting system** with NumberFormat integration (by [@davidlrichmond](https://github.com/davidlrichmond))
 - ✅ **v1.2.0** - **Heat map charts** with 2D data visualization and customizable color gradients
 - ✅ **v1.3.0** - **Bubble charts** with 3D data visualization and professional size encoding
 - ✅ **v1.4.0** - **Custom color palettes** for brand-specific category mapping
 - ✅ **v1.5.0** - **Automatic legend generation** with flexible positioning and styling
 - ✅ **v1.6.0** - **Experimental gradient color support** for customPalette with Linear, Radial, and Sweep gradients
 - ✅ **v1.7.0** - **Progress bar charts** with horizontal, vertical, circular, stacked, grouped, gauge, and concentric styles + comprehensive documentation improvements
+- ✅ **v1.8.0** - **Intelligent axis bounds & labeling** with Wilkinson Extended algorithm (by [@davidlrichmond](https://github.com/davidlrichmond)) - professional round-number ticks, geometry-aware defaults, comprehensive testing
+- ✅ **v1.9.0** - **Interactive & floating legends** with click-to-toggle visibility, custom positioning with offsets, color consistency preservation, and overflow rendering support
+- ✅ **v1.10.0** - **Axis titles & bubble size guide** with optional titles for all axes, visual bubble size legends, smart spacing calculations, and bubble legend validation fixes (by [@davidlrichmond](https://github.com/davidlrichmond))
+- ✅ **v1.11.0** - **Programmatic pan controller** for external chart panning control via PanController with panTo() and panReset() methods (by [@jbbjarnason](https://github.com/jbbjarnason))
+- ✅ **v1.12.0** - **Boundary clamping for pan operations** with optional boundaryClampingX and boundaryClampingY to prevent infinite panning beyond data boundaries (by [@jbbjarnason](https://github.com/jbbjarnason))
+- ✅ **v1.13.0** - **Optional Y-axis titles in legends** for improved multi-axis chart readability (by [@jbbjarnason](https://github.com/jbbjarnason))
+- ✅ **v1.14.0** - **Tick configuration for scales** with explicit tick positions and simple linear spacing options (by [@jbbjarnason](https://github.com/jbbjarnason))
+- ✅ **v1.15.0** - **Zoom & pan interactions** with pinch gestures, scroll wheel support, and floating zoom buttons for multi-touch and desktop platforms
+- ✅ **v1.16.0** - **Integer-only ticks** for continuous scales, ensuring clean integer values for count data
+- ✅ **v1.17.0** - **Bar chart positive/negative value styling** with smart rounded corners (`roundOutwardEdges`) and conditional colors (`positiveColor`/`negativeColor`) for financial charts and variance analysis
 
 ## Support This Project
 

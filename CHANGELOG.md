@@ -1,3 +1,965 @@
+# Changelog
+
+## 1.17.6 - 2026-04-04
+
+#### 🐛 Bug Fixes
+
+**Tooltip Flickering Fix:**
+- **Fixed tooltip flicker on subtle mouse movements:** When hovering over a chart, moving the mouse by even a single pixel while remaining over the same data point would cause the tooltip to close and immediately reopen, creating a visible flickering effect.
+- **Smart Point Detection:** Before closing and reopening the tooltip, the chart now checks if the hovered data point has actually changed. If the tooltip content would be the same, the existing tooltip is preserved instead of being recreated.
+- **Comparison Logic:** Points are identified by `dataIndex + seriesName`, ensuring the fix works correctly with multi-series charts and single-series data.
+
+**Quality Assurance:**
+- 297 tests pass — zero breaking changes.
+- Fully backward compatible.
+- Tooltip behavior improved across all chart types.
+
+---
+
+## 1.17.5 - 2026-02-22
+
+#### 🐛 Bug Fixes & Layout Optimization
+
+**Chart Padding & Heatmap Layout:**
+- **Dynamic Padding:** Removed hardcoded 80px left padding fallback. The chart widget now dynamically calculates the perfect left padding based on Y-axis labels and heatmap strings.
+- **Heatmap Layout Fix:** Fixed an issue where heatmap Y-axis labels could get clipped due to incorrect space estimation.
+- **Memory Leak Fix:** Addressed a `TextPainter` memory leak in `_getHeatMapYAxisSpace` by ensuring engine Paragraph resources are properly disposed.
+- **Tighter Default Themes:** Default `ChartTheme` padding has been tightened for a more pristine layout without wasting blank space, thanks to the newly improved dynamic bounds estimation.
+
+**Geometry Color Mapping Fix:**
+- **Color Bleeding Resolved:** Fixed a bug in `geomLine()` and `geomArea()` where specifying a fixed `color:` override would be ignored if the data also contained categorical color classifications. Explicit geometry colors now correctly override categorical scale colors.
+
+#### 📊 Example Enhancements
+- **Combo Charts:** Added a new "Combo Bar+Line" chart demonstrating categorical colored bars with a single continuous line overlaid. 
+
+---
+
+## 1.17.4 - 2026-02-17
+
+#### 🎨 Example App Enhancements
+
+**UI Overhaul & Dark Mode:**
+- **Dark Mode Support**: The example app now intelligently adapts to system brightness settings.
+- **New Palettes**: Added 13 distinct color palettes (Ocean, Warm, Cool, Neon, etc.) and new themes (High Contrast, Solarized).
+- **Gesture Reliability**: Replaced `SelectableText` with `Text` in AppBars, Buttons, and Dropdowns to fix gesture conflicts.
+- **Refactoring**: Converted theme/palette storage to strongly-typed records for better maintainability.
+- **Fixes**: Resolved hardcoded colors in bubble charts for better dark mode visibility.
+
+---
+
+## 1.17.3 - 2026-02-09
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix! 👏
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+#### 🐛 Bug Fixes
+
+**Fixed OrdinalScale Inversion Overflow:**
+- Fixed a bug where `OrdinalScale.invert()` would overflow at the edges of the range.
+- Corrected the formula to use the proper step calculation, aligning it with the `scale()` method.
+
+#### 📊 Example Enhancements
+
+**Multi-Series Bar Chart Demo:**
+- Enhanced the example app with multi-series data to better demonstrate grouped bar chart functionality.
+- Updated bar chart mapping to include category-based color coding.
+
+---
+
+## 1.17.2 - 2025-12-15
+
+#### 🐛 Bug Fixes
+
+**Fixed Tooltip Offset on Pan:**
+- Fixed an issue where tooltips were offset when panning the chart.
+- Ensured strict synchronization between the painter's plot area and the interaction detector.
+- Implemented `onChartAreaComputed` callback to persist the precise plot area across frame repaints.
+
+---
+
+## 1.17.1 - 2025-12-10
+
+#### 🐛 Bug Fixes
+
+**Fixed Tooltips Not Working with Interactive Legends:**
+- Tooltips now correctly appear when hovering over charts with `interactive: true` legends
+- Previously, enabling interactive legends caused tooltips to stop working on line, area, and bar charts
+- Root cause: Filtered chart widget was not wrapped with `ChartTooltipOverlay`
+- Fix: `_buildChartWidget()` now properly wraps filtered charts with tooltip overlay
+
+**Technical Details:**
+- Modified `_buildChartWidget()` in `animated_chart_widget.dart`
+- Wrapped filtered chart content with `ChartTooltipOverlay` when tooltips are enabled
+- Ensures tooltip functionality is preserved during legend toggle operations
+
+**API Example:**
+```dart
+// Now works correctly with both tooltips and interactive legends
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .legend(interactive: true)  // ✅ Tooltips now work with this!
+  .interaction(
+    tooltip: TooltipConfig(
+      builder: (point) => Text('${point.getDisplayValue('product')}: \$${point.getDisplayValue('revenue')}k'),
+    ),
+  )
+  .build()
+```
+
+**Quality Assurance:**
+- All 297 tests passing
+- Zero breaking changes - fully backward compatible
+- Updated example app with interactive legend + tooltip demonstration
+
+---
+
+## 1.17.0 - 2025-12-08
+
+#### 📊 Bar Chart Positive/Negative Value Enhancements
+
+**New Features:**
+- **Smart Rounded Corners**: `roundOutwardEdges` property for conditional corner rounding
+  - Positive bars: Rounded corners on top (vertical) or right (horizontal)
+  - Negative bars: Rounded corners on bottom (vertical) or left (horizontal)
+  - Sharp edges at zero baseline for clean alignment
+  - Works with existing `borderRadius` parameter
+  
+- **Conditional Bar Colors**: Different colors for positive and negative values
+  - New `positiveColor` parameter for bars with values >= 0
+  - New `negativeColor` parameter for bars with values < 0
+  - Intelligent fallback chain: positiveColor/negativeColor → color → colorScale → theme
+  - Perfect for financial charts, variance analysis, and profit/loss visualization
+
+**Technical Implementation:**
+- Added `roundOutwardEdges`, `positiveColor`, and `negativeColor` to `BarGeometry`
+- Updated `CristalyseChart.geomBar()` API with new parameters
+- Implemented `_computeOutwardRRect()` helper method to eliminate code duplication
+- Enhanced `_drawSingleBar()` with value-based conditional rendering logic
+- Fixed negative bar rendering bug (bars extending below zero baseline)
+
+**API Example:**
+```dart
+final profitLossData = [
+  {'month': 'Jan', 'pnl': 45000.0},
+  {'month': 'Feb', 'pnl': -12000.0},
+  {'month': 'Mar', 'pnl': 67000.0},
+  {'month': 'Apr', 'pnl': -8000.0},
+];
+
+CristalyseChart()
+  .data(profitLossData)
+  .mapping(x: 'month', y: 'pnl')
+  .geomBar(
+    borderRadius: BorderRadius.circular(12),
+    roundOutwardEdges: true,        // Smart rounding
+    positiveColor: Colors.green,    // Gains
+    negativeColor: Colors.red,      // Losses
+  )
+  .scaleXOrdinal()
+  .scaleYContinuous()
+  .build()
+```
+
+**Bug Fixes:**
+- Fixed negative bar rendering (bars extending below zero were not displaying)
+- Corrected bar rect calculation to handle negative heights properly
+
+**Documentation:**
+- Updated `bar-charts.mdx` with comprehensive examples
+- Added "Positive/Negative Value Styling" section with financial dashboard example
+- Code quality improvements: extracted helper method, const optimizations, top-level const data
+
+**Quality Assurance:**
+- Zero breaking changes - fully backward compatible
+- All new parameters are optional (default to `false`/`null`)
+- `flutter analyze` passes with no issues
+- Example app updated with live demonstration
+
+---
+
+## 1.16.0 - 2025-11-27
+
+#### 📏 Integer-Only Ticks
+
+**New Features:**
+- **Integer-Only Ticks**: Force axis ticks to be integers
+  - New `integersOnly` parameter in `TickConfig`
+  - Automatically clamps ticks to integer values
+  - Ensures step size is at least 1
+  - Ideal for count data (people, items, events) where fractional values don't make sense
+
+**Technical Implementation:**
+- Updated `TickConfig` to include `integersOnly` property
+- Enhanced `LinearScale` to respect integer constraints during tick generation
+
+**API Example:**
+```dart
+CristalyseChart()
+  .scaleYContinuous(
+    tickConfig: TickConfig(
+      integersOnly: true, // No more 1.5 people!
+    ),
+  )
+```
+
+---
+
+## 1.15.0 - 2025-11-11
+
+#### 🔍 Zoom & Pan Interactions
+
+**New Features:**
+- **Zoom Interactions**: Pinch, scroll wheel, and button-based zooming on continuous scales
+  - `ZoomConfig` class for comprehensive zoom configuration
+  - Three zoom modes: X-axis only, Y-axis only, or both axes simultaneously
+  - Multiple input methods: Pinch gestures, scroll wheel, floating +/- buttons
+  - Real-time zoom state callbacks (start, update, end)
+
+- **Scroll Wheel Zoom**: Native support for mouse wheel zooming
+  - Configurable sensitivity with `wheelSensitivity` parameter
+  - Zoom focused at cursor position for intuitive interaction
+  - Works seamlessly with existing pan operations
+
+- **Pinch Gesture Zoom**: Full multi-touch support
+  - Zoom centered at pinch focal point
+  - Smooth integration with single-finger pan gestures
+  - Respects zoom axis configuration
+
+- **Floating Zoom Controls**: Optional UI buttons for touch-friendly zooming
+  - Configurable button placement with `buttonAlignment`
+  - Adjustable zoom step size with `buttonStep` parameter
+  - Theme-aware styling
+  - Can be disabled for minimalist interfaces
+
+- **Zoom State Information**: Live callbacks expose detailed zoom metrics
+  - `visibleMinX`, `visibleMaxX` - Current visible X-axis range
+  - `visibleMinY`, `visibleMaxY` - Current visible Y-axis range
+  - `scaleX`, `scaleY` - Zoom scale factors
+  - `state` - Zoom lifecycle (start, update, end)
+
+**Technical Implementation:**
+- New `ZoomConfig` class with comprehensive configuration options
+- New `ZoomInfo` class for zoom event information
+- New `ZoomAxis` enum: `x`, `y`, `both`
+- New `ZoomState` enum: `start`, `update`, `end`
+- New `ZoomCallback` typedef for zoom event handlers
+- Enhanced `ChartInteraction` to include optional `zoom` parameter
+- Quick-setup `onZoom()` method on `CristalyseChart` API
+- Full integration with existing pan interactions and domain management
+- Zoom domain clamping respects original scale boundaries
+
+**API Examples:**
+
+```dart
+// Quick zoom setup (X-axis only)
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'day', y: 'revenue')
+  .geomLine()
+  .onZoom((info) {
+    print('Zoom scale: ${info.scaleX}x');
+  })
+  .build()
+
+// Advanced zoom configuration
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'value')
+  .geomLine()
+  .interaction(
+    zoom: ZoomConfig(
+      enabled: true,
+      axes: ZoomAxis.both,           // Zoom on both axes
+      maxScale: 16.0,                // Maximum 16x zoom
+      minScale: 1.0,                 // Minimum 1x (no zoom out)
+      wheelSensitivity: 0.0015,      // Scroll wheel sensitivity
+      buttonStep: 1.4,               // 40% zoom step for buttons
+      showButtons: true,             // Show +/- buttons
+      buttonAlignment: Alignment.bottomRight,
+      onZoomStart: (info) => print('Zoom started'),
+      onZoomUpdate: (info) => print('Scale: ${info.scaleX}x'),
+      onZoomEnd: (info) => print('Zoom ended'),
+    ),
+  )
+  .build()
+```
+
+**New Example:**
+- Full zoom interaction demo in example app (21st chart example)
+- Interactive controls for zoom mode, sensitivity, and button steps
+- Live zoom information display with visible ranges and scale factors
+- Touch, mouse scroll, and button interaction showcase
+
+**Use Cases:**
+- Time-series data exploration with precise zoom control
+- Scatter plots requiring X/Y axis independent zooming
+- Touch-friendly interfaces on mobile devices
+- Desktop applications with mouse wheel support
+- Accessibility: Zoom buttons for users with limited touch capability
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- New `zoom` parameter in `.interaction()` is optional
+- New `onZoom()` method is additive, doesn't affect existing code
+- Zoom respects existing domain boundaries and pan configuration
+- Comprehensive gesture handling (pinch, scroll, single-touch pan)
+- Example app demonstrates all zoom modes and configuration options
+
+---
+
+## 1.14.0 - 2025-11-09
+
+#### 🎯 Tick Configuration for Scales
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+**New Features:**
+- **TickConfig Class**: Control tick generation on continuous scales
+  - `ticks: List<double>?` - Specify explicit tick positions
+  - `simpleLinear: bool` - Use uniform linear spacing instead of Wilkinson's algorithm
+  - Optional parameters - scales work as before by default
+
+- **Explicit Tick Specification**: Pass custom tick positions for precise control
+  - Industry-standard reference points (freezing point, percentiles, etc.)
+  - Domain-specific intervals for specialized charts
+  - Consistent tick positions across multiple related charts
+
+- **Simple Linear Ticking**: Generate evenly-spaced ticks
+  - Predictable, uniform tick intervals
+  - Ideal for time-series and scientific/technical charts
+  - Alternative to default Wilkinson's algorithm
+
+**Technical Implementation:**
+- Added `TickConfig` class with `ticks` and `simpleLinear` properties
+- Extended `LinearScale` to accept and store `TickConfig`
+- `scaleXContinuous`, `scaleYContinuous`, `scaleY2Continuous` now accept optional `tickConfig` parameter
+- Enhanced Wilkinson labeling algorithm with simple linear fallback
+- New example: TimeBasedLineChartWidget demonstrating TickConfig usage
+
+**API Example:**
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'time', y: 'value')
+  .scaleXContinuous(
+    tickConfig: TickConfig(simpleLinear: true),
+  )
+  .scaleYContinuous(
+    tickConfig: TickConfig(ticks: [0, 25, 50, 75, 100]),
+  )
+  .geomLine()
+  .build()
+```
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- New feature is opt-in with sensible defaults
+- Backward compatible API - all parameters optional
+- Production ready
+
+---
+
+## 1.13.1 - 2025-11-03
+
+#### 🐛 Bug Fixes
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Fixed Label Size Calculation:**
+- Label size now deduced based on formatter with default font size
+- Calculates actual text width including padding for more accurate layout
+- Ensures consistent label spacing in both linear and ordinal scales
+- Improves chart readability with properly-sized axis labels
+
+**Technical Details:**
+- Added `_calculatePixelsPerLabel()` method to measure text dimensions
+- Uses TextPainter with default TextStyle (fontSize: 12) for accurate width calculation
+- Includes 10px padding (theme-deferred in future)
+- Applies calculated pixels per label to both LinearScale and OrdinalScale
+- Made `optimalPixelsPerLabel` private as implementation detail
+
+**Impact:**
+- More accurate label sizing across all chart types
+- Better space utilization for axis labels
+- Consistent behavior regardless of label content length
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Single file changed with focused bug fix
+- Maintains existing API surface
+
+---
+
+## 1.13.0 - 2025-11-02
+
+#### 🎨 Legend Enhancements
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+**New Features:**
+- **Optional Y-Axis Titles in Legends**: Add `showTitles` option to display Y-axis titles alongside legend entries
+  - Improves chart legend readability when multiple Y-axes are present
+  - Optional feature - legends work as before by default
+  - Seamless integration with existing legend styling and layout
+
+**Technical Implementation:**
+- Extended `LegendWidget` to support optional Y-axis title rendering
+- Enhanced `legend.dart` core logic to handle title display
+- Updated chart configuration to expose new option
+- Includes comprehensive test coverage
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- New feature is opt-in
+- All tests passing including new legend test cases
+- Production ready
+
+---
+
+## 1.12.1 - 2025-11-02
+
+#### 🐛 Bug Fixes
+
+**Right Padding & Secondary Y-Axis Alignment:**
+- Removed excessive hardcoded 80px right padding applied unconditionally for secondary y-axis
+- Widget layout now uses conservative 80px estimate only when y2Scale exists
+- Painter performs precise y2-axis space calculation at paint time with full scale information
+- Eliminates divergence between layout calculation and rendering, ensuring hit-testing alignment
+- Honors theme padding settings: `rightPadding = theme.padding.right + y2AxisSpace`
+- Added null check for `y2Scale` to prevent unnecessary padding when secondary axis is absent
+
+**Impact:**
+- Charts without secondary y-axis now use only theme padding (no waste)
+- Charts with secondary y-axis get proper space allocation based on actual label widths
+- Consistent plot area between widget layout and painter rendering phases
+- Correct hit-testing alignment for interactions (hover, click, pan)
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Maintains consistent plot area between layout and render phases
+- Proper hit-testing alignment for secondary y-axis interactions
+- Fixes excessive padding issues on charts without secondary y-axis
+
+---
+
+## 1.12.0 - 2025-11-01
+
+#### 🏔️ Boundary Clamping for Pan Operations
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**New Features:**
+- **Boundary Clamping**: Prevent infinite panning beyond data boundaries
+  - New `boundaryClampingX` and `boundaryClampingY` options in `PanConfig`
+  - Clamps pan domain within calculated scale boundaries
+  - Perfect for constrained data exploration and guided navigation
+
+**Technical Implementation:**
+- Scale boundaries tracked via `valuesBoundaries` in `LinearScale`
+- Computed in `LinearScale.computeDomain()` from data values
+- Pan domain clamping applied in `_updatePanDomain()` during interaction
+- Seamless integration with existing pan callbacks and pan controller
+- No changes to default behavior - opt-in feature
+
+**API Example:**
+```dart
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'time', y: 'value')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      boundaryClampingX: true,  // Clamp X-axis panning
+      boundaryClampingY: true,  // Clamp Y-axis panning
+    ),
+  )
+  .build()
+```
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Default clamping disabled (infinite panning by default)
+- Tested with pan controller and manual pan interactions
+- Production ready
+
+---
+
+## 1.11.1 - 2025-10-24
+
+#### 🐛 Bug Fixes
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Fixed Y-axis Bounds During X-axis Panning:**
+- Y-axis bounds now correctly update when panning X-axis
+- Previously, Y-axis would remain stuck with original `panYDomain` bounds during X-axis pan gestures
+- Added guard condition to reset `panYDomain` when `updateYDomain` is false
+- Enables expected behavior: Y-axis bounds remain dynamic and update based on visible data while panning horizontally
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Focused single-line fix with no API modifications
+
+---
+
+## 1.11.0 - 2025-10-24
+
+#### 🎯 Major Feature: Programmatic Pan Controller
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this contribution!
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+**New PanController Class:**
+- External control of chart panning via new `PanController` class
+- `panTo(PanInfo)` method for programmatic pan operations
+- `panReset()` method to restore original chart view
+- ChangeNotifier-based architecture for reactive updates
+- Optional `controller` parameter in `PanConfig`
+
+**Enhanced Pan Configuration:**
+- `PanConfig` now accepts optional `controller` parameter
+- Widget lifecycle management (initState, didUpdateWidget, dispose)
+- Automatic listener registration and cleanup
+- Full integration with existing pan callbacks
+
+**Use Cases:**
+- Programmatic zoom controls with buttons/sliders
+- Reset to original view functionality
+- Coordinated panning across multiple charts
+- External UI controls for chart navigation
+- Jump to specific data ranges programmatically
+
+**API Example:**
+```dart
+final panController = PanController();
+
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y')
+  .geomLine()
+  .interaction(
+    pan: PanConfig(
+      enabled: true,
+      controller: panController,
+    ),
+  )
+  .build();
+
+// Pan to specific range
+panController.panTo(PanInfo(
+  visibleMinX: 500,
+  visibleMaxX: 1500,
+  state: PanState.update,
+));
+
+// Reset to original view
+panController.panReset();
+```
+
+#### 🧪 Quality Assurance
+
+- Zero breaking changes - fully backward compatible
+- Optional controller parameter (defaults to null)
+- Proper lifecycle management with listener cleanup
+- Example integration in pan_example.dart
+
+---
+
+## 1.10.3 - 2025-10-23
+
+#### 🐛 Scale Padding Fix
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Fixed Chart Shrinking During Pan Operations:**
+- Scale padding now initialized before painting charts
+- Prevents `setupYScale` from changing padding during panning
+- Chart maintains consistent size during all pan operations
+- Smooth user experience without unintended resize behavior
+
+**Technical Details:**
+- Added `_setupScales()` method to initialize X and Y scales before chart painting
+- Fixes bug where panning would call `setupYScale` and reduce chart dimensions
+- Applied to both animated chart render paths
+
+#### 🧪 Quality Assurance
+
+- All existing tests continue to pass
+- Zero breaking changes - fully backward compatible
+
+---
+
+## 1.10.2 - 2025-10-21
+
+#### 🎨 Heat Map Unification & Bounds Fixes
+
+**Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Thank you for this contribution!
+
+**Heat Map Color System Unification:**
+- Unified heat maps to use `GradientColorScale` for consistent color handling
+  - Eliminates duplicate color logic between heat maps and other chart types
+  - Improves maintainability and reduces technical debt
+  - Heat map colors now follow the same scaling principles as other geometries
+
+**Bounds Edge Cases & Validation:**
+- Fixed guard condition for corner case where `min > max` in bounds calculations
+  - Prevents invalid scale configurations that could crash rendering
+  - Added comprehensive test coverage for edge cases
+  - Improved documentation for bounds behavior with notes on invalid configurations
+
+**Code Quality:**
+- Addressed code rabbit review feedback on refactored code
+- Fixed deprecated `int` RGB getters for Flutter compatibility
+- Applied code formatting linter fixes
+
+#### 🧪 Quality Assurance
+
+- Added documentation and comprehensive test cases for bounds edge cases
+- All existing tests continue to pass
+- Zero breaking changes - fully backward compatible
+
+---
+
+## 1.10.1 - 2025-10-21
+
+#### 🐛 Bug Fixes & Testing
+
+**Authored by [@jbbjarnason](https://github.com/jbbjarnason)** - Thank you for this fix!
+
+**Wilkinson Labeling Precision:**
+- Fixed floating-point rounding in epoch millisecond label calculations
+    - Replaced `round()` with `roundToDouble()` for proper double precision handling
+    - Resolves issues with large number labeling (e.g., epoch timestamps)
+    - Added comprehensive test case for epoch millisecond labeling
+    - Test validates correct tick generation: [1760527000000.0, 1760528000000.0, 1760529000000.0, 1760530000000.0]
+
+**Technical Details:**
+- `_cleanNumber()` method in `WilkinsonLabeling` class now uses `roundToDouble()` instead of `round()`
+- Fixes edge case with very large timestamp values (>1.7 trillion milliseconds)
+- Maintains precision in float arithmetic for astronomical numbers
+
+#### 🧪 Quality Assurance
+
+- Added new test: "Bigger numbers, replicate epoch ms" to `wilkinson_labeling_test.dart`
+- All 286 tests passing (285 existing + 1 new test)
+- Zero breaking changes - fully backward compatible
+
+---
+
+## 1.10.0 - 2025-10-07
+
+#### 🎨 Axis Titles & Bubble Size Guide
+
+**Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Thank you for this valuable contribution!
+
+**New Features:**
+- **Axis Titles**: Add descriptive titles to X, Y, and Y2 axes
+  - Optional `title` parameter on all scale methods
+  - Smart positioning with automatic spacing
+  - Rotated titles for vertical axes
+  - Theme-aware styling with customizable fonts
+- **Bubble Size Guide**: Visual legend for bubble charts
+  - Shows min, mid, and max size values from data
+  - Appears when `title` provided on `geomBubble()`
+  - Horizontal and vertical layout support
+  - Integrates with existing legend system
+
+**Enhanced API:**
+```dart
+// Axis titles
+CristalyseChart()
+  .scaleXContinuous(title: 'Time (seconds)')
+  .scaleYContinuous(title: 'Revenue (USD)')
+  .scaleY2Continuous(title: 'Conversion Rate (%)')
+  .build()
+
+// Bubble size guide
+CristalyseChart()
+  .geomBubble(
+    title: 'Market Share (%)',  // Enables size guide in legend
+    minSize: 5.0,
+    maxSize: 30.0,
+  )
+  .legend()
+  .build()
+```
+
+**Bug Fixes:**
+- **Bubble Legend Validation**: Fixed edge case where zero/negative bubble sizes could cause rendering issues
+  - Added validation to ensure bubble sizes are always positive
+  - Clamps invalid values to safe minimum (1.0px radius)
+  - Includes debug assertions for development feedback
+  - Prevents Container dimension errors with edge-case data
+
+**Technical Improvements:**
+- Precise axis label and title spacing calculations
+- Pre-calculated label dimensions for optimal layout
+- Consistent spacing constants across all axes
+- Validated bubble sizes in legend rendering
+- Comprehensive edge case test coverage (8 new tests)
+
+**Quality Assurance:**
+- All 285 tests passing (20 new tests added)
+- Zero breaking changes - fully backward compatible
+- Titles are optional and render only when provided
+- Production ready with comprehensive testing
+
+---
+
+## 1.9.0 - 2025-10-06
+
+#### 🎯 Major Feature: Interactive & Floating Legends
+
+- **Interactive Legend Toggle**: Click-to-hide/show data points with visual feedback
+  - Simple `.legend(interactive: true)` to enable interactivity
+  - Toggled items show reduced opacity and strikethrough styling
+  - Smooth chart updates with preserved color consistency
+  - Supports both auto-managed and external state control
+- **Floating Legend Positioning**: Advanced positioning with custom offsets
+  - New `LegendPosition.floating` with `floatingOffset` parameter
+  - Negative offsets supported for legends outside chart bounds
+  - `clipBehavior: Clip.none` enables overflow rendering
+  - Full creative control over legend placement
+- **Enhanced Legend API**: Expanded configuration options
+  - `interactive`: Enable click-to-toggle functionality
+  - `hiddenCategories`: External state management for advanced use cases
+  - `onToggle`: Callback for custom toggle handling
+  - `floatingOffset`: Precise positioning with Offset coordinates
+- **Color Consistency**: Fixed color mapping preservation when toggling
+  - Original ColorScale maintained when filtering data
+  - Chart painter respects provided ColorScale
+  - No color shifting when hiding/showing categories
+- **Theme-Aware Backgrounds**: Legend backgrounds adapt to theme colors
+  - No hardcoded white backgrounds
+  - Automatic contrast for light/dark modes
+  - Customizable via theme configuration
+
+#### ✨ New API Examples
+
+```dart
+// Interactive Legend (Auto-Managed State)
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'quarter', y: 'revenue', color: 'product')
+  .geomBar(style: BarStyle.grouped)
+  .legend(interactive: true) // Click to toggle!
+  .build()
+
+// Floating Legend with Custom Position
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomPoint()
+  .legend(
+    position: LegendPosition.floating,
+    floatingOffset: Offset(20, 20), // Top-left, 20px from corner
+  )
+  .build()
+
+// Interactive + Floating + External State Control
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'x', y: 'y', color: 'category')
+  .geomLine()
+  .legend(
+    interactive: true,
+    position: LegendPosition.floating,
+    floatingOffset: Offset(-10, 30), // Can overflow outside chart!
+    hiddenCategories: myHiddenSet, // External state
+    onToggle: (category, visible) => handleToggle(category, visible),
+  )
+  .build()
+```
+
+#### 📚 Documentation Updates
+
+- **Enhanced Legend Documentation** (`legends.mdx`):
+  - Comprehensive interactive legends section
+  - Floating position examples with negative offsets
+  - State management patterns (auto vs external)
+  - Visual feedback customization guide
+- **Updated Example App** (`legend_example.dart`):
+  - Interactive legend demo with grouped bars
+  - Auto-managed state demonstration
+  - Real-world usage patterns
+
+#### 🧪 Comprehensive Testing
+
+- **All 268 Tests Passing**: Zero regressions, fully backward compatible
+- **State Management**: Tested internal and external state patterns
+- **Color Preservation**: Validated consistent color mapping
+- **Overflow Rendering**: Verified legends render outside bounds
+
+#### 🔧 Technical Implementation
+
+- **State Management**: Clean separation of internal/external state
+- **ColorScale Preservation**: Original scale maintained through filtering
+- **Painter Updates**: Respects provided ColorScale for consistency
+- **Overflow Support**: `clipBehavior: Clip.none` for Stack widgets
+- **Visual Feedback**: Opacity + strikethrough for toggled items
+
+#### ⚡ Performance & Compatibility
+
+- **Zero Breaking Changes**: Fully backward compatible
+- **Smooth Animations**: Preserved during toggle interactions
+- **Negligible Overhead**: Efficient state updates and filtering
+- **Production Ready**: Well-tested, documented, and reviewed
+
+**Interactive legends bring a new level of data exploration to Cristalyse charts!** 🎨✨
+
+---
+
+## 1.8.1 - 2025-10-04
+
+#### 🔗 Enhanced Developer Experience
+
+- **Bidirectional Documentation Links**: Seamless navigation between docs and example app
+  - Added "View Docs" button to example app chart screens
+  - Added "View Live Example" cards to all chart documentation pages
+  - Enables quick switching between reading docs and seeing live examples
+  - Improves learning workflow for developers
+
+#### 📚 Documentation Navigation Improvements
+
+- **Example App Links**: 9 chart documentation pages now link to live examples
+  - Scatter plots, line charts, bar charts, area charts, bubble charts
+  - Pie charts, dual-axis charts, heat maps, progress bars
+  - Opens in new tab at `https://example.cristalyse.com/#/[chart-type]`
+- **Documentation Links**: All 19 example app routes link to corresponding docs
+  - Clean button UI with icon and proper spacing
+  - Opens in external browser with error handling
+  - Added `url_launcher` package (v6.3.1) dependency
+
+#### 🛠️ Technical Implementation
+
+- **Clean Architecture**: Single source of truth for URL mappings
+  - New `docsUrl` field in `RouteInfo` class (optional)
+  - Consistent URL mapping across 19 chart types
+  - Type-safe with proper null checks
+- **User-Friendly Design**: Both navigation methods follow consistent UI patterns
+  - "View Docs" button in example app (icon + text)
+  - "View Live Example" card in documentation (Mintlify Card component)
+  - Opens in appropriate context (external browser for app, new tab for docs)
+
+#### ✅ Quality Assurance
+
+- All Flutter analyze checks passing
+- No breaking changes
+- Backward compatible
+
+---
+
+## 1.8.0 - 2025-10-01
+
+#### 🎯 Major Feature: Intelligent Axis Bounds & Labeling
+
+**Authored by [@davidlrichmond](https://github.com/davidlrichmond)** - Thank you for this exceptional contribution!
+
+- **Wilkinson Extended Algorithm**: Industry-standard tick labeling for "nice" round numbers
+  - Based on IEEE paper by Talbot, Lin, and Hanrahan (2010)
+  - Optimizes simplicity, coverage, density, and legibility
+  - Generates clean axis labels like 0, 5, 10, 50, 100 instead of arbitrary decimals
+  - Smart pruning for performance optimization
+- **Geometry-Aware Bounds**: Different chart types automatically use appropriate scale defaults
+  - **Zero Baseline**: Bar and area charts start from zero for quantity comparison
+  - **Data-Driven**: Line and scatter charts use tight bounds for trend analysis
+  - **Precedence Logic**: Explicit limits → Geometry behavior → Fallback defaults
+- **Unified Scale Architecture**: Cleaner, more maintainable scale system
+  - New `setBounds()` API across all scale types
+  - Added `normalize()` and `scaleToRange()` helpers
+  - Size and gradient scales now properly extend `Scale` base class
+  - Removed duplicate bounds logic from painters
+
+#### ✨ New API Capabilities
+
+- **Bubble Chart Size Limits**: New `limits` parameter for bubble geometry
+  ```dart
+  chart.geomBubble(
+    minSize: 8.0,           // Visual: minimum bubble radius in pixels
+    maxSize: 25.0,          // Visual: maximum bubble radius in pixels
+    limits: (1000, 50000),  // Scale domain: $1K → 8px, $50K → 25px
+    alpha: 0.8,
+  )
+  ```
+- **Scale Limits as Tuples**: Cleaner API with `(min, max)` tuples
+  - `scaleYContinuous(min: 0, max: 100)` still works (backward compatible)
+  - Internally converted to `limits: (0, 100)` tuple
+  - Partial limits supported: `(0, null)` or `(null, 100)`
+
+#### 📈 User-Visible Improvements
+
+- **Prettier Axis Labels**: Ticks now show round numbers optimized for readability
+  - Before: 0.47, 5.23, 10.88, 15.91, 21.07
+  - After: 0, 5, 10, 15, 20
+- **Better Default Bounds**: Charts automatically use appropriate scale behavior
+  - Bar charts properly start at zero baseline
+  - Line charts focus on data range with minimal padding
+  - Consistent behavior across chart types
+- **Smarter Tick Density**: Optimal ~60 pixels per label for readability
+  - Prevents label overlap on small screens
+  - Maximizes information on large displays
+
+#### 🧪 Comprehensive Testing
+
+- **New Test Files** (803 lines of tests added):
+  - `axis_bounds_test.dart`: Bounds calculation with all behaviors
+  - `wilkinson_labeling_test.dart`: Algorithm validation with real-world scenarios
+  - `bounds_integration_test.dart`: End-to-end integration tests
+- **All 263 Tests Passing**: No regressions, fully backward compatible
+
+#### 📚 Documentation Updates
+
+- **Enhanced Scale Documentation** (`scales.mdx`):
+  - Comprehensive limits behavior explanation
+  - Data filtering vs. visual range clarification
+  - Practical examples for all use cases
+- **Bubble Chart Sizing Guide** (`bubble-charts.mdx`):
+  - Advanced bubble sizing with limits parameter
+  - Outlier behavior explanation
+  - Visual vs. domain scale distinction
+
+#### 🔧 Technical Implementation
+
+- **New Core Utilities**:
+  - `wilkinson_labeling.dart` (263 lines): IEEE-standard algorithm
+  - `bounds_calculator.dart` (230 lines): Geometry-aware bounds
+- **Refactored Scale System**:
+  - Unified `setBounds()` API
+  - Centralized bounds logic (no duplication)
+  - Cleaner abstractions and inheritance
+
+#### 🐛 Bug Fixes
+
+- Fixed Hero tag conflict with multiple FloatingActionButtons in example app
+- Removed unused `dart:math` import from `chart_widget.dart`
+- Cleaned up duplicate bounds calculation logic across widgets
+
+#### ⚡ Performance & Compatibility
+
+- **Zero Breaking Changes**: Fully backward compatible
+- **Negligible Performance Impact**: Ticks computed once and cached
+- **Production Ready**: Well-tested, documented, and reviewed
+
+**This release brings professional, publication-quality axis rendering to Cristalyse charts!** 📊✨
+
+---
+
 ## 1.7.0 - 2025-09-30
 
 #### 📊 Major Feature: Progress Bar Charts

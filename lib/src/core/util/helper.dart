@@ -41,7 +41,7 @@ void sortHeatMapValues(List<dynamic> values) {
     'wed',
     'thu',
     'fri',
-    'sat'
+    'sat',
   ];
 
   final monthOrder = [
@@ -68,7 +68,7 @@ void sortHeatMapValues(List<dynamic> values) {
     'sep',
     'oct',
     'nov',
-    'dec'
+    'dec',
   ];
 
   values.sort((a, b) {

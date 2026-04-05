@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 
 import '../core/geometry.dart';
 import '../core/scale.dart';
-import '../core/util/colors.dart';
 import '../core/util/helper.dart';
 import '../themes/chart_theme.dart';
 
 /// Custom painter with animation support
 class AnimatedChartPainter extends CustomPainter {
+  // Spacing constants for axis label and title positioning
+  static const double tickToLabelSpacing = 4.0;
+  static const double _labelToTitleSpacing = 8.0;
+
   final List<Map<String, dynamic>> data;
   final String? xColumn;
   final String? yColumn;
@@ -35,6 +38,8 @@ class AnimatedChartPainter extends CustomPainter {
   final bool coordFlipped;
   final List<double>? panXDomain;
   final List<double>? panYDomain;
+  final double? heatMapYAxisSpace;
+  final ValueChanged<Rect>? onChartAreaComputed;
 
   /// Creates an [AnimatedChartPainter] with comprehensive chart rendering capabilities.
   ///
@@ -91,6 +96,8 @@ class AnimatedChartPainter extends CustomPainter {
     this.coordFlipped = false,
     this.panXDomain,
     this.panYDomain,
+    this.heatMapYAxisSpace,
+    this.onChartAreaComputed,
   });
 
   /// Renders the complete chart visualization on the provided canvas.
@@ -116,8 +123,11 @@ class AnimatedChartPainter extends CustomPainter {
   Gradient _applyAlphaToGradient(Gradient gradient, double alpha) {
     final clampedAlpha = alpha.clamp(0.0, 1.0);
     final newColors = gradient.colors
-        .map((color) => color.withAlpha(
-            (((color.a * 255.0).round() & 0xff) * clampedAlpha).round()))
+        .map(
+          (color) => color.withAlpha(
+            (((color.a * 255.0).round() & 0xff) * clampedAlpha).round(),
+          ),
+        )
         .toList();
 
     if (gradient is LinearGradient) {
@@ -161,16 +171,92 @@ class AnimatedChartPainter extends CustomPainter {
     if (data.isEmpty || geometries.isEmpty) return;
 
     // Adjust padding for dual Y-axis
-    final hasSecondaryY =
-        hasSecondaryYAxis(y2Column: y2Column, geometries: geometries);
-    final rightPadding = hasSecondaryY ? 80.0 : theme.padding.right;
+    final hasSecondaryY = hasSecondaryYAxis(
+      y2Column: y2Column,
+      geometries: geometries,
+    );
+
+    // Pre-calculate maximum label dimensions for title spacing
+    final axisLabelStyle = theme.axisLabelStyle ??
+        const TextStyle(color: Colors.black, fontSize: 12);
+    final labelDimensions = _calculateMaxLabelDimensions(
+      xScale: this.xScale,
+      yScale: this.yScale,
+      y2Scale: this.y2Scale,
+      style: axisLabelStyle,
+    );
+
+    // Calculate title font size for dimension calculations
+    final titleFontSize = (axisLabelStyle.fontSize ?? 12) + 1;
+
+    // Use cached heatmap Y-axis label space if provided, otherwise compute it
+    double heatMapYAxisSpace = this.heatMapYAxisSpace ?? 0.0;
+    if (this.heatMapYAxisSpace == null &&
+        geometries.any((g) => g is HeatMapGeometry)) {
+      final yCol = heatMapYColumn ?? yColumn;
+      if (yCol != null && data.isNotEmpty) {
+        final yValues =
+            data.map((d) => d[yCol]).where((v) => v != null).toSet();
+        double maxHeatMapValWidth = 0.0;
+        for (final val in yValues) {
+          final tp = TextPainter(
+            text: TextSpan(text: val.toString(), style: axisLabelStyle),
+            textDirection: TextDirection.ltr,
+          )..layout();
+          if (tp.width > maxHeatMapValWidth) maxHeatMapValWidth = tp.width;
+        }
+        if (maxHeatMapValWidth > 0) {
+          heatMapYAxisSpace =
+              theme.axisWidth * 2 + tickToLabelSpacing + maxHeatMapValWidth;
+        }
+      }
+    }
+
+    // Space for Y-axis labels + optional title (title height becomes width after -90° rotation)
+    final yAxisSpace = math.max(
+        heatMapYAxisSpace,
+        this.yScale != null
+            ? theme.axisWidth * 2 + // tick marks
+                tickToLabelSpacing + // gap to labels
+                labelDimensions.maxYLabelWidth + // labels
+                (this.yScale?.title != null
+                    ? _labelToTitleSpacing + titleFontSize // gap + title height
+                    : 0.0)
+            : 0.0);
+    final leftPadding = theme.padding.left + yAxisSpace;
+
+    // Space for Y2-axis labels + optional title (title height becomes width after +90° rotation)
+    final y2AxisSpace = this.y2Scale != null
+        ? theme.axisWidth * 2 +
+            tickToLabelSpacing +
+            labelDimensions.maxY2LabelWidth +
+            (this.y2Scale?.title != null
+                ? _labelToTitleSpacing + titleFontSize // gap + title height
+                : 0.0)
+        : 0.0;
+    final rightPadding = theme.padding.right + y2AxisSpace;
+
+    // Space for X-axis labels + optional title (not rotated, height is vertical)
+    final xAxisSpace = this.xScale != null
+        ? theme.axisWidth * 2 +
+            tickToLabelSpacing +
+            labelDimensions.maxXLabelHeight +
+            (this.xScale?.title != null
+                ? _labelToTitleSpacing + titleFontSize // gap + title height
+                : 0.0)
+        : 0.0;
+    final bottomPadding = theme.padding.bottom + xAxisSpace;
 
     final plotArea = Rect.fromLTWH(
-      theme.padding.left,
+      leftPadding,
       theme.padding.top,
-      size.width - theme.padding.left - rightPadding,
-      size.height - theme.padding.vertical,
+      size.width - leftPadding - rightPadding,
+      size.height - theme.padding.top - bottomPadding,
     );
+
+    // Store for widget to use in interaction detection
+    // Use callback to ensure widget has persistent access even if repaint is skipped
+    onChartAreaComputed?.call(plotArea);
 
     if (plotArea.width <= 0 || plotArea.height <= 0) {
       return;
@@ -194,6 +280,7 @@ class AnimatedChartPainter extends CustomPainter {
         : null;
     final colorScale = _setupColorScale();
     final sizeScale = _setupSizeScale();
+    final gradientColorScale = _setupGradientColorScale();
 
     final hasPieChart = geometries.any((g) => g is PieGeometry);
     final hasHeatMapChart = geometries.any((g) => g is HeatMapGeometry);
@@ -226,6 +313,7 @@ class AnimatedChartPainter extends CustomPainter {
         colorScale,
         sizeScale,
         useY2,
+        gradientColorScale,
       );
     }
 
@@ -235,7 +323,15 @@ class AnimatedChartPainter extends CustomPainter {
     // Skip axes for pie charts, heatmaps, and progress bars
     // Use the same shouldSkipGridAndAxes variable for consistency
     if (!shouldSkipGridAndAxes) {
-      _drawAxes(canvas, size, plotArea, xScale, yScale, y2Scale);
+      _drawAxes(
+        canvas,
+        size,
+        plotArea,
+        xScale,
+        yScale,
+        y2Scale,
+        labelDimensions,
+      );
     } else if (hasHeatMapChart && !hasProgressChart) {
       // Only draw heat map axes if it's not a progress chart
       _drawHeatMapAxes(canvas, size, plotArea);
@@ -249,11 +345,13 @@ class AnimatedChartPainter extends CustomPainter {
           (preconfigured is LinearScale ? preconfigured : LinearScale());
       final dataCol = yColumn;
 
+      scale.range = [
+        0,
+        width,
+      ]; // Set range BEFORE setBounds for correct Wilkinson computation
+
       if (dataCol == null || data.isEmpty) {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
-        scale.range = [0, width];
+        scale.setBounds([], null, geometries);
         return scale;
       }
 
@@ -264,34 +362,10 @@ class AnimatedChartPainter extends CustomPainter {
           .toList();
 
       if (values.isNotEmpty) {
-        double domainMin = scale.min ?? values.reduce(math.min);
-        double domainMax = scale.max ?? values.reduce(math.max);
-
-        if (domainMin == domainMax) {
-          if (domainMin == 0) {
-            domainMin = -0.5;
-            domainMax = 0.5;
-          } else if (domainMin > 0) {
-            domainMax = domainMin + domainMin.abs() * 0.2;
-            domainMin = 0;
-          } else {
-            domainMin = domainMin - domainMin.abs() * 0.2;
-            domainMax = 0;
-          }
-        } else {
-          if (domainMin > 0) domainMin = 0;
-          if (domainMax < 0) domainMax = 0;
-        }
-        scale.domain = [domainMin, domainMax];
-        if (scale.domain[0] == scale.domain[1]) {
-          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
-        }
+        scale.setBounds(values, null, geometries);
       } else {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, geometries);
       }
-      scale.range = [0, width];
       return scale;
     } else {
       final preconfigured = xScale;
@@ -318,11 +392,13 @@ class AnimatedChartPainter extends CustomPainter {
       } else {
         final scale =
             (preconfigured is LinearScale ? preconfigured : LinearScale());
+        scale.range = [
+          0,
+          width,
+        ]; // Set range BEFORE setBounds for correct Wilkinson computation
+
         if (dataCol == null || data.isEmpty) {
-          scale.domain = scale.min != null && scale.max != null
-              ? [scale.min!, scale.max!]
-              : [0, 1];
-          scale.range = [0, width];
+          scale.setBounds([], null, geometries);
           return scale;
         }
         final values = data
@@ -332,41 +408,22 @@ class AnimatedChartPainter extends CustomPainter {
             .toList();
 
         if (values.isNotEmpty) {
-          double domainMin = scale.min ?? values.reduce(math.min);
-          double domainMax = scale.max ?? values.reduce(math.max);
-
-          if (domainMin == domainMax) {
-            if (domainMin == 0) {
-              domainMin = -0.5;
-              domainMax = 0.5;
-            } else if (domainMin > 0) {
-              domainMax = domainMin + domainMin.abs() * 0.2;
-              domainMin = 0;
-            } else {
-              domainMin = domainMin - domainMin.abs() * 0.2;
-              domainMax = 0;
-            }
-          } else {
-            if (domainMin > 0) domainMin = 0;
-            if (domainMax < 0) domainMax = 0;
-          }
+          // Use setBounds for consistent bounds calculation
+          scale.setBounds(values, null, geometries);
 
           // Use pan domain if available (for visual panning)
           if (!coordFlipped && panXDomain != null) {
-            scale.domain = [panXDomain![0], panXDomain![1]];
-          } else {
-            scale.domain = [domainMin, domainMax];
-          }
-
-          if (scale.domain[0] == scale.domain[1]) {
-            scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+            scale.setBounds(
+                values,
+                (
+                  panXDomain![0],
+                  panXDomain![1],
+                ),
+                geometries);
           }
         } else {
-          scale.domain = scale.min != null && scale.max != null
-              ? [scale.min!, scale.max!]
-              : [0, 1];
+          scale.setBounds([], null, geometries);
         }
-        scale.range = [0, width];
         return scale;
       }
     }
@@ -400,19 +457,20 @@ class AnimatedChartPainter extends CustomPainter {
 
       final scale =
           (preconfigured is LinearScale ? preconfigured : LinearScale());
+      scale.range = [
+        height,
+        0,
+      ]; // Set range BEFORE setBounds for correct Wilkinson computation
+
       if (dataCol == null || data.isEmpty) {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
-        scale.range = [height, 0];
+        scale.setBounds([], null, geometries);
         return scale;
       }
 
       final relevantGeometries =
           geometries.where((g) => g.yAxis == axis).toList();
       if (relevantGeometries.isEmpty) {
-        scale.domain = [0, 1];
-        scale.range = [height, 0];
+        scale.setBounds([0, 1], null, geometries);
         return scale;
       }
 
@@ -441,50 +499,29 @@ class AnimatedChartPainter extends CustomPainter {
       }
 
       if (values.isNotEmpty) {
-        double domainMin = scale.min ?? 0;
-        double domainMax = scale.max ?? values.reduce(math.max);
-
-        if (hasStackedBars) {
-          domainMax = domainMax * 1.1;
-        }
-
-        if (domainMin == domainMax) {
-          if (domainMax == 0) {
-            domainMin = -0.5;
-            domainMax = 0.5;
-          } else if (domainMax > 0) {
-            domainMax = domainMax + domainMax * 0.2;
-            domainMin = 0;
-          } else {
-            domainMin = domainMin - domainMin.abs() * 0.2;
-            domainMax = 0;
-          }
-        } else {
-          if (domainMin > 0) domainMin = 0;
-          if (domainMax < 0) domainMax = 0;
-        }
+        // Use setBounds for consistent bounds calculation
+        // Wilkinson algorithm provides visual padding
+        scale.setBounds(values, null, geometries);
 
         // Use pan domain if available (for visual panning)
         if (!coordFlipped && axis == YAxis.primary && panYDomain != null) {
-          scale.domain = [panYDomain![0], panYDomain![1]];
-        } else {
-          scale.domain = [domainMin, domainMax];
-        }
-
-        if (scale.domain[0] == scale.domain[1]) {
-          scale.domain = [scale.domain[0] - 0.5, scale.domain[1] + 0.5];
+          scale.setBounds(values, (panYDomain![0], panYDomain![1]), geometries);
         }
       } else {
-        scale.domain = scale.min != null && scale.max != null
-            ? [scale.min!, scale.max!]
-            : [0, 1];
+        scale.setBounds([], null, geometries);
       }
-      scale.range = [height, 0];
       return scale;
     }
   }
 
   ColorScale _setupColorScale() {
+    // If a colorScale was provided (e.g., for interactive legends with filtering),
+    // use it to preserve color-to-category mapping
+    if (colorScale != null) {
+      return colorScale!;
+    }
+
+    // Otherwise, create a new ColorScale from the data
     // For pie charts, use category column; otherwise use color column
     final hasPieChart = geometries.any((g) => g is PieGeometry);
     final columnToUse = hasPieChart && pieCategoryColumn != null
@@ -513,6 +550,65 @@ class AnimatedChartPainter extends CustomPainter {
     );
   }
 
+  GradientColorScale _setupGradientColorScale() {
+    // Find heat map geometry if present
+    HeatMapGeometry? heatMapGeom;
+    for (final geom in geometries) {
+      if (geom is HeatMapGeometry) {
+        heatMapGeom = geom;
+        break;
+      }
+    }
+
+    // If no heat map configured, return default scale without scanning data
+    if (heatMapGeom == null) {
+      return GradientColorScale.heatMap();
+    }
+
+    // Create gradient color scale based on heat map configuration
+    GradientColorScale scale;
+
+    if (heatMapGeom.colorGradient != null &&
+        heatMapGeom.colorGradient!.isNotEmpty) {
+      // Use custom gradient from geometry
+      scale = GradientColorScale(
+        colors: heatMapGeom.colorGradient!,
+        interpolate: heatMapGeom.interpolateColors,
+      );
+    } else {
+      // Use default heat map gradient
+      scale = GradientColorScale.heatMap();
+    }
+
+    // Validate heat map value column requirement
+    if (heatMapValueColumn == null) {
+      throw ArgumentError(
+        'Heat maps require a value column for color mapping. '
+        'Use .mappingHeatMap(x: "xCol", y: "yCol", value: "valueCol") '
+        'instead of .mapping() when creating heat maps.',
+      );
+    }
+
+    // Set domain using Scale's setBounds()
+    if (data.isNotEmpty) {
+      final values = data
+          .map((d) => getNumericValue(d[heatMapValueColumn]))
+          .where((v) => v != null && v.isFinite)
+          .cast<double>()
+          .toList();
+
+      scale.setBounds(
+          values,
+          (
+            heatMapGeom.minValue,
+            heatMapGeom.maxValue,
+          ),
+          geometries);
+    }
+
+    return scale;
+  }
+
   SizeScale _setupSizeScale() {
     if (sizeColumn == null) return SizeScale();
     final values = data
@@ -521,17 +617,16 @@ class AnimatedChartPainter extends CustomPainter {
         .cast<double>()
         .toList();
     if (values.isNotEmpty) {
-      // Check if we have a bubble geometry to use its size range
+      // Get bubble geometry and use its preconfigured size scale
       final bubbleGeometries = geometries.whereType<BubbleGeometry>().toList();
-      final bubbleGeometry =
-          bubbleGeometries.isNotEmpty ? bubbleGeometries.first : null;
-      final minSize = bubbleGeometry?.minSize ?? theme.pointSizeMin;
-      final maxSize = bubbleGeometry?.maxSize ?? theme.pointSizeMax;
+      final effectiveSizeScale = bubbleGeometries.isNotEmpty
+          ? bubbleGeometries.first.createSizeScale()
+          : (sizeScale ??
+              SizeScale(range: [theme.pointSizeMin, theme.pointSizeMax]));
 
-      return SizeScale(
-        domain: [values.reduce(math.min), values.reduce(math.max)],
-        range: [minSize, maxSize],
-      );
+      // Set domain from data - limits are already in the scale
+      effectiveSizeScale.setBounds(values, null, geometries);
+      return effectiveSizeScale;
     }
     return SizeScale();
   }
@@ -555,7 +650,7 @@ class AnimatedChartPainter extends CustomPainter {
       ..strokeWidth = math.max(0.1, theme.gridWidth);
 
     // Vertical grid lines
-    final xTicks = xScale.getTicks(5);
+    final xTicks = xScale.getTicks();
     for (final tick in xTicks) {
       double x;
       if (xScale is OrdinalScale) {
@@ -578,7 +673,7 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     // Horizontal grid lines (based on primary Y-axis)
-    final yTicks = yScale.getTicks(5);
+    final yTicks = yScale.getTicks();
     for (final tick in yTicks) {
       double y;
       if (yScale is OrdinalScale) {
@@ -610,6 +705,7 @@ class AnimatedChartPainter extends CustomPainter {
     ColorScale colorScale,
     SizeScale sizeScale,
     bool isSecondaryY,
+    GradientColorScale gradientColorScale,
   ) {
     if (geometry is PointGeometry) {
       _drawPointsAnimated(
@@ -653,19 +749,9 @@ class AnimatedChartPainter extends CustomPainter {
         isSecondaryY,
       );
     } else if (geometry is PieGeometry) {
-      _drawPieAnimated(
-        canvas,
-        plotArea,
-        geometry,
-        colorScale,
-      );
+      _drawPieAnimated(canvas, plotArea, geometry, colorScale);
     } else if (geometry is HeatMapGeometry) {
-      _drawHeatMapAnimated(
-        canvas,
-        plotArea,
-        geometry,
-        colorScale,
-      );
+      _drawHeatMapAnimated(canvas, plotArea, geometry, gradientColorScale);
     } else if (geometry is BubbleGeometry) {
       _drawBubblesAnimated(
         canvas,
@@ -946,6 +1032,51 @@ class AnimatedChartPainter extends CustomPainter {
     }
   }
 
+  /// Computes an RRect with rounded corners only on the outward edge
+  /// (away from the zero baseline) based on bar value and orientation.
+  RRect _computeOutwardRRect({
+    required Rect barRect,
+    required BorderRadius borderRadius,
+    required double yValForBar,
+    required bool coordFlipped,
+  }) {
+    if (coordFlipped) {
+      // Horizontal bars
+      if (yValForBar >= 0) {
+        // Positive: Round right side (top-right, bottom-right)
+        return RRect.fromRectAndCorners(
+          barRect,
+          topRight: borderRadius.topRight,
+          bottomRight: borderRadius.bottomRight,
+        );
+      } else {
+        // Negative: Round left side (top-left, bottom-left)
+        return RRect.fromRectAndCorners(
+          barRect,
+          topLeft: borderRadius.topLeft,
+          bottomLeft: borderRadius.bottomLeft,
+        );
+      }
+    } else {
+      // Vertical bars
+      if (yValForBar >= 0) {
+        // Positive: Round top side (top-left, top-right)
+        return RRect.fromRectAndCorners(
+          barRect,
+          topLeft: borderRadius.topLeft,
+          topRight: borderRadius.topRight,
+        );
+      } else {
+        // Negative: Round bottom side (bottom-left, bottom-right)
+        return RRect.fromRectAndCorners(
+          barRect,
+          bottomLeft: borderRadius.bottomLeft,
+          bottomRight: borderRadius.bottomRight,
+        );
+      }
+    }
+  }
+
   void _drawSingleBar(
     Canvas canvas,
     Rect plotArea,
@@ -961,9 +1092,32 @@ class AnimatedChartPainter extends CustomPainter {
     double? customWidth,
     double yStackOffset = 0,
   }) {
-    // Priority: geometry.color > colorScale > theme fallback
+    // Determine color based on value sign if positiveColor/negativeColor are specified
+    // Priority: positiveColor/negativeColor > geometry.color > colorScale > theme fallback
     final dynamic colorOrGradient;
-    if (geometry.color != null) {
+
+    // Check if we should use positive/negative colors
+    final bool usePositiveNegativeColors =
+        geometry.positiveColor != null || geometry.negativeColor != null;
+
+    if (usePositiveNegativeColors) {
+      // Use value-based coloring
+      if (yValForBar >= 0) {
+        // Positive value: use positiveColor, fall back to color, then theme
+        colorOrGradient = geometry.positiveColor ??
+            geometry.color ??
+            (theme.colorPalette.isNotEmpty
+                ? theme.colorPalette.first
+                : theme.primaryColor);
+      } else {
+        // Negative value: use negativeColor, fall back to color, then theme
+        colorOrGradient = geometry.negativeColor ??
+            geometry.color ??
+            (theme.colorPalette.length > 1
+                ? theme.colorPalette[1]
+                : theme.primaryColor);
+      }
+    } else if (geometry.color != null) {
       colorOrGradient = geometry.color!;
     } else if (colorColumn != null) {
       colorOrGradient = colorScale.scale(dataPoint[colorColumn]);
@@ -1017,12 +1171,25 @@ class AnimatedChartPainter extends CustomPainter {
       final yEnd = plotArea.top + yScale.scale(yValForBar + yStackOffset);
       final barHeight = (yStart - yEnd);
 
-      barRect = Rect.fromLTWH(
-        xPos.isFinite ? xPos : 0,
-        yStart - (barHeight * animationProgress),
-        barWidth.isFinite ? barWidth : 0,
-        barHeight.isFinite ? barHeight * animationProgress : 0,
-      );
+      // Handle both positive and negative bars
+      if (barHeight >= 0) {
+        // Positive bar: grows upward from baseline
+        barRect = Rect.fromLTWH(
+          xPos.isFinite ? xPos : 0,
+          yStart - (barHeight * animationProgress),
+          barWidth.isFinite ? barWidth : 0,
+          barHeight.isFinite ? barHeight * animationProgress : 0,
+        );
+      } else {
+        // Negative bar: grows downward from baseline
+        final absHeight = barHeight.abs();
+        barRect = Rect.fromLTWH(
+          xPos.isFinite ? xPos : 0,
+          yStart,
+          barWidth.isFinite ? barWidth : 0,
+          absHeight.isFinite ? absHeight * animationProgress : 0,
+        );
+      }
     }
 
     if (!barRect.isFinite || barRect.isEmpty) {
@@ -1031,8 +1198,10 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Apply gradient or solid color based on what we received
     if (colorOrGradient is Gradient) {
-      final alphaGradient =
-          _applyAlphaToGradient(colorOrGradient, geometry.alpha);
+      final alphaGradient = _applyAlphaToGradient(
+        colorOrGradient,
+        geometry.alpha,
+      );
       paint.shader = alphaGradient.createShader(barRect);
     } else {
       final color = colorOrGradient as Color;
@@ -1041,7 +1210,17 @@ class AnimatedChartPainter extends CustomPainter {
 
     if (geometry.borderRadius != null &&
         geometry.borderRadius != BorderRadius.zero) {
-      canvas.drawRRect(geometry.borderRadius!.toRRect(barRect), paint);
+      if (geometry.roundOutwardEdges) {
+        final rrect = _computeOutwardRRect(
+          barRect: barRect,
+          borderRadius: geometry.borderRadius!,
+          yValForBar: yValForBar,
+          coordFlipped: coordFlipped,
+        );
+        canvas.drawRRect(rrect, paint);
+      } else {
+        canvas.drawRRect(geometry.borderRadius!.toRRect(barRect), paint);
+      }
     } else {
       canvas.drawRect(barRect, paint);
     }
@@ -1056,7 +1235,18 @@ class AnimatedChartPainter extends CustomPainter {
 
       if (geometry.borderRadius != null &&
           geometry.borderRadius != BorderRadius.zero) {
-        canvas.drawRRect(geometry.borderRadius!.toRRect(barRect), borderPaint);
+        if (geometry.roundOutwardEdges) {
+          final rrect = _computeOutwardRRect(
+            barRect: barRect,
+            borderRadius: geometry.borderRadius!,
+            yValForBar: yValForBar,
+            coordFlipped: coordFlipped,
+          );
+          canvas.drawRRect(rrect, borderPaint);
+        } else {
+          canvas.drawRRect(
+              geometry.borderRadius!.toRRect(barRect), borderPaint);
+        }
       } else {
         canvas.drawRect(barRect, borderPaint);
       }
@@ -1135,8 +1325,10 @@ class AnimatedChartPainter extends CustomPainter {
           height: size * 2,
         );
         final combinedAlpha = geometry.alpha * pointProgress;
-        final alphaGradient =
-            _applyAlphaToGradient(colorOrGradient, combinedAlpha);
+        final alphaGradient = _applyAlphaToGradient(
+          colorOrGradient,
+          combinedAlpha,
+        );
         paint.shader = alphaGradient.createShader(shaderRect);
       } else {
         final color = colorOrGradient as Color;
@@ -1284,11 +1476,7 @@ class AnimatedChartPainter extends CustomPainter {
 
       // Draw bubble based on shape
       if (geometry.shape == PointShape.circle) {
-        canvas.drawCircle(
-          Offset(pointX, pointY),
-          animatedSize,
-          paint,
-        );
+        canvas.drawCircle(Offset(pointX, pointY), animatedSize, paint);
       } else if (geometry.shape == PointShape.square) {
         canvas.drawRect(
           Rect.fromCenter(
@@ -1301,14 +1489,8 @@ class AnimatedChartPainter extends CustomPainter {
       } else if (geometry.shape == PointShape.triangle) {
         final path = Path();
         path.moveTo(pointX, pointY - animatedSize);
-        path.lineTo(
-          pointX - animatedSize,
-          pointY + animatedSize,
-        );
-        path.lineTo(
-          pointX + animatedSize,
-          pointY + animatedSize,
-        );
+        path.lineTo(pointX - animatedSize, pointY + animatedSize);
+        path.lineTo(pointX + animatedSize, pointY + animatedSize);
         path.close();
         canvas.drawPath(path, paint);
       }
@@ -1324,11 +1506,7 @@ class AnimatedChartPainter extends CustomPainter {
           ..style = PaintingStyle.stroke;
 
         if (geometry.shape == PointShape.circle) {
-          canvas.drawCircle(
-            Offset(pointX, pointY),
-            animatedSize,
-            borderPaint,
-          );
+          canvas.drawCircle(Offset(pointX, pointY), animatedSize, borderPaint);
         } else if (geometry.shape == PointShape.square) {
           canvas.drawRect(
             Rect.fromCenter(
@@ -1341,14 +1519,8 @@ class AnimatedChartPainter extends CustomPainter {
         } else if (geometry.shape == PointShape.triangle) {
           final path = Path();
           path.moveTo(pointX, pointY - animatedSize);
-          path.lineTo(
-            pointX - animatedSize,
-            pointY + animatedSize,
-          );
-          path.lineTo(
-            pointX + animatedSize,
-            pointY + animatedSize,
-          );
+          path.lineTo(pointX - animatedSize, pointY + animatedSize);
+          path.lineTo(pointX + animatedSize, pointY + animatedSize);
           path.close();
           canvas.drawPath(path, borderPaint);
         }
@@ -1371,9 +1543,7 @@ class AnimatedChartPainter extends CustomPainter {
           text: TextSpan(
             text: labelText,
             style: textStyle.copyWith(
-              color: textStyle.color?.withAlpha(
-                (255 * bubbleProgress).round(),
-              ),
+              color: textStyle.color?.withAlpha((255 * bubbleProgress).round()),
             ),
           ),
           textAlign: TextAlign.center,
@@ -1396,9 +1566,7 @@ class AnimatedChartPainter extends CustomPainter {
         );
 
         final backgroundPaint = Paint()
-          ..color = Colors.white.withValues(
-            alpha: 0.8 * bubbleProgress,
-          )
+          ..color = Colors.white.withValues(alpha: 0.8 * bubbleProgress)
           ..style = PaintingStyle.fill;
 
         canvas.drawRRect(
@@ -1426,7 +1594,7 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     }
 
-    if (colorColumn != null) {
+    if (colorColumn != null && geometry.color == null) {
       // Group by color and draw separate lines
       final groupedData = <dynamic, List<Map<String, dynamic>>>{};
       for (final point in data) {
@@ -1437,7 +1605,7 @@ class AnimatedChartPainter extends CustomPainter {
       for (final entry in groupedData.entries) {
         final colorValue = entry.key;
         final groupData = entry.value;
-        final lineColor = geometry.color ?? colorScale.scale(colorValue);
+        final lineColor = colorScale.scale(colorValue);
         _drawSingleLineAnimated(
           canvas,
           plotArea,
@@ -1601,7 +1769,7 @@ class AnimatedChartPainter extends CustomPainter {
       return;
     }
 
-    if (colorColumn != null) {
+    if (colorColumn != null && geometry.color == null) {
       // Group by color and draw separate areas
       final groupedData = <dynamic, List<Map<String, dynamic>>>{};
       for (final point in data) {
@@ -1612,7 +1780,7 @@ class AnimatedChartPainter extends CustomPainter {
       for (final entry in groupedData.entries) {
         final colorValue = entry.key;
         final groupData = entry.value;
-        final areaColor = geometry.color ?? colorScale.scale(colorValue);
+        final areaColor = colorScale.scale(colorValue);
         _drawSingleArea(
           canvas,
           plotArea,
@@ -1783,6 +1951,7 @@ class AnimatedChartPainter extends CustomPainter {
     Scale xScale,
     Scale yScale,
     Scale? y2Scale,
+    _LabelDimensions labelDimensions,
   ) {
     final paint = Paint()
       ..color = theme.axisColor
@@ -1815,8 +1984,18 @@ class AnimatedChartPainter extends CustomPainter {
       );
     }
 
+    // Calculate tick outer edges for consistent label positioning
+    final xTickOuterEdge = plotArea.bottom + theme.axisWidth * 2;
+    final yTickOuterEdge = plotArea.left - theme.axisWidth * 2;
+    final y2TickOuterEdge = plotArea.right + theme.axisWidth * 2;
+
+    // Use pre-calculated max label dimensions
+    final maxXLabelHeight = labelDimensions.maxXLabelHeight;
+    final maxYLabelWidth = labelDimensions.maxYLabelWidth;
+    final maxY2LabelWidth = labelDimensions.maxY2LabelWidth;
+
     // X-axis labels
-    final xTicks = xScale.getTicks(5);
+    final xTicks = xScale.getTicks();
     for (final tick in xTicks) {
       // Use bandCenter for OrdinalScale to center ticks on bars
       final pos = plotArea.left +
@@ -1841,13 +2020,13 @@ class AnimatedChartPainter extends CustomPainter {
         canvas,
         Offset(
           pos - textPainter.width / 2,
-          plotArea.bottom + theme.axisWidth * 2 + 8,
+          xTickOuterEdge + tickToLabelSpacing,
         ),
       );
     }
 
     // Primary Y-axis labels (left)
-    final yTicks = yScale.getTicks(5);
+    final yTicks = yScale.getTicks();
     for (final tick in yTicks) {
       // Use bandCenter for OrdinalScale to center ticks on bars (for horizontal bar charts)
       final pos = plotArea.top +
@@ -1867,11 +2046,12 @@ class AnimatedChartPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.right,
       );
-      textPainter.layout(minWidth: 0, maxWidth: plotArea.left - 16);
+      textPainter.layout(
+          minWidth: 0, maxWidth: math.max(0.0, plotArea.left - 8));
       textPainter.paint(
         canvas,
         Offset(
-          plotArea.left - textPainter.width - theme.axisWidth * 2 - 8,
+          yTickOuterEdge - tickToLabelSpacing - textPainter.width,
           pos - textPainter.height / 2,
         ),
       );
@@ -1879,7 +2059,7 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Secondary Y-axis labels (right)
     if (y2Scale != null) {
-      final y2Ticks = y2Scale.getTicks(5);
+      final y2Ticks = y2Scale.getTicks();
       for (final tick in y2Ticks) {
         final pos = plotArea.top + y2Scale.scale(tick);
         canvas.drawLine(
@@ -1905,12 +2085,39 @@ class AnimatedChartPainter extends CustomPainter {
         textPainter.paint(
           canvas,
           Offset(
-            plotArea.right + theme.axisWidth * 2 + 8,
+            y2TickOuterEdge + tickToLabelSpacing,
             pos - textPainter.height / 2,
           ),
         );
       }
     }
+
+    // Calculate label alignment positions (where label edges meet tick spacing)
+    final xLabelAlignEdge =
+        xTickOuterEdge + tickToLabelSpacing; // Top edge of X labels
+    final yLabelAlignEdge =
+        yTickOuterEdge - tickToLabelSpacing; // Right edge of Y labels
+    final y2LabelAlignEdge =
+        y2TickOuterEdge + tickToLabelSpacing; // Left edge of Y2 labels
+
+    // Calculate label outer edges using alignment position and max dimensions
+    final xLabelOuterEdge = xLabelAlignEdge + maxXLabelHeight; // Bottom edge
+    final yLabelOuterEdge = yLabelAlignEdge - maxYLabelWidth; // Left edge
+    final y2LabelOuterEdge = y2LabelAlignEdge + maxY2LabelWidth; // Right edge
+
+    // Draw axis titles with calculated label dimensions
+    _drawAxisTitles(
+      canvas,
+      plotArea,
+      xScale,
+      yScale,
+      y2Scale,
+      axisLabelStyle,
+      xLabelOuterEdge,
+      yLabelOuterEdge,
+      y2LabelOuterEdge,
+      _labelToTitleSpacing,
+    );
   }
 
   void _drawPieAnimated(
@@ -1936,8 +2143,10 @@ class AnimatedChartPainter extends CustomPainter {
     // Calculate radius based on plot area (leave margin for labels)
     final maxRadius = math.min(plotArea.width, plotArea.height) / 2 - 50;
     final outerRadius = math.min(geometry.outerRadius, maxRadius);
-    final innerRadius = math.min(geometry.innerRadius,
-        outerRadius * 0.8); // Ensure inner radius isn't too close to outer
+    final innerRadius = math.min(
+      geometry.innerRadius,
+      outerRadius * 0.8,
+    ); // Ensure inner radius isn't too close to outer
 
     // Extract and calculate values
     final values =
@@ -2130,14 +2339,21 @@ class AnimatedChartPainter extends CustomPainter {
     Canvas canvas,
     Rect plotArea,
     HeatMapGeometry geometry,
-    ColorScale colorScale,
+    GradientColorScale gradientColorScale,
   ) {
     // Use heat map specific columns
     final xCol = heatMapXColumn ?? xColumn;
     final yCol = heatMapYColumn ?? yColumn;
-    final valueCol = heatMapValueColumn ?? colorColumn;
+    final valueCol = heatMapValueColumn;
 
-    if (xCol == null || yCol == null || valueCol == null || data.isEmpty) {
+    if (valueCol == null) {
+      throw ArgumentError(
+        'Heat maps require heatMapValueColumn. '
+        'Use .mappingHeatMap(x: "xCol", y: "yCol", value: "valueCol").',
+      );
+    }
+
+    if (xCol == null || yCol == null || data.isEmpty) {
       return;
     }
 
@@ -2170,21 +2386,6 @@ class AnimatedChartPainter extends CustomPainter {
         cellWidth = cellHeight * geometry.cellAspectRatio!;
       }
     }
-
-    // Get value range for color mapping
-    final values = data
-        .map((d) => getNumericValue(d[valueCol]))
-        .where((v) => v != null && v.isFinite)
-        .cast<double>()
-        .toList();
-
-    if (values.isEmpty) {
-      return;
-    }
-
-    final minValue = geometry.minValue ?? values.reduce(math.min);
-    final maxValue = geometry.maxValue ?? values.reduce(math.max);
-    final valueRange = maxValue - minValue;
 
     // Create a map for quick lookup
     final dataMap = <String, double>{};
@@ -2260,30 +2461,11 @@ class AnimatedChartPainter extends CustomPainter {
 
         if (cellProgress <= 0) continue;
 
-        // Calculate color based on value
-        Color cellColor;
-        // Calculate normalized value once for both color and text logic
-        final normalizedValue = valueRange > 0
-            ? ((value - minValue) / valueRange).clamp(0.0, 1.0)
-            : 0.5;
+        // Calculate color using GradientColorScale
+        final cellColor = gradientColorScale.scale(value);
 
-        if (geometry.colorGradient != null &&
-            geometry.colorGradient!.isNotEmpty) {
-          // Use provided color gradient
-          if (geometry.interpolateColors) {
-            cellColor = interpolateGradientColor(
-                normalizedValue, geometry.colorGradient!);
-          } else {
-            // Use discrete colors
-            final index =
-                (normalizedValue * (geometry.colorGradient!.length - 1))
-                    .round();
-            cellColor = geometry.colorGradient![index];
-          }
-        } else {
-          // Use default gradient with enhanced visibility
-          cellColor = defaultHeatMapColor(normalizedValue);
-        }
+        // Calculate normalized value for text color logic
+        final normalizedValue = gradientColorScale.normalize(value);
 
         // Animate cell
         Rect animatedRect = cellRect;
@@ -2337,10 +2519,7 @@ class AnimatedChartPainter extends CustomPainter {
                   : Colors.black);
 
           final textStyle = geometry.valueTextStyle ??
-              TextStyle(
-                color: textColor,
-                fontSize: 10,
-              );
+              TextStyle(color: textColor, fontSize: 10);
 
           final textPainter = TextPainter(
             text: TextSpan(
@@ -2370,9 +2549,16 @@ class AnimatedChartPainter extends CustomPainter {
     // Use heat map specific columns
     final xCol = heatMapXColumn ?? xColumn;
     final yCol = heatMapYColumn ?? yColumn;
-    final valueCol = heatMapValueColumn ?? colorColumn;
+    final valueCol = heatMapValueColumn;
 
-    if (xCol == null || yCol == null || valueCol == null || data.isEmpty) {
+    if (valueCol == null) {
+      throw ArgumentError(
+        'Heat maps require heatMapValueColumn. '
+        'Use .mappingHeatMap(x: "xCol", y: "yCol", value: "valueCol").',
+      );
+    }
+
+    if (xCol == null || yCol == null || data.isEmpty) {
       return;
     }
 
@@ -2432,10 +2618,7 @@ class AnimatedChartPainter extends CustomPainter {
       textPainter.layout();
       textPainter.paint(
         canvas,
-        Offset(
-          centerX - textPainter.width / 2,
-          plotArea.bottom + 8,
-        ),
+        Offset(centerX - textPainter.width / 2, plotArea.bottom + 8),
       );
     }
 
@@ -2453,7 +2636,8 @@ class AnimatedChartPainter extends CustomPainter {
         textDirection: TextDirection.ltr,
         textAlign: TextAlign.right,
       );
-      textPainter.layout(minWidth: 0, maxWidth: plotArea.left - 16);
+      textPainter.layout(
+          minWidth: 0, maxWidth: math.max(0.0, plotArea.left - 8));
       textPainter.paint(
         canvas,
         Offset(
@@ -2461,6 +2645,96 @@ class AnimatedChartPainter extends CustomPainter {
           centerY - textPainter.height / 2,
         ),
       );
+    }
+  }
+
+  /// Draw axis titles for X, Y, and Y2 axes
+  void _drawAxisTitles(
+    Canvas canvas,
+    Rect plotArea,
+    Scale? xScale,
+    Scale? yScale,
+    Scale? y2Scale,
+    TextStyle axisLabelStyle,
+    double xLabelOuterEdge,
+    double yLabelOuterEdge,
+    double y2LabelOuterEdge,
+    double labelToTitleSpacing,
+  ) {
+    final titleStyle = axisLabelStyle.copyWith(
+      fontWeight: FontWeight.w600,
+      fontSize: (axisLabelStyle.fontSize ?? 12) + 1,
+    );
+
+    // Draw X-axis title (horizontal, centered below tick labels)
+    if (xScale?.title != null) {
+      final xTitle = xScale!.title!;
+
+      final textPainter = TextPainter(
+        text: TextSpan(text: xTitle, style: titleStyle),
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.center,
+      );
+      textPainter.layout();
+
+      // Position below tick labels, using calculated label outer edge
+      textPainter.paint(
+        canvas,
+        Offset(
+          plotArea.left + (plotArea.width - textPainter.width) / 2,
+          xLabelOuterEdge + labelToTitleSpacing,
+        ),
+      );
+    }
+
+    // Draw Y-axis title (vertical, rotated 90° counter-clockwise)
+    if (yScale?.title != null) {
+      final yTitle = yScale!.title!;
+
+      final textPainter = TextPainter(
+        text: TextSpan(text: yTitle, style: titleStyle),
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+
+      canvas.save();
+      // Position to the left of tick labels, accounting for title height after rotation
+      // After -90° rotation, title extends LEFT by its height from translate point
+      canvas.translate(
+        yLabelOuterEdge - labelToTitleSpacing - textPainter.height,
+        plotArea.top + (plotArea.height + textPainter.width) / 2,
+      );
+      canvas.rotate(-math.pi / 2);
+      textPainter.paint(canvas, Offset.zero);
+      canvas.restore();
+    }
+
+    // Draw Y2-axis title (vertical, rotated 90° clockwise)
+    if (y2Scale?.title != null) {
+      final y2Title = y2Scale!.title!;
+
+      final y2TitleStyle = titleStyle.copyWith(
+        color: theme.colorPalette.length > 1
+            ? theme.colorPalette[1]
+            : theme.axisColor,
+      );
+
+      final textPainter = TextPainter(
+        text: TextSpan(text: y2Title, style: y2TitleStyle),
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+
+      canvas.save();
+      // Position to the right of tick labels, accounting for title height after rotation
+      // After +90° rotation, title extends RIGHT by its height from translate point
+      canvas.translate(
+        y2LabelOuterEdge + labelToTitleSpacing + textPainter.height,
+        plotArea.top + (plotArea.height - textPainter.width) / 2,
+      );
+      canvas.rotate(math.pi / 2);
+      textPainter.paint(canvas, Offset.zero);
+      canvas.restore();
     }
   }
 
@@ -2485,6 +2759,7 @@ class AnimatedChartPainter extends CustomPainter {
         oldDelegate.sizeScale != sizeScale ||
         oldDelegate.theme != theme ||
         oldDelegate.animationProgress != animationProgress ||
+        oldDelegate.heatMapYAxisSpace != heatMapYAxisSpace ||
         oldDelegate.coordFlipped != coordFlipped ||
         !_listEquals(oldDelegate.panXDomain, panXDomain) ||
         !_listEquals(oldDelegate.panYDomain, panYDomain);
@@ -2711,18 +2986,17 @@ class AnimatedChartPainter extends CustomPainter {
 
     if (geometry.fillGradient != null) {
       // Explicit gradient takes precedence
-      final animatedGradient =
-          _applyAlphaToGradient(geometry.fillGradient!, 1.0);
+      final animatedGradient = _applyAlphaToGradient(
+        geometry.fillGradient!,
+        1.0,
+      );
       fillPaint.shader = animatedGradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.gradient) {
       // Default gradient from light to dark version of fill color
       final gradient = LinearGradient(
         begin: Alignment.centerLeft,
         end: Alignment.centerRight,
-        colors: [
-          fillColor.withAlpha(127),
-          fillColor,
-        ],
+        colors: [fillColor.withAlpha(127), fillColor],
       );
       fillPaint.shader = gradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.striped) {
@@ -2730,15 +3004,24 @@ class AnimatedChartPainter extends CustomPainter {
       fillPaint.color = fillColor;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-            fillRect, Radius.circular(geometry.cornerRadius)),
+          fillRect,
+          Radius.circular(geometry.cornerRadius),
+        ),
         fillPaint,
       );
       // Draw diagonal stripes
       _drawStripes(canvas, fillRect, fillColor, geometry.cornerRadius);
       // Return early to avoid double-drawing
       _drawProgressBarStroke(canvas, barRect, geometry);
-      _drawProgressBarLabel(canvas, barRect, point, labelColumn, geometry,
-          adjustedBarHeight, true);
+      _drawProgressBarLabel(
+        canvas,
+        barRect,
+        point,
+        labelColumn,
+        geometry,
+        adjustedBarHeight,
+        true,
+      );
       return;
     } else {
       // Solid color
@@ -2756,7 +3039,14 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Draw label if enabled - positioned to the left of the bar
     _drawProgressBarLabel(
-        canvas, barRect, point, labelColumn, geometry, adjustedBarHeight, true);
+      canvas,
+      barRect,
+      point,
+      labelColumn,
+      geometry,
+      adjustedBarHeight,
+      true,
+    );
   }
 
   void _drawVerticalProgressBar(
@@ -2785,8 +3075,10 @@ class AnimatedChartPainter extends CustomPainter {
     final scaleFactor =
         totalWidth > plotArea.width ? plotArea.width / totalWidth : 1.0;
     final adjustedBarWidth = barWidth * scaleFactor;
-    final adjustedSpacing =
-        math.max(barSpacing * scaleFactor, minSpacing * 0.5);
+    final adjustedSpacing = math.max(
+      barSpacing * scaleFactor,
+      minSpacing * 0.5,
+    );
 
     final barX = plotArea.left +
         (index * (adjustedBarWidth + adjustedSpacing)) +
@@ -2823,18 +3115,17 @@ class AnimatedChartPainter extends CustomPainter {
 
     if (geometry.fillGradient != null) {
       // Explicit gradient takes precedence
-      final animatedGradient =
-          _applyAlphaToGradient(geometry.fillGradient!, 1.0);
+      final animatedGradient = _applyAlphaToGradient(
+        geometry.fillGradient!,
+        1.0,
+      );
       fillPaint.shader = animatedGradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.gradient) {
       // Default gradient from light to dark version of fill color
       final gradient = LinearGradient(
         begin: Alignment.bottomCenter,
         end: Alignment.topCenter,
-        colors: [
-          fillColor.withAlpha(127),
-          fillColor,
-        ],
+        colors: [fillColor.withAlpha(127), fillColor],
       );
       fillPaint.shader = gradient.createShader(fillRect);
     } else if (geometry.style == ProgressStyle.striped) {
@@ -2842,15 +3133,24 @@ class AnimatedChartPainter extends CustomPainter {
       fillPaint.color = fillColor;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-            fillRect, Radius.circular(geometry.cornerRadius)),
+          fillRect,
+          Radius.circular(geometry.cornerRadius),
+        ),
         fillPaint,
       );
       // Draw diagonal stripes
       _drawStripes(canvas, fillRect, fillColor, geometry.cornerRadius);
       // Return early to avoid double-drawing
       _drawProgressBarStroke(canvas, barRect, geometry);
-      _drawProgressBarLabel(canvas, barRect, point, labelColumn, geometry,
-          adjustedBarWidth, false);
+      _drawProgressBarLabel(
+        canvas,
+        barRect,
+        point,
+        labelColumn,
+        geometry,
+        adjustedBarWidth,
+        false,
+      );
       return;
     } else {
       // Solid color
@@ -2867,7 +3167,14 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Draw label if enabled - positioned below the bar
     _drawProgressBarLabel(
-        canvas, barRect, point, labelColumn, geometry, adjustedBarWidth, false);
+      canvas,
+      barRect,
+      point,
+      labelColumn,
+      geometry,
+      adjustedBarWidth,
+      false,
+    );
   }
 
   void _drawCircularProgressBar(
@@ -2979,10 +3286,9 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Save canvas state for clipping
     canvas.save();
-    canvas.clipRRect(RRect.fromRectAndRadius(
-      rect,
-      Radius.circular(cornerRadius),
-    ));
+    canvas.clipRRect(
+      RRect.fromRectAndRadius(rect, Radius.circular(cornerRadius)),
+    );
 
     // Draw stripes at 45-degree angle
     for (double x = rect.left - rect.height;
@@ -3014,7 +3320,9 @@ class AnimatedChartPainter extends CustomPainter {
 
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-            barRect, Radius.circular(geometry.cornerRadius)),
+          barRect,
+          Radius.circular(geometry.cornerRadius),
+        ),
         strokePaint,
       );
     }
@@ -3159,7 +3467,9 @@ class AnimatedChartPainter extends CustomPainter {
 
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-            segmentRect, Radius.circular(geometry.cornerRadius)),
+          segmentRect,
+          Radius.circular(geometry.cornerRadius),
+        ),
         segmentPaint,
       );
 
@@ -3174,7 +3484,9 @@ class AnimatedChartPainter extends CustomPainter {
         ..strokeWidth = geometry.strokeWidth;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-            barRect, Radius.circular(geometry.cornerRadius)),
+          barRect,
+          Radius.circular(geometry.cornerRadius),
+        ),
         strokePaint,
       );
     }
@@ -3307,7 +3619,9 @@ class AnimatedChartPainter extends CustomPainter {
         ..style = PaintingStyle.fill;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-            barRect, Radius.circular(geometry.cornerRadius)),
+          barRect,
+          Radius.circular(geometry.cornerRadius),
+        ),
         backgroundPaint,
       );
 
@@ -3315,8 +3629,12 @@ class AnimatedChartPainter extends CustomPainter {
       late Rect fillRect;
       if (isHorizontal) {
         final fillWidth = barRect.width * groupValue * animationProgress;
-        fillRect =
-            Rect.fromLTWH(barRect.left, barRect.top, fillWidth, barRect.height);
+        fillRect = Rect.fromLTWH(
+          barRect.left,
+          barRect.top,
+          fillWidth,
+          barRect.height,
+        );
       } else {
         final fillHeight = barRect.height * groupValue * animationProgress;
         fillRect = Rect.fromLTWH(
@@ -3332,7 +3650,9 @@ class AnimatedChartPainter extends CustomPainter {
         ..style = PaintingStyle.fill;
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-            fillRect, Radius.circular(geometry.cornerRadius)),
+          fillRect,
+          Radius.circular(geometry.cornerRadius),
+        ),
         fillPaint,
       );
     }
@@ -3639,4 +3959,101 @@ class AnimatedChartPainter extends CustomPainter {
     }
     return true;
   }
+
+  /// Pre-calculate maximum label dimensions for layout spacing
+  _LabelDimensions _calculateMaxLabelDimensions({
+    required Scale? xScale,
+    required Scale? yScale,
+    required Scale? y2Scale,
+    required TextStyle style,
+  }) {
+    double maxXLabelHeight = 0.0;
+    double maxYLabelWidth = 0.0;
+    double maxY2LabelWidth = 0.0;
+
+    // Measure X-axis labels
+    if (xScale != null) {
+      final xTicks = xScale.getTicks();
+      if (xTicks.isEmpty) {
+        final fallbackTp = TextPainter(
+          text: TextSpan(text: '8,888,888', style: style),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        maxXLabelHeight = math.max(maxXLabelHeight, fallbackTp.height);
+      } else {
+        for (final tick in xTicks) {
+          final label = xScale.formatLabel(tick);
+          final textPainter = TextPainter(
+            text: TextSpan(text: label, style: style),
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          maxXLabelHeight = math.max(maxXLabelHeight, textPainter.height);
+        }
+      }
+    }
+
+    // Measure Y-axis labels
+    if (yScale != null) {
+      final yTicks = yScale.getTicks();
+      if (yTicks.isEmpty) {
+        final fallbackTp = TextPainter(
+          text: TextSpan(text: '8,888,888', style: style),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        maxYLabelWidth = math.max(maxYLabelWidth, fallbackTp.width);
+      } else {
+        for (final tick in yTicks) {
+          final label = yScale.formatLabel(tick);
+          final textPainter = TextPainter(
+            text: TextSpan(text: label, style: style),
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          maxYLabelWidth = math.max(maxYLabelWidth, textPainter.width);
+        }
+      }
+    }
+
+    // Measure Y2-axis labels
+    if (y2Scale != null) {
+      final y2Ticks = y2Scale.getTicks();
+      if (y2Ticks.isEmpty) {
+        final fallbackTp = TextPainter(
+          text: TextSpan(text: '8,888,888', style: style),
+          textDirection: TextDirection.ltr,
+        )..layout();
+        maxY2LabelWidth = math.max(maxY2LabelWidth, fallbackTp.width);
+      } else {
+        for (final tick in y2Ticks) {
+          final label = y2Scale.formatLabel(tick);
+          final textPainter = TextPainter(
+            text: TextSpan(text: label, style: style),
+            textDirection: TextDirection.ltr,
+          );
+          textPainter.layout();
+          maxY2LabelWidth = math.max(maxY2LabelWidth, textPainter.width);
+        }
+      }
+    }
+
+    return _LabelDimensions(
+      maxXLabelHeight: maxXLabelHeight,
+      maxYLabelWidth: maxYLabelWidth,
+      maxY2LabelWidth: maxY2LabelWidth,
+    );
+  }
+}
+
+/// Helper class to store maximum label dimensions
+class _LabelDimensions {
+  final double maxXLabelHeight;
+  final double maxYLabelWidth;
+  final double maxY2LabelWidth;
+
+  const _LabelDimensions({
+    required this.maxXLabelHeight,
+    required this.maxYLabelWidth,
+    required this.maxY2LabelWidth,
+  });
 }

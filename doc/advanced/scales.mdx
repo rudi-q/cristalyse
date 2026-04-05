@@ -15,9 +15,47 @@ Linear scales map continuous data to a range, such as pixels:
 CristalyseChart()
   .data(data)
   .mapping(x: 'time', y: 'value')
-  .scaleXContinuous(min: 0, max: 100) // X-axis
-  .scaleYContinuous(min: 0, max: 200) // Y-axis
+  .scaleXContinuous(min: 0, max: 100) // X-axis with fixed visual range
+  .scaleYContinuous(min: 0, max: 200) // Y-axis with fixed visual range
   .geomLine()
+  .build()
+```
+
+### Axis Titles
+
+<Info>
+**New in v1.10.0:** Add descriptive titles to your axes for better data context!
+</Info>
+
+All scale methods now accept an optional `title` parameter to display descriptive axis labels:
+
+```dart
+CristalyseChart()
+  .data(temperatureData)
+  .mapping(x: 'hour', y: 'temperature')
+  .scaleXContinuous(title: 'Time (hours)')
+  .scaleYContinuous(title: 'Temperature (°C)')
+  .geomLine()
+  .build()
+```
+
+**Title Features:**
+- **Smart Positioning**: Automatically positioned with optimal spacing
+- **Rotated Text**: Y-axis titles rotate -90°, Y2-axis titles rotate +90°
+- **Theme-Aware**: Inherits text style from theme with slightly larger font
+- **Optional**: Only renders when provided (fully backward compatible)
+
+**Dual-Axis Example:**
+```dart
+CristalyseChart()
+  .data(businessData)
+  .mapping(x: 'month', y: 'revenue')
+  .mappingY2('conversion')
+  .geomBar(yAxis: YAxis.primary)
+  .geomLine(yAxis: YAxis.secondary)
+  .scaleXOrdinal(title: 'Month')
+  .scaleYContinuous(title: 'Revenue ($K)')  // Left axis
+  .scaleY2Continuous(title: 'Conversion Rate (%)') // Right axis
   .build()
 ```
 
@@ -25,7 +63,43 @@ CristalyseChart()
 
 - **Domain**: Data range mapped to chart space.
 - **Range**: Pixel space where the data is plotted.
+- **Limits**: Optional `min`/`max` parameters to constrain the displayed scale range.
+- **Title**: Optional descriptive label for the axis (v1.10.0+)
 - **Invertible**: Values can map back to the data space.
+
+### Scale Limits and Data Filtering
+
+Use `min` and `max` parameters to control scale behavior:
+
+```dart
+// Data-driven scaling (default behavior)
+CristalyseChart()
+  .data(temperatureData) // Values: [15.2, 22.8, 19.5, 16.1]
+  .mapping(x: 'hour', y: 'temp')
+  .scaleYContinuous() // Scale automatically fits data range
+  .geomLine()
+  .build()
+
+// Fixed range scaling with limits
+CristalyseChart()
+  .data(temperatureData)
+  .mapping(x: 'hour', y: 'temp')
+  .scaleYContinuous(min: 10, max: 30) // Fixed 10-30°C range
+  .geomLine()
+  .build()
+```
+
+Use limits for consistent ranges across multiple charts and to set explicit
+meaningful baselines (like 0 for revenue).
+
+Without limits, the behavior varies by geometry. Geometries that are value
+comparisons (Bar Charts, Area Charts) have zero baseline by default. For other
+geometries, the scale domain is fit to the actual data range (15.2-22.8°C). 
+
+With limits, the scale domain uses the specified range (10-30°C), including 
+overriding a zero baseline for e.g. Bar Charts and Area Charts. Data points 
+beyond the limits still render proportionally beyond the visual range.
+
 
 ## Ordinal Scales
 
@@ -40,11 +114,23 @@ CristalyseChart()
   .build()
 ```
 
+**With Axis Title:**
+```dart
+CristalyseChart()
+  .data(salesData)
+  .mapping(x: 'product', y: 'revenue')
+  .scaleXOrdinal(title: 'Product Category')
+  .scaleYContinuous(title: 'Revenue ($K)')
+  .geomBar()
+  .build()
+```
+
 ### Configuration
 
 - **Domain**: List of categories.
 - **Range**: Space for categories to be displayed.
 - **BandWidth**: Space allocated to each category.
+- **Title**: Optional descriptive label for the axis (v1.10.0+)
 
 ## Color Scales
 
@@ -217,6 +303,89 @@ CristalyseChart()
   .data(yieldData) // Data has decimal rates like 0.0025, 0.0150
   .mapping(x: 'maturity', y: 'yield_rate') // yield_rate is decimal (0.0025 = 25bp)
   .scaleYContinuous(labels: bpLabels) // Converts 0.0025 → "25bp"
+  .build()
+```
+
+## Tick Configuration
+
+<Info>
+**New in v1.14.0:** Control how tick marks and labels are generated on your axes!
+</Info>
+
+TickConfig allows you to customize tick generation on continuous scales:
+
+```dart
+TickConfig(
+  ticks: [0, 25, 50, 75, 100],  // Optional: specify explicit tick positions
+  simpleLinear: true,            // Optional: use simple linear ticks instead of Wilkinson's algorithm
+)
+```
+
+### Explicit Tick Specification
+
+Provide your own tick positions for precise control:
+
+```dart
+CristalyseChart()
+  .data(temperatureData)
+  .mapping(x: 'hour', y: 'temp')
+  .scaleYContinuous(
+    tickConfig: TickConfig(
+      ticks: [-10, 0, 10, 20, 30],  // Custom tick positions
+    ),
+  )
+  .geomLine()
+  .build()
+```
+
+**Use cases:**
+- Industry-standard reference points (e.g., freezing point at 0°C)
+- Domain-specific intervals (e.g., percentiles at 25, 50, 75)
+- Matching ticks across multiple related charts
+
+### Simple Linear Ticking
+
+Generate evenly-spaced ticks instead of using Wilkinson's algorithm:
+
+```dart
+CristalyseChart()
+  .data(timeSeriesData)
+  .mapping(x: 'timestamp', y: 'value')
+  .scaleXContinuous(
+    tickConfig: TickConfig(simpleLinear: true),
+  )
+  .scaleYContinuous(
+    tickConfig: TickConfig(simpleLinear: true),
+  )
+  .geomLine()
+  .build()
+```
+
+**Differences:**
+- **Wilkinson's Algorithm** (default): Intelligently chooses "nice" numbers for human-readable labels. Tick intervals vary based on data range (e.g., 10, 25, 50, 100).
+- **Simple Linear**: Always generates evenly-spaced ticks. Tick interval is constant based on the scale range divided by number of ticks.
+
+**When to use Simple Linear:**
+- Time-based charts where consistent intervals matter (e.g., hourly or daily splits)
+- Scientific/technical charts where precision is preferred over "niceness"
+- When you need predictable, uniform spacing
+
+### Dual-Axis Example
+
+```dart
+CristalyseChart()
+  .data(businessData)
+  .mapping(x: 'month', y: 'revenue')
+  .mappingY2('conversion')
+  .scaleXOrdinal()
+  .scaleYContinuous(
+    tickConfig: TickConfig(ticks: [0, 50000, 100000, 150000]),
+  )
+  .scaleY2Continuous(
+    tickConfig: TickConfig(simpleLinear: true),
+  )
+  .geomBar(yAxis: YAxis.primary)
+  .geomLine(yAxis: YAxis.secondary)
   .build()
 ```
 

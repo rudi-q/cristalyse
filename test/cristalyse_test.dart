@@ -321,11 +321,7 @@ void main() {
         final chart = CristalyseChart()
             .data(pieData)
             .mappingPie(value: 'users', category: 'category')
-            .geomPie(
-              innerRadius: 40.0,
-              outerRadius: 120.0,
-              strokeWidth: 2.0,
-            );
+            .geomPie(innerRadius: 40.0, outerRadius: 120.0, strokeWidth: 2.0);
 
         expect(chart, isNotNull);
         final widget = chart.build();
@@ -419,10 +415,10 @@ void main() {
       expect(scale.scale(10), equals(100));
     });
 
-    test('should handle custom min/max', () {
-      final scale = LinearScale(min: -5, max: 15);
-      scale.domain = [scale.min!, scale.max!];
+    test('should handle custom limits', () {
+      final scale = LinearScale(limits: (-5, 15));
       scale.range = [0, 200];
+      scale.setBounds([0, 10], null, []);
 
       expect(scale.scale(0), equals(50));
       expect(scale.scale(10), equals(150));
@@ -430,12 +426,16 @@ void main() {
 
     test('should generate ticks', () {
       final scale = LinearScale();
-      scale.domain = [0, 10];
+      scale.range = [0, 100]; // Set screen range BEFORE setBounds
+      scale.setBounds([0, 5, 10], null, []); // Sets domain and computes ticks
 
-      final ticks = scale.getTicks(5);
-      expect(ticks.length, equals(5));
-      expect(ticks.first, equals(0));
-      expect(ticks.last, equals(10));
+      final ticks = scale.getTicks();
+      // Wilkinson determines optimal number based on density
+      expect(ticks.length, greaterThanOrEqualTo(2));
+      expect(ticks.length, lessThanOrEqualTo(10));
+      // Should cover the domain
+      expect(ticks.first, lessThanOrEqualTo(0));
+      expect(ticks.last, greaterThanOrEqualTo(10));
     });
 
     test('should handle edge cases', () {
@@ -492,10 +492,13 @@ void main() {
     test('should generate categorical ticks', () {
       final scale = OrdinalScale();
       scale.domain = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
+      scale.range = [0, 500]; // Set screen range for proper density calculation
 
-      final ticks = scale.getTicks(3);
-      expect(ticks.length, equals(3));
+      final ticks = scale.getTicks();
+      // Ordinal scales return all domain values when there's enough space
+      expect(ticks.length, equals(5));
       expect(ticks.contains('Jan'), isTrue);
+      expect(ticks.contains('May'), isTrue);
     });
   });
 
@@ -534,7 +537,8 @@ void main() {
 
   group('SizeScale', () {
     test('should scale numeric values to sizes', () {
-      final scale = SizeScale(domain: [0, 10], range: [5, 15]);
+      final scale = SizeScale(range: [5, 15]);
+      scale.setBounds([0, 10], null, []);
 
       expect(scale.scale(0), equals(5));
       expect(scale.scale(5), equals(10));
@@ -542,10 +546,8 @@ void main() {
     });
 
     test('should handle edge cases', () {
-      final scale = SizeScale(
-        domain: [5, 5], // Same min and max
-        range: [10, 20],
-      );
+      final scale = SizeScale(range: [10, 20]);
+      scale.setBounds([5, 5], null, []); // Same min and max
 
       expect(scale.scale(5), equals(10)); // Should not crash
     });

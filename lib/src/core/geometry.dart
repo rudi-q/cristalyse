@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'label_formatter.dart';
+import 'scale.dart';
+import 'util/bounds_calculator.dart';
 
 /// Enum for specifying which Y-axis to use
 enum YAxis { primary, secondary }
@@ -14,6 +16,14 @@ abstract class Geometry {
   final bool interactive;
 
   Geometry({this.yAxis = YAxis.primary, this.interactive = true});
+
+  /// Returns the appropriate bounds behavior for this geometry type.
+  ///
+  /// Each geometry type must define its fallback behavior when bounds are
+  /// not explicitly specified in the grammar of graphics for a continuous axis.
+  /// Use BoundsBehavior.notApplicable if the geometry type does not support a
+  /// continuous axis (e.g., for a pie chart).
+  BoundsBehavior getBoundsBehavior();
 }
 
 /// Enum for point shapes
@@ -36,6 +46,9 @@ class PointGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.dataDriven;
 }
 
 /// Line geometry for line charts
@@ -53,29 +66,41 @@ class LineGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.dataDriven;
 }
 
 /// Bar geometry for bar charts
 class BarGeometry extends Geometry {
   final double width;
   final Color? color;
+  final Color? positiveColor;
+  final Color? negativeColor;
   final double alpha;
   final BarOrientation orientation;
   final BarStyle style;
   final BorderRadius? borderRadius;
   final double borderWidth;
+  final bool roundOutwardEdges;
 
   BarGeometry({
     this.width = 0.8,
     this.color,
+    this.positiveColor,
+    this.negativeColor,
     this.alpha = 1.0,
     this.orientation = BarOrientation.vertical,
     this.style = BarStyle.grouped,
     this.borderRadius,
     this.borderWidth = 0.0,
+    this.roundOutwardEdges = false,
     super.yAxis,
     super.interactive,
   });
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.zeroBaseline;
 }
 
 /// Line styles for line geometry
@@ -107,6 +132,9 @@ class AreaGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.zeroBaseline;
 }
 
 /// Pie geometry for pie and donut charts
@@ -143,6 +171,9 @@ class PieGeometry extends Geometry {
     super.interactive = true,
   })  : labelFormatter = labelFormatter ?? _defaultPercentageFormatter.format,
         super(yAxis: YAxis.primary); // Pie charts don't use Y-axis
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.notApplicable;
 }
 
 /// Heat map geometry for 2D matrix visualization
@@ -173,6 +204,9 @@ class HeatMapGeometry extends Geometry {
     this.cellAspectRatio,
     super.interactive = true,
   }) : super(yAxis: YAxis.primary);
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.dataDriven;
 }
 
 /// Bubble geometry for bubble charts
@@ -183,6 +217,9 @@ class HeatMapGeometry extends Geometry {
 class BubbleGeometry extends Geometry {
   final double? minSize;
   final double? maxSize;
+  final (double?, double?)? limits;
+  final String? title; // Title for a bubble size guide
+  // size guide is displayed if title is non-null
   final Color? color;
   final double alpha;
   final PointShape shape;
@@ -196,6 +233,8 @@ class BubbleGeometry extends Geometry {
   BubbleGeometry({
     this.minSize = 5.0,
     this.maxSize = 30.0,
+    this.limits,
+    this.title,
     this.color,
     this.alpha = 0.7,
     this.shape = PointShape.circle,
@@ -208,6 +247,19 @@ class BubbleGeometry extends Geometry {
     super.yAxis,
     super.interactive,
   });
+
+  /// Create a SizeScale configured with this geometry's parameters
+  SizeScale createSizeScale() {
+    return SizeScale(
+      range: [minSize ?? 5.0, maxSize ?? 30.0],
+      limits: limits,
+      labelFormatter: labelFormatter,
+      title: title,
+    );
+  }
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.dataDriven;
 }
 
 /// Enum for progress bar orientations
@@ -221,7 +273,7 @@ enum ProgressStyle {
   stacked, // Multiple segments in one bar
   grouped, // Multiple bars grouped together
   gauge, // Speedometer/arc style
-  concentric // Multiple concentric circles
+  concentric, // Multiple concentric circles
 }
 
 /// Progress bar geometry for progress indicators
@@ -305,47 +357,71 @@ class ProgressGeometry extends Geometry {
     this.concentricThicknesses,
     super.yAxis,
     super.interactive,
-  })  : assert(minValue != null && maxValue != null && minValue < maxValue,
-            'minValue must be less than maxValue'),
-        assert(animationDuration > Duration.zero,
-            'animationDuration must be positive'),
+  })  : assert(
+          minValue != null && maxValue != null && minValue < maxValue,
+          'minValue must be less than maxValue',
+        ),
+        assert(
+          animationDuration > Duration.zero,
+          'animationDuration must be positive',
+        ),
         assert(thickness >= 0, 'thickness must be >= 0'),
         assert(cornerRadius >= 0, 'cornerRadius must be >= 0'),
         assert(strokeWidth >= 0, 'strokeWidth must be >= 0'),
         assert(labelOffset >= 0, 'labelOffset must be >= 0'),
-        assert(groupSpacing == null || groupSpacing >= 0,
-            'groupSpacing must be >= 0'),
+        assert(
+          groupSpacing == null || groupSpacing >= 0,
+          'groupSpacing must be >= 0',
+        ),
         assert(groupCount == null || groupCount > 0, 'groupCount must be > 0'),
         assert(tickCount == null || tickCount > 0, 'tickCount must be > 0'),
         assert(
-            gaugeRadius == null || gaugeRadius > 0, 'gaugeRadius must be > 0'),
-        assert(segments == null || segments.every((s) => s >= 0),
-            'all segments must be >= 0'),
-        assert(concentricRadii == null || concentricRadii.every((r) => r > 0),
-            'all concentricRadii must be > 0'),
+          gaugeRadius == null || gaugeRadius > 0,
+          'gaugeRadius must be > 0',
+        ),
         assert(
-            concentricThicknesses == null ||
-                concentricThicknesses.every((t) => t > 0),
-            'all concentricThicknesses must be > 0'),
+          segments == null || segments.every((s) => s >= 0),
+          'all segments must be >= 0',
+        ),
         assert(
-            sweepAngle == null || (sweepAngle > 0 && sweepAngle <= 2 * math.pi),
-            'sweepAngle must be > 0 and <= 2π (360 degrees)'),
+          concentricRadii == null || concentricRadii.every((r) => r > 0),
+          'all concentricRadii must be > 0',
+        ),
         assert(
-            segments == null ||
-                segmentColors == null ||
-                segments.length == segmentColors.length,
-            'segments and segmentColors must have the same length'),
+          concentricThicknesses == null ||
+              concentricThicknesses.every((t) => t > 0),
+          'all concentricThicknesses must be > 0',
+        ),
         assert(
-            concentricRadii == null ||
-                concentricThicknesses == null ||
-                concentricRadii.length == concentricThicknesses.length,
-            'concentricRadii and concentricThicknesses must have the same length'),
-        assert(style != ProgressStyle.stacked || segments != null,
-            'stacked style requires non-null segments'),
-        assert(style != ProgressStyle.gauge || gaugeRadius != null,
-            'gauge style requires non-null gaugeRadius'),
+          sweepAngle == null || (sweepAngle > 0 && sweepAngle <= 2 * math.pi),
+          'sweepAngle must be > 0 and <= 2π (360 degrees)',
+        ),
         assert(
-            style != ProgressStyle.concentric ||
-                (concentricRadii != null && concentricThicknesses != null),
-            'concentric style requires non-null concentricRadii and concentricThicknesses');
+          segments == null ||
+              segmentColors == null ||
+              segments.length == segmentColors.length,
+          'segments and segmentColors must have the same length',
+        ),
+        assert(
+          concentricRadii == null ||
+              concentricThicknesses == null ||
+              concentricRadii.length == concentricThicknesses.length,
+          'concentricRadii and concentricThicknesses must have the same length',
+        ),
+        assert(
+          style != ProgressStyle.stacked || segments != null,
+          'stacked style requires non-null segments',
+        ),
+        assert(
+          style != ProgressStyle.gauge || gaugeRadius != null,
+          'gauge style requires non-null gaugeRadius',
+        ),
+        assert(
+          style != ProgressStyle.concentric ||
+              (concentricRadii != null && concentricThicknesses != null),
+          'concentric style requires non-null concentricRadii and concentricThicknesses',
+        );
+
+  @override
+  BoundsBehavior getBoundsBehavior() => BoundsBehavior.notApplicable;
 }

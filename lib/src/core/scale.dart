@@ -1,93 +1,262 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
+import 'geometry.dart';
 import 'label_formatter.dart';
+import 'util/bounds_calculator.dart';
+import 'util/wilkinson_labeling.dart';
 
 /// Base class for all scales
 abstract class Scale {
   final LabelFormatter _formatter;
 
-  Scale({LabelCallback? labelFormatter})
+  /// Default range for scales. Numeric for all scale types
+  List<double> _range = [0, 1];
+
+  /// Optional limits for this scale - used when setBounds is called with null limits
+  (double?, double?)? limits;
+
+  /// Optional title for this scale (e.g., "Revenue (USD)", "Temperature (°C)")
+  final String? title;
+
+  /// Optimal pixels per axis label for readability
+  /// Could be threaded as a parameter into API if users demand it
+  static const double _optimalPixelsPerLabel = 60.0;
+
+  Scale({LabelCallback? labelFormatter, this.limits, this.title})
       : _formatter = LabelFormatter(labelFormatter);
 
-  double scale(dynamic value);
-  List<dynamic> getTicks(int count);
-  List<dynamic> get domain;
-  List<double> get range;
+  /// Return display parameter within range from value on domain.
+  dynamic scale(dynamic value);
+  List<dynamic>
+      get domain; // Abstract - each scale implements its own domain type
 
-  /// Inverse transformation: convert screen coordinate back to data value
-  dynamic invert(double screenValue);
+  /// Map any value to 0-1 position within domain.
+  ///
+  /// This method applies only to continuous (numeric) domains. While OrdinalScale
+  /// inherits this method, it should not invoke it. Ordinal scales use indexOf
+  /// for positioning instead.
+  double normalize(dynamic value, {bool clamp = true}) {
+    final numericDomain = domain.cast<double>();
+    final domainSpan = numericDomain[1] - numericDomain[0];
+    if (domainSpan == 0) return 0.0;
+    final numValue = (value is num) ? value.toDouble() : 0.0;
+    final result = (numValue - numericDomain[0]) / domainSpan;
+    return clamp ? result.clamp(0.0, 1.0) : result;
+  }
+
+  /// Map a 0-1 normalized value to range.
+  double scaleToRange(double normalized) {
+    final rangeSpan = range[1] - range[0];
+    return range[0] + normalized * rangeSpan;
+  }
+
+  /// Unified range implementation for all scales
+  List<double> get range => _range;
+  set range(List<double> value) => _range = List.from(value);
+
+  /// Inverse transformation: convert screen coordinate back to data value.
+  /// This default implementation is for linear scales.
+  dynamic invert(double screenValue) {
+    final numericDomain = domain.cast<double>();
+    final rangeSpan = range[1] - range[0];
+    final domainSpan = numericDomain[1] - numericDomain[0];
+    if (rangeSpan == 0) return numericDomain[0];
+    return numericDomain[0] + (screenValue - range[0]) / rangeSpan * domainSpan;
+  }
+
+  /// Get tick values for axis display
+  List<dynamic> getTicks();
 
   /// Format a value for display using this Scale instance's label formatter
   String formatLabel(dynamic value) => _formatter.format(value);
+
+  /// Set bounds for this scale given data values, limits, and geometry context.
+  /// Uses passed limits, or falls back to scale's own limits, or geometry behavior.
+  void setBounds(
+    List<double> values,
+    (double?, double?)? passedLimits,
+    List<Geometry> geometries,
+  ) {
+    final effectiveLimits = passedLimits ?? limits;
+    setBoundsInternal(values, effectiveLimits, geometries);
+  }
+
+  /// Internal bounds setting - each scale implements its own logic.
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  );
+
+  double _calculatePixelsPerLabel(dynamic min, dynamic max) {
+    // todo get the actual text style from the theme
+    const TextStyle textStyle = TextStyle(fontSize: 12);
+    const double padding = 10; // todo defer from theme
+
+    final textMin = TextPainter(
+      text: TextSpan(text: formatLabel(min), style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final textMax = TextPainter(
+      text: TextSpan(text: formatLabel(max), style: textStyle),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    return math.max(textMin.width, textMax.width) + padding;
+  }
 }
 
 /// Linear scale for continuous data
 class LinearScale extends Scale {
   List<double> _domain = [0, 1];
-  List<double> _range = [0, 1];
-  final double? min;
-  final double? max;
+  List<double>? _ticks; // Cached ticks from Wilkinson algorithm
+  List<double> _valuesBoundaries = [0, 1];
+  final TickConfig? _tickConfig;
 
-  LinearScale({this.min, this.max, super.labelFormatter});
+  LinearScale({
+    super.limits,
+    super.labelFormatter,
+    super.title,
+    TickConfig? tickConfig,
+  }) : _tickConfig = tickConfig;
 
   @override
   List<double> get domain => _domain;
-  set domain(List<double> value) => _domain = value;
+  set domain(List<double> value) => _domain = List.from(value);
 
-  @override
-  List<double> get range => _range;
-  set range(List<double> value) => _range = value;
+  List<double> get valuesBoundaries => _valuesBoundaries;
 
   @override
   double scale(dynamic value) {
-    if (value is! num) return _range[0];
-    final numValue = value.toDouble();
-    final domainSpan = _domain[1] - _domain[0];
-    final rangeSpan = _range[1] - _range[0];
-    if (domainSpan == 0) return _range[0];
-    return _range[0] + (numValue - _domain[0]) / domainSpan * rangeSpan;
+    // normalize, but do not clamp any values out of bounds
+    return scaleToRange(normalize(value, clamp: false));
   }
 
   @override
-  List<double> getTicks(int count) {
-    if (count <= 1) return [_domain[0]];
-    final step = (_domain[1] - _domain[0]) / (count - 1);
-    return List.generate(count, (i) => _domain[0] + i * step);
+  // Return cached ticks computed during setBoundsInternal()
+  // As long as range is set BEFORE setBounds(), cache is always valid
+  List<dynamic> getTicks() {
+    return _ticks ?? [];
   }
 
-  /// Convert screen coordinate back to data value
   @override
-  double invert(double screenValue) {
-    final rangeSpan = _range[1] - _range[0];
-    final domainSpan = _domain[1] - _domain[0];
-    if (rangeSpan == 0) return _domain[0];
-    return _domain[0] + (screenValue - _range[0]) / rangeSpan * domainSpan;
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
+    final bounds = BoundsCalculator.calculateBounds(
+      values,
+      effectiveLimits,
+      geometries,
+      applyPadding: true,
+    );
+
+    if (values.isNotEmpty) {
+      _valuesBoundaries = [values.reduce(math.min), values.reduce(math.max)];
+    }
+
+    if (bounds != const Bounds.ignored()) {
+      if (_tickConfig?.ticks != null) {
+        _ticks = _tickConfig!.ticks;
+        _domain = [bounds.min, bounds.max];
+        return;
+      }
+
+      // Use Wilkinson algorithm to extend bounds to nice round numbers
+      final screenLength = (range[1] - range[0]).abs();
+
+      // Guard against zero or negative range during layout/bootstrap
+      if (screenLength <= 0) {
+        _ticks = null;
+        _domain = [bounds.min, bounds.max];
+        return;
+      }
+
+      final pixelsPerLabel = math.max(
+        _calculatePixelsPerLabel(bounds.min, bounds.max),
+        Scale._optimalPixelsPerLabel,
+      );
+
+      final targetLabelCount = (screenLength / pixelsPerLabel).round();
+      final targetDensity = targetLabelCount / screenLength; // labels per pixel
+
+      var niceTicks = WilkinsonLabeling.extended(
+        bounds.min,
+        bounds.max,
+        screenLength,
+        targetDensity,
+        limits: effectiveLimits,
+        simpleLinear: _tickConfig?.simpleLinear ?? false,
+      );
+
+      // NEW: Integer ticks feature, clamp ticks to integers if requested
+      if (_tickConfig?.integersOnly == true && niceTicks.isNotEmpty) {
+        final minTick = niceTicks.first.ceil();
+        final maxTick = niceTicks.last.floor();
+        if (maxTick >= minTick) {
+          final step = (niceTicks.length > 1)
+              ? (niceTicks[1] - niceTicks[0]).round().abs()
+              : 1;
+          final safeStep = step > 0 ? step : 1;
+          niceTicks = [
+            for (var tick = minTick; tick <= maxTick; tick += safeStep)
+              tick.toDouble()
+          ];
+        } else {
+          // Use the nearest integer to the midpoint, and clamp to effectiveLimits if present
+          final midpoint = (niceTicks.first + niceTicks.last) / 2;
+          int nearest = midpoint.round();
+          // Clamp to effectiveLimits if set
+          double lower = effectiveLimits?.$1 ?? double.negativeInfinity;
+          double upper = effectiveLimits?.$2 ?? double.infinity;
+          if (nearest >= lower && nearest <= upper) {
+            niceTicks = [nearest.toDouble()];
+          } else {
+            niceTicks = [];
+          }
+        }
+      }
+
+      if (niceTicks.isNotEmpty) {
+        // Cache ticks for getTicks() to avoid recomputing
+        _ticks = niceTicks;
+
+        // Ensure domain covers the actual data range
+        // Use nice ticks if they cover the data, otherwise expand to ensure coverage
+        final niceMin =
+            niceTicks.first <= bounds.min ? niceTicks.first : bounds.min;
+        final niceMax =
+            niceTicks.last >= bounds.max ? niceTicks.last : bounds.max;
+        _domain = [niceMin, niceMax];
+      } else {
+        _ticks = null;
+        _domain = [bounds.min, bounds.max];
+      }
+    }
   }
 }
 
 /// Ordinal scale for categorical data (essential for bar charts)
 class OrdinalScale extends Scale {
   List<dynamic> _domain = [];
-  List<double> _range = [0, 1];
   final double _padding; // 10% padding between bands
   double _bandWidth = 0;
 
-  OrdinalScale({double padding = 0.1, super.labelFormatter})
+  OrdinalScale({double padding = 0.1, super.labelFormatter, super.title})
       : _padding = padding;
 
   @override
   List<dynamic> get domain => _domain;
   set domain(List<dynamic> value) {
-    _domain = value;
-    debugPrint(
-        'OrdinalScale: Setting domain with ${value.length} items: ${value.take(10)}...');
+    _domain = List.from(value);
     _calculateBandWidth();
   }
 
   @override
-  List<double> get range => _range;
   set range(List<double> value) {
-    _range = value;
+    _range = List.from(value);
     _calculateBandWidth();
   }
 
@@ -101,9 +270,8 @@ class OrdinalScale extends Scale {
     }
 
     final totalRange = _range[1] - _range[0];
-    final totalPadding = _padding * totalRange;
-    final availableSpace = totalRange - totalPadding;
-    _bandWidth = availableSpace / _domain.length;
+    final step = totalRange / _domain.length;
+    _bandWidth = step * (1 - _padding);
   }
 
   @override
@@ -112,11 +280,10 @@ class OrdinalScale extends Scale {
     if (index == -1) return _range[0];
 
     final totalRange = _range[1] - _range[0];
-    final paddingSpace = _padding * totalRange / 2; // Split padding
+    final step = totalRange / _domain.length;
 
-    return _range[0] +
-        paddingSpace +
-        index * (_bandWidth + _padding * totalRange / _domain.length);
+    // Position at start of band: offset into step by half the padding fraction
+    return _range[0] + index * step + (_padding * step / 2);
   }
 
   /// Get the center position of a band
@@ -125,16 +292,41 @@ class OrdinalScale extends Scale {
   }
 
   @override
-  List<dynamic> getTicks(int count) {
-    // For ordinal scales, return all domain values or subset
-    if (count >= _domain.length) return List.from(_domain);
+  // For ordinal scales, return all domain values or subset
+  List<dynamic> getTicks() {
+    if (_domain.isEmpty) return [];
 
-    final step = _domain.length / count;
-    return List.generate(count, (i) {
-      final index = (i * step).floor();
-      // Safety check to prevent index out of bounds
-      return _domain[index.clamp(0, _domain.length - 1)];
-    });
+    final screenLength = (_range[1] - _range[0]).abs();
+
+    // Handle edge case: zero-size screen (e.g., during initialization)
+    if (screenLength == 0) return List.from(_domain);
+
+    final pixelsPerLabel = math.max(
+      _calculatePixelsPerLabel(_domain.first, _domain.last),
+      Scale._optimalPixelsPerLabel,
+    );
+
+    final targetLabelCount = (screenLength / pixelsPerLabel).round().clamp(
+          1,
+          _domain.length,
+        );
+
+    // If we have fewer categories than target, show all
+    if (_domain.length <= targetLabelCount) {
+      return List.from(_domain);
+    }
+
+    // Otherwise, intelligently subset by showing every nth category
+    // We know _domain.length > targetLabelCount, so step >= 2
+    final step = (_domain.length / targetLabelCount).ceil();
+    final count = (_domain.length / step).ceil();
+    final result = List.generate(count, (i) => _domain[(i * step)]);
+
+    // Always include the last domain entry if not already present
+    if (result.last != _domain.last) {
+      result.add(_domain.last);
+    }
+    return result;
   }
 
   /// Convert screen coordinate back to category value
@@ -143,16 +335,24 @@ class OrdinalScale extends Scale {
     if (_domain.isEmpty) return null;
 
     final totalRange = _range[1] - _range[0];
-    final paddingSpace = _padding * totalRange / 2;
-    final effectiveValue = screenValue - _range[0] - paddingSpace;
+    final step = totalRange / _domain.length;
+    final effectiveValue = screenValue - _range[0];
 
     if (effectiveValue < 0) return _domain.first;
 
-    final bandWithPadding = _bandWidth + _padding * totalRange / _domain.length;
-    final index = (effectiveValue / bandWithPadding).floor();
+    final index = (effectiveValue / step).floor();
 
     if (index >= _domain.length) return _domain.last;
     return _domain[index];
+  }
+
+  @override
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
+    // Ordinal scales don't use continuous bounds - so this is a no-op
   }
 }
 
@@ -162,11 +362,7 @@ class ColorScale {
   final List<Color> colors;
   final Map<dynamic, Gradient>? gradients;
 
-  ColorScale({
-    this.values = const [],
-    this.colors = const [],
-    this.gradients,
-  });
+  ColorScale({this.values = const [], this.colors = const [], this.gradients});
 
   /// Returns either a Color or Gradient for the given value
   dynamic scale(dynamic value) {
@@ -189,42 +385,101 @@ class ColorScale {
 }
 
 /// Size scale for point size mapping
-class SizeScale {
-  final List<double> domain;
-  final List<double> range;
+class SizeScale extends Scale {
+  List<double> _domain;
 
-  SizeScale({this.domain = const [0, 1], this.range = const [3, 10]});
+  SizeScale({
+    List<double> domain = const [0, 1],
+    List<double> range = const [3, 10],
+    super.limits,
+    super.labelFormatter,
+    super.title,
+  }) : _domain = List.from(domain) {
+    this.range = range; // Use setter to trigger validation
+  }
 
-  double scale(double value) {
-    final domainSpan = domain[1] - domain[0];
-    final rangeSpan = range[1] - range[0];
-    if (domainSpan == 0) return range[0];
-    return range[0] + (value - domain[0]) / domainSpan * rangeSpan;
+  @override
+  List<double> get domain => _domain;
+  set domain(List<double> value) => _domain = List.from(value);
+
+  @override
+  set range(List<double> value) {
+    if (value[0] < 0 || value[1] < 0) {
+      throw ArgumentError(
+        'SizeScale range values must be non-negative. '
+        'Got range: [${value[0]}, ${value[1]}]',
+      );
+    }
+    super.range = value;
+  }
+
+  @override
+  double scale(dynamic value) {
+    // normalize, but do not clamp any values out of bounds
+    return scaleToRange(normalize(value, clamp: false));
+  }
+
+  @override
+  List<dynamic> getTicks() {
+    // Size scales do not use axes w/ tick marks
+    return [];
+  }
+
+  @override
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
+    if (values.isEmpty) {
+      _domain = [0, 1];
+      return;
+    }
+
+    // For size scales, we want exact data bounds without padding
+    final bounds = BoundsCalculator.calculateBounds(
+      values,
+      effectiveLimits,
+      geometries,
+      applyPadding: false,
+    );
+
+    if (bounds != const Bounds.ignored()) {
+      _domain = [bounds.min, bounds.max];
+    }
   }
 }
 
 /// Gradient color scale for continuous color mapping (e.g., heat maps)
-class GradientColorScale {
-  final List<double> domain;
+class GradientColorScale extends Scale {
+  List<double> _domain;
   final List<Color> colors;
   final bool interpolate;
 
   GradientColorScale({
-    this.domain = const [0, 1],
+    List<double> domain = const [0, 1],
     this.colors = const [Colors.blue, Colors.red],
     this.interpolate = true,
-  });
+    super.limits,
+    super.labelFormatter,
+    super.title,
+  }) : _domain = List.from(domain);
 
-  Color scale(double value) {
+  @override
+  List<double> get domain => _domain;
+  set domain(List<double> value) => _domain = List.from(value);
+
+  @override
+  List<double> get range =>
+      [0, 1]; // Gradient color scales always use 0, 1 range
+
+  @override
+  Color scale(dynamic value) {
     if (colors.isEmpty) return Colors.grey;
     if (colors.length == 1) return colors[0];
 
-    // Normalize value to 0-1 range
-    final minDomain = domain.isNotEmpty ? domain.first : 0;
-    final maxDomain = domain.length > 1 ? domain.last : 1;
-    final normalizedValue = maxDomain > minDomain
-        ? ((value - minDomain) / (maxDomain - minDomain)).clamp(0.0, 1.0)
-        : 0.0;
+    // Normalize to get 0-1 value (clamped)
+    final normalizedValue = normalize(value);
 
     if (!interpolate) {
       // Discrete colors based on segments
@@ -243,6 +498,35 @@ class GradientColorScale {
 
     final t = scaledValue - lowerIndex;
     return Color.lerp(colors[lowerIndex], colors[upperIndex], t)!;
+  }
+
+  @override
+  double invert(double screenValue) {
+    // Not applicable for color scale
+    return 0;
+  }
+
+  @override
+  List<dynamic> getTicks() {
+    // Gradient color scales do not use axes w/ tick marks
+    return [];
+  }
+
+  @override
+  void setBoundsInternal(
+    List<double> values,
+    (double?, double?)? effectiveLimits,
+    List<Geometry> geometries,
+  ) {
+    final bounds = BoundsCalculator.calculateBounds(
+      values,
+      effectiveLimits,
+      geometries,
+    );
+
+    if (bounds != const Bounds.ignored()) {
+      _domain = [bounds.min, bounds.max];
+    }
   }
 
   /// Predefined gradient themes
@@ -271,17 +555,13 @@ class GradientColorScale {
   }
 
   static GradientColorScale heatMap() {
+    // Default heat map gradient: dark blue → cyan → lime green → bright red
     return GradientColorScale(
       colors: [
-        const Color(0xFF000033), // Dark blue
-        const Color(0xFF000099), // Blue
-        const Color(0xFF0000FF), // Bright blue
-        const Color(0xFF00FFFF), // Cyan
-        const Color(0xFF00FF00), // Green
-        const Color(0xFFFFFF00), // Yellow
-        const Color(0xFFFF8800), // Orange
-        const Color(0xFFFF0000), // Red
-        const Color(0xFF880000), // Dark red
+        const Color(0xFF000080), // Dark blue
+        const Color(0xFF00FFFF), // Bright cyan
+        const Color(0xFF32FF32), // Lime green
+        const Color(0xFFFF0000), // Bright red
       ],
     );
   }
@@ -297,4 +577,28 @@ class GradientColorScale {
       ],
     );
   }
+}
+
+/// Configuration for tick marks on a scale
+class TickConfig {
+  /// Explicitly set the ticks to this list
+  final List<double>? ticks;
+
+  /// If true, use simple linear ticks instead of Wilkinson algorithm
+  final bool simpleLinear;
+
+  /// If true, ticks must be integers only (NEW)
+  final bool integersOnly;
+
+  TickConfig(
+      {List<double>? ticks,
+      this.simpleLinear = false,
+      this.integersOnly = false})
+      : assert(
+          ticks == null || ticks.isNotEmpty,
+          'When provided, ticks must be non-empty.',
+        ),
+        ticks = ticks != null
+            ? (ticks.toList()..sort((a, b) => a.compareTo(b)))
+            : null;
 }
