@@ -330,12 +330,15 @@ class ChartTooltipProvider extends InheritedWidget {
   static TooltipController? of(BuildContext context, {bool listen = true}) {
     return listen
         ? context
-            .dependOnInheritedWidgetOfExactType<ChartTooltipProvider>()
-            ?.state
+              .dependOnInheritedWidgetOfExactType<ChartTooltipProvider>()
+              ?.state
         : (context
-                .getElementForInheritedWidgetOfExactType<ChartTooltipProvider>()
-                ?.widget as ChartTooltipProvider?)
-            ?.state;
+                      .getElementForInheritedWidgetOfExactType<
+                        ChartTooltipProvider
+                      >()
+                      ?.widget
+                  as ChartTooltipProvider?)
+              ?.state;
   }
 
   @override

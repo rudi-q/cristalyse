@@ -1,5 +1,7 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
-import "package:universal_html/html.dart" as html;
+import 'package:web/web.dart' as web;
 
 import '../widgets/animated_chart_widget.dart';
 import 'chart_export.dart';
@@ -33,7 +35,8 @@ Future<ExportResult> _exportToSvgWeb(
   final String svgContent = painter.generateSvg(chartWidget);
 
   // Generate filename
-  final String filename = customPath ??
+  final String filename =
+      customPath ??
       '${config.filename ?? 'cristalyse_chart_${DateTime.now().millisecondsSinceEpoch}'}.svg';
 
   // Download file using browser API (WASM-compatible)
@@ -51,18 +54,22 @@ Future<ExportResult> _exportToSvgWeb(
 
 /// Download file using browser API (works in WASM)
 void _downloadFile(String content, String filename, String mimeType) {
-  final blob = html.Blob([content], mimeType);
-  final url = html.Url.createObjectUrlFromBlob(blob);
+  final blob = web.Blob(
+    [content.toJS].toJS,
+    web.BlobPropertyBag(type: mimeType),
+  );
+  final url = web.URL.createObjectURL(blob);
 
-  final anchor = html.AnchorElement(href: url)
+  final anchor = (web.document.createElement('a') as web.HTMLAnchorElement)
+    ..href = url
     ..download = filename
     ..style.display = 'none';
 
-  html.document.body!.append(anchor);
+  web.document.body!.append(anchor);
   anchor.click();
   anchor.remove();
 
-  html.Url.revokeObjectUrl(url);
+  web.URL.revokeObjectURL(url);
 }
 
 /// Custom painter for SVG export (web version)
@@ -416,14 +423,17 @@ class SvgExportPainter {
       return;
     }
 
-    final points = chartData.data.map((point) {
-      final x = plotArea.left + xScale.scale(point[chartData.xColumn]);
-      final y = plotArea.top + yScale.scale(point[chartData.yColumn]);
-      return '$x,$y';
-    }).join(' ');
+    final points = chartData.data
+        .map((point) {
+          final x = plotArea.left + xScale.scale(point[chartData.xColumn]);
+          final y = plotArea.top + yScale.scale(point[chartData.yColumn]);
+          return '$x,$y';
+        })
+        .join(' ');
 
-    final color =
-        colorScale.values.isNotEmpty ? colorScale.values.first : '#1f77b4';
+    final color = colorScale.values.isNotEmpty
+        ? colorScale.values.first
+        : '#1f77b4';
     buffer.writeln(
       '  <polyline points="$points" stroke="$color" stroke-width="2" fill="none"/>',
     );
@@ -587,8 +597,9 @@ class _LinearScale extends _Scale {
 
   @override
   double scale(dynamic value) {
-    final numValue =
-        value is num ? value.toDouble() : double.tryParse(value.toString());
+    final numValue = value is num
+        ? value.toDouble()
+        : double.tryParse(value.toString());
     if (numValue == null) return range[0];
 
     final domainRange = domain[1] - domain[0];

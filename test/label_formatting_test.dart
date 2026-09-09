@@ -78,8 +78,8 @@ void main() {
       // Test the createDurationFormatter pattern - seconds to human readable
       String Function(num) createDurationFormatter() {
         return (num seconds) {
-          final roundedSeconds =
-              seconds.round(); // Round to nearest second first
+          final roundedSeconds = seconds
+              .round(); // Round to nearest second first
 
           if (roundedSeconds >= 3600) {
             final hours = roundedSeconds / 3600;

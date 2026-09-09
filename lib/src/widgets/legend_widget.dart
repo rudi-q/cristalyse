@@ -185,7 +185,8 @@ class _LegendWidgetState extends State<LegendWidget> {
     final bubbleLabelFontSize =
         baseFontSize * LegendWidget._bubbleLabelFontSizeRatio;
 
-    final bubbleGuideHeight = baseFontSize +
+    final bubbleGuideHeight =
+        baseFontSize +
         LegendWidget._bubbleTitleSpacing +
         maxBubbleDiameter +
         LegendWidget._bubbleLabelSpacing +
@@ -196,7 +197,8 @@ class _LegendWidgetState extends State<LegendWidget> {
         ? widget.config.symbolSize
         : baseFontSize;
     final itemsLength = widget.itemsY.length + widget.itemsY2.length;
-    final totalItemsHeight = (itemHeight * itemsLength) +
+    final totalItemsHeight =
+        (itemHeight * itemsLength) +
         (widget.config.itemSpacing * (itemsLength - 1));
 
     return totalItemsHeight <= bubbleGuideHeight;
@@ -386,8 +388,9 @@ class _LegendWidgetState extends State<LegendWidget> {
 
   Widget _buildSymbol(LegendItem item, bool isActive) {
     final size = widget.config.symbolSize;
-    final effectiveColor =
-        isActive ? item.color : item.color.withValues(alpha: 0.3);
+    final effectiveColor = isActive
+        ? item.color
+        : item.color.withValues(alpha: 0.3);
 
     switch (item.symbol) {
       case LegendSymbol.circle:
@@ -448,12 +451,15 @@ class _LegendWidgetState extends State<LegendWidget> {
 
     // Validate and clamp sizes to ensure they're always positive and visible
     // This prevents rendering issues with zero/negative Container dimensions
-    final displayMinSize =
-        rawMinSize > 0 ? rawMinSize : LegendWidget._minBubbleRadius;
-    final displayMaxSize =
-        rawMaxSize > 0 ? rawMaxSize : LegendWidget._minBubbleRadius;
-    final displayMidSize =
-        rawMidSize > 0 ? rawMidSize : LegendWidget._minBubbleRadius;
+    final displayMinSize = rawMinSize > 0
+        ? rawMinSize
+        : LegendWidget._minBubbleRadius;
+    final displayMaxSize = rawMaxSize > 0
+        ? rawMaxSize
+        : LegendWidget._minBubbleRadius;
+    final displayMidSize = rawMidSize > 0
+        ? rawMidSize
+        : LegendWidget._minBubbleRadius;
 
     // Debug assertion to catch potential scale configuration issues
     assert(
@@ -532,12 +538,15 @@ class _LegendWidgetState extends State<LegendWidget> {
 
     // Validate and clamp sizes to ensure they're always positive and visible
     // This prevents rendering issues with zero/negative Container dimensions
-    final displayMinSize =
-        rawMinSize > 0 ? rawMinSize : LegendWidget._minBubbleRadius;
-    final displayMaxSize =
-        rawMaxSize > 0 ? rawMaxSize : LegendWidget._minBubbleRadius;
-    final displayMidSize =
-        rawMidSize > 0 ? rawMidSize : LegendWidget._minBubbleRadius;
+    final displayMinSize = rawMinSize > 0
+        ? rawMinSize
+        : LegendWidget._minBubbleRadius;
+    final displayMaxSize = rawMaxSize > 0
+        ? rawMaxSize
+        : LegendWidget._minBubbleRadius;
+    final displayMidSize = rawMidSize > 0
+        ? rawMidSize
+        : LegendWidget._minBubbleRadius;
 
     // Debug assertion to catch potential scale configuration issues
     assert(
@@ -688,10 +697,12 @@ class LegendGenerator {
     final symbol = _determineSymbolFromGeometries(geometries);
 
     // Separate geometries by Y-axis
-    final primaryGeometries =
-        geometries.where((g) => g.yAxis == YAxis.primary).toList();
-    final secondaryGeometries =
-        geometries.where((g) => g.yAxis == YAxis.secondary).toList();
+    final primaryGeometries = geometries
+        .where((g) => g.yAxis == YAxis.primary)
+        .toList();
+    final secondaryGeometries = geometries
+        .where((g) => g.yAxis == YAxis.secondary)
+        .toList();
 
     // Generate legend items for primary Y-axis (yColumn)
     final itemsY = <LegendItem>[];

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Conditional imports for platform-specific implementations
 import 'chart_export_stub.dart'
     if (dart.library.io) 'chart_export_io.dart'
-    if (dart.library.html) 'chart_export_web.dart';
+    if (dart.library.js_interop) 'chart_export_web.dart';
 
 /// Export formats supported by the chart
 enum ExportFormat { svg }

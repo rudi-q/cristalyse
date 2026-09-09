@@ -33,19 +33,18 @@ Widget buildBarChartTab(
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(data)
-                  .mapping(x: 'quarter', y: 'revenue', color: 'bar')
-                  .geomBar(width: sliderValue.clamp(0.1, 1.0), alpha: 0.8)
-                  .scaleXOrdinal()
-                  .scaleYContinuous(min: 0)
-                  .theme(currentTheme)
-                  .animate(
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.easeOutBack,
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(data)
+              .mapping(x: 'quarter', y: 'revenue', color: 'bar')
+              .geomBar(width: sliderValue.clamp(0.1, 1.0), alpha: 0.8)
+              .scaleXOrdinal()
+              .scaleYContinuous(min: 0)
+              .theme(currentTheme)
+              .animate(
+                duration: const Duration(milliseconds: 1000),
+                curve: Curves.easeOutBack,
+              )
+              .build(),
         ),
         const SizedBox(height: 16),
         const SelectableText(
@@ -90,26 +89,25 @@ Widget buildBarChartTab(
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(_mixedDemoData)
-                  .mapping(x: 'category', y: 'value')
-                  .geomBar(
-                    width: sliderValue.clamp(0.1, 1.0),
-                    alpha: 0.9,
-                    borderRadius: BorderRadius.circular(15),
-                    roundOutwardEdges: true,
-                    positiveColor: Colors.green,
-                    negativeColor: Colors.red,
-                  )
-                  .scaleXOrdinal()
-                  .scaleYContinuous()
-                  .theme(currentTheme)
-                  .animate(
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.easeOutBack,
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(_mixedDemoData)
+              .mapping(x: 'category', y: 'value')
+              .geomBar(
+                width: sliderValue.clamp(0.1, 1.0),
+                alpha: 0.9,
+                borderRadius: BorderRadius.circular(15),
+                roundOutwardEdges: true,
+                positiveColor: Colors.green,
+                negativeColor: Colors.red,
+              )
+              .scaleXOrdinal()
+              .scaleYContinuous()
+              .theme(currentTheme)
+              .animate(
+                duration: const Duration(milliseconds: 1000),
+                curve: Curves.easeOutBack,
+              )
+              .build(),
         ),
         const SizedBox(height: 16),
         const SelectableText(

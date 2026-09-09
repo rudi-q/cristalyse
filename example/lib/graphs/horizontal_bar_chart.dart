@@ -27,25 +27,23 @@ Widget buildHorizontalBarTab(
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(data)
-                  .mapping(x: 'department', y: 'headcount')
-                  .geomBar(width: sliderValue.clamp(0.1, 1.0))
-                  .coordFlip()
-                  .scaleXOrdinal()
-                  .scaleYContinuous(
-                    min: 0,
-                    labels:
-                        (value) =>
-                            '${value.round()}', // Clean whole numbers for headcount
-                  )
-                  .theme(currentTheme)
-                  .animate(
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.easeOutQuart,
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(data)
+              .mapping(x: 'department', y: 'headcount')
+              .geomBar(width: sliderValue.clamp(0.1, 1.0))
+              .coordFlip()
+              .scaleXOrdinal()
+              .scaleYContinuous(
+                min: 0,
+                labels: (value) =>
+                    '${value.round()}', // Clean whole numbers for headcount
+              )
+              .theme(currentTheme)
+              .animate(
+                duration: const Duration(milliseconds: 1000),
+                curve: Curves.easeOutQuart,
+              )
+              .build(),
         ),
         const SizedBox(height: 16),
         const SelectableText(

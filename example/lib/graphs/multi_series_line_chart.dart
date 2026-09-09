@@ -44,18 +44,17 @@ Widget buildMultiSeriesLineChartTab(
 
         SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(data)
-                  .mapping(x: 'month', y: 'users', color: 'platform')
-                  .geomLine(strokeWidth: 2.0 + sliderValue * 3.0)
-                  .geomPoint(size: 4.0 + sliderValue * 4.0)
-                  .scaleXOrdinal()
-                  .scaleYContinuous(min: 0)
-                  .theme(currentTheme)
-                  .animate(duration: const Duration(milliseconds: 1500))
-                  .legend(position: LegendPosition.right)
-                  .build(),
+          child: CristalyseChart()
+              .data(data)
+              .mapping(x: 'month', y: 'users', color: 'platform')
+              .geomLine(strokeWidth: 2.0 + sliderValue * 3.0)
+              .geomPoint(size: 4.0 + sliderValue * 4.0)
+              .scaleXOrdinal()
+              .scaleYContinuous(min: 0)
+              .theme(currentTheme)
+              .animate(duration: const Duration(milliseconds: 1500))
+              .legend(position: LegendPosition.right)
+              .build(),
         ),
 
         const SizedBox(height: 24),
@@ -78,20 +77,19 @@ Widget buildMultiSeriesLineChartTab(
 
         SizedBox(
           height: 350,
-          child:
-              CristalyseChart()
-                  .data(data)
-                  .mapping(x: 'month', y: 'users', color: 'platform')
-                  .geomLine(
-                    strokeWidth: 3.0 + sliderValue * 2.0,
-                    alpha: 0.8 + sliderValue * 0.2,
-                  )
-                  .scaleXOrdinal()
-                  .scaleYContinuous(min: 0)
-                  .theme(currentTheme)
-                  .animate(duration: const Duration(milliseconds: 1200))
-                  .legend(position: LegendPosition.bottom)
-                  .build(),
+          child: CristalyseChart()
+              .data(data)
+              .mapping(x: 'month', y: 'users', color: 'platform')
+              .geomLine(
+                strokeWidth: 3.0 + sliderValue * 2.0,
+                alpha: 0.8 + sliderValue * 0.2,
+              )
+              .scaleXOrdinal()
+              .scaleYContinuous(min: 0)
+              .theme(currentTheme)
+              .animate(duration: const Duration(milliseconds: 1200))
+              .legend(position: LegendPosition.bottom)
+              .build(),
         ),
 
         const SizedBox(height: 24),

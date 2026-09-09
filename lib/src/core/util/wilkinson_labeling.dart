@@ -48,9 +48,9 @@ class WilkinsonLabeling {
     List<double> makeLinearTicks() {
       // Estimate a reasonable count from screen length and target density
       final estimatedCount = (targetDensity * screenLength).round().clamp(
-            2,
-            10,
-          );
+        2,
+        10,
+      );
       return _fallbackTicks(dmin, dmax, estimatedCount, limits);
     }
 
@@ -115,9 +115,11 @@ class WilkinsonLabeling {
             final minStart = dmaxOverStep.floor() - (k - 1);
             final maxStart = dminOverStep.ceil();
 
-            for (double start = minStart.toDouble();
-                start <= maxStart;
-                start += 1.0) {
+            for (
+              double start = minStart.toDouble();
+              start <= maxStart;
+              start += 1.0
+            ) {
               final lmin = start * step;
               final lmax = lmin + step * (k - 1);
 
@@ -279,10 +281,12 @@ class WilkinsonLabeling {
     (double?, double?)? limits,
   ) {
     // Constrain to limits, if provided
-    final constrainedMin =
-        limits?.$1 != null && limits!.$1! > dmin ? limits.$1! : dmin;
-    final constrainedMax =
-        limits?.$2 != null && limits!.$2! < dmax ? limits.$2! : dmax;
+    final constrainedMin = limits?.$1 != null && limits!.$1! > dmin
+        ? limits.$1!
+        : dmin;
+    final constrainedMax = limits?.$2 != null && limits!.$2! < dmax
+        ? limits.$2!
+        : dmax;
 
     if (count <= 1) return [constrainedMin];
     final step = (constrainedMax - constrainedMin) / (count - 1);

@@ -31,24 +31,23 @@ Widget buildPieChartTab(
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(pieData)
-                  .mappingPie(value: 'revenue', category: 'category')
-                  .geomPie(
-                    outerRadius:
-                        100.0 + sliderValue * 50.0, // Use slider for radius
-                    strokeWidth: 2.0,
-                    strokeColor: Theme.of(context).scaffoldBackgroundColor,
-                    showLabels: true,
-                    showPercentages: true, // Show default percentage formatting
-                  )
-                  .theme(currentTheme)
-                  .animate(
-                    duration: const Duration(milliseconds: 1200),
-                    curve: Curves.elasticOut,
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(pieData)
+              .mappingPie(value: 'revenue', category: 'category')
+              .geomPie(
+                outerRadius:
+                    100.0 + sliderValue * 50.0, // Use slider for radius
+                strokeWidth: 2.0,
+                strokeColor: Theme.of(context).scaffoldBackgroundColor,
+                showLabels: true,
+                showPercentages: true, // Show default percentage formatting
+              )
+              .theme(currentTheme)
+              .animate(
+                duration: const Duration(milliseconds: 1200),
+                curve: Curves.elasticOut,
+              )
+              .build(),
         ),
         const SizedBox(height: 16),
         const SelectableText(
@@ -66,28 +65,25 @@ Widget buildPieChartTab(
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(pieData)
-                  .mappingPie(value: 'users', category: 'category')
-                  .geomPie(
-                    innerRadius: 60.0, // Creates larger donut hole
-                    outerRadius: 120.0,
-                    strokeWidth: 3.0,
-                    strokeColor: Theme.of(context).scaffoldBackgroundColor,
-                    showLabels: true,
-                    showPercentages:
-                        false, // Show formatted user counts instead
-                    labels:
-                        NumberFormat.compact()
-                            .format, // Direct NumberFormat usage
-                  )
-                  .theme(currentTheme)
-                  .animate(
-                    duration: const Duration(milliseconds: 1500),
-                    curve: Curves.easeOutBack,
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(pieData)
+              .mappingPie(value: 'users', category: 'category')
+              .geomPie(
+                innerRadius: 60.0, // Creates larger donut hole
+                outerRadius: 120.0,
+                strokeWidth: 3.0,
+                strokeColor: Theme.of(context).scaffoldBackgroundColor,
+                showLabels: true,
+                showPercentages: false, // Show formatted user counts instead
+                labels:
+                    NumberFormat.compact().format, // Direct NumberFormat usage
+              )
+              .theme(currentTheme)
+              .animate(
+                duration: const Duration(milliseconds: 1500),
+                curve: Curves.easeOutBack,
+              )
+              .build(),
         ),
         const SizedBox(height: 16),
         const SelectableText(

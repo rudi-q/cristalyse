@@ -65,12 +65,11 @@ Widget buildComboBarLineTab(ChartTheme currentTheme, double sliderValue) {
                       plotBackgroundColor: Colors.transparent,
                       gridColor: Colors.transparent,
                       axisColor: Colors.transparent,
-                      axisLabelStyle:
-                          currentTheme.axisLabelStyle != null
-                              ? currentTheme.axisLabelStyle!.copyWith(
-                                color: Colors.transparent,
-                              )
-                              : const TextStyle(color: Colors.transparent),
+                      axisLabelStyle: currentTheme.axisLabelStyle != null
+                          ? currentTheme.axisLabelStyle!.copyWith(
+                              color: Colors.transparent,
+                            )
+                          : const TextStyle(color: Colors.transparent),
                     ),
                   )
                   .animate(

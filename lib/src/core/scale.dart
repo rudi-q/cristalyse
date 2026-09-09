@@ -25,12 +25,12 @@ abstract class Scale {
   static const double _optimalPixelsPerLabel = 60.0;
 
   Scale({LabelCallback? labelFormatter, this.limits, this.title})
-      : _formatter = LabelFormatter(labelFormatter);
+    : _formatter = LabelFormatter(labelFormatter);
 
   /// Return display parameter within range from value on domain.
   dynamic scale(dynamic value);
   List<dynamic>
-      get domain; // Abstract - each scale implements its own domain type
+  get domain; // Abstract - each scale implements its own domain type
 
   /// Map any value to 0-1 position within domain.
   ///
@@ -202,7 +202,7 @@ class LinearScale extends Scale {
           final safeStep = step > 0 ? step : 1;
           niceTicks = [
             for (var tick = minTick; tick <= maxTick; tick += safeStep)
-              tick.toDouble()
+              tick.toDouble(),
           ];
         } else {
           // Use the nearest integer to the midpoint, and clamp to effectiveLimits if present
@@ -225,10 +225,12 @@ class LinearScale extends Scale {
 
         // Ensure domain covers the actual data range
         // Use nice ticks if they cover the data, otherwise expand to ensure coverage
-        final niceMin =
-            niceTicks.first <= bounds.min ? niceTicks.first : bounds.min;
-        final niceMax =
-            niceTicks.last >= bounds.max ? niceTicks.last : bounds.max;
+        final niceMin = niceTicks.first <= bounds.min
+            ? niceTicks.first
+            : bounds.min;
+        final niceMax = niceTicks.last >= bounds.max
+            ? niceTicks.last
+            : bounds.max;
         _domain = [niceMin, niceMax];
       } else {
         _ticks = null;
@@ -245,7 +247,7 @@ class OrdinalScale extends Scale {
   double _bandWidth = 0;
 
   OrdinalScale({double padding = 0.1, super.labelFormatter, super.title})
-      : _padding = padding;
+    : _padding = padding;
 
   @override
   List<dynamic> get domain => _domain;
@@ -307,9 +309,9 @@ class OrdinalScale extends Scale {
     );
 
     final targetLabelCount = (screenLength / pixelsPerLabel).round().clamp(
-          1,
-          _domain.length,
-        );
+      1,
+      _domain.length,
+    );
 
     // If we have fewer categories than target, show all
     if (_domain.length <= targetLabelCount) {
@@ -470,8 +472,7 @@ class GradientColorScale extends Scale {
   set domain(List<double> value) => _domain = List.from(value);
 
   @override
-  List<double> get range =>
-      [0, 1]; // Gradient color scales always use 0, 1 range
+  List<double> get range => [0, 1]; // Gradient color scales always use 0, 1 range
 
   @override
   Color scale(dynamic value) {
@@ -590,15 +591,15 @@ class TickConfig {
   /// If true, ticks must be integers only (NEW)
   final bool integersOnly;
 
-  TickConfig(
-      {List<double>? ticks,
-      this.simpleLinear = false,
-      this.integersOnly = false})
-      : assert(
-          ticks == null || ticks.isNotEmpty,
-          'When provided, ticks must be non-empty.',
-        ),
-        ticks = ticks != null
-            ? (ticks.toList()..sort((a, b) => a.compareTo(b)))
-            : null;
+  TickConfig({
+    List<double>? ticks,
+    this.simpleLinear = false,
+    this.integersOnly = false,
+  }) : assert(
+         ticks == null || ticks.isNotEmpty,
+         'When provided, ticks must be non-empty.',
+       ),
+       ticks = ticks != null
+           ? (ticks.toList()..sort((a, b) => a.compareTo(b)))
+           : null;
 }

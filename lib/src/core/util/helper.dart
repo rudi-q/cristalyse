@@ -80,10 +80,12 @@ void sortHeatMapValues(List<dynamic> values) {
     final bDay = dayOrder.indexOf(bStr);
     if (aDay != -1 && bDay != -1) {
       // Both are days - use day order, but normalize Sunday=0 to Sunday=7 for weekly view
-      final normalizedA =
-          aDay < 7 ? (aDay == 0 ? 7 : aDay) : (aDay - 7 == 0 ? 7 : aDay - 7);
-      final normalizedB =
-          bDay < 7 ? (bDay == 0 ? 7 : bDay) : (bDay - 7 == 0 ? 7 : bDay - 7);
+      final normalizedA = aDay < 7
+          ? (aDay == 0 ? 7 : aDay)
+          : (aDay - 7 == 0 ? 7 : aDay - 7);
+      final normalizedB = bDay < 7
+          ? (bDay == 0 ? 7 : bDay)
+          : (bDay - 7 == 0 ? 7 : bDay - 7);
       return normalizedA.compareTo(normalizedB);
     }
 

@@ -56,7 +56,8 @@ Future<String> _getExportPath(ExportConfig config, String extension) async {
     throw const ChartExportException('Could not access documents directory');
   }
 
-  final String filename = config.filename ??
+  final String filename =
+      config.filename ??
       'cristalyse_chart_${DateTime.now().millisecondsSinceEpoch}';
 
   return '${directory.path}/$filename.$extension';
@@ -397,14 +398,17 @@ class SvgExportPainter {
   ) {
     if (chartData.data.length < 2) return;
 
-    final points = chartData.data.map((point) {
-      final x = plotArea.left + xScale.scale(point[chartData.xColumn]);
-      final y = plotArea.top + yScale.scale(point[chartData.yColumn]);
-      return '$x,$y';
-    }).join(' ');
+    final points = chartData.data
+        .map((point) {
+          final x = plotArea.left + xScale.scale(point[chartData.xColumn]);
+          final y = plotArea.top + yScale.scale(point[chartData.yColumn]);
+          return '$x,$y';
+        })
+        .join(' ');
 
-    final color =
-        colorScale.values.isNotEmpty ? colorScale.values.first : '#1f77b4';
+    final color = colorScale.values.isNotEmpty
+        ? colorScale.values.first
+        : '#1f77b4';
     buffer.writeln(
       '  <polyline points="$points" stroke="$color" stroke-width="2" fill="none"/>',
     );
@@ -568,8 +572,9 @@ class _LinearScale extends _Scale {
 
   @override
   double scale(dynamic value) {
-    final numValue =
-        value is num ? value.toDouble() : double.tryParse(value.toString());
+    final numValue = value is num
+        ? value.toDouble()
+        : double.tryParse(value.toString());
     if (numValue == null) return range[0];
 
     final domainRange = domain[1] - domain[0];

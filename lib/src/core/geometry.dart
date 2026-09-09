@@ -169,8 +169,8 @@ class PieGeometry extends Geometry {
     this.explodeDistance = 10.0,
     LabelCallback? labelFormatter,
     super.interactive = true,
-  })  : labelFormatter = labelFormatter ?? _defaultPercentageFormatter.format,
-        super(yAxis: YAxis.primary); // Pie charts don't use Y-axis
+  }) : labelFormatter = labelFormatter ?? _defaultPercentageFormatter.format,
+       super(yAxis: YAxis.primary); // Pie charts don't use Y-axis
 
   @override
   BoundsBehavior getBoundsBehavior() => BoundsBehavior.notApplicable;
@@ -357,70 +357,70 @@ class ProgressGeometry extends Geometry {
     this.concentricThicknesses,
     super.yAxis,
     super.interactive,
-  })  : assert(
-          minValue != null && maxValue != null && minValue < maxValue,
-          'minValue must be less than maxValue',
-        ),
-        assert(
-          animationDuration > Duration.zero,
-          'animationDuration must be positive',
-        ),
-        assert(thickness >= 0, 'thickness must be >= 0'),
-        assert(cornerRadius >= 0, 'cornerRadius must be >= 0'),
-        assert(strokeWidth >= 0, 'strokeWidth must be >= 0'),
-        assert(labelOffset >= 0, 'labelOffset must be >= 0'),
-        assert(
-          groupSpacing == null || groupSpacing >= 0,
-          'groupSpacing must be >= 0',
-        ),
-        assert(groupCount == null || groupCount > 0, 'groupCount must be > 0'),
-        assert(tickCount == null || tickCount > 0, 'tickCount must be > 0'),
-        assert(
-          gaugeRadius == null || gaugeRadius > 0,
-          'gaugeRadius must be > 0',
-        ),
-        assert(
-          segments == null || segments.every((s) => s >= 0),
-          'all segments must be >= 0',
-        ),
-        assert(
-          concentricRadii == null || concentricRadii.every((r) => r > 0),
-          'all concentricRadii must be > 0',
-        ),
-        assert(
-          concentricThicknesses == null ||
-              concentricThicknesses.every((t) => t > 0),
-          'all concentricThicknesses must be > 0',
-        ),
-        assert(
-          sweepAngle == null || (sweepAngle > 0 && sweepAngle <= 2 * math.pi),
-          'sweepAngle must be > 0 and <= 2π (360 degrees)',
-        ),
-        assert(
-          segments == null ||
-              segmentColors == null ||
-              segments.length == segmentColors.length,
-          'segments and segmentColors must have the same length',
-        ),
-        assert(
-          concentricRadii == null ||
-              concentricThicknesses == null ||
-              concentricRadii.length == concentricThicknesses.length,
-          'concentricRadii and concentricThicknesses must have the same length',
-        ),
-        assert(
-          style != ProgressStyle.stacked || segments != null,
-          'stacked style requires non-null segments',
-        ),
-        assert(
-          style != ProgressStyle.gauge || gaugeRadius != null,
-          'gauge style requires non-null gaugeRadius',
-        ),
-        assert(
-          style != ProgressStyle.concentric ||
-              (concentricRadii != null && concentricThicknesses != null),
-          'concentric style requires non-null concentricRadii and concentricThicknesses',
-        );
+  }) : assert(
+         minValue != null && maxValue != null && minValue < maxValue,
+         'minValue must be less than maxValue',
+       ),
+       assert(
+         animationDuration > Duration.zero,
+         'animationDuration must be positive',
+       ),
+       assert(thickness >= 0, 'thickness must be >= 0'),
+       assert(cornerRadius >= 0, 'cornerRadius must be >= 0'),
+       assert(strokeWidth >= 0, 'strokeWidth must be >= 0'),
+       assert(labelOffset >= 0, 'labelOffset must be >= 0'),
+       assert(
+         groupSpacing == null || groupSpacing >= 0,
+         'groupSpacing must be >= 0',
+       ),
+       assert(groupCount == null || groupCount > 0, 'groupCount must be > 0'),
+       assert(tickCount == null || tickCount > 0, 'tickCount must be > 0'),
+       assert(
+         gaugeRadius == null || gaugeRadius > 0,
+         'gaugeRadius must be > 0',
+       ),
+       assert(
+         segments == null || segments.every((s) => s >= 0),
+         'all segments must be >= 0',
+       ),
+       assert(
+         concentricRadii == null || concentricRadii.every((r) => r > 0),
+         'all concentricRadii must be > 0',
+       ),
+       assert(
+         concentricThicknesses == null ||
+             concentricThicknesses.every((t) => t > 0),
+         'all concentricThicknesses must be > 0',
+       ),
+       assert(
+         sweepAngle == null || (sweepAngle > 0 && sweepAngle <= 2 * math.pi),
+         'sweepAngle must be > 0 and <= 2π (360 degrees)',
+       ),
+       assert(
+         segments == null ||
+             segmentColors == null ||
+             segments.length == segmentColors.length,
+         'segments and segmentColors must have the same length',
+       ),
+       assert(
+         concentricRadii == null ||
+             concentricThicknesses == null ||
+             concentricRadii.length == concentricThicknesses.length,
+         'concentricRadii and concentricThicknesses must have the same length',
+       ),
+       assert(
+         style != ProgressStyle.stacked || segments != null,
+         'stacked style requires non-null segments',
+       ),
+       assert(
+         style != ProgressStyle.gauge || gaugeRadius != null,
+         'gauge style requires non-null gaugeRadius',
+       ),
+       assert(
+         style != ProgressStyle.concentric ||
+             (concentricRadii != null && concentricThicknesses != null),
+         'concentric style requires non-null concentricRadii and concentricThicknesses',
+       );
 
   @override
   BoundsBehavior getBoundsBehavior() => BoundsBehavior.notApplicable;
