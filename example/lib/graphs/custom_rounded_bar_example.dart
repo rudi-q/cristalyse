@@ -19,17 +19,16 @@ class CustomRoundedBarExample extends StatelessWidget {
       body: Center(
         child: SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(data)
-                  .mapping(x: 'category', y: 'value')
-                  .geomBar(
-                    color: Colors.blueAccent,
-                    width: 0.6,
-                    borderRadius: BorderRadius.circular(15),
-                    roundOutwardEdges: true, // This is the new feature
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(data)
+              .mapping(x: 'category', y: 'value')
+              .geomBar(
+                color: Colors.blueAccent,
+                width: 0.6,
+                borderRadius: BorderRadius.circular(15),
+                roundOutwardEdges: true, // This is the new feature
+              )
+              .build(),
         ),
       ),
     );

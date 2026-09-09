@@ -32,21 +32,20 @@ class _ExportDemoState extends State<ExportDemo> {
 
   void _generateSampleData() {
     _chartData = List.generate(12, (i) {
-      final month =
-          [
-            'Jan',
-            'Feb',
-            'Mar',
-            'Apr',
-            'May',
-            'Jun',
-            'Jul',
-            'Aug',
-            'Sep',
-            'Oct',
-            'Nov',
-            'Dec',
-          ][i];
+      final month = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ][i];
 
       final revenue =
           50 +
@@ -94,35 +93,34 @@ class _ExportDemoState extends State<ExportDemo> {
         .animate(duration: const Duration(milliseconds: 1200))
         .interaction(
           tooltip: TooltipConfig(
-            builder:
-                (point) => Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withAlpha(204),
-                    borderRadius: BorderRadius.circular(4),
+            builder: (point) => Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withAlpha(204),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    point.getDisplayValue('month'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        point.getDisplayValue('month'),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Revenue: \$${point.getDisplayValue('revenue')}k',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        'Users: ${point.getDisplayValue('users')}',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ],
+                  Text(
+                    'Revenue: \$${point.getDisplayValue('revenue')}k',
+                    style: const TextStyle(color: Colors.white),
                   ),
-                ),
+                  Text(
+                    'Users: ${point.getDisplayValue('users')}',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
   }

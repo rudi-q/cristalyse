@@ -177,7 +177,8 @@ class AnimatedChartPainter extends CustomPainter {
     );
 
     // Pre-calculate maximum label dimensions for title spacing
-    final axisLabelStyle = theme.axisLabelStyle ??
+    final axisLabelStyle =
+        theme.axisLabelStyle ??
         const TextStyle(color: Colors.black, fontSize: 12);
     final labelDimensions = _calculateMaxLabelDimensions(
       xScale: this.xScale,
@@ -195,8 +196,10 @@ class AnimatedChartPainter extends CustomPainter {
         geometries.any((g) => g is HeatMapGeometry)) {
       final yCol = heatMapYColumn ?? yColumn;
       if (yCol != null && data.isNotEmpty) {
-        final yValues =
-            data.map((d) => d[yCol]).where((v) => v != null).toSet();
+        final yValues = data
+            .map((d) => d[yCol])
+            .where((v) => v != null)
+            .toSet();
         double maxHeatMapValWidth = 0.0;
         for (final val in yValues) {
           final tp = TextPainter(
@@ -214,36 +217,40 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Space for Y-axis labels + optional title (title height becomes width after -90° rotation)
     final yAxisSpace = math.max(
-        heatMapYAxisSpace,
-        this.yScale != null
-            ? theme.axisWidth * 2 + // tick marks
+      heatMapYAxisSpace,
+      this.yScale != null
+          ? theme.axisWidth * 2 + // tick marks
                 tickToLabelSpacing + // gap to labels
                 labelDimensions.maxYLabelWidth + // labels
                 (this.yScale?.title != null
-                    ? _labelToTitleSpacing + titleFontSize // gap + title height
+                    ? _labelToTitleSpacing +
+                          titleFontSize // gap + title height
                     : 0.0)
-            : 0.0);
+          : 0.0,
+    );
     final leftPadding = theme.padding.left + yAxisSpace;
 
     // Space for Y2-axis labels + optional title (title height becomes width after +90° rotation)
     final y2AxisSpace = this.y2Scale != null
         ? theme.axisWidth * 2 +
-            tickToLabelSpacing +
-            labelDimensions.maxY2LabelWidth +
-            (this.y2Scale?.title != null
-                ? _labelToTitleSpacing + titleFontSize // gap + title height
-                : 0.0)
+              tickToLabelSpacing +
+              labelDimensions.maxY2LabelWidth +
+              (this.y2Scale?.title != null
+                  ? _labelToTitleSpacing +
+                        titleFontSize // gap + title height
+                  : 0.0)
         : 0.0;
     final rightPadding = theme.padding.right + y2AxisSpace;
 
     // Space for X-axis labels + optional title (not rotated, height is vertical)
     final xAxisSpace = this.xScale != null
         ? theme.axisWidth * 2 +
-            tickToLabelSpacing +
-            labelDimensions.maxXLabelHeight +
-            (this.xScale?.title != null
-                ? _labelToTitleSpacing + titleFontSize // gap + title height
-                : 0.0)
+              tickToLabelSpacing +
+              labelDimensions.maxXLabelHeight +
+              (this.xScale?.title != null
+                  ? _labelToTitleSpacing +
+                        titleFontSize // gap + title height
+                  : 0.0)
         : 0.0;
     final bottomPadding = theme.padding.bottom + xAxisSpace;
 
@@ -341,8 +348,9 @@ class AnimatedChartPainter extends CustomPainter {
   Scale _setupXScale(double width, bool hasBarGeometry) {
     if (coordFlipped) {
       final preconfigured = yScale;
-      final scale =
-          (preconfigured is LinearScale ? preconfigured : LinearScale());
+      final scale = (preconfigured is LinearScale
+          ? preconfigured
+          : LinearScale());
       final dataCol = yColumn;
 
       scale.range = [
@@ -372,8 +380,9 @@ class AnimatedChartPainter extends CustomPainter {
       final dataCol = xColumn;
       if (preconfigured is OrdinalScale ||
           (hasBarGeometry && isColumnCategorical(dataCol, data))) {
-        final scale =
-            (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+        final scale = (preconfigured is OrdinalScale
+            ? preconfigured
+            : OrdinalScale());
         if (dataCol == null || data.isEmpty) {
           scale.domain = [];
           scale.range = [0, width];
@@ -390,8 +399,9 @@ class AnimatedChartPainter extends CustomPainter {
         scale.range = [0, width];
         return scale;
       } else {
-        final scale =
-            (preconfigured is LinearScale ? preconfigured : LinearScale());
+        final scale = (preconfigured is LinearScale
+            ? preconfigured
+            : LinearScale());
         scale.range = [
           0,
           width,
@@ -413,13 +423,10 @@ class AnimatedChartPainter extends CustomPainter {
 
           // Use pan domain if available (for visual panning)
           if (!coordFlipped && panXDomain != null) {
-            scale.setBounds(
-                values,
-                (
-                  panXDomain![0],
-                  panXDomain![1],
-                ),
-                geometries);
+            scale.setBounds(values, (
+              panXDomain![0],
+              panXDomain![1],
+            ), geometries);
           }
         } else {
           scale.setBounds([], null, geometries);
@@ -432,8 +439,9 @@ class AnimatedChartPainter extends CustomPainter {
   Scale _setupYScale(double height, bool hasBarGeometry, YAxis axis) {
     if (coordFlipped) {
       final preconfigured = xScale;
-      final scale =
-          (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+      final scale = (preconfigured is OrdinalScale
+          ? preconfigured
+          : OrdinalScale());
       final dataCol = xColumn;
 
       if (dataCol == null || data.isEmpty) {
@@ -455,8 +463,9 @@ class AnimatedChartPainter extends CustomPainter {
       final preconfigured = axis == YAxis.primary ? yScale : y2Scale;
       final dataCol = axis == YAxis.primary ? yColumn : y2Column;
 
-      final scale =
-          (preconfigured is LinearScale ? preconfigured : LinearScale());
+      final scale = (preconfigured is LinearScale
+          ? preconfigured
+          : LinearScale());
       scale.range = [
         height,
         0,
@@ -467,8 +476,9 @@ class AnimatedChartPainter extends CustomPainter {
         return scale;
       }
 
-      final relevantGeometries =
-          geometries.where((g) => g.yAxis == axis).toList();
+      final relevantGeometries = geometries
+          .where((g) => g.yAxis == axis)
+          .toList();
       if (relevantGeometries.isEmpty) {
         scale.setBounds([0, 1], null, geometries);
         return scale;
@@ -597,13 +607,10 @@ class AnimatedChartPainter extends CustomPainter {
           .cast<double>()
           .toList();
 
-      scale.setBounds(
-          values,
-          (
-            heatMapGeom.minValue,
-            heatMapGeom.maxValue,
-          ),
-          geometries);
+      scale.setBounds(values, (
+        heatMapGeom.minValue,
+        heatMapGeom.maxValue,
+      ), geometries);
     }
 
     return scale;
@@ -622,7 +629,7 @@ class AnimatedChartPainter extends CustomPainter {
       final effectiveSizeScale = bubbleGeometries.isNotEmpty
           ? bubbleGeometries.first.createSizeScale()
           : (sizeScale ??
-              SizeScale(range: [theme.pointSizeMin, theme.pointSizeMax]));
+                SizeScale(range: [theme.pointSizeMin, theme.pointSizeMax]));
 
       // Set domain from data - limits are already in the scale
       effectiveSizeScale.setBounds(values, null, geometries);
@@ -890,8 +897,9 @@ class AnimatedChartPainter extends CustomPainter {
       final x = groupEntry.key;
       final colorValues = groupEntry.value;
 
-      final groupDelay =
-          groups.isNotEmpty ? groupIndex / groups.length * 0.2 : 0.0;
+      final groupDelay = groups.isNotEmpty
+          ? groupIndex / groups.length * 0.2
+          : 0.0;
       final groupProgress = math.max(
         0.0,
         math.min(
@@ -972,8 +980,9 @@ class AnimatedChartPainter extends CustomPainter {
       final x = groupEntry.key;
       final groupData = groupEntry.value;
 
-      final groupDelay =
-          groups.isNotEmpty ? groupIndex / groups.length * 0.3 : 0.0;
+      final groupDelay = groups.isNotEmpty
+          ? groupIndex / groups.length * 0.3
+          : 0.0;
       final groupProgress = math.max(
         0.0,
         math.min(
@@ -1104,14 +1113,16 @@ class AnimatedChartPainter extends CustomPainter {
       // Use value-based coloring
       if (yValForBar >= 0) {
         // Positive value: use positiveColor, fall back to color, then theme
-        colorOrGradient = geometry.positiveColor ??
+        colorOrGradient =
+            geometry.positiveColor ??
             geometry.color ??
             (theme.colorPalette.isNotEmpty
                 ? theme.colorPalette.first
                 : theme.primaryColor);
       } else {
         // Negative value: use negativeColor, fall back to color, then theme
-        colorOrGradient = geometry.negativeColor ??
+        colorOrGradient =
+            geometry.negativeColor ??
             geometry.color ??
             (theme.colorPalette.length > 1
                 ? theme.colorPalette[1]
@@ -1227,9 +1238,7 @@ class AnimatedChartPainter extends CustomPainter {
 
     if (geometry.borderWidth > 0) {
       final borderPaint = Paint()
-        ..color = theme.borderColor.withAlpha(
-          (geometry.alpha * 255).round(),
-        )
+        ..color = theme.borderColor.withAlpha((geometry.alpha * 255).round())
         ..strokeWidth = geometry.borderWidth
         ..style = PaintingStyle.stroke;
 
@@ -1245,7 +1254,9 @@ class AnimatedChartPainter extends CustomPainter {
           canvas.drawRRect(rrect, borderPaint);
         } else {
           canvas.drawRRect(
-              geometry.borderRadius!.toRRect(barRect), borderPaint);
+            geometry.borderRadius!.toRRect(barRect),
+            borderPaint,
+          );
         }
       } else {
         canvas.drawRect(barRect, borderPaint);
@@ -1447,12 +1458,13 @@ class AnimatedChartPainter extends CustomPainter {
       if (bubbleProgress <= 0) continue;
 
       // Get bubble color
-      final color = geometry.color ??
+      final color =
+          geometry.color ??
           (colorColumn != null
               ? colorScale.scale(point[colorColumn])
               : (theme.colorPalette.isNotEmpty
-                  ? theme.colorPalette.first
-                  : theme.primaryColor));
+                    ? theme.colorPalette.first
+                    : theme.primaryColor));
 
       // Calculate bubble size using size scale
       final bubbleSize = sizeScale.scale(sizeValue);
@@ -1532,7 +1544,8 @@ class AnimatedChartPainter extends CustomPainter {
             ? geometry.labelFormatter!(sizeValue)
             : sizeValue.toStringAsFixed(1);
 
-        final textStyle = geometry.labelStyle ??
+        final textStyle =
+            geometry.labelStyle ??
             TextStyle(
               color: Colors.black,
               fontSize: 10,
@@ -1619,7 +1632,8 @@ class AnimatedChartPainter extends CustomPainter {
       }
     } else {
       // Draw single line for all data
-      final lineColor = geometry.color ??
+      final lineColor =
+          geometry.color ??
           (theme.colorPalette.isNotEmpty
               ? theme.colorPalette.first
               : theme.primaryColor);
@@ -1741,9 +1755,11 @@ class AnimatedChartPainter extends CustomPainter {
       final Offset lastFullPoint = points[fullyDrawnSegments];
       final Offset nextPoint = points[fullyDrawnSegments + 1];
 
-      final double dx = lastFullPoint.dx +
+      final double dx =
+          lastFullPoint.dx +
           (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
-      final double dy = lastFullPoint.dy +
+      final double dy =
+          lastFullPoint.dy +
           (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
       path.lineTo(dx, dy);
     }
@@ -1887,9 +1903,11 @@ class AnimatedChartPainter extends CustomPainter {
         final Offset lastFullPoint = points[fullyDrawnSegments];
         final Offset nextPoint = points[fullyDrawnSegments + 1];
 
-        final double dx = lastFullPoint.dx +
+        final double dx =
+            lastFullPoint.dx +
             (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
-        final double dy = lastFullPoint.dy +
+        final double dy =
+            lastFullPoint.dy +
             (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
         areaPath.lineTo(dx, dy);
 
@@ -1925,15 +1943,18 @@ class AnimatedChartPainter extends CustomPainter {
           final Offset lastFullPoint = points[fullyDrawnSegments];
           final Offset nextPoint = points[fullyDrawnSegments + 1];
 
-          final double dx = lastFullPoint.dx +
+          final double dx =
+              lastFullPoint.dx +
               (nextPoint.dx - lastFullPoint.dx) * partialSegmentProgress;
-          final double dy = lastFullPoint.dy +
+          final double dy =
+              lastFullPoint.dy +
               (nextPoint.dy - lastFullPoint.dy) * partialSegmentProgress;
           strokePath.lineTo(dx, dy);
         }
 
         final strokePaint = Paint()
-          ..color = color.withAlpha(255) // Full opacity for stroke
+          ..color = color
+              .withAlpha(255) // Full opacity for stroke
           ..strokeWidth = geometry.strokeWidth
           ..style = PaintingStyle.stroke
           ..strokeCap = StrokeCap.round
@@ -1958,7 +1979,8 @@ class AnimatedChartPainter extends CustomPainter {
       ..strokeWidth = theme.axisWidth
       ..style = PaintingStyle.stroke;
 
-    final axisLabelStyle = theme.axisLabelStyle ??
+    final axisLabelStyle =
+        theme.axisLabelStyle ??
         const TextStyle(color: Colors.black, fontSize: 12);
 
     // Draw horizontal axis (bottom)
@@ -1998,7 +2020,8 @@ class AnimatedChartPainter extends CustomPainter {
     final xTicks = xScale.getTicks();
     for (final tick in xTicks) {
       // Use bandCenter for OrdinalScale to center ticks on bars
-      final pos = plotArea.left +
+      final pos =
+          plotArea.left +
           (xScale is OrdinalScale
               // ignore: unnecessary_cast
               ? (xScale as OrdinalScale).bandCenter(tick)
@@ -2029,7 +2052,8 @@ class AnimatedChartPainter extends CustomPainter {
     final yTicks = yScale.getTicks();
     for (final tick in yTicks) {
       // Use bandCenter for OrdinalScale to center ticks on bars (for horizontal bar charts)
-      final pos = plotArea.top +
+      final pos =
+          plotArea.top +
           (yScale is OrdinalScale
               // ignore: unnecessary_cast
               ? (yScale as OrdinalScale).bandCenter(tick)
@@ -2047,7 +2071,9 @@ class AnimatedChartPainter extends CustomPainter {
         textAlign: TextAlign.right,
       );
       textPainter.layout(
-          minWidth: 0, maxWidth: math.max(0.0, plotArea.left - 8));
+        minWidth: 0,
+        maxWidth: math.max(0.0, plotArea.left - 8),
+      );
       textPainter.paint(
         canvas,
         Offset(
@@ -2149,8 +2175,9 @@ class AnimatedChartPainter extends CustomPainter {
     ); // Ensure inner radius isn't too close to outer
 
     // Extract and calculate values
-    final values =
-        data.map((d) => getNumericValue(d[valueColumn]) ?? 0).toList();
+    final values = data
+        .map((d) => getNumericValue(d[valueColumn]) ?? 0)
+        .toList();
     final total = values.fold<double>(0, (sum, val) => sum + val);
 
     if (total <= 0) return;
@@ -2206,9 +2233,11 @@ class AnimatedChartPainter extends CustomPainter {
             sliceCenter.dx + math.cos(currentAngle) * outerRadius;
         final outerStartY =
             sliceCenter.dy + math.sin(currentAngle) * outerRadius;
-        final innerEndX = sliceCenter.dx +
+        final innerEndX =
+            sliceCenter.dx +
             math.cos(currentAngle + animatedSweepAngle) * innerRadius;
-        final innerEndY = sliceCenter.dy +
+        final innerEndY =
+            sliceCenter.dy +
             math.sin(currentAngle + animatedSweepAngle) * innerRadius;
 
         // Start at outer edge
@@ -2295,7 +2324,8 @@ class AnimatedChartPainter extends CustomPainter {
 
     String labelText;
     if (showPercentages) {
-      final percentageRatio = value /
+      final percentageRatio =
+          value /
           total; // 0.0-1.0 range, as NumberFormat expects for percentages
       final percentageText = geometry.labelFormatter(percentageRatio);
       labelText = '$category\n$percentageText';
@@ -2358,10 +2388,16 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     // Get unique X and Y values to determine grid
-    final xValues =
-        data.map((d) => d[xCol]).where((v) => v != null).toSet().toList();
-    final yValues =
-        data.map((d) => d[yCol]).where((v) => v != null).toSet().toList();
+    final xValues = data
+        .map((d) => d[xCol])
+        .where((v) => v != null)
+        .toSet()
+        .toList();
+    final yValues = data
+        .map((d) => d[yCol])
+        .where((v) => v != null)
+        .toSet()
+        .toList();
 
     if (xValues.isEmpty || yValues.isEmpty) {
       return;
@@ -2514,11 +2550,12 @@ class AnimatedChartPainter extends CustomPainter {
           final textColor = normalizedValue < 0.15
               ? Colors.black
               : (ThemeData.estimateBrightnessForColor(cellColor) ==
-                      Brightness.dark
-                  ? Colors.white
-                  : Colors.black);
+                        Brightness.dark
+                    ? Colors.white
+                    : Colors.black);
 
-          final textStyle = geometry.valueTextStyle ??
+          final textStyle =
+              geometry.valueTextStyle ??
               TextStyle(color: textColor, fontSize: 10);
 
           final textPainter = TextPainter(
@@ -2563,10 +2600,16 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     // Get unique X and Y values to determine grid
-    final xValues =
-        data.map((d) => d[xCol]).where((v) => v != null).toSet().toList();
-    final yValues =
-        data.map((d) => d[yCol]).where((v) => v != null).toSet().toList();
+    final xValues = data
+        .map((d) => d[xCol])
+        .where((v) => v != null)
+        .toSet()
+        .toList();
+    final yValues = data
+        .map((d) => d[yCol])
+        .where((v) => v != null)
+        .toSet()
+        .toList();
 
     if (xValues.isEmpty || yValues.isEmpty) {
       return;
@@ -2577,10 +2620,12 @@ class AnimatedChartPainter extends CustomPainter {
     sortHeatMapValues(yValues);
 
     // Find the heat map geometry for styling
-    final heatMapGeom = geometries.firstWhere(
-      (g) => g is HeatMapGeometry,
-      orElse: () => HeatMapGeometry(),
-    ) as HeatMapGeometry;
+    final heatMapGeom =
+        geometries.firstWhere(
+              (g) => g is HeatMapGeometry,
+              orElse: () => HeatMapGeometry(),
+            )
+            as HeatMapGeometry;
 
     // Calculate cell dimensions considering spacing
     final totalSpacingX = heatMapGeom.cellSpacing * (xValues.length + 1);
@@ -2598,13 +2643,15 @@ class AnimatedChartPainter extends CustomPainter {
       }
     }
 
-    final axisLabelStyle = theme.axisLabelStyle ??
+    final axisLabelStyle =
+        theme.axisLabelStyle ??
         const TextStyle(color: Colors.black, fontSize: 12);
 
     // Draw X-axis labels (bottom)
     for (int xi = 0; xi < xValues.length; xi++) {
       final xVal = xValues[xi];
-      final centerX = plotArea.left +
+      final centerX =
+          plotArea.left +
           heatMapGeom.cellSpacing +
           xi * (cellWidth + heatMapGeom.cellSpacing) +
           cellWidth / 2;
@@ -2625,7 +2672,8 @@ class AnimatedChartPainter extends CustomPainter {
     // Draw Y-axis labels (left)
     for (int yi = 0; yi < yValues.length; yi++) {
       final yVal = yValues[yi];
-      final centerY = plotArea.top +
+      final centerY =
+          plotArea.top +
           heatMapGeom.cellSpacing +
           yi * (cellHeight + heatMapGeom.cellSpacing) +
           cellHeight / 2;
@@ -2637,7 +2685,9 @@ class AnimatedChartPainter extends CustomPainter {
         textAlign: TextAlign.right,
       );
       textPainter.layout(
-          minWidth: 0, maxWidth: math.max(0.0, plotArea.left - 8));
+        minWidth: 0,
+        maxWidth: math.max(0.0, plotArea.left - 8),
+      );
       textPainter.paint(
         canvas,
         Offset(
@@ -2944,12 +2994,14 @@ class AnimatedChartPainter extends CustomPainter {
     final totalHeight = data.length * (barHeight + barSpacing);
 
     // Scale down bars if they don't fit
-    final scaleFactor =
-        totalHeight > plotArea.height ? plotArea.height / totalHeight : 1.0;
+    final scaleFactor = totalHeight > plotArea.height
+        ? plotArea.height / totalHeight
+        : 1.0;
     final adjustedBarHeight = barHeight * scaleFactor;
     final adjustedSpacing = barSpacing * scaleFactor;
 
-    final barY = plotArea.top +
+    final barY =
+        plotArea.top +
         (index * (adjustedBarHeight + adjustedSpacing)) +
         adjustedSpacing;
 
@@ -2981,7 +3033,8 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Determine fill color from geometry or theme palette
     // Priority: explicit fillColor > theme palette by index (always use theme for responsiveness)
-    final fillColor = geometry.fillColor ??
+    final fillColor =
+        geometry.fillColor ??
         theme.colorPalette[index % theme.colorPalette.length];
 
     if (geometry.fillGradient != null) {
@@ -3072,15 +3125,17 @@ class AnimatedChartPainter extends CustomPainter {
     final totalWidth = data.length * (barWidth + barSpacing);
 
     // Scale down bars if they don't fit, but maintain minimum spacing
-    final scaleFactor =
-        totalWidth > plotArea.width ? plotArea.width / totalWidth : 1.0;
+    final scaleFactor = totalWidth > plotArea.width
+        ? plotArea.width / totalWidth
+        : 1.0;
     final adjustedBarWidth = barWidth * scaleFactor;
     final adjustedSpacing = math.max(
       barSpacing * scaleFactor,
       minSpacing * 0.5,
     );
 
-    final barX = plotArea.left +
+    final barX =
+        plotArea.left +
         (index * (adjustedBarWidth + adjustedSpacing)) +
         adjustedSpacing;
 
@@ -3110,7 +3165,8 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Determine fill color from geometry or theme palette
     // Priority: explicit fillColor > theme palette by index (always use theme for responsiveness)
-    final fillColor = geometry.fillColor ??
+    final fillColor =
+        geometry.fillColor ??
         theme.colorPalette[index % theme.colorPalette.length];
 
     if (geometry.fillGradient != null) {
@@ -3226,7 +3282,8 @@ class AnimatedChartPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
 
     // Priority: explicit fillColor > theme palette by index (always use theme for responsiveness)
-    Color fillColor = geometry.fillColor ??
+    Color fillColor =
+        geometry.fillColor ??
         theme.colorPalette[index % theme.colorPalette.length];
     progressPaint.color = fillColor;
 
@@ -3291,9 +3348,11 @@ class AnimatedChartPainter extends CustomPainter {
     );
 
     // Draw stripes at 45-degree angle
-    for (double x = rect.left - rect.height;
-        x < rect.right + rect.height;
-        x += stripeSpacing) {
+    for (
+      double x = rect.left - rect.height;
+      x < rect.right + rect.height;
+      x += stripeSpacing
+    ) {
       final path = Path()
         ..moveTo(x, rect.top)
         ..lineTo(x + stripeWidth, rect.top)
@@ -3572,10 +3631,12 @@ class AnimatedChartPainter extends CustomPainter {
 
         final adjustedBarHeight = barHeight * scaleFactor;
         final adjustedGroupSpacing = groupSpacing * scaleFactor;
-        final adjustedTotalHeight = (adjustedBarHeight * groupCount) +
+        final adjustedTotalHeight =
+            (adjustedBarHeight * groupCount) +
             (adjustedGroupSpacing * (groupCount - 1));
 
-        final groupY = plotArea.top +
+        final groupY =
+            plotArea.top +
             (index * (adjustedTotalHeight + (minGroupSpacing * scaleFactor))) +
             (minGroupSpacing * scaleFactor * 0.5) +
             (groupIndex * (adjustedBarHeight + adjustedGroupSpacing));
@@ -3599,10 +3660,12 @@ class AnimatedChartPainter extends CustomPainter {
 
         final adjustedBarWidth = barWidth * scaleFactor;
         final adjustedGroupSpacing = groupSpacing * scaleFactor;
-        final adjustedTotalWidth = (adjustedBarWidth * groupCount) +
+        final adjustedTotalWidth =
+            (adjustedBarWidth * groupCount) +
             (adjustedGroupSpacing * (groupCount - 1));
 
-        final groupX = plotArea.left +
+        final groupX =
+            plotArea.left +
             (index * (adjustedTotalWidth + (minGroupSpacing * scaleFactor))) +
             (minGroupSpacing * scaleFactor * 0.5) +
             (groupIndex * (adjustedBarWidth + adjustedGroupSpacing));
@@ -3687,10 +3750,12 @@ class AnimatedChartPainter extends CustomPainter {
 
           final adjustedBarHeight = barHeight * scaleFactor;
           final adjustedGroupSpacing = groupSpacing * scaleFactor;
-          final adjustedTotalHeight = (adjustedBarHeight * groupCount) +
+          final adjustedTotalHeight =
+              (adjustedBarHeight * groupCount) +
               (adjustedGroupSpacing * (groupCount - 1));
 
-          final groupY = plotArea.top +
+          final groupY =
+              plotArea.top +
               (index *
                   (adjustedTotalHeight + (minGroupSpacing * scaleFactor))) +
               (minGroupSpacing * scaleFactor * 0.5);
@@ -3718,10 +3783,12 @@ class AnimatedChartPainter extends CustomPainter {
 
           final adjustedBarWidth = barWidth * scaleFactor;
           final adjustedGroupSpacing = groupSpacing * scaleFactor;
-          final adjustedTotalWidth = (adjustedBarWidth * groupCount) +
+          final adjustedTotalWidth =
+              (adjustedBarWidth * groupCount) +
               (adjustedGroupSpacing * (groupCount - 1));
 
-          final groupX = plotArea.left +
+          final groupX =
+              plotArea.left +
               (index * (adjustedTotalWidth + (minGroupSpacing * scaleFactor))) +
               (minGroupSpacing * scaleFactor * 0.5);
 
@@ -3752,7 +3819,8 @@ class AnimatedChartPainter extends CustomPainter {
     String? labelColumn,
     int index,
   ) {
-    final radius = geometry.gaugeRadius ??
+    final radius =
+        geometry.gaugeRadius ??
         (math.min(plotArea.width, plotArea.height) * 0.3);
     final centerSpacing = radius * 2.5;
     final cols = math.max(1, (plotArea.width / centerSpacing).floor());
@@ -3808,7 +3876,8 @@ class AnimatedChartPainter extends CustomPainter {
     // Draw progress arc
     final progressSweep = sweepAngle * normalizedValue * animationProgress;
     final progressPaint = Paint()
-      ..color = geometry.fillColor ??
+      ..color =
+          geometry.fillColor ??
           theme.colorPalette[index % theme.colorPalette.length]
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth
@@ -3874,9 +3943,11 @@ class AnimatedChartPainter extends CustomPainter {
     int index,
   ) {
     final baseRadius = geometry.thickness;
-    final radii = geometry.concentricRadii ??
+    final radii =
+        geometry.concentricRadii ??
         [baseRadius, baseRadius * 1.5, baseRadius * 2.0];
-    final thicknesses = geometry.concentricThicknesses ??
+    final thicknesses =
+        geometry.concentricThicknesses ??
         [baseRadius * 0.2, baseRadius * 0.2, baseRadius * 0.2];
 
     final centerSpacing = (radii.last + thicknesses.last) * 2.5;

@@ -254,8 +254,8 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
       builder: (context, constraints) {
         final spacing =
             constraints.maxHeight.isFinite && constraints.maxHeight < 520
-                ? 10.0
-                : 16.0;
+            ? 10.0
+            : 16.0;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -299,53 +299,50 @@ class _ZoomExampleWidgetState extends State<_ZoomExampleWidget> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child:
-            CristalyseChart()
-                .data(_data)
-                .mapping(x: 'day', y: 'revenue', color: 'region')
-                .geomLine(strokeWidth: 1.5 + widget.sliderValue * 3, alpha: 0.9)
-                .geomPoint(size: 2.0 + widget.sliderValue * 3, alpha: 0.6)
-                .scaleXContinuous()
-                .scaleYContinuous()
-                .legend(
-                  position: LegendPosition.bottom,
-                  orientation: LegendOrientation.horizontal,
-                )
-                .interaction(
-                  tooltip: TooltipConfig(
-                    builder: DefaultTooltips.multi({
-                      'day': 'Day',
-                      'region': 'Region',
-                      'revenue': 'Revenue',
-                    }),
-                  ),
-                  hover: HoverConfig(hitTestRadius: 18),
-                  zoom: ZoomConfig(
-                    enabled: true,
-                    axes: _axis,
-                    maxScale: 16,
-                    minScale: 1,
-                    wheelSensitivity: _wheelSensitivity,
-                    buttonStep: _buttonStep,
-                    showButtons: _showButtons,
-                    buttonPadding: const EdgeInsets.all(20),
-                    buttonAlignment: Alignment.bottomRight,
-                    onZoomStart: _handleZoomEvent,
-                    onZoomUpdate: _handleZoomEvent,
-                    onZoomEnd: _handleZoomEvent,
-                  ),
-                  pan: PanConfig(
-                    enabled: true,
-                    updateXDomain:
-                        _axis == ZoomAxis.x || _axis == ZoomAxis.both,
-                    updateYDomain:
-                        _axis == ZoomAxis.y || _axis == ZoomAxis.both,
-                    throttle: const Duration(milliseconds: 32),
-                  ),
-                )
-                .theme(widget.theme)
-                .animate(duration: const Duration(milliseconds: 450))
-                .build(),
+        child: CristalyseChart()
+            .data(_data)
+            .mapping(x: 'day', y: 'revenue', color: 'region')
+            .geomLine(strokeWidth: 1.5 + widget.sliderValue * 3, alpha: 0.9)
+            .geomPoint(size: 2.0 + widget.sliderValue * 3, alpha: 0.6)
+            .scaleXContinuous()
+            .scaleYContinuous()
+            .legend(
+              position: LegendPosition.bottom,
+              orientation: LegendOrientation.horizontal,
+            )
+            .interaction(
+              tooltip: TooltipConfig(
+                builder: DefaultTooltips.multi({
+                  'day': 'Day',
+                  'region': 'Region',
+                  'revenue': 'Revenue',
+                }),
+              ),
+              hover: HoverConfig(hitTestRadius: 18),
+              zoom: ZoomConfig(
+                enabled: true,
+                axes: _axis,
+                maxScale: 16,
+                minScale: 1,
+                wheelSensitivity: _wheelSensitivity,
+                buttonStep: _buttonStep,
+                showButtons: _showButtons,
+                buttonPadding: const EdgeInsets.all(20),
+                buttonAlignment: Alignment.bottomRight,
+                onZoomStart: _handleZoomEvent,
+                onZoomUpdate: _handleZoomEvent,
+                onZoomEnd: _handleZoomEvent,
+              ),
+              pan: PanConfig(
+                enabled: true,
+                updateXDomain: _axis == ZoomAxis.x || _axis == ZoomAxis.both,
+                updateYDomain: _axis == ZoomAxis.y || _axis == ZoomAxis.both,
+                throttle: const Duration(milliseconds: 32),
+              ),
+            )
+            .theme(widget.theme)
+            .animate(duration: const Duration(milliseconds: 450))
+            .build(),
       ),
     );
   }

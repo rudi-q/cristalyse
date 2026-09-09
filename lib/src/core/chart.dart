@@ -412,8 +412,9 @@ class CristalyseChart {
   }) {
     // Validate and normalize size parameters
     double normalizedMinSize = (minSize != null && minSize > 0) ? minSize : 5.0;
-    double normalizedMaxSize =
-        (maxSize != null && maxSize > 0) ? maxSize : 30.0;
+    double normalizedMaxSize = (maxSize != null && maxSize > 0)
+        ? maxSize
+        : 30.0;
 
     // Ensure minSize <= maxSize; if not, swap or set equal
     if (normalizedMinSize > normalizedMaxSize) {

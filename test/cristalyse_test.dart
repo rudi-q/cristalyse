@@ -78,8 +78,10 @@ void main() {
       });
 
       test('should handle empty data', () {
-        final chart =
-            CristalyseChart().data([]).mapping(x: 'x', y: 'y').geomPoint();
+        final chart = CristalyseChart()
+            .data([])
+            .mapping(x: 'x', y: 'y')
+            .geomPoint();
 
         expect(chart, isNotNull);
         final widget = chart.build();
@@ -269,24 +271,25 @@ void main() {
       });
 
       test('should handle different animation curves', () {
-        final charts = [
-          Curves.easeInOut,
-          Curves.bounceOut,
-          Curves.elasticOut,
-          Curves.easeOutBack,
-        ]
-            .map(
-              (curve) => CristalyseChart()
-                  .data(sampleData)
-                  .mapping(x: 'x', y: 'y')
-                  .geomLine()
-                  .animate(
-                    duration: const Duration(milliseconds: 500),
-                    curve: curve,
-                  )
-                  .build(),
-            )
-            .toList();
+        final charts =
+            [
+                  Curves.easeInOut,
+                  Curves.bounceOut,
+                  Curves.elasticOut,
+                  Curves.easeOutBack,
+                ]
+                .map(
+                  (curve) => CristalyseChart()
+                      .data(sampleData)
+                      .mapping(x: 'x', y: 'y')
+                      .geomLine()
+                      .animate(
+                        duration: const Duration(milliseconds: 500),
+                        curve: curve,
+                      )
+                      .build(),
+                )
+                .toList();
 
         expect(charts.length, equals(4));
         for (final chart in charts) {

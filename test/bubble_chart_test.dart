@@ -100,8 +100,9 @@ void main() {
       ];
 
       // Extract market share values
-      final marketShares =
-          marketData.map((d) => d['marketShare'] as double).toList();
+      final marketShares = marketData
+          .map((d) => d['marketShare'] as double)
+          .toList();
       final minShare = marketShares.reduce((a, b) => a < b ? a : b);
       final maxShare = marketShares.reduce((a, b) => a > b ? a : b);
 
@@ -230,8 +231,9 @@ void main() {
       ];
 
       // Get market share range
-      final shares =
-          exampleData.map((d) => d['marketShare'] as double).toList();
+      final shares = exampleData
+          .map((d) => d['marketShare'] as double)
+          .toList();
       final minShare = shares.reduce((a, b) => a < b ? a : b);
       final maxShare = shares.reduce((a, b) => a > b ? a : b);
 

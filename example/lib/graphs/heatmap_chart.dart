@@ -155,32 +155,31 @@ class HeatMapExample extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child:
-                CristalyseChart()
-                    .data(heatMapData)
-                    .mappingHeatMap(x: 'day', y: 'hour', value: 'activity')
-                    .geomHeatMap(
-                      cellSpacing: 1,
-                      cellBorderRadius: BorderRadius.circular(3),
-                      showValues: true,
-                      valueFormatter: (value) => '${value.toStringAsFixed(0)}%',
-                      valueTextStyle: const TextStyle(
-                        fontSize: 8,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      // Ensure min/max values cover the full range of your data (0-100 for percentages)
-                      minValue: 0,
-                      maxValue: 100,
-                      colorGradient: heatMapColors,
-                      interpolateColors: true,
-                      nullValueColor: Colors.grey.shade200,
-                    )
-                    .theme(theme)
-                    .animate(
-                      duration: const Duration(milliseconds: 800),
-                      curve: Curves.easeOutCubic,
-                    )
-                    .build(),
+            child: CristalyseChart()
+                .data(heatMapData)
+                .mappingHeatMap(x: 'day', y: 'hour', value: 'activity')
+                .geomHeatMap(
+                  cellSpacing: 1,
+                  cellBorderRadius: BorderRadius.circular(3),
+                  showValues: true,
+                  valueFormatter: (value) => '${value.toStringAsFixed(0)}%',
+                  valueTextStyle: const TextStyle(
+                    fontSize: 8,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  // Ensure min/max values cover the full range of your data (0-100 for percentages)
+                  minValue: 0,
+                  maxValue: 100,
+                  colorGradient: heatMapColors,
+                  interpolateColors: true,
+                  nullValueColor: Colors.grey.shade200,
+                )
+                .theme(theme)
+                .animate(
+                  duration: const Duration(milliseconds: 800),
+                  curve: Curves.easeOutCubic,
+                )
+                .build(),
           ),
         ),
       ],
@@ -267,27 +266,26 @@ class ContributionHeatMap extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child:
-                CristalyseChart()
-                    .data(contributionData)
-                    .mappingHeatMap(x: 'week', y: 'day', value: 'contributions')
-                    .geomHeatMap(
-                      cellSpacing: 3,
-                      cellBorderRadius: BorderRadius.circular(2),
-                      showValues: false, // Don't show values for cleaner look
-                      minValue: 0,
-                      maxValue: 10,
-                      colorGradient: contributionColors,
-                      interpolateColors: false, // Use discrete colors
-                      nullValueColor: const Color(0xFFEBEDF0),
-                      cellAspectRatio: 1.0, // Square cells
-                    )
-                    .theme(theme)
-                    .animate(
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeOutBack,
-                    )
-                    .build(),
+            child: CristalyseChart()
+                .data(contributionData)
+                .mappingHeatMap(x: 'week', y: 'day', value: 'contributions')
+                .geomHeatMap(
+                  cellSpacing: 3,
+                  cellBorderRadius: BorderRadius.circular(2),
+                  showValues: false, // Don't show values for cleaner look
+                  minValue: 0,
+                  maxValue: 10,
+                  colorGradient: contributionColors,
+                  interpolateColors: false, // Use discrete colors
+                  nullValueColor: const Color(0xFFEBEDF0),
+                  cellAspectRatio: 1.0, // Square cells
+                )
+                .theme(theme)
+                .animate(
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutBack,
+                )
+                .build(),
           ),
         ),
         // Legend

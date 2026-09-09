@@ -35,27 +35,26 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
         const SizedBox(height: 8),
         SizedBox(
           height: 300,
-          child:
-              CristalyseChart()
-                  .data(_generateProgressData())
-                  .mappingProgress(
-                    value: 'completion',
-                    label: 'task',
-                    category: 'department',
-                  )
-                  .geomProgress(
-                    orientation: ProgressOrientation.horizontal,
-                    style: ProgressStyle.striped,
-                    thickness: 25.0,
-                    cornerRadius: 8.0,
-                    showLabel: true,
-                  )
-                  .theme(currentTheme)
-                  .animate(
-                    duration: const Duration(milliseconds: 1200),
-                    curve: Curves.easeOutCubic,
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(_generateProgressData())
+              .mappingProgress(
+                value: 'completion',
+                label: 'task',
+                category: 'department',
+              )
+              .geomProgress(
+                orientation: ProgressOrientation.horizontal,
+                style: ProgressStyle.striped,
+                thickness: 25.0,
+                cornerRadius: 8.0,
+                showLabel: true,
+              )
+              .theme(currentTheme)
+              .animate(
+                duration: const Duration(milliseconds: 1200),
+                curve: Curves.easeOutCubic,
+              )
+              .build(),
         ),
         const SizedBox(height: 24),
 
@@ -71,27 +70,26 @@ Widget buildStripedProgressExample(ChartTheme currentTheme) {
         const SizedBox(height: 8),
         SizedBox(
           height: 300,
-          child:
-              CristalyseChart()
-                  .data(_generateProgressData())
-                  .mappingProgress(
-                    value: 'completion',
-                    label: 'task',
-                    category: 'department',
-                  )
-                  .geomProgress(
-                    orientation: ProgressOrientation.vertical,
-                    style: ProgressStyle.striped,
-                    thickness: 30.0,
-                    cornerRadius: 6.0,
-                    showLabel: true,
-                  )
-                  .theme(currentTheme)
-                  .animate(
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.easeOutCubic,
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(_generateProgressData())
+              .mappingProgress(
+                value: 'completion',
+                label: 'task',
+                category: 'department',
+              )
+              .geomProgress(
+                orientation: ProgressOrientation.vertical,
+                style: ProgressStyle.striped,
+                thickness: 30.0,
+                cornerRadius: 6.0,
+                showLabel: true,
+              )
+              .theme(currentTheme)
+              .animate(
+                duration: const Duration(milliseconds: 1000),
+                curve: Curves.easeOutCubic,
+              )
+              .build(),
         ),
         const SizedBox(height: 16),
 

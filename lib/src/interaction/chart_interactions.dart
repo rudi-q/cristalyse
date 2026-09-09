@@ -46,12 +46,12 @@ class TooltipConfig {
   });
 
   static TooltipConfig get defaultConfig => const TooltipConfig(
-        shadow: BoxShadow(
-          color: Color(0x44000000),
-          blurRadius: 8.0,
-          offset: Offset(0, 2),
-        ),
-      );
+    shadow: BoxShadow(
+      color: Color(0x44000000),
+      blurRadius: 8.0,
+      offset: Offset(0, 2),
+    ),
+  );
 }
 
 /// Configuration for hover interactions
@@ -344,15 +344,15 @@ class ZoomConfig {
     this.onZoomStart,
     this.onZoomUpdate,
     this.onZoomEnd,
-  })  : assert(
-          maxScale >= minScale && maxScale > 0 && minScale > 0,
-          'Zoom scales must be positive and max >= min',
-        ),
-        assert(
-          wheelSensitivity >= 0.0005 && wheelSensitivity <= 0.0035,
-          'wheelSensitivity must be between 0.0005 and 0.0035 (inclusive); '
-          'received $wheelSensitivity',
-        );
+  }) : assert(
+         maxScale >= minScale && maxScale > 0 && minScale > 0,
+         'Zoom scales must be positive and max >= min',
+       ),
+       assert(
+         wheelSensitivity >= 0.0005 && wheelSensitivity <= 0.0035,
+         'wheelSensitivity must be between 0.0005 and 0.0035 (inclusive); '
+         'received $wheelSensitivity',
+       );
 }
 
 /// Information emitted during zoom interactions

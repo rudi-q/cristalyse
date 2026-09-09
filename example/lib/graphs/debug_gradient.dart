@@ -20,13 +20,12 @@ class DebugGradientExample extends StatelessWidget {
       'Q4': const LinearGradient(colors: [Colors.cyan, Colors.pink]),
     };
 
-    final builtWidget =
-        CristalyseChart()
-            .data(data)
-            .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
-            .geomBar()
-            .customPalette(categoryGradients: quarterlyGradients)
-            .build();
+    final builtWidget = CristalyseChart()
+        .data(data)
+        .mapping(x: 'quarter', y: 'revenue', color: 'quarter')
+        .geomBar()
+        .customPalette(categoryGradients: quarterlyGradients)
+        .build();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Debug Gradient')),

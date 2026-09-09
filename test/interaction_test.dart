@@ -46,14 +46,15 @@ void main() {
                 .mapping(x: 'x', y: 'y', color: 'category')
                 .geomPoint(size: 8.0)
                 .interaction(
-              tooltip: TooltipConfig(
-                builder: (point) {
-                  tooltipShown = true;
-                  hoveredPoint = point;
-                  return Text('Value: ${point.getDisplayValue('y')}');
-                },
-              ),
-            ).build(),
+                  tooltip: TooltipConfig(
+                    builder: (point) {
+                      tooltipShown = true;
+                      hoveredPoint = point;
+                      return Text('Value: ${point.getDisplayValue('y')}');
+                    },
+                  ),
+                )
+                .build(),
           ),
         );
 
@@ -96,12 +97,13 @@ void main() {
                 .mapping(x: 'x', y: 'y')
                 .geomPoint(size: 10.0)
                 .interaction(
-              click: ClickConfig(
-                onTap: (point) {
-                  clickedPoint = point;
-                },
-              ),
-            ).build(),
+                  click: ClickConfig(
+                    onTap: (point) {
+                      clickedPoint = point;
+                    },
+                  ),
+                )
+                .build(),
           ),
         );
 
@@ -399,9 +401,7 @@ void main() {
                     builder: (point) => Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'Product ${point.getDisplayValue('product')}',
-                        ),
+                        Text('Product ${point.getDisplayValue('product')}'),
                         Text(
                           '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
                         ),
@@ -563,9 +563,8 @@ void main() {
                     ),
                   ),
                   click: ClickConfig(
-                    onTap: (point) => debugPrint(
-                      'Combined chart clicked: ${point.data}',
-                    ),
+                    onTap: (point) =>
+                        debugPrint('Combined chart clicked: ${point.data}'),
                   ),
                 )
                 .scaleXContinuous()

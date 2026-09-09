@@ -75,56 +75,70 @@ void main() {
     });
 
     test('should handle progress mapping correctly', () {
-      final chart = CristalyseChart().data([
-        {'value': 80.0, 'name': 'Progress 1'},
-        {'value': 60.0, 'name': 'Progress 2'},
-      ]).mappingProgress(value: 'value', label: 'name');
+      final chart = CristalyseChart()
+          .data([
+            {'value': 80.0, 'name': 'Progress 1'},
+            {'value': 60.0, 'name': 'Progress 2'},
+          ])
+          .mappingProgress(value: 'value', label: 'name');
 
       expect(chart, isA<CristalyseChart>());
     });
 
     test('should create progress chart with different orientations', () {
       // Horizontal
-      final horizontalChart = CristalyseChart().data([
-        {'completion': 50.0},
-      ]).geomProgress(orientation: ProgressOrientation.horizontal);
+      final horizontalChart = CristalyseChart()
+          .data([
+            {'completion': 50.0},
+          ])
+          .geomProgress(orientation: ProgressOrientation.horizontal);
 
       expect(horizontalChart, isA<CristalyseChart>());
 
       // Vertical
-      final verticalChart = CristalyseChart().data([
-        {'completion': 75.0},
-      ]).geomProgress(orientation: ProgressOrientation.vertical);
+      final verticalChart = CristalyseChart()
+          .data([
+            {'completion': 75.0},
+          ])
+          .geomProgress(orientation: ProgressOrientation.vertical);
 
       expect(verticalChart, isA<CristalyseChart>());
 
       // Circular
-      final circularChart = CristalyseChart().data([
-        {'completion': 90.0},
-      ]).geomProgress(orientation: ProgressOrientation.circular);
+      final circularChart = CristalyseChart()
+          .data([
+            {'completion': 90.0},
+          ])
+          .geomProgress(orientation: ProgressOrientation.circular);
 
       expect(circularChart, isA<CristalyseChart>());
     });
 
     test('should create progress chart with different styles', () {
       // Filled
-      final filledChart = CristalyseChart().data([
-        {'completion': 50.0},
-      ]).geomProgress(style: ProgressStyle.filled);
+      final filledChart = CristalyseChart()
+          .data([
+            {'completion': 50.0},
+          ])
+          .geomProgress(style: ProgressStyle.filled);
 
       expect(filledChart, isA<CristalyseChart>());
 
       // Gradient
-      final gradientChart = CristalyseChart().data([
-        {'completion': 75.0},
-      ]).geomProgress(style: ProgressStyle.gradient);
+      final gradientChart = CristalyseChart()
+          .data([
+            {'completion': 75.0},
+          ])
+          .geomProgress(style: ProgressStyle.gradient);
 
       expect(gradientChart, isA<CristalyseChart>());
 
       // Striped
-      final stripedChart = CristalyseChart().data([
-        {'completion': 90.0},
-      ]).geomProgress(style: ProgressStyle.striped);
+      final stripedChart = CristalyseChart()
+          .data([
+            {'completion': 90.0},
+          ])
+          .geomProgress(style: ProgressStyle.striped);
 
       expect(stripedChart, isA<CristalyseChart>());
     });
@@ -236,11 +250,12 @@ void main() {
     testWidgets('should handle empty data gracefully', (
       WidgetTester tester,
     ) async {
-      final chart = CristalyseChart().data([]) // Empty data
+      final chart = CristalyseChart()
+          .data([]) // Empty data
           .geomProgress(
-        orientation: ProgressOrientation.horizontal,
-        thickness: 20.0,
-      );
+            orientation: ProgressOrientation.horizontal,
+            thickness: 20.0,
+          );
 
       await tester.pumpWidget(
         MaterialApp(
@@ -258,15 +273,17 @@ void main() {
     testWidgets('should handle different data types in progress values', (
       WidgetTester tester,
     ) async {
-      final chart = CristalyseChart().data([
-        {'progress': 50}, // int
-        {'progress': 75.5}, // double
-        {'progress': '80'}, // string (should be parsed)
-      ]).geomProgress(
-        orientation: ProgressOrientation.vertical,
-        minValue: 0.0,
-        maxValue: 100.0,
-      );
+      final chart = CristalyseChart()
+          .data([
+            {'progress': 50}, // int
+            {'progress': 75.5}, // double
+            {'progress': '80'}, // string (should be parsed)
+          ])
+          .geomProgress(
+            orientation: ProgressOrientation.vertical,
+            minValue: 0.0,
+            maxValue: 100.0,
+          );
 
       await tester.pumpWidget(
         MaterialApp(

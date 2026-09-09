@@ -24,36 +24,37 @@ void main() {
         {'name': 'DataFlow Systems', 'category': 'SMB', 'growth': 25},
       ];
 
-      final bubbleData = companies.map((company) {
-        final isEnterprise = company['category'] == 'Enterprise';
-        final isSMB = company['category'] == 'SMB';
-        final growth = (company['growth'] as int).toDouble();
+      final bubbleData =
+          companies.map((company) {
+            final isEnterprise = company['category'] == 'Enterprise';
+            final isSMB = company['category'] == 'SMB';
+            final growth = (company['growth'] as int).toDouble();
 
-        final baseRevenue = isEnterprise ? 250.0 : (isSMB ? 150.0 : 50.0);
-        final baseCustomers = isEnterprise ? 180.0 : (isSMB ? 120.0 : 60.0);
-        final baseMarketShare = isEnterprise ? 18.0 : (isSMB ? 10.0 : 5.0);
+            final baseRevenue = isEnterprise ? 250.0 : (isSMB ? 150.0 : 50.0);
+            final baseCustomers = isEnterprise ? 180.0 : (isSMB ? 120.0 : 60.0);
+            final baseMarketShare = isEnterprise ? 18.0 : (isSMB ? 10.0 : 5.0);
 
-        final variance = random.nextDouble() * 0.8 + 0.6;
+            final variance = random.nextDouble() * 0.8 + 0.6;
 
-        return {
-          'name': company['name'],
-          'category': company['category'],
-          'revenue': (baseRevenue * variance).roundToDouble(),
-          'customers': (baseCustomers * variance).roundToDouble(),
-          'marketShare':
-              (baseMarketShare * variance * (1 + growth / 100)).roundToDouble(),
-          'growth': growth,
-        };
-      }).toList()
-        ..sort(
-          (a, b) => (b['marketShare'] as double).compareTo(
-            a['marketShare'] as double,
-          ),
-        );
+            return {
+              'name': company['name'],
+              'category': company['category'],
+              'revenue': (baseRevenue * variance).roundToDouble(),
+              'customers': (baseCustomers * variance).roundToDouble(),
+              'marketShare': (baseMarketShare * variance * (1 + growth / 100))
+                  .roundToDouble(),
+              'growth': growth,
+            };
+          }).toList()..sort(
+            (a, b) => (b['marketShare'] as double).compareTo(
+              a['marketShare'] as double,
+            ),
+          );
 
       // Extract market share values
-      final marketShares =
-          bubbleData.map((d) => d['marketShare'] as double).toList();
+      final marketShares = bubbleData
+          .map((d) => d['marketShare'] as double)
+          .toList();
 
       final minMarketShare = marketShares.reduce(math.min);
       final maxMarketShare = marketShares.reduce(math.max);
@@ -128,7 +129,8 @@ void main() {
         // But relative proportions should be maintained
         final proportionAtMin =
             (sizeAtMin - minBubbleSize) / (maxBubbleSize - minBubbleSize);
-        final proportionAtMax = (sizeAtMax - minBubbleSizeMax) /
+        final proportionAtMax =
+            (sizeAtMax - minBubbleSizeMax) /
             (maxBubbleSizeMax - minBubbleSizeMax);
 
         expect(

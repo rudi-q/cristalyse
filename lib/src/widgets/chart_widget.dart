@@ -270,11 +270,13 @@ class _ChartPainter extends CustomPainter {
       final screenY = plotArea.top + yScale.scale(y);
 
       // Determine point properties
-      final pointColor = geometry.color ??
+      final pointColor =
+          geometry.color ??
           (colorColumn != null
               ? colorScale.scale(point[colorColumn])
               : theme.primaryColor);
-      final pointSize = geometry.size ??
+      final pointSize =
+          geometry.size ??
           (sizeColumn != null
               ? sizeScale.scale(_getNumericValue(point[sizeColumn]) ?? 0)
               : theme.pointSizeDefault);

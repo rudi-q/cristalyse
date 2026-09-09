@@ -269,59 +269,54 @@ class _PanExampleWidgetState extends State<_PanExampleWidget> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
-              child:
-                  CristalyseChart()
-                      .data(currentData)
-                      .mapping(x: 'x', y: 'y', color: 'category')
-                      .geomLine(
-                        strokeWidth: 1.0 + widget.sliderValue * 4.0,
-                        alpha: 0.8,
-                      )
-                      .geomPoint(
-                        size: 2.0 + widget.sliderValue * 4.0,
-                        alpha: 0.7,
-                      )
-                      .scaleXContinuous(min: visibleMinX, max: visibleMaxX)
-                      .scaleYContinuous()
-                      .interaction(
-                        pan: PanConfig(
-                          enabled: true,
-                          updateXDomain: true, // Enable X-axis panning
-                          updateYDomain:
-                              false, // Disable Y-axis panning for this example
-                          onPanStart: _handlePanStart,
-                          onPanUpdate: _handlePanUpdate,
-                          onPanEnd: _handlePanEnd,
-                          throttle: const Duration(milliseconds: 50),
-                          controller: panController,
-                          boundaryClampingX: boundaryClamping,
-                          boundaryClampingY: boundaryClamping,
+              child: CristalyseChart()
+                  .data(currentData)
+                  .mapping(x: 'x', y: 'y', color: 'category')
+                  .geomLine(
+                    strokeWidth: 1.0 + widget.sliderValue * 4.0,
+                    alpha: 0.8,
+                  )
+                  .geomPoint(size: 2.0 + widget.sliderValue * 4.0, alpha: 0.7)
+                  .scaleXContinuous(min: visibleMinX, max: visibleMaxX)
+                  .scaleYContinuous()
+                  .interaction(
+                    pan: PanConfig(
+                      enabled: true,
+                      updateXDomain: true, // Enable X-axis panning
+                      updateYDomain:
+                          false, // Disable Y-axis panning for this example
+                      onPanStart: _handlePanStart,
+                      onPanUpdate: _handlePanUpdate,
+                      onPanEnd: _handlePanEnd,
+                      throttle: const Duration(milliseconds: 50),
+                      controller: panController,
+                      boundaryClampingX: boundaryClamping,
+                      boundaryClampingY: boundaryClamping,
+                    ),
+                    tooltip: TooltipConfig(
+                      builder: (point) => Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.8),
+                          borderRadius: BorderRadius.circular(4),
                         ),
-                        tooltip: TooltipConfig(
-                          builder:
-                              (point) => Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.8),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: SelectableText(
-                                  '${point.getDisplayValue('x')}: ${point.getDisplayValue('y')} data',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
+                        child: SelectableText(
+                          '${point.getDisplayValue('x')}: ${point.getDisplayValue('y')} data',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
                         ),
-                      )
-                      .legend(
-                        position: LegendPosition.topRight,
-                        orientation: LegendOrientation.horizontal,
-                      )
-                      .theme(widget.theme)
-                      .animate(duration: const Duration(milliseconds: 0))
-                      .build(),
+                      ),
+                    ),
+                  )
+                  .legend(
+                    position: LegendPosition.topRight,
+                    orientation: LegendOrientation.horizontal,
+                  )
+                  .theme(widget.theme)
+                  .animate(duration: const Duration(milliseconds: 0))
+                  .build(),
             ),
           ),
         ),

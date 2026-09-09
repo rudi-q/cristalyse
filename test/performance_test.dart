@@ -15,7 +15,8 @@ void main() {
           1000,
           (i) => {
             'x': i.toDouble(),
-            'y': math.sin(i * 0.1) * 50 +
+            'y':
+                math.sin(i * 0.1) * 50 +
                 100 +
                 (math.Random().nextDouble() - 0.5) * 20,
             'category': 'Group${i % 5}',
@@ -166,9 +167,8 @@ void main() {
                   .geomPoint(size: 10.0)
                   .interaction(
                     tooltip: TooltipConfig(
-                      builder: (point) => Text(
-                        'Memory test: ${point.getDisplayValue('y')}',
-                      ),
+                      builder: (point) =>
+                          Text('Memory test: ${point.getDisplayValue('y')}'),
                       showDelay: Duration(milliseconds: 10),
                       hideDelay: Duration(milliseconds: 50),
                     ),
@@ -341,12 +341,8 @@ void main() {
                       children: [
                         Text('X: ${point.getDisplayValue('x')}'),
                         Text('Y: ${point.getDisplayValue('y')}'),
-                        Text(
-                          'Category: ${point.getDisplayValue('category')}',
-                        ),
-                        Text(
-                          'Active: ${point.getDisplayValue('active')}',
-                        ),
+                        Text('Category: ${point.getDisplayValue('category')}'),
+                        Text('Active: ${point.getDisplayValue('active')}'),
                       ],
                     ),
                   ),
@@ -429,9 +425,8 @@ void main() {
                 .geomPoint(size: 8.0)
                 .interaction(
                   tooltip: TooltipConfig(
-                    builder: (point) => Text(
-                      'During animation: ${point.getDisplayValue('y')}',
-                    ),
+                    builder: (point) =>
+                        Text('During animation: ${point.getDisplayValue('y')}'),
                   ),
                 )
                 .animate(
@@ -492,9 +487,8 @@ void main() {
                   .geomPoint()
                   .interaction(
                     tooltip: TooltipConfig(
-                      builder: (point) => Text(
-                        'Size test: ${point.getDisplayValue('y')}',
-                      ),
+                      builder: (point) =>
+                          Text('Size test: ${point.getDisplayValue('y')}'),
                     ),
                   )
                   .build(),
@@ -533,9 +527,8 @@ void main() {
                   .geomPoint()
                   .interaction(
                     tooltip: TooltipConfig(
-                      builder: (point) => Text(
-                        'Density test: ${point.getDisplayValue('y')}',
-                      ),
+                      builder: (point) =>
+                          Text('Density test: ${point.getDisplayValue('y')}'),
                     ),
                   )
                   .build(),
@@ -583,9 +576,8 @@ void main() {
                     .geomPoint()
                     .interaction(
                       tooltip: TooltipConfig(
-                        builder: (point) => Text(
-                          'Theme test: ${point.getDisplayValue('y')}',
-                        ),
+                        builder: (point) =>
+                            Text('Theme test: ${point.getDisplayValue('y')}'),
                       ),
                     )
                     .theme(themes[currentThemeIndex])
@@ -628,9 +620,8 @@ void main() {
                   .geomPoint()
                   .interaction(
                     tooltip: TooltipConfig(
-                      builder: (point) => Text(
-                        'Conflict test: ${point.getDisplayValue('y')}',
-                      ),
+                      builder: (point) =>
+                          Text('Conflict test: ${point.getDisplayValue('y')}'),
                     ),
                     click: ClickConfig(
                       onTap: (point) => debugPrint('Chart tapped'),

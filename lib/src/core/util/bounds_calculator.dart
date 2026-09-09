@@ -28,9 +28,7 @@ class Bounds {
   /// Creates bounds that indicate the `min, max` values are ignored.
   ///
   /// Used for chart types that don't use continuous X/Y axes (e.g., pie charts).
-  const Bounds.ignored()
-      : min = 0,
-        max = 0;
+  const Bounds.ignored() : min = 0, max = 0;
 }
 
 /// Utility class for calculating axis bounds based on data and geometry behavior.

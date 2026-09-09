@@ -211,14 +211,14 @@ class _AnimatedCristalyseChartWidgetState
     final panConfig = widget.interaction.pan;
     final needsXDomain =
         (panConfig?.enabled == true && panConfig!.updateXDomain != false) ||
-            (_isZoomEnabled &&
-                (_zoomConfig!.axes == ZoomAxis.x ||
-                    _zoomConfig!.axes == ZoomAxis.both));
+        (_isZoomEnabled &&
+            (_zoomConfig!.axes == ZoomAxis.x ||
+                _zoomConfig!.axes == ZoomAxis.both));
     final needsYDomain =
         (panConfig?.enabled == true && panConfig!.updateYDomain == true) ||
-            (_isZoomEnabled &&
-                (_zoomConfig!.axes == ZoomAxis.y ||
-                    _zoomConfig!.axes == ZoomAxis.both));
+        (_isZoomEnabled &&
+            (_zoomConfig!.axes == ZoomAxis.y ||
+                _zoomConfig!.axes == ZoomAxis.both));
 
     if (needsXDomain && _panXDomain == null) {
       final xScale = _setupXScale(plotArea.width, hasBarGeometry);
@@ -350,7 +350,8 @@ class _AnimatedCristalyseChartWidgetState
     Rect plotArea,
   ) {
     final panConfig = widget.interaction.pan;
-    final hasTooltips = widget.interaction.hover?.onHover != null ||
+    final hasTooltips =
+        widget.interaction.hover?.onHover != null ||
         widget.interaction.tooltip?.builder != null;
 
     if (!widget.interaction.enabled) {
@@ -552,10 +553,12 @@ class _AnimatedCristalyseChartWidgetState
       final currentXDomain = List<double>.from(_panXDomain ?? []);
       final currentYDomain = List<double>.from(_panYDomain ?? []);
       setState(() {
-        _panXDomain =
-            _originalXDomain != null ? List.from(_originalXDomain!) : null;
-        _panYDomain =
-            _originalYDomain != null ? List.from(_originalYDomain!) : null;
+        _panXDomain = _originalXDomain != null
+            ? List.from(_originalXDomain!)
+            : null;
+        _panYDomain = _originalYDomain != null
+            ? List.from(_originalYDomain!)
+            : null;
       });
       bool listEquals(List<double>? a, List<double>? b) {
         if (a == null) return b == null;
@@ -580,13 +583,15 @@ class _AnimatedCristalyseChartWidgetState
         );
       }
     } else {
-      final xChanged = panInfo.visibleMaxX != null &&
+      final xChanged =
+          panInfo.visibleMaxX != null &&
           panInfo.visibleMinX != null &&
           panInfo.visibleMaxX! > panInfo.visibleMinX!;
       if (xChanged) {
         _panXDomain = [panInfo.visibleMinX!, panInfo.visibleMaxX!];
       }
-      final yChanged = panInfo.visibleMaxY != null &&
+      final yChanged =
+          panInfo.visibleMaxY != null &&
           panInfo.visibleMinY != null &&
           panInfo.visibleMaxY! > panInfo.visibleMinY!;
       if (yChanged) {
@@ -664,10 +669,11 @@ class _AnimatedCristalyseChartWidgetState
       widget.geometries.any((g) => g is BarGeometry),
       YAxis.primary,
     );
-    final y2Scale = hasSecondaryYAxis(
-      y2Column: widget.y2Column,
-      geometries: widget.geometries,
-    )
+    final y2Scale =
+        hasSecondaryYAxis(
+          y2Column: widget.y2Column,
+          geometries: widget.geometries,
+        )
         ? _setupYScale(
             plotArea.height,
             widget.geometries.any((g) => g is BarGeometry),
@@ -956,8 +962,10 @@ class _AnimatedCristalyseChartWidgetState
     // to preserve color-to-category mapping when filtering
     ColorScale? preservedColorScale;
     if (widget.colorColumn != null && widget.legendConfig!.interactive) {
-      final originalValues =
-          widget.data.map((d) => d[widget.colorColumn]).toSet().toList();
+      final originalValues = widget.data
+          .map((d) => d[widget.colorColumn])
+          .toSet()
+          .toList();
 
       preservedColorScale = ColorScale(
         values: originalValues,
@@ -999,7 +1007,8 @@ class _AnimatedCristalyseChartWidgetState
               xScale: widget.xScale,
               yScale: widget.yScale,
               y2Scale: widget.y2Scale,
-              colorScale: preservedColorScale ??
+              colorScale:
+                  preservedColorScale ??
                   widget.colorScale, // Use preserved scale
               sizeScale: widget.sizeScale,
               theme: widget.theme,
@@ -1272,21 +1281,50 @@ class _AnimatedCristalyseChartWidgetState
   ) {
     switch (config.position) {
       case LegendPosition.top:
-        return Column(children: [legend, spacing, Flexible(child: chart)]);
+        return Column(
+          children: [
+            legend,
+            spacing,
+            Flexible(child: chart),
+          ],
+        );
 
       case LegendPosition.bottom:
-        return Column(children: [Flexible(child: chart), spacing, legend]);
+        return Column(
+          children: [
+            Flexible(child: chart),
+            spacing,
+            legend,
+          ],
+        );
 
       case LegendPosition.left:
-        return Row(children: [legend, spacing, Flexible(child: chart)]);
+        return Row(
+          children: [
+            legend,
+            spacing,
+            Flexible(child: chart),
+          ],
+        );
 
       case LegendPosition.right:
-        return Row(children: [Flexible(child: chart), spacing, legend]);
+        return Row(
+          children: [
+            Flexible(child: chart),
+            spacing,
+            legend,
+          ],
+        );
 
       case LegendPosition.topLeft:
         return Column(
           children: [
-            Row(children: [legend, Flexible(child: Container())]),
+            Row(
+              children: [
+                legend,
+                Flexible(child: Container()),
+              ],
+            ),
             spacing,
             Flexible(child: chart),
           ],
@@ -1295,7 +1333,12 @@ class _AnimatedCristalyseChartWidgetState
       case LegendPosition.topRight:
         return Column(
           children: [
-            Row(children: [Flexible(child: Container()), legend]),
+            Row(
+              children: [
+                Flexible(child: Container()),
+                legend,
+              ],
+            ),
             spacing,
             Flexible(child: chart),
           ],
@@ -1306,7 +1349,12 @@ class _AnimatedCristalyseChartWidgetState
           children: [
             Flexible(child: chart),
             spacing,
-            Row(children: [legend, Flexible(child: Container())]),
+            Row(
+              children: [
+                legend,
+                Flexible(child: Container()),
+              ],
+            ),
           ],
         );
 
@@ -1315,7 +1363,12 @@ class _AnimatedCristalyseChartWidgetState
           children: [
             Flexible(child: chart),
             spacing,
-            Row(children: [Flexible(child: Container()), legend]),
+            Row(
+              children: [
+                Flexible(child: Container()),
+                legend,
+              ],
+            ),
           ],
         );
 
@@ -1359,7 +1412,8 @@ class _AnimatedCristalyseChartWidgetState
     if (!hasHeatMap || chartWidget.data.isEmpty) return 0.0;
 
     final yCol = chartWidget.heatMapYColumn ?? chartWidget.yColumn;
-    final axisLabelStyle = chartWidget.theme.axisLabelStyle ??
+    final axisLabelStyle =
+        chartWidget.theme.axisLabelStyle ??
         const TextStyle(color: Colors.black, fontSize: 12);
 
     final yValues = yCol != null
@@ -1392,7 +1446,8 @@ class _AnimatedCristalyseChartWidgetState
     }
 
     if (maxHeatMapValWidth > 0) {
-      _cachedHeatMapYAxisSpace = chartWidget.theme.axisWidth * 2 +
+      _cachedHeatMapYAxisSpace =
+          chartWidget.theme.axisWidth * 2 +
           AnimatedChartPainter.tickToLabelSpacing +
           maxHeatMapValWidth;
     } else {
@@ -1437,8 +1492,9 @@ class _AnimatedCristalyseChartWidgetState
   Scale _setupXScale(double width, bool hasBarGeometry) {
     if (widget.coordFlipped) {
       final preconfigured = widget.yScale;
-      final scale =
-          (preconfigured is LinearScale ? preconfigured : LinearScale());
+      final scale = (preconfigured is LinearScale
+          ? preconfigured
+          : LinearScale());
       final dataCol = widget.yColumn;
 
       if (dataCol == null || widget.data.isEmpty) {
@@ -1466,8 +1522,9 @@ class _AnimatedCristalyseChartWidgetState
       final dataCol = widget.xColumn;
       if (preconfigured is OrdinalScale ||
           (hasBarGeometry && isColumnCategorical(dataCol, widget.data))) {
-        final scale =
-            (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+        final scale = (preconfigured is OrdinalScale
+            ? preconfigured
+            : OrdinalScale());
         if (dataCol == null || widget.data.isEmpty) {
           scale.domain = [];
           scale.range = [0, width];
@@ -1484,8 +1541,9 @@ class _AnimatedCristalyseChartWidgetState
         scale.range = [0, width];
         return scale;
       } else {
-        final scale =
-            (preconfigured is LinearScale ? preconfigured : LinearScale());
+        final scale = (preconfigured is LinearScale
+            ? preconfigured
+            : LinearScale());
         if (dataCol == null || widget.data.isEmpty) {
           scale.setBounds([], null, widget.geometries);
           scale.range = [0, width];
@@ -1504,11 +1562,10 @@ class _AnimatedCristalyseChartWidgetState
           // Apply pan domain if available (for interaction hit-testing)
           // This mirrors the painter's approach to ensure detector matches rendering
           if (!widget.coordFlipped && _panXDomain != null) {
-            scale.setBounds(
-              values,
-              (_panXDomain![0], _panXDomain![1]),
-              widget.geometries,
-            );
+            scale.setBounds(values, (
+              _panXDomain![0],
+              _panXDomain![1],
+            ), widget.geometries);
           }
         } else {
           scale.setBounds([], null, widget.geometries);
@@ -1522,8 +1579,9 @@ class _AnimatedCristalyseChartWidgetState
   Scale _setupYScale(double height, bool hasBarGeometry, YAxis axis) {
     if (widget.coordFlipped) {
       final preconfigured = widget.xScale;
-      final scale =
-          (preconfigured is OrdinalScale ? preconfigured : OrdinalScale());
+      final scale = (preconfigured is OrdinalScale
+          ? preconfigured
+          : OrdinalScale());
       final dataCol = widget.xColumn;
 
       if (dataCol == null || widget.data.isEmpty) {
@@ -1542,20 +1600,23 @@ class _AnimatedCristalyseChartWidgetState
       scale.range = [0, height];
       return scale;
     } else {
-      final preconfigured =
-          axis == YAxis.primary ? widget.yScale : widget.y2Scale;
+      final preconfigured = axis == YAxis.primary
+          ? widget.yScale
+          : widget.y2Scale;
       final dataCol = axis == YAxis.primary ? widget.yColumn : widget.y2Column;
 
-      final scale =
-          (preconfigured is LinearScale ? preconfigured : LinearScale());
+      final scale = (preconfigured is LinearScale
+          ? preconfigured
+          : LinearScale());
       if (dataCol == null || widget.data.isEmpty) {
         scale.setBounds([], null, widget.geometries);
         scale.range = [height, 0];
         return scale;
       }
 
-      final relevantGeometries =
-          widget.geometries.where((g) => g.yAxis == axis).toList();
+      final relevantGeometries = widget.geometries
+          .where((g) => g.yAxis == axis)
+          .toList();
       if (relevantGeometries.isEmpty) {
         scale.setBounds([0, 1], null, widget.geometries);
         scale.range = [height, 0];
@@ -1595,11 +1656,10 @@ class _AnimatedCristalyseChartWidgetState
         if (!widget.coordFlipped &&
             axis == YAxis.primary &&
             _panYDomain != null) {
-          scale.setBounds(
-            values,
-            (_panYDomain![0], _panYDomain![1]),
-            widget.geometries,
-          );
+          scale.setBounds(values, (
+            _panYDomain![0],
+            _panYDomain![1],
+          ), widget.geometries);
         }
       } else {
         scale.setBounds([], null, widget.geometries);
@@ -1622,14 +1682,15 @@ class _AnimatedCristalyseChartWidgetState
     if (values.isEmpty) return SizeScale();
 
     // Get bubble geometry and use its preconfigured size scale
-    final bubbleGeometries =
-        widget.geometries.whereType<BubbleGeometry>().toList();
+    final bubbleGeometries = widget.geometries
+        .whereType<BubbleGeometry>()
+        .toList();
     final sizeScale = bubbleGeometries.isNotEmpty
         ? bubbleGeometries.first.createSizeScale()
         : (widget.sizeScale ??
-            SizeScale(
-              range: [widget.theme.pointSizeMin, widget.theme.pointSizeMax],
-            ));
+              SizeScale(
+                range: [widget.theme.pointSizeMin, widget.theme.pointSizeMax],
+              ));
 
     // Set domain from data - limits are already in the scale
     sizeScale.setBounds(values, null, widget.geometries);
@@ -1767,8 +1828,9 @@ class _AnimatedCristalyseChartWidgetState
       }
     }
 
-    final totalDelta =
-        _panStartPosition != null ? currentPosition - _panStartPosition! : null;
+    final totalDelta = _panStartPosition != null
+        ? currentPosition - _panStartPosition!
+        : null;
 
     return PanInfo(
       visibleMinX: visibleMinX,
@@ -1867,10 +1929,10 @@ class _AnimatedCristalyseChartWidgetState
 
     bool changed = false;
 
-    final normalizedX =
-        ((focalPoint.dx - plotArea.left) / plotArea.width).clamp(0.0, 1.0);
-    final normalizedY =
-        (1 - (focalPoint.dy - plotArea.top) / plotArea.height).clamp(0.0, 1.0);
+    final normalizedX = ((focalPoint.dx - plotArea.left) / plotArea.width)
+        .clamp(0.0, 1.0);
+    final normalizedY = (1 - (focalPoint.dy - plotArea.top) / plotArea.height)
+        .clamp(0.0, 1.0);
 
     if ((zoomConfig.axes == ZoomAxis.x || zoomConfig.axes == ZoomAxis.both) &&
         _panXDomain != null &&

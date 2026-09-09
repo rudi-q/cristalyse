@@ -26,10 +26,9 @@ Widget buildLegendExampleTab(
           'Demonstrating different legend positions and configurations',
           style: TextStyle(
             fontSize: 12,
-            color:
-                Theme.of(context).brightness == Brightness.dark
-                    ? Colors.grey[400]
-                    : Colors.grey[700],
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey[400]
+                : Colors.grey[700],
           ),
         ),
         const SizedBox(height: 24),
@@ -42,42 +41,41 @@ Widget buildLegendExampleTab(
               'Free-floating legend with absolute positioning - perfect for overlays',
           child: SizedBox(
             height: 300,
-            child:
-                CristalyseChart()
-                    .data(data)
-                    .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                    .geomBar(
-                      width: sliderValue.clamp(0.1, 1.0).toDouble(),
-                      style: BarStyle.grouped,
-                      alpha: 0.9,
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(
-                      min: 10,
-                      labels: NumberFormat.simpleCurrency().format,
-                      title: 'Revenue',
-                    )
-                    .theme(currentTheme)
-                    .legend(
-                      position: LegendPosition.floating,
-                      interactive: true,
-                      floatingOffset: const Offset(150, 30), // x: 150, y: 30
-                      backgroundColor: currentTheme.backgroundColor.withValues(
-                        alpha: 0.95,
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      symbolSize: 12.0,
-                      itemSpacing: 10.0,
-                      borderRadius: 8.0,
-                    ) // <- Floating legend
-                    .animate(
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeOutCubic,
-                    )
-                    .build(),
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                  width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                  style: BarStyle.grouped,
+                  alpha: 0.9,
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 10,
+                  labels: NumberFormat.simpleCurrency().format,
+                  title: 'Revenue',
+                )
+                .theme(currentTheme)
+                .legend(
+                  position: LegendPosition.floating,
+                  interactive: true,
+                  floatingOffset: const Offset(150, 30), // x: 150, y: 30
+                  backgroundColor: currentTheme.backgroundColor.withValues(
+                    alpha: 0.95,
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  symbolSize: 12.0,
+                  itemSpacing: 10.0,
+                  borderRadius: 8.0,
+                ) // <- Floating legend
+                .animate(
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutCubic,
+                )
+                .build(),
           ),
         ),
 
@@ -90,27 +88,26 @@ Widget buildLegendExampleTab(
           description: 'Simple .legend() call with smart defaults',
           child: SizedBox(
             height: 300,
-            child:
-                CristalyseChart()
-                    .data(data)
-                    .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                    .geomBar(
-                      width: sliderValue.clamp(0.1, 1.0).toDouble(),
-                      style: BarStyle.grouped,
-                      alpha: 0.9,
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(
-                      min: 0,
-                      labels: NumberFormat.simpleCurrency().format,
-                    )
-                    .theme(currentTheme)
-                    .legend() // <- Basic legend with defaults
-                    .animate(
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeOutCubic,
-                    )
-                    .build(),
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                  width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                  style: BarStyle.grouped,
+                  alpha: 0.9,
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(currentTheme)
+                .legend() // <- Basic legend with defaults
+                .animate(
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutCubic,
+                )
+                .build(),
           ),
         ),
 
@@ -123,29 +120,26 @@ Widget buildLegendExampleTab(
           description: 'Legend positioned at the bottom of the chart',
           child: SizedBox(
             height: 300,
-            child:
-                CristalyseChart()
-                    .data(data)
-                    .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                    .geomBar(
-                      width: sliderValue.clamp(0.1, 1.0).toDouble(),
-                      style: BarStyle.grouped,
-                      alpha: 0.9,
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(
-                      min: 0,
-                      labels: NumberFormat.simpleCurrency().format,
-                    )
-                    .theme(currentTheme)
-                    .legend(
-                      position: LegendPosition.bottom,
-                    ) // <- Bottom position
-                    .animate(
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeOutCubic,
-                    )
-                    .build(),
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                  width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                  style: BarStyle.grouped,
+                  alpha: 0.9,
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(currentTheme)
+                .legend(position: LegendPosition.bottom) // <- Bottom position
+                .animate(
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutCubic,
+                )
+                .build(),
           ),
         ),
 
@@ -159,40 +153,39 @@ Widget buildLegendExampleTab(
               'Custom background and symbol size (text adapts to theme)',
           child: SizedBox(
             height: 300,
-            child:
-                CristalyseChart()
-                    .data(data)
-                    .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                    .geomBar(
-                      width: sliderValue.clamp(0.1, 1.0).toDouble(),
-                      style: BarStyle.grouped,
-                      alpha: 0.9,
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(
-                      min: 0,
-                      labels: NumberFormat.simpleCurrency().format,
-                    )
-                    .theme(currentTheme)
-                    .legend(
-                      position: LegendPosition.right,
-                      backgroundColor: currentTheme.backgroundColor.withValues(
-                        alpha: 0.95,
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        // No color specified - automatically uses theme color
-                      ),
-                      symbolSize: 14.0,
-                      itemSpacing: 12.0,
-                      borderRadius: 8.0,
-                    ) // <- Styled legend
-                    .animate(
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeOutCubic,
-                    )
-                    .build(),
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                  width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                  style: BarStyle.grouped,
+                  alpha: 0.9,
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(currentTheme)
+                .legend(
+                  position: LegendPosition.right,
+                  backgroundColor: currentTheme.backgroundColor.withValues(
+                    alpha: 0.95,
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    // No color specified - automatically uses theme color
+                  ),
+                  symbolSize: 14.0,
+                  itemSpacing: 12.0,
+                  borderRadius: 8.0,
+                ) // <- Styled legend
+                .animate(
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutCubic,
+                )
+                .build(),
           ),
         ),
 
@@ -205,27 +198,26 @@ Widget buildLegendExampleTab(
           description: 'Legend text automatically adapts to dark themes',
           child: SizedBox(
             height: 300,
-            child:
-                CristalyseChart()
-                    .data(data)
-                    .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                    .geomBar(
-                      width: sliderValue.clamp(0.1, 1.0).toDouble(),
-                      style: BarStyle.grouped,
-                      alpha: 0.9,
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(
-                      min: 0,
-                      labels: NumberFormat.simpleCurrency().format,
-                    )
-                    .theme(ChartTheme.darkTheme()) // Dark theme
-                    .legend(position: LegendPosition.topRight)
-                    .animate(
-                      duration: const Duration(milliseconds: 1000),
-                      curve: Curves.easeOutCubic,
-                    )
-                    .build(),
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                  width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                  style: BarStyle.grouped,
+                  alpha: 0.9,
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(ChartTheme.darkTheme()) // Dark theme
+                .legend(position: LegendPosition.topRight)
+                .animate(
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutCubic,
+                )
+                .build(),
           ),
         ),
 
@@ -238,24 +230,23 @@ Widget buildLegendExampleTab(
           description: 'Legend automatically adapts to line chart geometry',
           child: SizedBox(
             height: 300,
-            child:
-                CristalyseChart()
-                    .data(data)
-                    .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                    .geomLine(strokeWidth: 3.0)
-                    .geomPoint(size: 6.0)
-                    .scaleXOrdinal()
-                    .scaleYContinuous(
-                      min: 0,
-                      labels: NumberFormat.simpleCurrency().format,
-                    )
-                    .theme(currentTheme)
-                    .legend(position: LegendPosition.topLeft)
-                    .animate(
-                      duration: const Duration(milliseconds: 1200),
-                      curve: Curves.easeOutCubic,
-                    )
-                    .build(),
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomLine(strokeWidth: 3.0)
+                .geomPoint(size: 6.0)
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(currentTheme)
+                .legend(position: LegendPosition.topLeft)
+                .animate(
+                  duration: const Duration(milliseconds: 1200),
+                  curve: Curves.easeOutCubic,
+                )
+                .build(),
           ),
         ),
 
@@ -269,60 +260,56 @@ Widget buildLegendExampleTab(
               'Click legend items to show/hide categories • Auto-managed state',
           child: SizedBox(
             height: 300,
-            child:
-                CristalyseChart()
-                    .data(data)
-                    .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                    .geomBar(
-                      width: sliderValue.clamp(0.1, 1.0).toDouble(),
-                      style: BarStyle.grouped,
-                      alpha: 0.9,
-                    )
-                    .scaleXOrdinal()
-                    .scaleYContinuous(
-                      min: 0,
-                      labels: NumberFormat.simpleCurrency().format,
-                    )
-                    .theme(currentTheme)
-                    .legend(
-                      position: LegendPosition.topRight,
-                      interactive: true, // <- Enable click-to-toggle
-                      backgroundColor: currentTheme.backgroundColor.withValues(
-                        alpha: 0.95,
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      symbolSize: 12.0,
-                      itemSpacing: 10.0,
-                      borderRadius: 8.0,
-                    )
-                    .interaction(
-                      tooltip: TooltipConfig(
-                        builder:
-                            (point) => Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  point.getDisplayValue('product'),
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
-                                ),
-                              ],
-                            ),
-                      ),
-                    )
-                    .animate(
-                      duration: const Duration(milliseconds: 800),
-                      curve: Curves.easeInOut,
-                    )
-                    .build(),
+            child: CristalyseChart()
+                .data(data)
+                .mapping(x: 'quarter', y: 'revenue', color: 'product')
+                .geomBar(
+                  width: sliderValue.clamp(0.1, 1.0).toDouble(),
+                  style: BarStyle.grouped,
+                  alpha: 0.9,
+                )
+                .scaleXOrdinal()
+                .scaleYContinuous(
+                  min: 0,
+                  labels: NumberFormat.simpleCurrency().format,
+                )
+                .theme(currentTheme)
+                .legend(
+                  position: LegendPosition.topRight,
+                  interactive: true, // <- Enable click-to-toggle
+                  backgroundColor: currentTheme.backgroundColor.withValues(
+                    alpha: 0.95,
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  symbolSize: 12.0,
+                  itemSpacing: 10.0,
+                  borderRadius: 8.0,
+                )
+                .interaction(
+                  tooltip: TooltipConfig(
+                    builder: (point) => Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          point.getDisplayValue('product'),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${point.getDisplayValue('quarter')}: \$${point.getDisplayValue('revenue')}k',
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+                .animate(
+                  duration: const Duration(milliseconds: 800),
+                  curve: Curves.easeInOut,
+                )
+                .build(),
           ),
         ),
       ],

@@ -27,107 +27,103 @@ Widget buildInteractiveScatterTab(
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(data)
-                  .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
-                  .geomPoint(alpha: 0.8, size: 4.0 + sliderValue * 8.0)
-                  .scaleXContinuous()
-                  .scaleYContinuous()
-                  .theme(
-                    currentTheme.copyWith(
-                      pointSizeMax: 2.0 + sliderValue * 20.0,
-                    ),
-                  )
-                  .interaction(
-                    tooltip: TooltipConfig(
-                      builder: (point) {
-                        return Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.9),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.white24, width: 1),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 12.0,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
+          child: CristalyseChart()
+              .data(data)
+              .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
+              .geomPoint(alpha: 0.8, size: 4.0 + sliderValue * 8.0)
+              .scaleXContinuous()
+              .scaleYContinuous()
+              .theme(
+                currentTheme.copyWith(pointSizeMax: 2.0 + sliderValue * 20.0),
+              )
+              .interaction(
+                tooltip: TooltipConfig(
+                  builder: (point) {
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.9),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white24, width: 1),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 12.0,
+                            offset: Offset(0, 4),
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SelectableText(
-                                'Sales Data',
-                                style: TextStyle(
-                                  color: currentTheme.primaryColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              SelectableText(
-                                'Week: ${point.getDisplayValue('x')}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              SelectableText(
-                                'Revenue: \$${point.getDisplayValue('y')}k',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              SelectableText(
-                                'Segment: ${point.getDisplayValue('category')}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              SelectableText(
-                                'Deal Size: ${point.getDisplayValue('size')}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SelectableText(
+                            'Sales Data',
+                            style: TextStyle(
+                              color: currentTheme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
-                        );
-                      },
-                      showDelay: const Duration(
-                        milliseconds: 10,
-                      ), // Almost instant for smooth switching
-                      hideDelay: const Duration(
-                        milliseconds: 1500,
-                      ), // Much longer to hide
-                      followPointer:
-                          false, // Disable to prevent pan interference
-                    ),
-                    hover: const HoverConfig(
-                      hitTestRadius: 30.0, // Very generous hit area
-                      debounce: Duration(milliseconds: 50),
-                    ),
-                    click: ClickConfig(
-                      onTap: (point) {
-                        // In a real app, you'd navigate to details or show a dialog
-                        debugPrint('Tapped on data point: ${point.data}');
-                      },
-                      hitTestRadius: 35.0, // Even more generous for taps
-                    ),
-                  )
-                  .legend(position: LegendPosition.top)
-                  .animate(
-                    duration: const Duration(milliseconds: 800),
-                    curve: Curves.elasticOut,
-                  )
-                  .build(),
+                          const SizedBox(height: 6),
+                          SelectableText(
+                            'Week: ${point.getDisplayValue('x')}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                          SelectableText(
+                            'Revenue: \$${point.getDisplayValue('y')}k',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                          SelectableText(
+                            'Segment: ${point.getDisplayValue('category')}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                          SelectableText(
+                            'Deal Size: ${point.getDisplayValue('size')}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  showDelay: const Duration(
+                    milliseconds: 10,
+                  ), // Almost instant for smooth switching
+                  hideDelay: const Duration(
+                    milliseconds: 1500,
+                  ), // Much longer to hide
+                  followPointer: false, // Disable to prevent pan interference
+                ),
+                hover: const HoverConfig(
+                  hitTestRadius: 30.0, // Very generous hit area
+                  debounce: Duration(milliseconds: 50),
+                ),
+                click: ClickConfig(
+                  onTap: (point) {
+                    // In a real app, you'd navigate to details or show a dialog
+                    debugPrint('Tapped on data point: ${point.data}');
+                  },
+                  hitTestRadius: 35.0, // Even more generous for taps
+                ),
+              )
+              .legend(position: LegendPosition.top)
+              .animate(
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.elasticOut,
+              )
+              .build(),
         ),
         const SizedBox(height: 16),
         const _InteractionGuide(),
@@ -295,17 +291,16 @@ class TooltipExamples {
       (point) {
         showDialog(
           context: context,
-          builder:
-              (context) => AlertDialog(
-                title: const SelectableText('Data Point Details'),
-                content: SelectableText('Selected: ${point.data}'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Close'),
-                  ),
-                ],
+          builder: (context) => AlertDialog(
+            title: const SelectableText('Data Point Details'),
+            content: SelectableText('Selected: ${point.data}'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
               ),
+            ],
+          ),
         );
       },
     ).build();

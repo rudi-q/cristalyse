@@ -22,27 +22,24 @@ Widget buildScatterPlotTab(
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(data)
-                  .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
-                  .geomPoint(alpha: 0.8)
-                  .scaleXContinuous()
-                  .scaleYContinuous()
-                  .theme(
-                    currentTheme.copyWith(
-                      pointSizeMax: 2.0 + sliderValue * 20.0,
-                    ),
-                  )
-                  .legend(
-                    position: LegendPosition.topRight,
-                    orientation: LegendOrientation.horizontal,
-                  )
-                  .animate(
-                    duration: const Duration(milliseconds: 800),
-                    curve: Curves.elasticOut,
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(data)
+              .mapping(x: 'x', y: 'y', color: 'category', size: 'size')
+              .geomPoint(alpha: 0.8)
+              .scaleXContinuous()
+              .scaleYContinuous()
+              .theme(
+                currentTheme.copyWith(pointSizeMax: 2.0 + sliderValue * 20.0),
+              )
+              .legend(
+                position: LegendPosition.topRight,
+                orientation: LegendOrientation.horizontal,
+              )
+              .animate(
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.elasticOut,
+              )
+              .build(),
         ),
         const SizedBox(height: 16),
         const SelectableText(

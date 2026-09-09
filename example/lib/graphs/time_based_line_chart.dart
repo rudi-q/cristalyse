@@ -40,30 +40,29 @@ class _TimeBasedLineChartWidgetState extends State<TimeBasedLineChartWidget> {
           const SizedBox(height: 16),
           SizedBox(
             height: 400,
-            child:
-                CristalyseChart()
-                    .data(_data)
-                    .mapping(x: 'x', y: 'y')
-                    .geomLine(
-                      strokeWidth: 1.0 + widget.sliderValue * 9.0,
-                      alpha: 0.9,
-                    )
-                    .scaleXContinuous(
-                      title: 'Timestamp',
-                      tickConfig: TickConfig(simpleLinear: _simpleLinear),
-                      labels: (value) {
-                        final date = DateTime.fromMillisecondsSinceEpoch(
-                          value.toInt(),
-                        );
-                        return DateFormat('MM/dd HH:mm:ss').format(date);
-                      },
-                    )
-                    .scaleYContinuous(
-                      title: 'Value (units)',
-                      tickConfig: TickConfig(simpleLinear: _simpleLinear),
-                    )
-                    .theme(widget.currentTheme)
-                    .build(),
+            child: CristalyseChart()
+                .data(_data)
+                .mapping(x: 'x', y: 'y')
+                .geomLine(
+                  strokeWidth: 1.0 + widget.sliderValue * 9.0,
+                  alpha: 0.9,
+                )
+                .scaleXContinuous(
+                  title: 'Timestamp',
+                  tickConfig: TickConfig(simpleLinear: _simpleLinear),
+                  labels: (value) {
+                    final date = DateTime.fromMillisecondsSinceEpoch(
+                      value.toInt(),
+                    );
+                    return DateFormat('MM/dd HH:mm:ss').format(date);
+                  },
+                )
+                .scaleYContinuous(
+                  title: 'Value (units)',
+                  tickConfig: TickConfig(simpleLinear: _simpleLinear),
+                )
+                .theme(widget.currentTheme)
+                .build(),
           ),
           // toggle switch
           SwitchListTile(

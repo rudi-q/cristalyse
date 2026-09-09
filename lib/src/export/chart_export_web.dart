@@ -35,7 +35,8 @@ Future<ExportResult> _exportToSvgWeb(
   final String svgContent = painter.generateSvg(chartWidget);
 
   // Generate filename
-  final String filename = customPath ??
+  final String filename =
+      customPath ??
       '${config.filename ?? 'cristalyse_chart_${DateTime.now().millisecondsSinceEpoch}'}.svg';
 
   // Download file using browser API (WASM-compatible)
@@ -53,8 +54,10 @@ Future<ExportResult> _exportToSvgWeb(
 
 /// Download file using browser API (works in WASM)
 void _downloadFile(String content, String filename, String mimeType) {
-  final blob =
-      web.Blob([content.toJS].toJS, web.BlobPropertyBag(type: mimeType));
+  final blob = web.Blob(
+    [content.toJS].toJS,
+    web.BlobPropertyBag(type: mimeType),
+  );
   final url = web.URL.createObjectURL(blob);
 
   final anchor = (web.document.createElement('a') as web.HTMLAnchorElement)
@@ -420,14 +423,17 @@ class SvgExportPainter {
       return;
     }
 
-    final points = chartData.data.map((point) {
-      final x = plotArea.left + xScale.scale(point[chartData.xColumn]);
-      final y = plotArea.top + yScale.scale(point[chartData.yColumn]);
-      return '$x,$y';
-    }).join(' ');
+    final points = chartData.data
+        .map((point) {
+          final x = plotArea.left + xScale.scale(point[chartData.xColumn]);
+          final y = plotArea.top + yScale.scale(point[chartData.yColumn]);
+          return '$x,$y';
+        })
+        .join(' ');
 
-    final color =
-        colorScale.values.isNotEmpty ? colorScale.values.first : '#1f77b4';
+    final color = colorScale.values.isNotEmpty
+        ? colorScale.values.first
+        : '#1f77b4';
     buffer.writeln(
       '  <polyline points="$points" stroke="$color" stroke-width="2" fill="none"/>',
     );
@@ -591,8 +597,9 @@ class _LinearScale extends _Scale {
 
   @override
   double scale(dynamic value) {
-    final numValue =
-        value is num ? value.toDouble() : double.tryParse(value.toString());
+    final numValue = value is num
+        ? value.toDouble()
+        : double.tryParse(value.toString());
     if (numValue == null) return range[0];
 
     final domainRange = domain[1] - domain[0];

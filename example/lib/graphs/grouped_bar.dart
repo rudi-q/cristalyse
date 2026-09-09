@@ -28,29 +28,27 @@ Widget buildGroupedBarTab(
         const SizedBox(height: 16),
         SizedBox(
           height: 400,
-          child:
-              CristalyseChart()
-                  .data(data)
-                  .mapping(x: 'quarter', y: 'revenue', color: 'product')
-                  .geomBar(
-                    width: sliderValue.clamp(0.1, 1.0),
-                    style: BarStyle.grouped,
-                    alpha: 0.9,
-                  )
-                  .scaleXOrdinal()
-                  .scaleYContinuous(
-                    min: 0,
-                    labels:
-                        NumberFormat.simpleCurrency()
-                            .format, // Direct NumberFormat usage
-                  )
-                  .theme(currentTheme)
-                  .legend(position: LegendPosition.top)
-                  .animate(
-                    duration: const Duration(milliseconds: 1200),
-                    curve: Curves.easeOutCubic,
-                  )
-                  .build(),
+          child: CristalyseChart()
+              .data(data)
+              .mapping(x: 'quarter', y: 'revenue', color: 'product')
+              .geomBar(
+                width: sliderValue.clamp(0.1, 1.0),
+                style: BarStyle.grouped,
+                alpha: 0.9,
+              )
+              .scaleXOrdinal()
+              .scaleYContinuous(
+                min: 0,
+                labels: NumberFormat.simpleCurrency()
+                    .format, // Direct NumberFormat usage
+              )
+              .theme(currentTheme)
+              .legend(position: LegendPosition.top)
+              .animate(
+                duration: const Duration(milliseconds: 1200),
+                curve: Curves.easeOutCubic,
+              )
+              .build(),
         ),
         const SizedBox(height: 16),
         const SelectableText(

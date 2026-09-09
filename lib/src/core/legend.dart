@@ -73,7 +73,7 @@ class LegendConfig {
   final bool interactive; // Enable click-to-toggle visibility
   final Set<String>? hiddenCategories; // Categories that are currently hidden
   final void Function(String category, bool visible)?
-      onToggle; // Callback when legend item is toggled
+  onToggle; // Callback when legend item is toggled
 
   /// Whether to show y and y2 axes titles for the legend group
   final bool showTitles;
@@ -118,31 +118,31 @@ class LegendConfig {
 
   /// Check if legend should be positioned on the right side
   bool get isRightSide => [
-        LegendPosition.right,
-        LegendPosition.topRight,
-        LegendPosition.bottomRight,
-      ].contains(position);
+    LegendPosition.right,
+    LegendPosition.topRight,
+    LegendPosition.bottomRight,
+  ].contains(position);
 
   /// Check if legend should be positioned on the left side
   bool get isLeftSide => [
-        LegendPosition.left,
-        LegendPosition.topLeft,
-        LegendPosition.bottomLeft,
-      ].contains(position);
+    LegendPosition.left,
+    LegendPosition.topLeft,
+    LegendPosition.bottomLeft,
+  ].contains(position);
 
   /// Check if legend should be positioned on the top
   bool get isTopSide => [
-        LegendPosition.top,
-        LegendPosition.topLeft,
-        LegendPosition.topRight,
-      ].contains(position);
+    LegendPosition.top,
+    LegendPosition.topLeft,
+    LegendPosition.topRight,
+  ].contains(position);
 
   /// Check if legend should be positioned on the bottom
   bool get isBottomSide => [
-        LegendPosition.bottom,
-        LegendPosition.bottomLeft,
-        LegendPosition.bottomRight,
-      ].contains(position);
+    LegendPosition.bottom,
+    LegendPosition.bottomLeft,
+    LegendPosition.bottomRight,
+  ].contains(position);
 
   @override
   bool operator ==(Object other) =>
