@@ -1,5 +1,7 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
-import "package:universal_html/html.dart" as html;
+import 'package:web/web.dart' as web;
 
 import '../widgets/animated_chart_widget.dart';
 import 'chart_export.dart';
@@ -51,18 +53,20 @@ Future<ExportResult> _exportToSvgWeb(
 
 /// Download file using browser API (works in WASM)
 void _downloadFile(String content, String filename, String mimeType) {
-  final blob = html.Blob([content], mimeType);
-  final url = html.Url.createObjectUrlFromBlob(blob);
+  final blob =
+      web.Blob([content.toJS].toJS, web.BlobPropertyBag(type: mimeType));
+  final url = web.URL.createObjectURL(blob);
 
-  final anchor = html.AnchorElement(href: url)
+  final anchor = (web.document.createElement('a') as web.HTMLAnchorElement)
+    ..href = url
     ..download = filename
     ..style.display = 'none';
 
-  html.document.body!.append(anchor);
+  web.document.body!.append(anchor);
   anchor.click();
   anchor.remove();
 
-  html.Url.revokeObjectUrl(url);
+  web.URL.revokeObjectURL(url);
 }
 
 /// Custom painter for SVG export (web version)
