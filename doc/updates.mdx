@@ -12,6 +12,66 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 23, 2026" description="v1.18.1">
+  ### 🐛 Ordinal Axis Label Overlap Fix
+  
+  **No more crowded last labels!** (resolves [#101](https://github.com/rudi-q/cristalyse/issues/101))
+  
+  **What was fixed:**
+  - **Overlapping last label:** On ordinal (categorical) axes with more categories than fit, the always-shown last label could land right next to the previous one — like "Nov" and "Dec" on a 12-month chart — and overlap it.
+  - **Smarter last label:** When the last category is less than one step after the previous label, it now replaces that label instead of being squeezed in next to it.
+  
+  **Why this matters:**
+  - Crowded bar charts with monthly or other categorical axes stay readable.
+  - The axis still always starts on the first category and ends on the last.
+  
+  **Quality Assurance:**
+  - New regression tests across 59 category counts and 31 axis widths.
+  - 306 tests pass — zero breaking changes.
+  - Fully backward compatible.
+</Update>
+
+<Update label="November 23, 2026" description="v1.18.0">
+  <Warning>
+  **Action may be required: custom tooltips using Material widgets**
+
+  Tooltips are **no longer wrapped in a `Material` widget**. If your custom tooltip builder uses widgets that need a `Material` ancestor (such as `ListTile`, `Chip`, `InkWell`, or `TextField`), Flutter will throw *"No Material widget found"* when the tooltip appears.
+
+  **Fix:** wrap your tooltip content in a `Material`:
+
+  ```dart
+  chart.tooltip((point) => Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          title: Text(point.getDisplayValue('revenue')),
+        ),
+      ));
+  ```
+
+  Tooltips built from plain widgets (`Text`, `Row`, `Column`, `Icon`, `Container`, etc.) and the built-in `DefaultTooltips` are not affected.
+  </Warning>
+
+  ### 🔧 Flutter 3.50 Compatibility
+  
+  **Ready for the Material split!**
+  
+  **What changed:**
+  - **No more deprecated Material import:** Flutter 3.50 deprecates `package:flutter/material.dart`. Cristalyse's library code now uses only `package:flutter/widgets.dart`, so your projects no longer inherit deprecation warnings from the package.
+  - **Pixel-identical charts:** Built-in themes, palettes, and default colors keep the exact same values.
+  - **No SDK bump:** The minimum supported Flutter version stays the same, and your app doesn't need `material_ui`.
+  - **Tests & example app:** Migrated to `package:material_ui` and `package:cupertino_ui` (dev-only, no impact on your app). Running them requires Flutter 3.47+.
+  
+  **Behavior notes:**
+  - Zoom buttons look and work the same, including keyboard focus and Enter/Space activation, but show a focus ring instead of a tap ripple.
+  - Default colors are plain `Color` values, so they no longer compare equal (`==`) to `Colors.*` constants, though they look identical.
+  - Tooltips are no longer wrapped in a transparent `Material`. See the warning at the top of this release.
+  
+  **Quality Assurance:**
+  - 302 tests pass, including new keyboard and pointer tests for the zoom buttons.
+  - Zero analyzer issues across the package on Flutter 3.50.
+  - No public API changes.
+</Update>
+
 <Update label="November 23, 2026" description="v1.17.7">
   **Authored by [@dmitriy-bty](https://github.com/dmitriy-bty)** - Thank you for this fix!
 

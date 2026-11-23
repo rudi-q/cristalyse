@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../../../cristalyse.dart' show AnimatedCristalyseChartWidget;
 import '../../widgets/animated_chart_painter.dart' show AnimatedChartPainter;
