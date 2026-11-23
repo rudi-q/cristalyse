@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../core/geometry.dart';
 import '../core/legend.dart';
@@ -1360,7 +1360,7 @@ class _AnimatedCristalyseChartWidgetState
 
     final yCol = chartWidget.heatMapYColumn ?? chartWidget.yColumn;
     final axisLabelStyle = chartWidget.theme.axisLabelStyle ??
-        const TextStyle(color: Colors.black, fontSize: 12);
+        const TextStyle(color: Color(0xFF000000), fontSize: 12);
 
     final yValues = yCol != null
         ? chartWidget.data.map((d) => d[yCol]).where((v) => v != null).toSet()
@@ -1922,13 +1922,13 @@ class _AnimatedCristalyseChartWidgetState
           mainAxisSize: MainAxisSize.min,
           children: [
             _ZoomButton(
-              icon: Icons.add,
+              icon: _kZoomInIcon,
               onPressed: () => _handleZoomButtonPressed(true),
               theme: widget.theme,
             ),
             const SizedBox(height: 8),
             _ZoomButton(
-              icon: Icons.remove,
+              icon: _kZoomOutIcon,
               onPressed: () => _handleZoomButtonPressed(false),
               theme: widget.theme,
             ),
@@ -2011,6 +2011,11 @@ class _AnimatedCristalyseChartWidgetState
   }
 }
 
+// Same glyphs as Material's `Icons.add` and `Icons.remove`, referenced by code
+// point so the library doesn't need to import Material.
+const IconData _kZoomInIcon = IconData(0xe047, fontFamily: 'MaterialIcons');
+const IconData _kZoomOutIcon = IconData(0xe516, fontFamily: 'MaterialIcons');
+
 class _ZoomButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
@@ -2024,16 +2029,22 @@ class _ZoomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: theme.backgroundColor.withValues(alpha: 0.9),
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onPressed,
-        child: SizedBox(
-          width: 36,
-          height: 36,
-          child: Icon(icon, size: 18, color: theme.axisColor),
+    return Semantics(
+      button: true,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onTap: onPressed,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: theme.backgroundColor.withValues(alpha: 0.9),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: 18, color: theme.axisColor),
+          ),
         ),
       ),
     );
