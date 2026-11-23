@@ -2,6 +2,29 @@
 
 ## 1.18.0 - 2026-11-23
 
+> ### ⚠️ Action may be required: custom tooltips using Material widgets
+>
+> Tooltips are **no longer wrapped in a `Material` widget**. If your custom tooltip builder uses widgets that need a `Material` ancestor (such as `ListTile`, `Chip`, `InkWell`, or `TextField`), Flutter will throw *"No Material widget found"* when the tooltip appears.
+>
+> **Fix:** wrap your tooltip content in a `Material` yourself:
+>
+> ```dart
+> // Before (1.17.x)
+> chart.tooltip((point) => ListTile(
+>       title: Text(point.getDisplayValue('revenue')),
+>     ));
+>
+> // After (1.18.0)
+> chart.tooltip((point) => Material(
+>       type: MaterialType.transparency,
+>       child: ListTile(
+>         title: Text(point.getDisplayValue('revenue')),
+>       ),
+>     ));
+> ```
+>
+> Tooltips built from plain widgets (`Text`, `Row`, `Column`, `Icon`, `Container`, etc.) and the built-in `DefaultTooltips` are **not affected**, and text styling is unchanged.
+
 #### 🔧 Flutter 3.50 Compatibility
 
 **Material-Free Library Code:**
@@ -13,13 +36,13 @@
 **Behavior Notes:**
 - **Zoom buttons** are now built from plain widgets. They look and work the same, including keyboard focus (Tab) and activation (Enter/Space), but show a focus ring instead of an ink ripple.
 - **Default colors** (for example `ChartTheme.defaultTheme().primaryColor`) are now plain `Color` values rather than `MaterialColor` swatches. They are visually identical but no longer compare equal (`==`) to `Colors.*` constants.
-- **Tooltips** are no longer wrapped in a transparent `Material`. Text styling is unchanged; custom tooltip builders that use Material-only widgets (such as `ListTile` or `Chip`) should wrap their content in a `Material` widget.
+- **Tooltips** are no longer wrapped in a transparent `Material`. See the ⚠️ note at the top of this release.
 
 **Quality Assurance:**
-- 299 tests pass.
+- 302 tests pass, including new keyboard and pointer tests for the zoom buttons.
 - Zero analyzer issues across the package on Flutter 3.50.
 - CI now runs on Flutter 3.50.1.
-- Fully backward compatible public API.
+- No public API changes (no classes, methods, or parameter types changed).
 
 ---
 
