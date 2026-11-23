@@ -1,5 +1,5 @@
 import 'package:cristalyse/cristalyse.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Static demo data for positive/negative value chart
 const List<Map<String, dynamic>> _mixedDemoData = [
