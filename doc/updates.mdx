@@ -12,6 +12,31 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 23, 2026" description="v1.17.7">
+  **Authored by [@dmitriy-bty](https://github.com/dmitriy-bty)** - Thank you for this fix!
+
+  **Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+  ### 🐛 Single-Slice Pie & Donut Fix
+  
+  **Single-category charts now stay on screen!**
+  
+  **What was fixed:**
+  - **No more disappearing slices:** Pie and donut charts with a single category (100% of the total) no longer vanish once the enter animation completes.
+  - **Root Cause:** A full `2π` sweep made `Path.arcTo` draw nothing, so the lone slice collapsed to an empty path on the final animation frame.
+  - **Full-Circle Rendering:** Complete slices are now drawn as a filled circle (pie) or a proper ring (donut). Partial slices are unchanged.
+  
+  **Why this matters:**
+  - Charts filtered down to a single category, or datasets where one value makes up the whole total, now render reliably.
+  - Multi-slice pie and donut charts look exactly as before.
+  
+  **Quality Assurance:**
+  - New pixel-based regression tests for single-slice pie and donut charts.
+  - 299 tests pass — zero breaking changes.
+  - Fully backward compatible.
+  - Safe upgrade for all existing projects.
+</Update>
+
 <Update label="April 4, 2026" description="v1.17.6">
   ### 🐛 Tooltip Flickering Fix
   

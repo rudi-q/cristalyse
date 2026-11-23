@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.17.7 - 2026-11-23
+
+**Authored by [@dmitriy-bty](https://github.com/dmitriy-bty)** - Thank you for this fix! 👏
+
+**Reviewed and documented by maintainer [@rudi-q](https://github.com/rudi-q)**
+
+#### 🐛 Bug Fixes
+
+**Single-Slice Pie/Donut Fix:**
+- **Fixed single-slice charts vanishing after animation:** A pie or donut chart with only one category (100% of the total) rendered during the enter animation but disappeared the moment the animation finished.
+- **Root Cause:** At full progress the slice sweeps exactly `2π`, and `Path.arcTo` draws nothing for a full-circle sweep, so the slice path collapsed to an empty shape on the final frame.
+- **Full-Circle Rendering:** When a slice completes a full circle, it is now built from ovals instead — a filled circle for pies and an even-odd outer/inner ring for donuts. Partial slices keep the existing `arcTo` path, so multi-slice charts render exactly as before.
+
+**Quality Assurance:**
+- Added pixel-based regression tests for single-slice pie and donut charts.
+- 299 tests pass — zero breaking changes.
+- Fully backward compatible.
+
+---
+
 ## 1.17.6 - 2026-04-04
 
 #### 🐛 Bug Fixes
