@@ -12,6 +12,27 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 23, 2026" description="v1.18.0">
+  ### 🔧 Flutter 3.50 Compatibility
+  
+  **Ready for the Material split!**
+  
+  **What changed:**
+  - **No more deprecated Material import:** Flutter 3.50 deprecates `package:flutter/material.dart`. Cristalyse's library code now uses only `package:flutter/widgets.dart`, so your projects no longer inherit deprecation warnings from the package.
+  - **Pixel-identical charts:** Built-in themes, palettes, and default colors keep the exact same values.
+  - **No SDK bump:** The minimum supported Flutter version stays the same, and no `material_ui` dependency is needed.
+  
+  **Behavior notes:**
+  - Zoom buttons look and work the same but no longer show a tap ripple.
+  - Default colors are plain `Color` values, so they no longer compare equal (`==`) to `Colors.*` constants, though they look identical.
+  - Tooltips are no longer wrapped in a transparent `Material`. If a custom tooltip builder uses Material-only widgets like `ListTile` or `Chip`, wrap its content in a `Material` widget.
+  
+  **Quality Assurance:**
+  - 299 tests pass.
+  - Zero analyzer issues in library code on Flutter 3.50.
+  - Fully backward compatible public API.
+</Update>
+
 <Update label="November 23, 2026" description="v1.17.7">
   **Authored by [@dmitriy-bty](https://github.com/dmitriy-bty)** - Thank you for this fix!
 
