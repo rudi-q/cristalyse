@@ -24,7 +24,7 @@ Stay informed about the latest features, improvements, and fixes in Cristalyse.
   - **Tests & example app:** Migrated to `package:material_ui` and `package:cupertino_ui` (dev-only, no impact on your app). Running them requires Flutter 3.47+.
   
   **Behavior notes:**
-  - Zoom buttons look and work the same but no longer show a tap ripple.
+  - Zoom buttons look and work the same, including keyboard focus and Enter/Space activation, but show a focus ring instead of a tap ripple.
   - Default colors are plain `Color` values, so they no longer compare equal (`==`) to `Colors.*` constants, though they look identical.
   - Tooltips are no longer wrapped in a transparent `Material`. If a custom tooltip builder uses Material-only widgets like `ListTile` or `Chip`, wrap its content in a `Material` widget.
   
