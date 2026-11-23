@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 // Conditional imports for platform-specific implementations
 import 'chart_export_stub.dart'

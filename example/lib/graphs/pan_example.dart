@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:cristalyse/cristalyse.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 Widget buildPanExampleTab(ChartTheme theme, double sliderValue) {
   return _PanExampleWidget(theme: theme, sliderValue: sliderValue);

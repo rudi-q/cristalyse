@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Visual theme configuration for charts
 class ChartTheme {
@@ -43,32 +43,32 @@ class ChartTheme {
   /// Default light theme
   static ChartTheme defaultTheme() {
     return const ChartTheme(
-      backgroundColor: Colors.white,
-      plotBackgroundColor: Colors.white,
-      primaryColor: Colors.blue,
-      borderColor: Colors.grey,
+      backgroundColor: Color(0xFFFFFFFF),
+      plotBackgroundColor: Color(0xFFFFFFFF),
+      primaryColor: Color(0xFF2196F3),
+      borderColor: Color(0xFF9E9E9E),
       gridColor: Color(0xFFE0E0E0),
-      axisColor: Colors.black87,
+      axisColor: Color(0xDD000000),
       gridWidth: 0.5,
       axisWidth: 1.0,
       pointSizeDefault: 4.0,
       pointSizeMin: 2.0,
       pointSizeMax: 12.0,
       colorPalette: [
-        Colors.blue,
-        Colors.red,
-        Colors.green,
-        Colors.orange,
-        Colors.purple,
-        Colors.brown,
-        Colors.pink,
-        Colors.grey,
-        Colors.cyan,
-        Colors.lime,
+        Color(0xFF2196F3), // blue
+        Color(0xFFF44336), // red
+        Color(0xFF4CAF50), // green
+        Color(0xFFFF9800), // orange
+        Color(0xFF9C27B0), // purple
+        Color(0xFF795548), // brown
+        Color(0xFFE91E63), // pink
+        Color(0xFF9E9E9E), // grey
+        Color(0xFF00BCD4), // cyan
+        Color(0xFFCDDC39), // lime
       ],
       padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
-      axisTextStyle: TextStyle(fontSize: 12, color: Colors.black87),
-      axisLabelStyle: TextStyle(fontSize: 12, color: Colors.black87),
+      axisTextStyle: TextStyle(fontSize: 12, color: Color(0xDD000000)),
+      axisLabelStyle: TextStyle(fontSize: 12, color: Color(0xDD000000)),
     );
   }
 
@@ -77,30 +77,30 @@ class ChartTheme {
     return const ChartTheme(
       backgroundColor: Color(0xFF121212),
       plotBackgroundColor: Color(0xFF1E1E1E),
-      primaryColor: Colors.lightBlue,
-      borderColor: Colors.grey,
+      primaryColor: Color(0xFF03A9F4),
+      borderColor: Color(0xFF9E9E9E),
       gridColor: Color(0xFF404040),
-      axisColor: Colors.white70,
+      axisColor: Color(0xB3FFFFFF),
       gridWidth: 0.5,
       axisWidth: 1.0,
       pointSizeDefault: 4.0,
       pointSizeMin: 2.0,
       pointSizeMax: 12.0,
       colorPalette: [
-        Colors.lightBlue,
-        Colors.redAccent,
-        Colors.lightGreen,
-        Colors.orangeAccent,
-        Colors.purpleAccent,
-        Colors.brown,
-        Colors.pinkAccent,
-        Colors.grey,
-        Colors.cyanAccent,
-        Colors.limeAccent,
+        Color(0xFF03A9F4), // lightBlue
+        Color(0xFFFF5252), // redAccent
+        Color(0xFF8BC34A), // lightGreen
+        Color(0xFFFFAB40), // orangeAccent
+        Color(0xFFE040FB), // purpleAccent
+        Color(0xFF795548), // brown
+        Color(0xFFFF4081), // pinkAccent
+        Color(0xFF9E9E9E), // grey
+        Color(0xFF18FFFF), // cyanAccent
+        Color(0xFFEEFF41), // limeAccent
       ],
       padding: EdgeInsets.only(left: 8, right: 8, top: 16, bottom: 8),
-      axisTextStyle: TextStyle(fontSize: 12, color: Colors.white70),
-      axisLabelStyle: TextStyle(fontSize: 12, color: Colors.white70),
+      axisTextStyle: TextStyle(fontSize: 12, color: Color(0xB3FFFFFF)),
+      axisLabelStyle: TextStyle(fontSize: 12, color: Color(0xB3FFFFFF)),
     );
   }
 
