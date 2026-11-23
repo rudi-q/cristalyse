@@ -322,9 +322,16 @@ class OrdinalScale extends Scale {
     final count = (_domain.length / step).ceil();
     final result = List.generate(count, (i) => _domain[(i * step)]);
 
-    // Always include the last domain entry if not already present
+    // Always end on the last domain entry. If it falls less than one step
+    // after the previous label, the two labels would crowd or overlap, so the
+    // last entry replaces that label instead of being appended next to it.
     if (result.last != _domain.last) {
-      result.add(_domain.last);
+      final gapToLast = (_domain.length - 1) - (count - 1) * step;
+      if (gapToLast < step && result.length > 1) {
+        result[result.length - 1] = _domain.last;
+      } else {
+        result.add(_domain.last);
+      }
     }
     return result;
   }
