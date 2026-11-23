@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 /// Interaction configuration for charts
 class ChartInteraction {
@@ -40,7 +40,7 @@ class TooltipConfig {
     this.followPointer = true,
     this.padding = const EdgeInsets.all(8.0),
     this.backgroundColor = const Color(0xFF323232),
-    this.textColor = Colors.white,
+    this.textColor = const Color(0xFFFFFFFF),
     this.borderRadius = 4.0,
     this.shadow,
   });
@@ -239,7 +239,7 @@ class DefaultTooltips {
     return (DataPointInfo point) {
       return Text(
         point.getDisplayValue(column),
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: Color(0xFFFFFFFF)),
       );
     };
   }
@@ -257,7 +257,7 @@ class DefaultTooltips {
             padding: const EdgeInsets.symmetric(vertical: 1),
             child: Text(
               '${entry.value}: ${point.getDisplayValue(entry.key)}',
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: const TextStyle(color: Color(0xFFFFFFFF), fontSize: 12),
             ),
           );
         }).toList(),
@@ -279,7 +279,7 @@ class DefaultTooltips {
           Text(
             title,
             style: TextStyle(
-              color: accentColor ?? Colors.white,
+              color: accentColor ?? Color(0xFFFFFFFF),
               fontWeight: FontWeight.bold,
               fontSize: 14,
             ),
@@ -293,12 +293,13 @@ class DefaultTooltips {
                 children: [
                   Text(
                     '${entry.value}: ',
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    style:
+                        const TextStyle(color: Color(0xB3FFFFFF), fontSize: 12),
                   ),
                   Text(
                     point.getDisplayValue(entry.key),
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFFFFFFFF),
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),

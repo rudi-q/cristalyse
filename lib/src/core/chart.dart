@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../export/chart_export.dart';
 import '../interaction/chart_interactions.dart';

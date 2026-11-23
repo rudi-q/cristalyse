@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../core/geometry.dart';
 import '../core/legend.dart';
@@ -783,7 +783,7 @@ class LegendGenerator {
 
     return BubbleSizeGuide(
       title: bubbleGeometry.title!,
-      color: bubbleGeometry.color ?? Colors.grey,
+      color: bubbleGeometry.color ?? Color(0xFF9E9E9E),
       sizeScale: sizeScale,
     );
   }

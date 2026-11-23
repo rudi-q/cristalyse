@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'geometry.dart';
 import 'label_formatter.dart';
@@ -372,7 +372,7 @@ class ColorScale {
     }
 
     // Fall back to solid colors if available
-    if (values.isEmpty || colors.isEmpty) return Colors.blue;
+    if (values.isEmpty || colors.isEmpty) return Color(0xFF2196F3);
 
     final index = values.indexOf(value);
     return index >= 0 ? colors[index % colors.length] : colors[0];
@@ -458,7 +458,7 @@ class GradientColorScale extends Scale {
 
   GradientColorScale({
     List<double> domain = const [0, 1],
-    this.colors = const [Colors.blue, Colors.red],
+    this.colors = const [Color(0xFF2196F3), Color(0xFFF44336)],
     this.interpolate = true,
     super.limits,
     super.labelFormatter,
@@ -475,7 +475,7 @@ class GradientColorScale extends Scale {
 
   @override
   Color scale(dynamic value) {
-    if (colors.isEmpty) return Colors.grey;
+    if (colors.isEmpty) return Color(0xFF9E9E9E);
     if (colors.length == 1) return colors[0];
 
     // Normalize to get 0-1 value (clamped)

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import "package:universal_html/html.dart" as html;
 
 import '../widgets/animated_chart_widget.dart';
