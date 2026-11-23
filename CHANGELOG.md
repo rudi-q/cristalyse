@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.18.1 - 2026-11-23
+
+#### 🐛 Bug Fixes
+
+**Ordinal Axis Label Overlap Fix** (resolves [#101](https://github.com/rudi-q/cristalyse/issues/101)):
+- **Fixed overlapping last label:** When an ordinal (categorical) axis has more categories than fit, Cristalyse shows every nth label and always includes the last category. That last label could land right next to the previous one — e.g. "Nov" and "Dec" on a 12-month bar chart about 370 px wide — and the two overlapped.
+- **Smarter Last Label:** If the last category falls less than one step after the previous label, it now replaces that label instead of being added next to it. Labels are never closer than one step apart, and the axis still always starts on the first category and ends on the last.
+- **No Change When Labels Fit:** Axes with room for every category are unaffected.
+
+**Quality Assurance:**
+- New regression tests, including a sweep over 59 category counts and 31 axis widths.
+- 306 tests pass — zero breaking changes.
+- Fully backward compatible.
+
+---
+
 ## 1.18.0 - 2026-11-23
 
 > ### ⚠️ Action may be required: custom tooltips using Material widgets
