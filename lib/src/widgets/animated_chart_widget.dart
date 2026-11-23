@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 import '../core/geometry.dart';
 import '../core/legend.dart';
@@ -1360,7 +1361,7 @@ class _AnimatedCristalyseChartWidgetState
 
     final yCol = chartWidget.heatMapYColumn ?? chartWidget.yColumn;
     final axisLabelStyle = chartWidget.theme.axisLabelStyle ??
-        const TextStyle(color: Colors.black, fontSize: 12);
+        const TextStyle(color: Color(0xFF000000), fontSize: 12);
 
     final yValues = yCol != null
         ? chartWidget.data.map((d) => d[yCol]).where((v) => v != null).toSet()
@@ -1922,13 +1923,13 @@ class _AnimatedCristalyseChartWidgetState
           mainAxisSize: MainAxisSize.min,
           children: [
             _ZoomButton(
-              icon: Icons.add,
+              icon: _kZoomInIcon,
               onPressed: () => _handleZoomButtonPressed(true),
               theme: widget.theme,
             ),
             const SizedBox(height: 8),
             _ZoomButton(
-              icon: Icons.remove,
+              icon: _kZoomOutIcon,
               onPressed: () => _handleZoomButtonPressed(false),
               theme: widget.theme,
             ),
@@ -2011,7 +2012,12 @@ class _AnimatedCristalyseChartWidgetState
   }
 }
 
-class _ZoomButton extends StatelessWidget {
+// Same glyphs as Material's `Icons.add` and `Icons.remove`, referenced by code
+// point so the library doesn't need to import Material.
+const IconData _kZoomInIcon = IconData(0xe047, fontFamily: 'MaterialIcons');
+const IconData _kZoomOutIcon = IconData(0xe516, fontFamily: 'MaterialIcons');
+
+class _ZoomButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onPressed;
   final ChartTheme theme;
@@ -2023,17 +2029,59 @@ class _ZoomButton extends StatelessWidget {
   });
 
   @override
+  State<_ZoomButton> createState() => _ZoomButtonState();
+}
+
+class _ZoomButtonState extends State<_ZoomButton> {
+  // Keyboard activation keys, matching the defaults that Material's InkWell
+  // responds to. Declared here so they work even without a WidgetsApp.
+  static const Map<ShortcutActivator, Intent> _shortcuts = {
+    SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+    SingleActivator(LogicalKeyboardKey.numpadEnter): ActivateIntent(),
+    SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+  };
+
+  late final Map<Type, Action<Intent>> _actions = {
+    ActivateIntent: CallbackAction<ActivateIntent>(
+      onInvoke: (_) {
+        widget.onPressed();
+        return null;
+      },
+    ),
+  };
+
+  bool _showFocusHighlight = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Material(
-      color: theme.backgroundColor.withValues(alpha: 0.9),
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onPressed,
-        child: SizedBox(
-          width: 36,
-          height: 36,
-          child: Icon(icon, size: 18, color: theme.axisColor),
+    final theme = widget.theme;
+    return Semantics(
+      button: true,
+      onTap: widget.onPressed,
+      child: FocusableActionDetector(
+        shortcuts: _shortcuts,
+        actions: _actions,
+        mouseCursor: SystemMouseCursors.click,
+        onShowFocusHighlight: (value) {
+          if (value != _showFocusHighlight) {
+            setState(() => _showFocusHighlight = value);
+          }
+        },
+        child: GestureDetector(
+          onTap: widget.onPressed,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: theme.backgroundColor.withValues(alpha: 0.9),
+              shape: BoxShape.circle,
+              border: _showFocusHighlight
+                  ? Border.all(color: theme.axisColor, width: 2)
+                  : null,
+            ),
+            child: Icon(widget.icon, size: 18, color: theme.axisColor),
+          ),
         ),
       ),
     );

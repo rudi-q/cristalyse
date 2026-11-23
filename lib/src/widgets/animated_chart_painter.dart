@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../core/geometry.dart';
 import '../core/scale.dart';
@@ -178,7 +178,7 @@ class AnimatedChartPainter extends CustomPainter {
 
     // Pre-calculate maximum label dimensions for title spacing
     final axisLabelStyle = theme.axisLabelStyle ??
-        const TextStyle(color: Colors.black, fontSize: 12);
+        const TextStyle(color: Color(0xFF000000), fontSize: 12);
     final labelDimensions = _calculateMaxLabelDimensions(
       xScale: this.xScale,
       yScale: this.yScale,
@@ -643,14 +643,20 @@ class AnimatedChartPainter extends CustomPainter {
     Scale yScale,
     Scale? y2Scale,
   ) {
+    final drawVertical = theme.showVerticalGridLines;
+    final drawHorizontal = theme.showHorizontalGridLines;
+    if (!drawVertical && !drawHorizontal) return;
+
+    // Fade the grid in with the animation. Scale the grid color's own alpha
+    // rather than replacing it, so a transparent or semi-transparent gridColor
+    // stays transparent (replacing it turned Colors.transparent into black).
+    final fade = math.max(0.0, math.min(1.0, animationProgress * 0.5));
     final paint = Paint()
-      ..color = theme.gridColor.withAlpha(
-        (math.max(0.0, math.min(1.0, animationProgress * 0.5)) * 255).round(),
-      )
+      ..color = theme.gridColor.withValues(alpha: theme.gridColor.a * fade)
       ..strokeWidth = math.max(0.1, theme.gridWidth);
 
     // Vertical grid lines
-    final xTicks = xScale.getTicks();
+    final xTicks = drawVertical ? xScale.getTicks() : const <dynamic>[];
     for (final tick in xTicks) {
       double x;
       if (xScale is OrdinalScale) {
@@ -673,7 +679,7 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     // Horizontal grid lines (based on primary Y-axis)
-    final yTicks = yScale.getTicks();
+    final yTicks = drawHorizontal ? yScale.getTicks() : const <dynamic>[];
     for (final tick in yTicks) {
       double y;
       if (yScale is OrdinalScale) {
@@ -1534,7 +1540,7 @@ class AnimatedChartPainter extends CustomPainter {
 
         final textStyle = geometry.labelStyle ??
             TextStyle(
-              color: Colors.black,
+              color: Color(0xFF000000),
               fontSize: 10,
               fontWeight: FontWeight.bold,
             );
@@ -1566,7 +1572,7 @@ class AnimatedChartPainter extends CustomPainter {
         );
 
         final backgroundPaint = Paint()
-          ..color = Colors.white.withValues(alpha: 0.8 * bubbleProgress)
+          ..color = Color(0xFFFFFFFF).withValues(alpha: 0.8 * bubbleProgress)
           ..style = PaintingStyle.fill;
 
         canvas.drawRRect(
@@ -1959,7 +1965,7 @@ class AnimatedChartPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final axisLabelStyle = theme.axisLabelStyle ??
-        const TextStyle(color: Colors.black, fontSize: 12);
+        const TextStyle(color: Color(0xFF000000), fontSize: 12);
 
     // Draw horizontal axis (bottom)
     canvas.drawLine(
@@ -2276,7 +2282,7 @@ class AnimatedChartPainter extends CustomPainter {
       // Draw stroke if specified
       if (geometry.strokeWidth > 0) {
         final strokePaint = Paint()
-          ..color = geometry.strokeColor ?? Colors.white
+          ..color = geometry.strokeColor ?? Color(0xFFFFFFFF)
           ..style = PaintingStyle.stroke
           ..strokeWidth = geometry.strokeWidth;
         canvas.drawPath(path, strokePaint);
@@ -2344,7 +2350,7 @@ class AnimatedChartPainter extends CustomPainter {
     );
 
     final backgroundPaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.8)
+      ..color = Color(0xFFFFFFFF).withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
 
     canvas.drawRRect(
@@ -2532,11 +2538,10 @@ class AnimatedChartPainter extends CustomPainter {
 
           // Use black text for normalized values < 15%, otherwise use brightness-based logic
           final textColor = normalizedValue < 0.15
-              ? Colors.black
-              : (ThemeData.estimateBrightnessForColor(cellColor) ==
-                      Brightness.dark
-                  ? Colors.white
-                  : Colors.black);
+              ? Color(0xFF000000)
+              : (_estimateBrightnessForColor(cellColor) == Brightness.dark
+                  ? Color(0xFFFFFFFF)
+                  : Color(0xFF000000));
 
           final textStyle = geometry.valueTextStyle ??
               TextStyle(color: textColor, fontSize: 10);
@@ -2619,7 +2624,7 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     final axisLabelStyle = theme.axisLabelStyle ??
-        const TextStyle(color: Colors.black, fontSize: 12);
+        const TextStyle(color: Color(0xFF000000), fontSize: 12);
 
     // Draw X-axis labels (bottom)
     for (int xi = 0; xi < xValues.length; xi++) {
@@ -3845,7 +3850,7 @@ class AnimatedChartPainter extends CustomPainter {
     // Draw needle/indicator
     final needleAngle = startAngle + progressSweep;
     final needlePaint = Paint()
-      ..color = Colors.red
+      ..color = Color(0xFFF44336)
       ..strokeWidth = 2.0;
 
     final needleEnd = Offset(
@@ -3855,7 +3860,7 @@ class AnimatedChartPainter extends CustomPainter {
     canvas.drawLine(center, needleEnd, needlePaint);
 
     // Draw center dot
-    canvas.drawCircle(center, 3.0, Paint()..color = Colors.red);
+    canvas.drawCircle(center, 3.0, Paint()..color = Color(0xFFF44336));
 
     // Draw label for gauge
     if (geometry.showLabel && labelColumn != null) {
@@ -4077,4 +4082,15 @@ class _LabelDimensions {
     required this.maxYLabelWidth,
     required this.maxY2LabelWidth,
   });
+}
+
+/// Estimates whether [color] is light or dark, matching Material's
+/// `ThemeData.estimateBrightnessForColor` without importing Material.
+Brightness _estimateBrightnessForColor(Color color) {
+  final relativeLuminance = color.computeLuminance();
+  const kThreshold = 0.15;
+  if ((relativeLuminance + 0.05) * (relativeLuminance + 0.05) > kThreshold) {
+    return Brightness.light;
+  }
+  return Brightness.dark;
 }

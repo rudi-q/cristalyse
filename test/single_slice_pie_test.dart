@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 import 'package:cristalyse/src/core/geometry.dart';
 import 'package:cristalyse/src/themes/chart_theme.dart';
 import 'package:cristalyse/src/widgets/animated_chart_painter.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Regression coverage for the single-slice pie/donut bug: a chart with one
