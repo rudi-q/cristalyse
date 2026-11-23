@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import '../core/geometry.dart';
 import '../core/scale.dart';
@@ -258,7 +258,7 @@ class InteractionDetector {
       return geometry.color;
     }
 
-    return Colors.blue; // Default
+    return Color(0xFF2196F3); // Default
   }
 
   /// Convert numeric value from dynamic

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'chart_interactions.dart';
 
@@ -262,10 +262,7 @@ class _TooltipPositioned extends AnimatedWidget {
               opacity: fadeAnimation.value,
               child: Transform.scale(
                 scale: scaleAnimation.value,
-                child: Material(
-                  color: Colors.transparent,
-                  child: _TooltipContainer(config: config, child: this.child),
-                ),
+                child: _TooltipContainer(config: config, child: this.child),
               ),
             );
           },
@@ -293,12 +290,12 @@ class _TooltipContainer extends StatelessWidget {
             ? [config.shadow!]
             : [
                 const BoxShadow(
-                  color: Colors.black54,
+                  color: Color(0x8A000000),
                   blurRadius: 8.0,
                   offset: Offset(0, 2),
                 ),
               ],
-        border: Border.all(color: Colors.white24, width: 1),
+        border: Border.all(color: Color(0x3DFFFFFF), width: 1),
       ),
       constraints: const BoxConstraints(
         minWidth: 50,

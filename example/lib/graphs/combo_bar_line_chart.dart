@@ -1,5 +1,5 @@
 import 'package:cristalyse/cristalyse.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 Widget buildComboBarLineTab(ChartTheme currentTheme, double sliderValue) {
   // Data for the Combo Chart displaying Categorical mapping on Bars and fixed Line color
