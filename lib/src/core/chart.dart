@@ -1112,6 +1112,8 @@ extension ChartThemeExtension on ChartTheme {
     TextStyle? axisTextStyle,
     TextStyle? axisLabelStyle,
     Map<String, Gradient>? categoryGradients,
+    bool? showVerticalGridLines,
+    bool? showHorizontalGridLines,
   }) {
     return ChartTheme(
       backgroundColor: backgroundColor ?? this.backgroundColor,
@@ -1130,6 +1132,10 @@ extension ChartThemeExtension on ChartTheme {
       axisTextStyle: axisTextStyle ?? this.axisTextStyle,
       axisLabelStyle: axisLabelStyle ?? this.axisLabelStyle,
       categoryGradients: categoryGradients ?? this.categoryGradients,
+      showVerticalGridLines:
+          showVerticalGridLines ?? this.showVerticalGridLines,
+      showHorizontalGridLines:
+          showHorizontalGridLines ?? this.showHorizontalGridLines,
     );
   }
 

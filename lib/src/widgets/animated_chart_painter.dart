@@ -643,14 +643,20 @@ class AnimatedChartPainter extends CustomPainter {
     Scale yScale,
     Scale? y2Scale,
   ) {
+    final drawVertical = theme.showVerticalGridLines;
+    final drawHorizontal = theme.showHorizontalGridLines;
+    if (!drawVertical && !drawHorizontal) return;
+
+    // Fade the grid in with the animation. Scale the grid color's own alpha
+    // rather than replacing it, so a transparent or semi-transparent gridColor
+    // stays transparent (replacing it turned Colors.transparent into black).
+    final fade = math.max(0.0, math.min(1.0, animationProgress * 0.5));
     final paint = Paint()
-      ..color = theme.gridColor.withAlpha(
-        (math.max(0.0, math.min(1.0, animationProgress * 0.5)) * 255).round(),
-      )
+      ..color = theme.gridColor.withValues(alpha: theme.gridColor.a * fade)
       ..strokeWidth = math.max(0.1, theme.gridWidth);
 
     // Vertical grid lines
-    final xTicks = xScale.getTicks();
+    final xTicks = drawVertical ? xScale.getTicks() : const <dynamic>[];
     for (final tick in xTicks) {
       double x;
       if (xScale is OrdinalScale) {
@@ -673,7 +679,7 @@ class AnimatedChartPainter extends CustomPainter {
     }
 
     // Horizontal grid lines (based on primary Y-axis)
-    final yTicks = yScale.getTicks();
+    final yTicks = drawHorizontal ? yScale.getTicks() : const <dynamic>[];
     for (final tick in yTicks) {
       double y;
       if (yScale is OrdinalScale) {

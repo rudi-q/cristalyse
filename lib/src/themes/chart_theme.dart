@@ -21,6 +21,18 @@ class ChartTheme {
   /// Category-specific gradients for custom visual mapping
   final Map<String, Gradient>? categoryGradients;
 
+  /// Whether to draw vertical grid lines (one per horizontal-axis tick).
+  ///
+  /// Defaults to `true`. Set to `false` to hide them while keeping the
+  /// horizontal grid lines.
+  final bool showVerticalGridLines;
+
+  /// Whether to draw horizontal grid lines (one per vertical-axis tick).
+  ///
+  /// Defaults to `true`. Set to `false` to hide them while keeping the
+  /// vertical grid lines.
+  final bool showHorizontalGridLines;
+
   const ChartTheme({
     required this.backgroundColor,
     required this.plotBackgroundColor,
@@ -38,6 +50,8 @@ class ChartTheme {
     required this.axisTextStyle,
     this.axisLabelStyle,
     this.categoryGradients,
+    this.showVerticalGridLines = true,
+    this.showHorizontalGridLines = true,
   });
 
   /// Default light theme
