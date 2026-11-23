@@ -2200,7 +2200,27 @@ class AnimatedChartPainter extends CustomPainter {
 
       // Create slice path
       final path = Path();
-      if (innerRadius > 0) {
+      // Flutter's [Path.arcTo] draws nothing for a full 2*pi sweep, so a lone
+      // slice (one category at 100%) collapses to an empty path on the final
+      // animation frame and disappears. Build the shape from ovals instead
+      // once the sweep completes a full circle.
+      const fullCircle = 2 * math.pi;
+      if (animatedSweepAngle >= fullCircle) {
+        if (innerRadius > 0) {
+          // Full donut ring: outer circle with the inner circle punched out.
+          path.fillType = PathFillType.evenOdd;
+          path
+            ..addOval(Rect.fromCircle(center: sliceCenter, radius: outerRadius))
+            ..addOval(
+              Rect.fromCircle(center: sliceCenter, radius: innerRadius),
+            );
+        } else {
+          // Full pie: a complete circle.
+          path.addOval(
+            Rect.fromCircle(center: sliceCenter, radius: outerRadius),
+          );
+        }
+      } else if (innerRadius > 0) {
         // Donut chart - create proper donut slice path
         final outerStartX =
             sliceCenter.dx + math.cos(currentAngle) * outerRadius;
