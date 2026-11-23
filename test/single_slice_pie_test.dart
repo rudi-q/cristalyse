@@ -41,7 +41,10 @@ Future<int> _nonBackgroundPixelCount(CustomPainter painter, Size size) async {
   var nonBackground = 0;
   for (var i = 0; i < data.length; i += 4) {
     if (data[i + 3] == 0) continue; // ignore fully transparent pixels
-    if (data[i] == r && data[i + 1] == g && data[i + 2] == b && data[i + 3] == a) {
+    if (data[i] == r &&
+        data[i + 1] == g &&
+        data[i + 2] == b &&
+        data[i + 3] == a) {
       continue; // ignore background-coloured pixels
     }
     nonBackground++;
@@ -72,7 +75,8 @@ void main() {
         expect(
           drawn,
           greaterThan(3000),
-          reason: 'a single 100% pie slice must fill the disc at full animation '
+          reason:
+              'a single 100% pie slice must fill the disc at full animation '
               'progress, not collapse to an empty path',
         );
       });
@@ -87,7 +91,8 @@ void main() {
         expect(
           drawn,
           greaterThan(3000),
-          reason: 'a single 100% donut slice must fill the ring at full animation '
+          reason:
+              'a single 100% donut slice must fill the ring at full animation '
               'progress, not collapse to an empty path',
         );
       });
