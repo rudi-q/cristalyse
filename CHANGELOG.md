@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.19.0 - 2026-11-23
+
+#### ✨ New Features
+
+**Grid Line Visibility Controls** (resolves [#96](https://github.com/rudi-q/cristalyse/issues/96)):
+- **Hide grid lines per direction:** New `ChartTheme` options `showVerticalGridLines` and `showHorizontalGridLines` (both default to `true`) let you hide either set of grid lines — or both — without touching colors or widths.
+- **Works with `copyWith`:** Toggle them on any built-in or custom theme:
+
+```dart
+CristalyseChart()
+  .data(data)
+  .mapping(x: 'month', y: 'revenue')
+  .geomBar()
+  .theme(ChartTheme.defaultTheme().copyWith(
+    showHorizontalGridLines: false, // keep only vertical grid lines
+  ))
+  .build();
+```
+
+#### 🐛 Bug Fixes
+
+**Transparent Grid Color Fix:**
+- **`Colors.transparent` no longer renders black:** The grid's fade-in animation replaced the grid color's alpha instead of scaling it, so a transparent `gridColor` was drawn as semi-transparent black lines. Grid colors now keep their own transparency; opaque grid colors look exactly as before.
+
+**Quality Assurance:**
+- New pixel-based regression tests for each grid visibility combination and for transparent grid colors.
+- 312 tests pass — zero breaking changes.
+- Fully backward compatible: grid lines are shown by default, as before.
+
+---
+
 ## 1.18.1 - 2026-11-23
 
 #### 🐛 Bug Fixes

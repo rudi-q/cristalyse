@@ -1101,7 +1101,7 @@ chart
 
 ## 🧪 Development Status
 
-**Current Version: 1.18.1** - Production ready with fixed tooltips for interactive legends, bar chart positive/negative value styling, integer-only ticks, pinch/scroll wheel/button-based zoom, tick configuration, optional Y-axis titles in legends, boundary clamping, programmatic pan controller, interactive floating legends, and intelligent axis bounds
+**Current Version: 1.19.0** - Production ready with fixed tooltips for interactive legends, bar chart positive/negative value styling, integer-only ticks, pinch/scroll wheel/button-based zoom, tick configuration, optional Y-axis titles in legends, boundary clamping, programmatic pan controller, interactive floating legends, and intelligent axis bounds
 
 We're shipping progressively! Each release adds new visualization types while maintaining backward compatibility.
 
@@ -1133,6 +1133,7 @@ We're shipping progressively! Each release adds new visualization types while ma
 - ✅ **v1.16.0** - **Integer-only ticks** for continuous scales, ensuring clean integer values for count data
 - ✅ **v1.17.0** - **Bar chart positive/negative value styling** with smart rounded corners (`roundOutwardEdges`) and conditional colors (`positiveColor`/`negativeColor`) for financial charts and variance analysis
 - ✅ **v1.18.0** - **Material-free library code** for Flutter 3.50+, removing the deprecated `package:flutter/material.dart` import from the package with no change to rendering or the minimum supported Flutter version
+- ✅ **v1.19.0** - **Grid line visibility controls** with `showVerticalGridLines` and `showHorizontalGridLines` theme options to hide either or both sets of grid lines, plus correct rendering of transparent grid colors
 
 ## Support This Project
 

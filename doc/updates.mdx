@@ -12,6 +12,35 @@ seo:
 
 Stay informed about the latest features, improvements, and fixes in Cristalyse.
 
+<Update label="November 23, 2026" description="v1.19.0">
+  ### ✨ Grid Line Visibility Controls
+  
+  **Show only the grid lines you want!** (resolves [#96](https://github.com/rudi-q/cristalyse/issues/96))
+  
+  **What's new:**
+  - **Per-direction toggles:** New `ChartTheme` options `showVerticalGridLines` and `showHorizontalGridLines` (both default to `true`) hide either set of grid lines, or both.
+  - **Works with any theme** via `copyWith`:
+  
+  ```dart
+  CristalyseChart()
+    .data(data)
+    .mapping(x: 'month', y: 'revenue')
+    .geomBar()
+    .theme(ChartTheme.defaultTheme().copyWith(
+      showHorizontalGridLines: false, // keep only vertical grid lines
+    ))
+    .build();
+  ```
+  
+  **What was fixed:**
+  - **Transparent grid colors:** `gridColor: Colors.transparent` used to render as black lines because the grid's fade-in replaced the color's alpha. Grid colors now keep their own transparency, and opaque colors look exactly as before.
+  
+  **Quality Assurance:**
+  - New pixel-based tests for every grid visibility combination and for transparent grid colors.
+  - 312 tests pass — zero breaking changes.
+  - Fully backward compatible: grid lines are still shown by default.
+</Update>
+
 <Update label="November 23, 2026" description="v1.18.1">
   ### 🐛 Ordinal Axis Label Overlap Fix
   
