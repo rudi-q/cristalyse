@@ -20,7 +20,8 @@ Stay informed about the latest features, improvements, and fixes in Cristalyse.
   **What changed:**
   - **No more deprecated Material import:** Flutter 3.50 deprecates `package:flutter/material.dart`. Cristalyse's library code now uses only `package:flutter/widgets.dart`, so your projects no longer inherit deprecation warnings from the package.
   - **Pixel-identical charts:** Built-in themes, palettes, and default colors keep the exact same values.
-  - **No SDK bump:** The minimum supported Flutter version stays the same, and no `material_ui` dependency is needed.
+  - **No SDK bump:** The minimum supported Flutter version stays the same, and your app doesn't need `material_ui`.
+  - **Tests & example app:** Migrated to `package:material_ui` and `package:cupertino_ui` (dev-only, no impact on your app). Running them requires Flutter 3.47+.
   
   **Behavior notes:**
   - Zoom buttons look and work the same but no longer show a tap ripple.
@@ -29,7 +30,7 @@ Stay informed about the latest features, improvements, and fixes in Cristalyse.
   
   **Quality Assurance:**
   - 299 tests pass.
-  - Zero analyzer issues in library code on Flutter 3.50.
+  - Zero analyzer issues across the package on Flutter 3.50.
   - Fully backward compatible public API.
 </Update>
 
