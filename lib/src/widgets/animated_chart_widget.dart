@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../core/geometry.dart';
@@ -2016,7 +2017,7 @@ class _AnimatedCristalyseChartWidgetState
 const IconData _kZoomInIcon = IconData(0xe047, fontFamily: 'MaterialIcons');
 const IconData _kZoomOutIcon = IconData(0xe516, fontFamily: 'MaterialIcons');
 
-class _ZoomButton extends StatelessWidget {
+class _ZoomButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onPressed;
   final ChartTheme theme;
@@ -2028,13 +2029,46 @@ class _ZoomButton extends StatelessWidget {
   });
 
   @override
+  State<_ZoomButton> createState() => _ZoomButtonState();
+}
+
+class _ZoomButtonState extends State<_ZoomButton> {
+  // Keyboard activation keys, matching the defaults that Material's InkWell
+  // responds to. Declared here so they work even without a WidgetsApp.
+  static const Map<ShortcutActivator, Intent> _shortcuts = {
+    SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+    SingleActivator(LogicalKeyboardKey.numpadEnter): ActivateIntent(),
+    SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+  };
+
+  late final Map<Type, Action<Intent>> _actions = {
+    ActivateIntent: CallbackAction<ActivateIntent>(
+      onInvoke: (_) {
+        widget.onPressed();
+        return null;
+      },
+    ),
+  };
+
+  bool _showFocusHighlight = false;
+
+  @override
   Widget build(BuildContext context) {
+    final theme = widget.theme;
     return Semantics(
       button: true,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
+      onTap: widget.onPressed,
+      child: FocusableActionDetector(
+        shortcuts: _shortcuts,
+        actions: _actions,
+        mouseCursor: SystemMouseCursors.click,
+        onShowFocusHighlight: (value) {
+          if (value != _showFocusHighlight) {
+            setState(() => _showFocusHighlight = value);
+          }
+        },
         child: GestureDetector(
-          onTap: onPressed,
+          onTap: widget.onPressed,
           behavior: HitTestBehavior.opaque,
           child: Container(
             width: 36,
@@ -2042,8 +2076,11 @@ class _ZoomButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: theme.backgroundColor.withValues(alpha: 0.9),
               shape: BoxShape.circle,
+              border: _showFocusHighlight
+                  ? Border.all(color: theme.axisColor, width: 2)
+                  : null,
             ),
-            child: Icon(icon, size: 18, color: theme.axisColor),
+            child: Icon(widget.icon, size: 18, color: theme.axisColor),
           ),
         ),
       ),

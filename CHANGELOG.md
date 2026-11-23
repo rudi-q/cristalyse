@@ -11,7 +11,7 @@
 - **Tests & Example App:** The test suite and example app now import `package:material_ui` and `package:cupertino_ui`. `material_ui` is only a dev dependency, so this doesn't affect your app; running the tests or the example app requires Flutter 3.47+.
 
 **Behavior Notes:**
-- **Zoom buttons** are now built from plain widgets. They look and work the same, but no longer show an ink ripple when tapped.
+- **Zoom buttons** are now built from plain widgets. They look and work the same, including keyboard focus (Tab) and activation (Enter/Space), but show a focus ring instead of an ink ripple.
 - **Default colors** (for example `ChartTheme.defaultTheme().primaryColor`) are now plain `Color` values rather than `MaterialColor` swatches. They are visually identical but no longer compare equal (`==`) to `Colors.*` constants.
 - **Tooltips** are no longer wrapped in a transparent `Material`. Text styling is unchanged; custom tooltip builders that use Material-only widgets (such as `ListTile` or `Chip`) should wrap their content in a `Material` widget.
 
